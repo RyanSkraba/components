@@ -42,11 +42,11 @@ public class MockComponentProperties extends ComponentPropertiesImpl {
     }
 
     public ValidationResult validateTag() {
-        return new ValidationResult().setStatus(ValidationResult.Result.OK);
+        return new ValidationResult(ValidationResult.Result.OK);
     }
 
     public ValidationResult validateTagId() {
-        return new ValidationResult().setStatus(ValidationResult.Result.OK).setMessage("Everything is OK");
+        return new ValidationResult(ValidationResult.Result.OK, "Everything is OK");
     }
 
 }

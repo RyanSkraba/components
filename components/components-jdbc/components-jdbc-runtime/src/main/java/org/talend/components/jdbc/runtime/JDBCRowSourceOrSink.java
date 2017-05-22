@@ -30,6 +30,8 @@ import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.ValidationResultMutable;
 
 /**
  * JDBC row runtime execution object
@@ -55,23 +57,9 @@ public class JDBCRowSourceOrSink implements SourceOrSink {
         return ValidationResult.OK;
     }
 
-    protected static ValidationResult fillValidationResult(ValidationResult vr, Exception ex) {
-        if (vr == null) {
-            return null;
-        }
-
-        if (ex.getMessage() == null || ex.getMessage().isEmpty()) {
-            vr.setMessage(ex.toString());
-        } else {
-            vr.setMessage(ex.getMessage());
-        }
-        vr.setStatus(ValidationResult.Result.ERROR);
-        return vr;
-    }
-
     @Override
     public ValidationResult validate(RuntimeContainer runtime) {
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
 
         AllSetting setting = properties.getRuntimeSetting();
         String sql = setting.getSql();
@@ -103,7 +91,8 @@ public class JDBCRowSourceOrSink implements SourceOrSink {
             }
         } catch (Exception ex) {
             if (dieOnError) {
-                fillValidationResult(vr, ex);
+                vr.setStatus(Result.ERROR);
+                vr.setMessage(ex.getMessage());
             } else {
                 // should log it
             }

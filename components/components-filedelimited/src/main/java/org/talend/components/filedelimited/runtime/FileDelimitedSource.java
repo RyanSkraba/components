@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.filedelimited.FileDelimitedProperties;
-import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResultMutable;
 
 public class FileDelimitedSource extends FileSourceOrSink implements BoundedSource {
 
@@ -51,12 +51,12 @@ public class FileDelimitedSource extends FileSourceOrSink implements BoundedSour
 
     @Override
     public ValidationResult validate(RuntimeContainer container) {
-        ValidationResult vr = super.validate(container);
+        ValidationResultMutable vr = new ValidationResultMutable(super.validate(container));
         // also check that the properties is the right type
         if (vr.getStatus() != ValidationResult.Result.ERROR) {
             if (!(properties instanceof FileDelimitedProperties)) {
-                return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
-                        .setMessage("properties should be of type :" + FileDelimitedProperties.class.getCanonicalName());
+                return new ValidationResult(ValidationResult.Result.ERROR,
+                        "properties should be of type :" + FileDelimitedProperties.class.getCanonicalName());
             }
         }
         Object fileOrStream = ((FileDelimitedProperties) properties).fileName.getValue();

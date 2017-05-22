@@ -170,7 +170,7 @@ public class TSalesforceInputPropertiesIT {
 
         properties.module = salesforceModuleProperties;
 
-        ValidationResult.Result resultStatus = properties.validateGuessQuery().status;
+        ValidationResult.Result resultStatus = properties.validateGuessQuery().getStatus();
         String expectedMessage = properties.validateGuessQuery().getMessage();
 
         LOGGER.debug("validation result status: " + resultStatus);
@@ -204,7 +204,7 @@ public class TSalesforceInputPropertiesIT {
 
         properties.module = salesforceModuleProperties;
 
-        ValidationResult.Result resultStatus = properties.validateGuessQuery().status;
+        ValidationResult.Result resultStatus = properties.validateGuessQuery().getStatus();
         String expectedMessage = properties.validateGuessQuery().getMessage();
 
         LOGGER.debug("validation result status: " + resultStatus);

@@ -37,8 +37,8 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
         // also check that the properties is the right type
         if (validate.getStatus() != Result.ERROR) {
             if (!(properties instanceof SalesforceOutputProperties)) {
-                return new ValidationResult().setStatus(Result.ERROR)
-                        .setMessage("properties should be of type :" + SalesforceOutputProperties.class.getCanonicalName());
+                return new ValidationResult(Result.ERROR,
+                        "properties should be of type :" + SalesforceOutputProperties.class.getCanonicalName());
             } // else this is the right type
         } // else already an ERROR olready
         return validate;

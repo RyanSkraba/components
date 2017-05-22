@@ -41,11 +41,11 @@ public class FullExampleDatastoreProperties extends PropertiesImpl implements Da
     }
 
     public ValidationResult validateTag() {
-        return new ValidationResult().setStatus(ValidationResult.Result.OK);
+        return new ValidationResult();
     }
 
     public ValidationResult validateTagId() {
-        return new ValidationResult().setStatus(ValidationResult.Result.OK).setMessage("tagId is OK");
+        return new ValidationResult(ValidationResult.Result.OK, "tagId is OK");
     }
 
 }

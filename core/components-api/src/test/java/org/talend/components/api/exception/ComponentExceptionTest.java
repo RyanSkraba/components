@@ -46,13 +46,11 @@ public class ComponentExceptionTest {
         assertEquals(ComponentsApiErrorCode.WRONG_WIZARD_NAME, exception.getCode());
         assertEquals("message v2", exception.getCause().getMessage());
 
-        ValidationResult vr = new ValidationResult();
-        vr.setMessage("vr");
+        ValidationResult vr = new ValidationResult(ValidationResult.Result.ERROR, "vr");
         exception = new ComponentException(vr);
         assertTrue(vr == exception.getValidationResult());
 
-        ValidationResult vr2 = new ValidationResult();
-        vr2.setMessage("vr2");
+        ValidationResult vr2 = new ValidationResult(ValidationResult.Result.ERROR, "vr2");
         exception.setValidationResult(vr2);
         assertTrue(vr2 == exception.getValidationResult());
 

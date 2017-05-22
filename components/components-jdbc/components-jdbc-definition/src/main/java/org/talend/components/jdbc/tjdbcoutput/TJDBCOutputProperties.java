@@ -44,8 +44,7 @@ import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
-public class TJDBCOutputProperties extends FixedConnectorsComponentProperties
-        implements RuntimeSettingProvider {
+public class TJDBCOutputProperties extends FixedConnectorsComponentProperties implements RuntimeSettingProvider {
 
     public TJDBCOutputProperties(String name) {
         super(name);
@@ -240,7 +239,7 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties
             try {
                 schema = ss.getEndpointSchema(null, tableSelection.tablename.getValue());
             } catch (Exception e) {
-                return new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage(e.getCause().getMessage());
+                return new ValidationResult(ValidationResult.Result.ERROR, e.getCause().getMessage());
             }
             main.schema.setValue(schema);
             updateOutputSchemas();

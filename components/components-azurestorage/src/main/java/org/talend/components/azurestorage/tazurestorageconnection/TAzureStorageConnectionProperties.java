@@ -42,8 +42,7 @@ import org.talend.daikon.properties.service.Repository;
  * Class TAzureStorageConnectionProperties.
  */
 public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
-        implements
-            AzureStorageProvideConnectionProperties {
+        implements AzureStorageProvideConnectionProperties {
 
     private static final long serialVersionUID = 5588521568261191377L;
 
@@ -53,7 +52,7 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
     public static final String FORM_WIZARD = "Wizard";
 
     private String repositoryLocation;
-    
+
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(TAzureStorageConnectionProperties.class);
     //
@@ -80,8 +79,8 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
             "referencedComponent", TAzureStorageConnectionDefinition.COMPONENT_NAME);
 
     public PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
-    
-    public List<NamedThing> BlobSchema = null,QueueSchema = null,TableSchema = null;
+
+    public List<NamedThing> BlobSchema = null, QueueSchema = null, TableSchema = null;
 
     public TAzureStorageConnectionProperties(String name) {
         super(name);
@@ -159,15 +158,19 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
 
     public ValidationResult validateTestConnection() throws Exception {
         ValidationResult vr = AzureStorageSourceOrSink.validateConnection(this);
+        if (ValidationResult.Result.OK != vr.getStatus()) {
+            return vr;
+        }
+
         try {
             if (useSharedAccessSignature.getValue()) {
                 String[] SAS = sharedAccessSignature.getValue().split("&");
-                boolean allowedBlob = true,allowedQueue = true,allowedtable = true;
+                boolean allowedBlob = true, allowedQueue = true, allowedtable = true;
                 for (String string : SAS) {
                     if (string.startsWith("ss=")) {
-                        allowedBlob = string.contains("b")? true : false;
-                        allowedQueue = string.contains("q")? true : false;
-                        allowedtable = string.contains("t")? true : false;
+                        allowedBlob = string.contains("b") ? true : false;
+                        allowedQueue = string.contains("q") ? true : false;
+                        allowedtable = string.contains("t") ? true : false;
                         break;
                     }
                 }
@@ -186,23 +189,20 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
                 TableSchema = AzureStorageTableSourceOrSink.getSchemaNames(null, this);
             }
         } catch (Exception e) {
-            vr.setStatus(Result.ERROR);
-            String errorMessage = e.getLocalizedMessage()+'\n';
+            String errorMessage = e.getLocalizedMessage() + '\n';
             Throwable throwable = e.getCause();
-            while(throwable!=null){
-                errorMessage+=throwable.getLocalizedMessage()+'\n';
+            while (throwable != null) {
+                errorMessage += throwable.getLocalizedMessage() + '\n';
                 throwable = throwable.getCause();
             }
-            vr.setMessage(errorMessage);
-        }
-        if (vr.getStatus() == ValidationResult.Result.OK) {
-            vr.setMessage(i18nMessages.getMessage("message.success"));
-            getForm(FORM_WIZARD).setAllowForward(true);
-            getForm(FORM_WIZARD).setAllowFinish(true);
-        } else {
+
             getForm(FORM_WIZARD).setAllowForward(false);
+            return new ValidationResult(Result.ERROR, errorMessage);
         }
-        return vr;
+
+        getForm(FORM_WIZARD).setAllowForward(true);
+        getForm(FORM_WIZARD).setAllowFinish(true);
+        return new ValidationResult(Result.OK, i18nMessages.getMessage("message.success"));
     }
 
     public ValidationResult afterFormFinishWizard(Repository<Properties> repo) throws Exception {

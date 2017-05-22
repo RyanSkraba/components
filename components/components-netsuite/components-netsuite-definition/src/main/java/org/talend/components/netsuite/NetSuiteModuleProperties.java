@@ -35,8 +35,7 @@ import org.talend.daikon.properties.property.StringProperty;
 /**
  *
  */
-public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
-        implements NetSuiteProvideConnectionProperties {
+public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl implements NetSuiteProvideConnectionProperties {
 
     public final NetSuiteConnectionProperties connection;
 
@@ -68,7 +67,9 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
 
     public List<NamedThing> getRecordTypes() {
         return NetSuiteComponentDefinition.withDatasetRuntime(this, new Function<NetSuiteDatasetRuntime, List<NamedThing>>() {
-            @Override public List<NamedThing> apply(NetSuiteDatasetRuntime dataSetRuntime) {
+
+            @Override
+            public List<NamedThing> apply(NetSuiteDatasetRuntime dataSetRuntime) {
                 return dataSetRuntime.getRecordTypes();
             }
         });
@@ -76,7 +77,9 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
 
     public List<NamedThing> getSearchableTypes() {
         return NetSuiteComponentDefinition.withDatasetRuntime(this, new Function<NetSuiteDatasetRuntime, List<NamedThing>>() {
-            @Override public List<NamedThing> apply(NetSuiteDatasetRuntime dataSetRuntime) {
+
+            @Override
+            public List<NamedThing> apply(NetSuiteDatasetRuntime dataSetRuntime) {
                 return dataSetRuntime.getSearchableTypes();
             }
         });
@@ -84,7 +87,9 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
 
     public Schema getSchema(final String typeName) {
         return NetSuiteComponentDefinition.withDatasetRuntime(this, new Function<NetSuiteDatasetRuntime, Schema>() {
-            @Override public Schema apply(NetSuiteDatasetRuntime dataSetRuntime) {
+
+            @Override
+            public Schema apply(NetSuiteDatasetRuntime dataSetRuntime) {
                 return dataSetRuntime.getSchema(typeName);
             }
         });
@@ -92,7 +97,9 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
 
     public SearchInfo getSearchInfo(final String typeName) {
         return NetSuiteComponentDefinition.withDatasetRuntime(this, new Function<NetSuiteDatasetRuntime, SearchInfo>() {
-            @Override public SearchInfo apply(NetSuiteDatasetRuntime dataSetRuntime) {
+
+            @Override
+            public SearchInfo apply(NetSuiteDatasetRuntime dataSetRuntime) {
                 return dataSetRuntime.getSearchInfo(typeName);
             }
         });
@@ -106,7 +113,9 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
      */
     public Schema getSchemaForUpdate(final String typeName) {
         return NetSuiteComponentDefinition.withDatasetRuntime(this, new Function<NetSuiteDatasetRuntime, Schema>() {
-            @Override public Schema apply(NetSuiteDatasetRuntime dataSetRuntime) {
+
+            @Override
+            public Schema apply(NetSuiteDatasetRuntime dataSetRuntime) {
                 return dataSetRuntime.getSchemaForUpdate(typeName);
             }
         });
@@ -120,7 +129,9 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
      */
     public Schema getSchemaForDelete(final String typeName) {
         return NetSuiteComponentDefinition.withDatasetRuntime(this, new Function<NetSuiteDatasetRuntime, Schema>() {
-            @Override public Schema apply(NetSuiteDatasetRuntime dataSetRuntime) {
+
+            @Override
+            public Schema apply(NetSuiteDatasetRuntime dataSetRuntime) {
                 return dataSetRuntime.getSchemaForDelete(typeName);
             }
         });
@@ -128,7 +139,9 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
 
     public List<String> getSearchFieldOperators() {
         return withDatasetRuntime(this, new Function<NetSuiteDatasetRuntime, List<String>>() {
-            @Override public List<String> apply(NetSuiteDatasetRuntime dataSetRuntime) {
+
+            @Override
+            public List<String> apply(NetSuiteDatasetRuntime dataSetRuntime) {
                 return dataSetRuntime.getSearchFieldOperators();
             }
         });
@@ -136,9 +149,8 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
 
     protected void assertModuleName() {
         if (StringUtils.isEmpty(moduleName.getStringValue())) {
-            throw new ComponentException(new ValidationResult()
-                    .setStatus(ValidationResult.Result.ERROR)
-                    .setMessage(getI18nMessage("error.recordTypeNotSpecified")));
+            throw new ComponentException(
+                    new ValidationResult(ValidationResult.Result.ERROR, getI18nMessage("error.recordTypeNotSpecified")));
         }
     }
 

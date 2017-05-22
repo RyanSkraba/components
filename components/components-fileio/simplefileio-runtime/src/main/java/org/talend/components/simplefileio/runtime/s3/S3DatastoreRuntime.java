@@ -13,16 +13,16 @@
 
 package org.talend.components.simplefileio.runtime.s3;
 
-import com.talend.shaded.com.amazonaws.AmazonServiceException;
-import com.talend.shaded.com.amazonaws.services.s3.AmazonS3;
-import com.talend.shaded.com.amazonaws.services.s3.internal.Constants;
-import com.talend.shaded.com.amazonaws.services.s3.model.HeadBucketRequest;
+import java.util.Arrays;
+
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.datastore.runtime.DatastoreRuntime;
 import org.talend.components.simplefileio.s3.S3DatastoreProperties;
 import org.talend.daikon.properties.ValidationResult;
 
-import java.util.Arrays;
+import com.talend.shaded.com.amazonaws.AmazonServiceException;
+import com.talend.shaded.com.amazonaws.services.s3.AmazonS3;
+import com.talend.shaded.com.amazonaws.services.s3.internal.Constants;
 
 public class S3DatastoreRuntime implements DatastoreRuntime<S3DatastoreProperties> {
 
@@ -48,10 +48,7 @@ public class S3DatastoreRuntime implements DatastoreRuntime<S3DatastorePropertie
             }
             return Arrays.asList(ValidationResult.OK);
         } catch (Exception e) {
-            ValidationResult vr = new ValidationResult();
-            vr.setMessage(e.getMessage());
-            vr.setStatus(ValidationResult.Result.ERROR);
-            return Arrays.asList(vr);
+            return Arrays.asList(new ValidationResult(ValidationResult.Result.ERROR, e.getMessage()));
         }
     }
 

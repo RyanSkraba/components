@@ -38,6 +38,8 @@ import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.ValidationResultMutable;
 
 /**
  * common JDBC runtime execution object
@@ -75,29 +77,16 @@ public class JDBCSourceOrSink implements SourceOrSink {
         return ValidationResult.OK;
     }
 
-    private static ValidationResult fillValidationResult(ValidationResult vr, Exception ex) {
-        if (vr == null) {
-            return null;
-        }
-
-        if (ex.getMessage() == null || ex.getMessage().isEmpty()) {
-            vr.setMessage(ex.toString());
-        } else {
-            vr.setMessage(ex.getMessage());
-        }
-        vr.setStatus(ValidationResult.Result.ERROR);
-        return vr;
-    }
-
     @Override
     public ValidationResult validate(RuntimeContainer runtime) {
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         // TODO The connection should not be maintained just for validation. But as it is store in the runtime context, could not
         // close it here.
         try {
             conn = connect(runtime);
         } catch (Exception ex) {
-            fillValidationResult(vr, ex);
+            vr.setStatus(Result.ERROR);
+            vr.setMessage(ex.getMessage());
         }
         return vr;
     }
@@ -112,7 +101,7 @@ public class JDBCSourceOrSink implements SourceOrSink {
                 result.add(new SimpleNamedThing(tablename, tablename));
             }
         } catch (Exception e) {
-            throw new ComponentException(fillValidationResult(new ValidationResult(), e));
+            throw new ComponentException(new ValidationResult(Result.ERROR, e.getMessage()));
         }
         return result;
     }

@@ -46,8 +46,8 @@ public class FileSourceOrSink implements SourceOrSink {
     @Override
     public ValidationResult validate(RuntimeContainer adaptor) {
         if (!(properties instanceof FileDelimitedProperties)) {
-            return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
-                    .setMessage("properties should be of type :" + FileDelimitedProperties.class.getCanonicalName());
+            return new ValidationResult(ValidationResult.Result.ERROR,
+                    "properties should be of type :" + FileDelimitedProperties.class.getCanonicalName());
         }
         return ValidationResult.OK;
     }

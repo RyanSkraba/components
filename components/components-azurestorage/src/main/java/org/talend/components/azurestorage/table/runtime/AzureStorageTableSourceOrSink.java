@@ -68,16 +68,10 @@ public class AzureStorageTableSourceOrSink extends AzureStorageSourceOrSink impl
         AzureStorageTableProperties p = (AzureStorageTableProperties) properties;
         String tn = p.tableName.getValue();
         if (tn.isEmpty()) {
-            vr = new ValidationResult();
-            vr.setStatus(ValidationResult.Result.ERROR);
-            vr.setMessage(i18nMessages.getMessage("message.VacantName"));
-            return vr;
+            return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("message.VacantName"));
         }
         if (!tableCheckNamePattern.matcher(tn).matches()) {
-            vr = new ValidationResult();
-            vr.setStatus(ValidationResult.Result.ERROR);
-            vr.setMessage(i18nMessages.getMessage("message.IncorrectName"));
-            return vr;
+            return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("message.IncorrectName"));
         }
 
         return ValidationResult.OK;

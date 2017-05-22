@@ -67,10 +67,7 @@ public class AzureStorageSourceOrSink extends AzureStorageRuntime implements Sou
             sos.initialize(null, (ComponentProperties) properties);
             sos.getStorageAccount(null);
         } catch (InvalidKeyException | URISyntaxException e) {
-            ValidationResult vr = new ValidationResult();
-            vr.setStatus(Result.ERROR);
-            vr.setMessage(e.getLocalizedMessage());
-            return vr;
+            return new ValidationResult(Result.ERROR, e.getLocalizedMessage());
         }
 
         return ValidationResult.OK;

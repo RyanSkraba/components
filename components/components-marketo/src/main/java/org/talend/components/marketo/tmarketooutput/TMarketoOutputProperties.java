@@ -44,6 +44,7 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -281,7 +282,7 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
             case deleteCustomObjects:
             case syncCompanies:
             case deleteCompanies:
-                ValidationResult vr = new ValidationResult();
+                ValidationResultMutable vr = new ValidationResultMutable();
                 vr.setStatus(Result.ERROR);
                 vr.setMessage(messages.getMessage("validation.error.operation.soap"));
                 return vr;

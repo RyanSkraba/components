@@ -74,45 +74,28 @@ public class AzureStorageQueueSourceOrSink extends AzureStorageSourceOrSink impl
         if (properties instanceof AzureStorageQueueProperties) {
             String q = ((AzureStorageQueueProperties) properties).queueName.getValue();
             if (q.isEmpty()) {
-                vr = new ValidationResult();
-                vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage(i18nMessages.getMessage("error.NameEmpty"));
-                return vr;
+                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("error.NameEmpty"));
+
             }
             if (q.length() < 3 || q.length() > 63) {
-                vr = new ValidationResult();
-                vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage(i18nMessages.getMessage("error.LengthError"));
-                return vr;
+                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("error.LengthError"));
             }
             if (q.indexOf("--") > -1) {
-                vr = new ValidationResult();
-                vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage(i18nMessages.getMessage("error.TwoDashError"));
-                return vr;
+                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("error.TwoDashError"));
             }
 
             if (!queueCheckNamePattern.matcher(q.replaceAll("-", "")).matches()) {
-                vr = new ValidationResult();
-                vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage(i18nMessages.getMessage("error.QueueNameError"));
-                return vr;
+                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("error.QueueNameError"));
             }
         }
         if (properties instanceof TAzureStorageQueueInputProperties) {
             int nom = ((TAzureStorageQueueInputProperties) properties).numberOfMessages.getValue();
             if (nom < 1 || nom > 32) {
-                vr = new ValidationResult();
-                vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage(i18nMessages.getMessage("error.ParameterLengthError"));
-                return vr;
+                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("error.ParameterLengthError"));
             }
             int vtimeout = ((TAzureStorageQueueInputProperties) properties).visibilityTimeoutInSeconds.getValue();
             if (vtimeout < 0) {
-                vr = new ValidationResult();
-                vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage(i18nMessages.getMessage("error.ParameterValueError"));
-                return vr;
+                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("error.ParameterValueError"));
             }
 
         }

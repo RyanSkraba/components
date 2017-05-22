@@ -44,6 +44,7 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.ValidationResultMutable;
 
 public class SnowflakeSourceOrSink implements SourceOrSink {
 
@@ -71,21 +72,21 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
         try {
             connect(container);
         } catch (IllegalArgumentException e) {
-            ValidationResult vr = new ValidationResult();
+            ValidationResultMutable vr = new ValidationResultMutable();
             vr.setMessage(e.getMessage().concat(SnowflakeConstants.INCORRECT_SNOWFLAKE_ACCOUNT_MESSAGE));
             vr.setStatus(ValidationResult.Result.ERROR);
             return vr;
         } catch (Exception ex) {
             return exceptionToValidationResult(ex);
         }
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         vr.setStatus(Result.OK);
         vr.setMessage(SnowflakeConstants.CONNECTION_SUCCESSFUL_MESSAGE);
         return vr;
     }
 
     public static ValidationResult exceptionToValidationResult(Exception ex) {
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         vr.setMessage(ex.getMessage());
         vr.setStatus(ValidationResult.Result.ERROR);
         return vr;
@@ -101,7 +102,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
         } catch (Exception ex) {
             return exceptionToValidationResult(ex);
         }
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         vr.setStatus(Result.OK);
         vr.setMessage(SnowflakeConstants.CONNECTION_SUCCESSFUL_MESSAGE);
         return vr;

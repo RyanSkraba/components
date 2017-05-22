@@ -23,6 +23,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.multiruntime.MultiRuntimeComponentProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.test.MyClass1;
 
 /**
@@ -59,7 +60,7 @@ public class MultiRuntimeComponentSource implements BoundedSource {
 
     @Override
     public ValidationResult validate(RuntimeContainer adaptor) {
-        return ValidationResult.OK.setMessage(MyClass1.showMe());
+        return new ValidationResult(Result.OK, MyClass1.showMe());
     }
 
     @Override

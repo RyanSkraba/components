@@ -44,8 +44,7 @@ import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
-public class TJDBCInputProperties extends FixedConnectorsComponentProperties
-        implements RuntimeSettingProvider {
+public class TJDBCInputProperties extends FixedConnectorsComponentProperties implements RuntimeSettingProvider {
 
     static final Logger LOG = LoggerFactory.getLogger(TJDBCInputProperties.class);
 
@@ -180,7 +179,7 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties
                 main.schema.setValue(schema);
             } catch (Exception e) {
                 LOG.error("failed to retrieve the schema :", e);
-                return new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage(e.getCause().getMessage());
+                return new ValidationResult(ValidationResult.Result.ERROR, e.getCause().getMessage());
             }
         }
         return ValidationResult.OK;
@@ -190,11 +189,10 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties
         String tablename = tableSelection.tablename.getValue();
         Schema schema = main.schema.getValue();
         if (tablename == null || tablename.isEmpty()) {
-            return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
-                    .setMessage("Please set the table name before it");
+            return new ValidationResult(ValidationResult.Result.ERROR, "Please set the table name before it");
         }
         if (schema == null || schema.getFields().isEmpty()) {
-            return new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage("Please set the schema before it");
+            return new ValidationResult(ValidationResult.Result.ERROR, "Please set the schema before it");
         }
         String query = JDBCSQLBuilder.getInstance().generateSQL4SelectTable(tablename, schema);
         sql.setValue("\"" + query + "\"");

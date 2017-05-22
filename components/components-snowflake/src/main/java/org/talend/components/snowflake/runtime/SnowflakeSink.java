@@ -42,7 +42,7 @@ public class SnowflakeSink extends SnowflakeSourceOrSink implements Sink {
         // also check that the properties is the right type
         if (validate.getStatus() != Result.ERROR) {
             if (!(properties instanceof TSnowflakeOutputProperties)) {
-                return new ValidationResult().setStatus(Result.ERROR).setMessage(i18nMessages
+                return new ValidationResult(Result.ERROR, i18nMessages
                         .getMessage("debug.wrongPropertiesType", TSnowflakeOutputProperties.class.getCanonicalName()));
             } // else this is the right type
         } // else already an ERROR

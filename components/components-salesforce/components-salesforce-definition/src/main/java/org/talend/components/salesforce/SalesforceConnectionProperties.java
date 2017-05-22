@@ -27,6 +27,7 @@ import org.talend.components.salesforce.common.SalesforceRuntimeSourceOrSink;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -185,7 +186,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
                 classLoader)) {
             SalesforceRuntimeSourceOrSink ss = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
             ss.initialize(null, this);
-            ValidationResult vr = ss.validate(null);
+            ValidationResultMutable vr = new ValidationResultMutable(ss.validate(null));
             if (vr.getStatus() == ValidationResult.Result.OK) {
                 vr.setMessage("Connection successful");
                 getForm(FORM_WIZARD).setAllowForward(true);

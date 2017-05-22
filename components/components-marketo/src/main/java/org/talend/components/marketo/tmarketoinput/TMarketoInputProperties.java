@@ -53,6 +53,7 @@ import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -635,7 +636,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
             case Company:
             case Opportunity:
             case OpportunityRole:
-                ValidationResult vr = new ValidationResult();
+                ValidationResultMutable vr = new ValidationResultMutable();
                 vr.setStatus(Result.ERROR);
                 vr.setMessage(messages.getMessage("error.validation.customobjects.nosoap"));
                 return vr;
@@ -651,26 +652,28 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
         // DependenciesReader.computeDependenciesFilePath(MAVEN_GROUP_ID, MAVEN_RUNTIME_ARTIFACT_ID),
         // RUNTIME_SOURCEORSINK_CLASS), connection.getClass().getClassLoader())) {
         // MarketoSourceOrSinkSchemaProvider sos = (MarketoSourceOrSinkSchemaProvider) sandboxedInstance.getInstance();
+
+        ValidationResultMutable vrm = new ValidationResultMutable(vr);
         try {
             MarketoSourceOrSink sos = new MarketoSourceOrSink();
             sos.initialize(null, this);
             Schema schema = sos.getSchemaForCustomObject(customObjectName.getValue());
             if (schema == null) {
-                vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages.getMessage(
+                vrm.setStatus(ValidationResult.Result.ERROR).setMessage(messages.getMessage(
                         "error.validation.customobjects.fetchcustomobjectschema", customObjectName.getValue(), "NULL"));
-                return vr;
+                return vrm;
             }
             schemaInput.schema.setValue(schema);
-            vr.setStatus(ValidationResult.Result.OK);
+            vrm.setStatus(ValidationResult.Result.OK);
         } catch (RuntimeException | IOException e) {
-            vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages.getMessage(
+            vrm.setStatus(ValidationResult.Result.ERROR).setMessage(messages.getMessage(
                     "error.validation.customobjects.fetchcustomobjectschema", customObjectName.getValue(), e.getMessage()));
         }
         return vr;
     }
 
     public ValidationResult validateFetchCompoundKey() {
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         try {
             MarketoSourceOrSink sos = new MarketoSourceOrSink();
             sos.initialize(null, this);

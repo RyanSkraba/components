@@ -15,6 +15,7 @@ package org.talend.components.netsuite.util;
 
 import org.talend.components.api.exception.ComponentException;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 
 /**
  *
@@ -27,9 +28,7 @@ public abstract class ComponentExceptions {
             vr = ((ComponentException) ex).getValidationResult();
         }
         if (vr == null) {
-            vr = new ValidationResult();
-            vr.setMessage(ex.getMessage());
-            vr.setStatus(ValidationResult.Result.ERROR);
+            vr = new ValidationResult(Result.ERROR, ex.getMessage());
         }
         return vr;
     }

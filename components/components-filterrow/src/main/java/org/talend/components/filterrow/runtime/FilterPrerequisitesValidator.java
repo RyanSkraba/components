@@ -32,22 +32,21 @@ public class FilterPrerequisitesValidator {
         if (fieldType == Schema.Type.STRING) {
             Collection<OperatorType> possibleOperators = ProcessingHelper.getPossibleOperatorTypesByFunctionType(functionType);
             if (!possibleOperators.contains(operatorType)) {
-                return new ValidationResult().setStatus(Result.ERROR)
-                        .setMessage(MessageFormat.format("Possible operators for {0} are {1}", functionType, possibleOperators));
+                return new ValidationResult(Result.ERROR,
+                        MessageFormat.format("Possible operators for {0} are {1}", functionType, possibleOperators));
             }
             if (functionType == FunctionType.LENGTH && !(predefinedValue instanceof Number)) {
-                return new ValidationResult().setStatus(Result.ERROR)
-                        .setMessage(MessageFormat.format("Predefined value for {0} must be numeric", functionType));
+                return new ValidationResult(Result.ERROR,
+                        MessageFormat.format("Predefined value for {0} must be numeric", functionType));
             }
         } else {
             if (functionType != FunctionType.EMPTY) {
-                return new ValidationResult().setStatus(Result.ERROR)
-                        .setMessage(MessageFormat.format("Function for this field type can be only {0}", FunctionType.EMPTY));
+                return new ValidationResult(Result.ERROR,
+                        MessageFormat.format("Function for this field type can be only {0}", FunctionType.EMPTY));
             }
             if (ProcessingHelper.getComparableOperatorTypes().contains(functionType)
                     && !(predefinedValue instanceof Comparable)) {
-                return new ValidationResult().setStatus(Result.ERROR)
-                        .setMessage("Predefined value for this operator must be Comparable");
+                return new ValidationResult(Result.ERROR, "Predefined value for this operator must be Comparable");
             }
         }
         return ValidationResult.OK;

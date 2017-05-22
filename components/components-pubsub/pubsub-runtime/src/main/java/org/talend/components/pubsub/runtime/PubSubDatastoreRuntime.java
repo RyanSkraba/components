@@ -41,7 +41,7 @@ public class PubSubDatastoreRuntime implements DatastoreRuntime<PubSubDatastoreP
             return Arrays.asList(ValidationResult.OK);
         } catch (Exception pubsubException) {
             return Arrays.asList(
-                    new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage(pubsubException.getMessage()));
+                    new ValidationResult(ValidationResult.Result.ERROR, pubsubException.getMessage()));
         }
 
     }

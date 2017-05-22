@@ -27,14 +27,14 @@ public class KafkaDatastoreRuntime implements DatastoreRuntime<KafkaDatastorePro
     public Iterable<ValidationResult> doHealthChecks(RuntimeContainer container) {
         String bootstraps = datastore.brokers.getValue();
         if (bootstraps == null || "".equals(bootstraps)) {
-            return Arrays.asList(new ValidationResult().setStatus(ValidationResult.Result.ERROR)
-                    .setMessage("Bootstrap server urls should not be empty"));
+            return Arrays
+                    .asList(new ValidationResult(ValidationResult.Result.ERROR, "Bootstrap server urls should not be empty"));
         }
         try {
             KafkaConnection.createConsumer(datastore).listTopics();
         } catch (Throwable exception) {
             return Arrays
-                    .asList(new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage(exception.getMessage()));
+                    .asList(new ValidationResult(ValidationResult.Result.ERROR, exception.getMessage()));
         }
         return Arrays.asList(ValidationResult.OK);
     }

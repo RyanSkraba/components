@@ -15,7 +15,6 @@ package org.talend.components.azurestorage.blob.runtime;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
@@ -77,7 +76,7 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
         if (errorMessage.isEmpty()) { // everything is OK.
             return ValidationResult.OK;
         } else {
-            return createValidationResult(ValidationResult.Result.ERROR, errorMessage);
+            return new ValidationResult(ValidationResult.Result.ERROR, errorMessage);
         }
     }
 

@@ -37,9 +37,8 @@ public class NameMappingTable extends ComponentPropertiesImpl {
     public Property<List<String>> schemaColumnName = newProperty(LIST_STRING_TYPE, "schemaColumnName"); //$NON-NLS-1$
 
     public Property<List<String>> entityPropertyName = newProperty(LIST_STRING_TYPE, "entityPropertyName"); //$NON-NLS-1$
-    
-    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
-            .getI18nMessages(NameMappingTable.class);
+
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider().getI18nMessages(NameMappingTable.class);
 
     public NameMappingTable(String name) {
         super(name);
@@ -83,10 +82,7 @@ public class NameMappingTable extends ComponentPropertiesImpl {
             String v = entityPropertyName.getValue().get(idx);
             mappingOk = mappingOk && (k != null && !k.isEmpty() && v != null && !v.isEmpty());
             if (!mappingOk) {
-                ValidationResult vr = new ValidationResult();
-                vr.setStatus(Result.ERROR);
-                vr.setMessage(i18nMessages.getMessage("error.MissSchemaName"));
-                return vr;
+                return new ValidationResult(Result.ERROR, i18nMessages.getMessage("error.MissSchemaName"));
             }
         }
 

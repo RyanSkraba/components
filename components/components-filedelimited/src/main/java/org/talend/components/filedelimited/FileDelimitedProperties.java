@@ -37,6 +37,7 @@ import org.talend.components.filedelimited.runtime.FileDelimitedSource;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -220,7 +221,7 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
     }
 
     public ValidationResult validatePreview() {
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         try {
             if (!StringUtils.isEmpty(fileName.getStringValue())) {
                 File file = new File(fileName.getStringValue());

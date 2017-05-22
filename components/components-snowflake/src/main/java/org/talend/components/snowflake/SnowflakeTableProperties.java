@@ -12,20 +12,21 @@
 // ============================================================================
 package org.talend.components.snowflake;
 
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newString;
+
+import java.util.List;
+
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.snowflake.runtime.SnowflakeSourceOrSink;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.StringProperty;
-
-import java.util.List;
-
-import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 public class SnowflakeTableProperties extends ComponentPropertiesImpl implements SnowflakeProvideConnectionProperties {
 
@@ -75,7 +76,7 @@ public class SnowflakeTableProperties extends ComponentPropertiesImpl implements
     }
 
     public ValidationResult beforeTableName() throws Exception {
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         try {
             List<NamedThing> tableNames = SnowflakeSourceOrSink.getSchemaNames(null, connection);
             tableName.setPossibleNamedThingValues(tableNames);
@@ -87,7 +88,7 @@ public class SnowflakeTableProperties extends ComponentPropertiesImpl implements
     }
 
     public ValidationResult afterTableName() throws Exception {
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         try {
             main.schema.setValue(SnowflakeSourceOrSink.getSchema(null, connection, tableName.getStringValue()));
         } catch (Exception ex) {

@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc.wizard;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.jdbc.CommonUtils;
@@ -65,7 +65,7 @@ public class JDBCConnectionWizardProperties extends ComponentPropertiesImpl impl
             sourceOrSink.initialize(null, this);
             ValidationResult vr = sourceOrSink.validate(null);
             if (vr.getStatus() == ValidationResult.Result.OK) {
-                vr.setMessage("Connection successful");
+                vr = new ValidationResult(ValidationResult.Result.OK, "Connection successful");
                 getForm(Form.MAIN).setAllowForward(true);
             } else {
                 getForm(Form.MAIN).setAllowForward(false);

@@ -30,23 +30,19 @@ public class ComponentExceptionsTest {
 
     @Test
     public void testExceptionToValidationResult() {
-        ValidationResult result1 = ComponentExceptions.exceptionToValidationResult(
-                new WebServiceException("TEST"));
+        ValidationResult result1 = ComponentExceptions.exceptionToValidationResult(new WebServiceException("TEST"));
         assertNotNull(result1);
         assertEquals(ValidationResult.Result.ERROR, result1.getStatus());
         assertEquals("TEST", result1.getMessage());
 
         ValidationResult result2 = ComponentExceptions.exceptionToValidationResult(
-                new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION,
-                        new WebServiceException("TEST")));
+                new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, new WebServiceException("TEST")));
         assertNotNull(result2);
         assertEquals(ValidationResult.Result.ERROR, result2.getStatus());
         assertEquals(CommonErrorCodes.UNEXPECTED_EXCEPTION.name(), result2.getMessage());
 
-        ValidationResult controlResult = new ValidationResult()
-                .setStatus(ValidationResult.Result.ERROR).setMessage("TEST");
-        ValidationResult result3 = ComponentExceptions.exceptionToValidationResult(
-                new ComponentException(controlResult));
+        ValidationResult controlResult = new ValidationResult(ValidationResult.Result.ERROR, "TEST");
+        ValidationResult result3 = ComponentExceptions.exceptionToValidationResult(new ComponentException(controlResult));
         assertEquals(controlResult, result3);
     }
 }

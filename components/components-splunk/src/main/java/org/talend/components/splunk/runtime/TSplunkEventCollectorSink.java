@@ -54,16 +54,15 @@ public class TSplunkEventCollectorSink implements Sink {
         TSplunkEventCollectorProperties props = (TSplunkEventCollectorProperties) properties;
         this.serverUrl = props.fullUrl.getStringValue();
         if (this.serverUrl.isEmpty()) {
-            return new ValidationResult().setStatus(Result.ERROR).setMessage("Server url should not be empty.");
+            return new ValidationResult(Result.ERROR, "Server url should not be empty.");
         }
         this.token = props.token.getStringValue();
         if (this.token.isEmpty()) {
-            return new ValidationResult().setStatus(Result.ERROR).setMessage("Token should not be empty.");
+            return new ValidationResult(Result.ERROR, "Token should not be empty.");
         }
         this.eventsBatchSize = props.getBatchSize();
         if (this.eventsBatchSize <= 0) {
-            return new ValidationResult().setStatus(Result.ERROR)
-                    .setMessage("Events batch size cannot be less or equal to zero.");
+            return new ValidationResult(Result.ERROR, "Events batch size cannot be less or equal to zero.");
         }
         this.schema = props.getSchema();
         return ValidationResult.OK;
@@ -73,11 +72,11 @@ public class TSplunkEventCollectorSink implements Sink {
     public ValidationResult validate(RuntimeContainer container) {
         if (serverUrl == null || serverUrl.trim().isEmpty()) {
             LOGGER.debug("Server URL is empty.");
-            return new ValidationResult().setStatus(Result.ERROR).setMessage(getMessage("message.serverUrlCannotBeEmpty"));
+            return new ValidationResult(Result.ERROR, getMessage("message.serverUrlCannotBeEmpty"));
         }
         if (token == null || token.trim().isEmpty()) {
             LOGGER.debug("Splunk Authorization Token is empty.");
-            return new ValidationResult().setStatus(Result.ERROR).setMessage(getMessage("message.tokenCannotBeEmpty"));
+            return new ValidationResult(Result.ERROR, getMessage("message.tokenCannotBeEmpty"));
         }
         return ValidationResult.OK;
     }

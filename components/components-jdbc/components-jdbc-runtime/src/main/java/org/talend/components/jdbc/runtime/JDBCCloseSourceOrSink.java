@@ -24,6 +24,8 @@ import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.ValidationResultMutable;
 
 /**
  * JDBC close runtime execution object
@@ -41,22 +43,14 @@ public class JDBCCloseSourceOrSink implements SourceOrSink {
         return ValidationResult.OK;
     }
 
-    private static ValidationResult fillValidationResult(ValidationResult vr, Exception ex) {
-        if (vr == null) {
-            return null;
-        }
-        vr.setMessage(ex.getMessage());
-        vr.setStatus(ValidationResult.Result.ERROR);
-        return vr;
-    }
-
     @Override
     public ValidationResult validate(RuntimeContainer runtime) {
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         try {
             doCloseAction(runtime);
         } catch (Exception ex) {
-            fillValidationResult(vr, ex);
+            vr.setStatus(Result.ERROR);
+            vr.setMessage(ex.getMessage());
         }
         return vr;
     }

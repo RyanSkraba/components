@@ -25,6 +25,7 @@ import org.talend.components.snowflake.tsnowflakeclose.TSnowflakeCloseProperties
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.ValidationResultMutable;
 
 public class SnowflakeCloseSourceOrSink implements SourceOrSink {
 
@@ -48,7 +49,7 @@ public class SnowflakeCloseSourceOrSink implements SourceOrSink {
 
     @Override
     public ValidationResult validate(RuntimeContainer container) {
-        ValidationResult result = new ValidationResult();
+        ValidationResultMutable result = new ValidationResultMutable();
         try {
             closeConnection(container);
             result.setStatus(Result.OK);

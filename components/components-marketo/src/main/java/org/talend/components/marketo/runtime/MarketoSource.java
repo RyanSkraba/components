@@ -29,6 +29,7 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.ValidationResultMutable;
 
 public class MarketoSource extends MarketoSourceOrSink implements BoundedSource {
 
@@ -68,10 +69,11 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
 
     @Override
     public ValidationResult validate(RuntimeContainer container) {
-        ValidationResult vr = super.validate(container);
+        ValidationResultMutable vr = new ValidationResultMutable(super.validate(container));
         if (vr.getStatus().equals(Result.ERROR)) {
             return vr;
         }
+
         if (properties instanceof TMarketoInputProperties) {
             TMarketoInputProperties p = (TMarketoInputProperties) properties;
             boolean useSOAP = properties.getConnectionProperties().apiMode.getValue().equals(APIMode.SOAP);

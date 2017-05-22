@@ -57,11 +57,9 @@ public class AzureStorageRuntime implements RuntimableRuntime<ComponentPropertie
         if (errorMessage.isEmpty()) {
             return ValidationResult.OK;
         } else {
-            return createValidationResult(ValidationResult.Result.ERROR, errorMessage);
+            return new ValidationResult(ValidationResult.Result.ERROR, errorMessage);
         }
     }
-
-
 
     public TAzureStorageConnectionProperties getConnectionProperties() {
         return properties.getConnectionProperties();
@@ -105,8 +103,7 @@ public class AzureStorageRuntime implements RuntimableRuntime<ComponentPropertie
 
         } else {
             StringBuilder connectionString = new StringBuilder();
-            connectionString.append("DefaultEndpointsProtocol=")
-                    .append(conn.protocol.getValue().toString().toLowerCase())
+            connectionString.append("DefaultEndpointsProtocol=").append(conn.protocol.getValue().toString().toLowerCase())
                     //
                     .append(";AccountName=").append(conn.accountName.getValue())
                     //
@@ -142,12 +139,4 @@ public class AzureStorageRuntime implements RuntimableRuntime<ComponentPropertie
 
         return getServiceClient(runtimeContainer).getContainerReference(containerName);
     }
-
-    public ValidationResult createValidationResult(ValidationResult.Result resultCode, String resultMessage) {
-        ValidationResult vr = new ValidationResult();
-        vr.setMessage(resultMessage); // $NON-NLS-1$
-        vr.setStatus(resultCode);
-        return vr;
-    }
-
 }

@@ -124,10 +124,7 @@ public class JiraSourceOrSink implements SourceOrSink {
         StringBuilder sb = new StringBuilder(validationFailed);
         sb.append(System.lineSeparator());
         sb.append(errorMessage);
-        ValidationResult validationResult = new ValidationResult();
-        validationResult.setStatus(Result.ERROR);
-        validationResult.setMessage(sb.toString());
-        return validationResult;
+        return new ValidationResult(Result.ERROR, sb.toString());
     }
 
     /**

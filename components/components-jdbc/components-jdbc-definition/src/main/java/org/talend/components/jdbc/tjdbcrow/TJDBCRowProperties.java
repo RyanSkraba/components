@@ -43,8 +43,7 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-public class TJDBCRowProperties extends FixedConnectorsComponentProperties
-        implements RuntimeSettingProvider {
+public class TJDBCRowProperties extends FixedConnectorsComponentProperties implements RuntimeSettingProvider {
 
     public TJDBCRowProperties(String name) {
         super(name);
@@ -226,11 +225,10 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties
         String tablename = tableSelection.tablename.getValue();
         Schema schema = main.schema.getValue();
         if (tablename == null || tablename.isEmpty()) {
-            return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
-                    .setMessage("Please set the table name before it");
+            return new ValidationResult(ValidationResult.Result.ERROR, "Please set the table name before it");
         }
         if (schema == null || schema.getFields().isEmpty()) {
-            return new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage("Please set the schema before it");
+            return new ValidationResult(ValidationResult.Result.ERROR, "Please set the schema before it");
         }
         String query = JDBCSQLBuilder.getInstance().generateSQL4SelectTable(tablename, schema);
         sql.setValue("\"" + query + "\"");

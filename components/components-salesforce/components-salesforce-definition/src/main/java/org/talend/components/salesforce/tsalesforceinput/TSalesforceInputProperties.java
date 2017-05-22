@@ -33,6 +33,7 @@ import org.talend.components.salesforce.schema.SalesforceSchemaHelper;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -120,7 +121,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     }
 
     public ValidationResult validateGuessSchema() {
-        ValidationResult validationResult = new ValidationResult();
+        ValidationResultMutable validationResult = new ValidationResultMutable();
 
         try (SandboxedInstance sandboxISalesforceSourceOrSink = RuntimeUtil
                 .createRuntimeClass(
@@ -152,7 +153,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     }
 
     public ValidationResult validateGuessQuery() {
-        ValidationResult validationResult = new ValidationResult();
+        ValidationResultMutable validationResult = new ValidationResultMutable();
 
         try (SandboxedInstance sandboxISalesforceSourceOrSink = RuntimeUtil
                 .createRuntimeClass(

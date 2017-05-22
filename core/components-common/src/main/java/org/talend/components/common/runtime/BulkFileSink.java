@@ -48,8 +48,8 @@ public class BulkFileSink implements Sink {
     public ValidationResult validate(RuntimeContainer container) {
         ValidationResult validate = new ValidationResult();
         if (!(properties instanceof BulkFileProperties)) {
-            validate = new ValidationResult().setStatus(ValidationResult.Result.ERROR)
-                    .setMessage("properties should be of type :" + BulkFileProperties.class.getCanonicalName());
+            validate = new ValidationResult(ValidationResult.Result.ERROR,
+                    "properties should be of type :" + BulkFileProperties.class.getCanonicalName());
         }
         return validate;
     }

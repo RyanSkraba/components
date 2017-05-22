@@ -36,8 +36,8 @@ public class FileDelimitedSink extends FileSourceOrSink implements Sink {
         // also check that the properties is the right type
         if (validate.getStatus() != ValidationResult.Result.ERROR) {
             if (!(properties instanceof TFileOutputDelimitedProperties)) {
-                return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
-                        .setMessage("properties should be of type :" + TFileOutputDelimitedProperties.class.getCanonicalName());
+                return new ValidationResult(ValidationResult.Result.ERROR,
+                        "properties should be of type :" + TFileOutputDelimitedProperties.class.getCanonicalName());
             }
         }
         return validate;

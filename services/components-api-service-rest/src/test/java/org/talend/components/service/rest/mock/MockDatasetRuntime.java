@@ -13,6 +13,8 @@
 
 package org.talend.components.service.rest.mock;
 
+import static org.apache.avro.SchemaBuilder.builder;
+
 import java.util.Collections;
 
 import org.apache.avro.Schema;
@@ -23,8 +25,6 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.dataset.runtime.DatasetRuntime;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
-
-import static org.apache.avro.SchemaBuilder.builder;
 
 public class MockDatasetRuntime implements DatasetRuntime<MockDatasetProperties> {
 
@@ -73,7 +73,7 @@ public class MockDatasetRuntime implements DatasetRuntime<MockDatasetProperties>
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, MockDatasetProperties properties) {
-        return new ValidationResult().setMessage("initialized").setStatus(ValidationResult.Result.OK);
+        return new ValidationResult(ValidationResult.Result.OK, "initialized");
     }
 }
 

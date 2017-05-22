@@ -12,8 +12,9 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -89,7 +90,7 @@ public class JDBCRowTestIT {
             JDBCRowSourceOrSink sourceOrSink = (JDBCRowSourceOrSink) sandboxedInstance.getInstance();
             sourceOrSink.initialize(null, properties);
             ValidationResult result = sourceOrSink.validate(null);
-            Assert.assertTrue(result.status == ValidationResult.Result.OK);
+            Assert.assertTrue(result.getStatus() == ValidationResult.Result.OK);
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
@@ -124,7 +125,7 @@ public class JDBCRowTestIT {
             JDBCRowSourceOrSink sourceOrSink = (JDBCRowSourceOrSink) sandboxedInstance.getInstance();
             sourceOrSink.initialize(null, properties);
             ValidationResult result = sourceOrSink.validate(null);
-            Assert.assertTrue(result.status == ValidationResult.Result.OK);
+            Assert.assertTrue(result.getStatus() == ValidationResult.Result.OK);
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
@@ -153,7 +154,7 @@ public class JDBCRowTestIT {
             JDBCRowSourceOrSink sourceOrSink = (JDBCRowSourceOrSink) sandboxedInstance.getInstance();
             sourceOrSink.initialize(null, properties);
             ValidationResult result = sourceOrSink.validate(null);
-            Assert.assertTrue(result.status == ValidationResult.Result.ERROR);
+            Assert.assertTrue(result.getStatus() == ValidationResult.Result.ERROR);
             Assert.assertNotNull(result.getMessage());
         }
     }
@@ -184,7 +185,7 @@ public class JDBCRowTestIT {
             JDBCRowSource source = (JDBCRowSource) sandboxedInstance.getInstance();
             source.initialize(null, properties);
             ValidationResult result = source.validate(null);
-            Assert.assertTrue(result.status == ValidationResult.Result.OK);
+            Assert.assertTrue(result.getStatus() == ValidationResult.Result.OK);
 
             Reader reader = source.createReader(null);
             try {
@@ -246,7 +247,7 @@ public class JDBCRowTestIT {
             JDBCRowSource source = (JDBCRowSource) sandboxedInstance.getInstance();
             source.initialize(null, properties);
             ValidationResult result = source.validate(null);
-            Assert.assertTrue(result.status == ValidationResult.Result.OK);
+            Assert.assertTrue(result.getStatus() == ValidationResult.Result.OK);
 
             Reader reader = source.createReader(null);
             try {
@@ -295,7 +296,7 @@ public class JDBCRowTestIT {
             JDBCRowSource source = (JDBCRowSource) sandboxedInstance.getInstance();
             source.initialize(null, properties);
             ValidationResult result = source.validate(null);
-            Assert.assertTrue(result.status == ValidationResult.Result.OK);
+            Assert.assertTrue(result.getStatus() == ValidationResult.Result.OK);
 
             Reader reader = source.createReader(null);
             try {
@@ -347,7 +348,7 @@ public class JDBCRowTestIT {
             JDBCRowSink sink = (JDBCRowSink) sandboxedInstance.getInstance();
             sink.initialize(null, properties);
             ValidationResult result = sink.validate(null);
-            Assert.assertTrue(result.status == ValidationResult.Result.OK);
+            Assert.assertTrue(result.getStatus() == ValidationResult.Result.OK);
 
             WriteOperation operation = sink.createWriteOperation();
             JDBCRowWriter writer = (JDBCRowWriter) operation.createWriter(null);
@@ -414,7 +415,7 @@ public class JDBCRowTestIT {
             JDBCRowSink sink = (JDBCRowSink) sandboxedInstance.getInstance();
             sink.initialize(null, properties);
             ValidationResult result = sink.validate(null);
-            Assert.assertTrue(result.status == ValidationResult.Result.OK);
+            Assert.assertTrue(result.getStatus() == ValidationResult.Result.OK);
 
             WriteOperation operation = sink.createWriteOperation();
             JDBCRowWriter writer = (JDBCRowWriter) operation.createWriter(null);
@@ -484,7 +485,7 @@ public class JDBCRowTestIT {
             JDBCRowSink sink = (JDBCRowSink) sandboxedInstance.getInstance();
             sink.initialize(null, properties);
             ValidationResult result = sink.validate(null);
-            Assert.assertTrue(result.status == ValidationResult.Result.OK);
+            Assert.assertTrue(result.getStatus() == ValidationResult.Result.OK);
 
             WriteOperation operation = sink.createWriteOperation();
             JDBCRowWriter writer = (JDBCRowWriter) operation.createWriter(null);
@@ -536,7 +537,7 @@ public class JDBCRowTestIT {
             JDBCRowSink sink = (JDBCRowSink) sandboxedInstance.getInstance();
             sink.initialize(null, properties);
             ValidationResult result = sink.validate(null);
-            Assert.assertTrue(result.status == ValidationResult.Result.OK);
+            Assert.assertTrue(result.getStatus() == ValidationResult.Result.OK);
 
             WriteOperation operation = sink.createWriteOperation();
             JDBCRowWriter writer = (JDBCRowWriter) operation.createWriter(null);

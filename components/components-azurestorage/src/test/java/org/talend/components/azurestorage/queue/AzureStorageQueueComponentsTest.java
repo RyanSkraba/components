@@ -88,13 +88,10 @@ public class AzureStorageQueueComponentsTest {
 
     @Test
     public void testQueueNameValidation() {
-        ValidationResult vrEmpty = new ValidationResult().setStatus(Result.ERROR).setMessage(i18nMessages.getMessage("error.NameEmpty"));
-        ValidationResult vrSize = new ValidationResult().setStatus(Result.ERROR)
-                .setMessage(i18nMessages.getMessage("error.LengthError"));
-        ValidationResult vrDash = new ValidationResult().setStatus(Result.ERROR)
-                .setMessage(i18nMessages.getMessage("error.TwoDashError"));
-        ValidationResult vrName = new ValidationResult().setStatus(Result.ERROR)
-                .setMessage(i18nMessages.getMessage("error.QueueNameError"));
+        ValidationResult vrEmpty = new ValidationResult(Result.ERROR, i18nMessages.getMessage("error.NameEmpty"));
+        ValidationResult vrSize = new ValidationResult(Result.ERROR, i18nMessages.getMessage("error.LengthError"));
+        ValidationResult vrDash = new ValidationResult(Result.ERROR, i18nMessages.getMessage("error.TwoDashError"));
+        ValidationResult vrName = new ValidationResult(Result.ERROR, i18nMessages.getMessage("error.QueueNameError"));
         //
         TAzureStorageQueueCreateProperties properties = new TAzureStorageQueueCreateProperties("test");
         properties.connection.accountName.setValue("dummy");
@@ -103,7 +100,7 @@ public class AzureStorageQueueComponentsTest {
         AzureStorageQueueSourceOrSink sos = new AzureStorageQueueSourceOrSink();
         // empty queue name
         sos.initialize(null, properties);
-        assertEquals(vrEmpty.message, sos.validate(null).getMessage());
+        assertEquals(vrEmpty.getMessage(), sos.validate(null).getMessage());
         // invalid queue size
         properties.queueName.setValue("in");
         sos.initialize(null, properties);

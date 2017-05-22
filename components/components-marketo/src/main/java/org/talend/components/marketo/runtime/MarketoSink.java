@@ -15,6 +15,7 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.ValidationResultMutable;
 
 public class MarketoSink extends MarketoSourceOrSink implements Sink {
 
@@ -27,7 +28,7 @@ public class MarketoSink extends MarketoSourceOrSink implements Sink {
 
     @Override
     public ValidationResult validate(RuntimeContainer container) {
-        ValidationResult vr = super.validate(container);
+        ValidationResultMutable vr = new ValidationResultMutable(super.validate(container));
         if (vr.getStatus().equals(Result.ERROR)) {
             return vr;
         }

@@ -33,7 +33,7 @@ public class AzureStorageQueueRuntime extends AzureStorageRuntime {
      * getServiceClient.
      *
      * @param runtimeContainer
-     *            {@link RuntimeContainer} container
+     * {@link RuntimeContainer} container
      * @return {@link CloudBlobClient} cloud blob client
      */
     public CloudQueueClient getQueueServiceClient(RuntimeContainer runtimeContainer)
@@ -45,9 +45,9 @@ public class AzureStorageQueueRuntime extends AzureStorageRuntime {
      * getStorageContainerReference.
      *
      * @param runtimeContainer
-     *            {@link RuntimeContainer} container
+     * {@link RuntimeContainer} container
      * @param containerName
-     *            {@link String} storage container
+     * {@link String} storage container
      * @return {@link CloudBlobContainer} cloud blob container
      * @throws StorageException
      * @throws URISyntaxException
@@ -65,7 +65,6 @@ public class AzureStorageQueueRuntime extends AzureStorageRuntime {
         AzureStorageQueueProperties componentProperties = (AzureStorageQueueProperties) properties;
 
         this.QueueName = componentProperties.queueName.getValue();
-        
 
         // validate
         ValidationResult validationResult = super.initialize(runtimeContainer, properties);
@@ -76,23 +75,23 @@ public class AzureStorageQueueRuntime extends AzureStorageRuntime {
         String errorMessage = "";
         if (QueueName.isEmpty()) {
             errorMessage = messages.getMessage("error.NameEmpty");
-            return createValidationResult(ValidationResult.Result.ERROR, errorMessage);
+            return new ValidationResult(ValidationResult.Result.ERROR, errorMessage);
         }
         if (QueueName.length() < 3 || QueueName.length() > 63) {
             errorMessage = messages.getMessage("error.LengthError");
-            return createValidationResult(ValidationResult.Result.ERROR, errorMessage);
+            return new ValidationResult(ValidationResult.Result.ERROR, errorMessage);
         }
         if (QueueName.indexOf("--") > -1) {
             errorMessage = messages.getMessage("error.TwoDashError");
-            return createValidationResult(ValidationResult.Result.ERROR, errorMessage);
+            return new ValidationResult(ValidationResult.Result.ERROR, errorMessage);
         }
 
         if (!queueCheckNamePattern.matcher(QueueName.replaceAll("-", "")).matches()) {
             errorMessage = messages.getMessage("error.QueueNameError");
-            return createValidationResult(ValidationResult.Result.ERROR, errorMessage);
+            return new ValidationResult(ValidationResult.Result.ERROR, errorMessage);
         }
 
-            return ValidationResult.OK;
+        return ValidationResult.OK;
 
     }
 

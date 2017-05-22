@@ -15,11 +15,9 @@ package org.talend.components.azurestorage.queue.runtime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.container.RuntimeContainer;
@@ -76,12 +74,9 @@ public class AzureStorageQueueCreateRuntimeTest {
     @Test
     public void testInitializeNonentityLocal() {
 
-        ValidationResult vrSize = new ValidationResult().setStatus(Result.ERROR)
-                .setMessage(messages.getMessage("error.LengthError"));
-        ValidationResult vrDash = new ValidationResult().setStatus(Result.ERROR)
-                .setMessage(messages.getMessage("error.TwoDashError"));
-        ValidationResult vrName = new ValidationResult().setStatus(Result.ERROR)
-                .setMessage(messages.getMessage("error.QueueNameError"));
+        ValidationResult vrSize = new ValidationResult(Result.ERROR, messages.getMessage("error.LengthError"));
+        ValidationResult vrDash = new ValidationResult(Result.ERROR, messages.getMessage("error.TwoDashError"));
+        ValidationResult vrName = new ValidationResult(Result.ERROR, messages.getMessage("error.QueueNameError"));
 
         // invalid queue size
         properties.queueName.setValue("in");

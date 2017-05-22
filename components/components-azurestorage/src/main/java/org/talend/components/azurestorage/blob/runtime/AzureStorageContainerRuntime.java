@@ -66,7 +66,7 @@ public class AzureStorageContainerRuntime extends AzureStorageRuntime {
         if (errorMessage.isEmpty()) {
             return ValidationResult.OK;
         } else {
-            return createValidationResult(ValidationResult.Result.ERROR, errorMessage);
+            return new ValidationResult(ValidationResult.Result.ERROR, errorMessage);
         }
     }
 

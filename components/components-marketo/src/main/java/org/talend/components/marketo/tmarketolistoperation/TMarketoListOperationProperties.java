@@ -32,6 +32,7 @@ import org.talend.components.marketo.MarketoConstants;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
@@ -135,7 +136,7 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
     }
 
     public ValidationResult validateMultipleOperation() {
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         if (listOperation.getValue().equals(ListOperation.isMemberOf) && multipleOperation.getValue()) {
             vr.setStatus(Result.ERROR);
             vr.setMessage("multipleOperation flag cannot be set with operation=isMemberOf!");

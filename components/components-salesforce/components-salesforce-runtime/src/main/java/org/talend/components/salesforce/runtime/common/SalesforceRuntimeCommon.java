@@ -10,6 +10,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResultMutable;
 
 import com.sforce.soap.partner.DescribeGlobalResult;
 import com.sforce.soap.partner.DescribeGlobalSObjectResult;
@@ -23,7 +24,7 @@ public final class SalesforceRuntimeCommon {
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceRuntimeCommon.class);
     
     public static ValidationResult exceptionToValidationResult(Exception ex) {
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         // FIXME - do a better job here
         vr.setMessage(ex.getMessage());
         vr.setStatus(ValidationResult.Result.ERROR);

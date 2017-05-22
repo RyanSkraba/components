@@ -10,6 +10,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.simplefileio.s3.output.S3OutputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResultMutable;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
@@ -27,7 +28,7 @@ public class S3SourceOrSink implements SourceOrSink {
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         if (properties == null) {
-            return new ValidationResult().setStatus(ValidationResult.Result.ERROR);
+            return new ValidationResult(ValidationResult.Result.ERROR);
         }
 
         this.properties = (S3OutputProperties) properties;
@@ -59,7 +60,7 @@ public class S3SourceOrSink implements SourceOrSink {
             }
             return ValidationResult.OK;
         } catch (Exception e) {
-            ValidationResult vr = new ValidationResult();
+            ValidationResultMutable vr = new ValidationResultMutable();
             vr.setMessage(e.getClass() + " : " + e.getMessage());
             vr.setStatus(ValidationResult.Result.ERROR);
             return vr;

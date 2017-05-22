@@ -12,8 +12,13 @@
 // ============================================================================
 package org.talend.components.fullexample;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.COMPONENT_REFERENCE_WIDGET_TYPE;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.property.PropertyFactory.newSchema;
+import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -269,7 +274,7 @@ public class FullExampleProperties extends ComponentPropertiesImpl {
         if (methodCalled.size() == 25) {
             return ValidationResult.OK;
         } else {
-            return new ValidationResult().setStatus(Result.ERROR).setMessage("some method where not called :" + methodCalled);
+            return new ValidationResult(Result.ERROR, "some method where not called :" + methodCalled);
         }
     }
 

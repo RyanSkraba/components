@@ -28,6 +28,7 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -172,7 +173,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
     }
 
     public ValidationResult validateTestConnection() throws Exception {
-        ValidationResult vr = SnowflakeSourceOrSink.validateConnection(this);
+        ValidationResultMutable vr = new ValidationResultMutable(SnowflakeSourceOrSink.validateConnection(this));
         if (vr.getStatus() == ValidationResult.Result.OK) {
             vr.setMessage(i18nMessages.getMessage("messages.connectionSuccessful"));
             getForm(FORM_WIZARD).setAllowForward(true);

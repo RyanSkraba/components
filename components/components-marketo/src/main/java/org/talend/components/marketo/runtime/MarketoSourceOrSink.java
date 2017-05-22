@@ -36,6 +36,7 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.ValidationResultMutable;
 
 import com.google.gson.Gson;
 
@@ -69,7 +70,7 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
         String endpoint = conn.endpoint.getValue();
         String clientAccess = conn.clientAccessId.getValue();
         String secretKey = conn.secretKey.getValue();
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         if (endpoint == null || endpoint.isEmpty()) {
             vr.setMessage(messages.getMessage("error.validation.connection.endpoint"));
             vr.setStatus(ValidationResult.Result.ERROR);
@@ -292,7 +293,7 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
     }
 
     public static ValidationResult validateConnection(MarketoProvideConnectionProperties properties) {
-        ValidationResult vr = new ValidationResult().setStatus(Result.OK);
+        ValidationResultMutable vr = new ValidationResultMutable();
         try {
             MarketoSourceOrSink sos = new MarketoSourceOrSink();
             sos.initialize(null, (ComponentProperties) properties);

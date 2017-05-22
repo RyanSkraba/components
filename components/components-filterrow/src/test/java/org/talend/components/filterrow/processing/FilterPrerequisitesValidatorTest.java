@@ -33,7 +33,7 @@ public class FilterPrerequisitesValidatorTest {
         String value = "a*";
         FilterPrerequisitesValidator validator = new FilterPrerequisitesValidator();
         ValidationResult result = validator.validate(function, operator, Schema.Type.STRING, value);
-        Assert.assertTrue("Match filter should have been created.", result.status == Result.OK);
+        Assert.assertTrue("Match filter should have been created.", result.getStatus() == Result.OK);
     }
 
     @Test
@@ -43,8 +43,8 @@ public class FilterPrerequisitesValidatorTest {
         String value = "a*";
         FilterPrerequisitesValidator validator = new FilterPrerequisitesValidator();
         ValidationResult result = validator.validate(function, operator, Schema.Type.STRING, value);
-        Assert.assertTrue("Match filter should have not been created.", result.status == Result.ERROR);
-        System.out.println(result.message);
+        Assert.assertTrue("Match filter should have not been created.", result.getStatus() == Result.ERROR);
+        System.out.println(result.getMessage());
     }
 
     @Test
@@ -54,7 +54,7 @@ public class FilterPrerequisitesValidatorTest {
         Integer value = 50;
         FilterPrerequisitesValidator validator = new FilterPrerequisitesValidator();
         ValidationResult result = validator.validate(function, operator, Schema.Type.INT, value);
-        Assert.assertTrue("Match filter should have been created.", result.status == Result.OK);
+        Assert.assertTrue("Match filter should have been created.", result.getStatus() == Result.OK);
     }
 
     @Test
@@ -64,8 +64,8 @@ public class FilterPrerequisitesValidatorTest {
         Integer value = 50;
         FilterPrerequisitesValidator validator = new FilterPrerequisitesValidator();
         ValidationResult result = validator.validate(function, operator, Schema.Type.INT, value);
-        Assert.assertTrue("Match filter should have not been created.", result.status == Result.ERROR);
-        System.out.println(result.message);
+        Assert.assertTrue("Match filter should have not been created.", result.getStatus() == Result.ERROR);
+        System.out.println(result.getMessage());
     }
 
 }
