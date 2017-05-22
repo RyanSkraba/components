@@ -62,6 +62,16 @@ if [ ! -z "$KRB5_CONFIG" ] ; then
   JAVA_OPTS="$JAVA_OPTS -Djava.security.krb5.conf=$KRB5_CONFIG"
 fi
 
+
+# If PAX_MVN_REPO is not set, try to get it from the application properties, then add it to the java options. 
+if [ -z "$PAX_MVN_REPO" ] ; then
+  PAX_MVN_REPO=$(grep "^pax.mvn.repo=" config/application.properties) && \
+      export PAX_MVN_REPO=$(expr $PAX_MVN_REPO : 'pax.mvn.repo=\(.*\)')
+fi
+if [ ! -z "$PAX_MVN_REPO" ] ; then
+  JAVA_OPTS="$JAVA_OPTS -Dorg.ops4j.pax.url.mvn.repositories=$PAX_MVN_REPO"
+fi
+
 THE_CMD="$JAVA_BIN $JAVA_OPTS -cp \"$APP_CLASSPATH\" $APP_CLASS $*"  
 
 writeAppInfoInTty

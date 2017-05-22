@@ -17,6 +17,15 @@
                 <include>*.*</include>
             </includes>
         </fileSet>
+        <!-- components list -->
+        <!-- configuration files -->
+        <fileSet>
+            <directory>${project.basedir}/target/external-resources/config</directory>
+            <outputDirectory>${file.separator}config</outputDirectory>
+            <includes>
+                <include>*.*</include>
+            </includes>
+        </fileSet>
         <!-- Start up scripts -->
         <fileSet>
             <directory>${project.basedir}/scripts</directory>
