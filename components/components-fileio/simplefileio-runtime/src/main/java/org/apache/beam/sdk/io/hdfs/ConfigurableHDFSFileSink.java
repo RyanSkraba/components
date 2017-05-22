@@ -54,6 +54,8 @@ import org.apache.hadoop.mapreduce.task.JobContextImpl;
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -67,7 +69,8 @@ import org.apache.beam.sdk.repackaged.com.google.common.collect.Sets;
 /**
  * Copied from https://github.com/apache/beam/commit/89cf4613465647e2711983674879afd5f67c519d
  * 
- * This class was modified to add the {@link HDFSWriter#configure(Job)} method.
+ * This class was modified to add the {@link HDFSWriter#configure(Job)} method, and to use the path when getting the
+ * filesystem, and to prevent the filesystem from being cached in the components service.
  *
  * A {@code Sink} for writing records to a Hadoop filesystem using a Hadoop file-based output
  * format.
@@ -106,9 +109,11 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
     public void validate(PipelineOptions options) {
         try {
             Job job = jobInstance();
-            FileSystem fs = FileSystem.get(job.getConfiguration());
+            FileSystem fs = FileSystem.get(new URI(path), job.getConfiguration());
             checkState(!fs.exists(new Path(path)), "Output path " + path + " already exists");
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
@@ -118,13 +123,14 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
         return new HDFSWriteOperation<>(this, path, formatClass);
     }
 
-    private Job jobInstance() throws IOException {
+    protected Job jobInstance() throws IOException {
         Job job = Job.getInstance();
         // deserialize map to conf
         Configuration conf = job.getConfiguration();
         for (Map.Entry<String, String> entry : map.entrySet()) {
             conf.set(entry.getKey(), entry.getValue());
         }
+        conf.set("fs.hdfs.impl.disable.cache", "true");
         job.setJobID(jobId);
         return job;
     }
@@ -157,10 +163,15 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
         @Override
         public void finalize(Iterable<String> writerResults, PipelineOptions options) throws Exception {
             Job job = ((ConfigurableHDFSFileSink<K, V>) getSink()).jobInstance();
-            FileSystem fs = FileSystem.get(job.getConfiguration());
+            FileSystem fs = FileSystem.get(new URI(path), job.getConfiguration());
+
+            // Get expected output shards.  Nulls indicate that the task was launched, but didn't 
+            // process any records.
+            Set<String> expected = Sets.newHashSet(writerResults);
+            expected.remove(null);
 
             // If there are 0 output shards, just create output folder.
-            if (!writerResults.iterator().hasNext()) {
+            if (!expected.iterator().hasNext()) {
                 fs.mkdirs(new Path(path));
                 return;
             }
@@ -180,8 +191,6 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
                 }
             });
 
-            // get expected output shards
-            Set<String> expected = Sets.newHashSet(writerResults);
             checkState(
                     expected.size() == Lists.newArrayList(writerResults).size(),
                     "Data loss due to writer results hash collision");
