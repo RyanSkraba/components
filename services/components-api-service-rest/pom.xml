@@ -157,14 +157,6 @@
 			<version>10.12.1.1</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-maven-repo</artifactId>
-			<version>${project.version}</version>
-			<type>zip</type>
-			<classifier>config</classifier>
-			<scope>test</scope>
-		</dependency>
 
 	</dependencies>
 	<!-- dependencyManagement block may be added here and components bom may 
@@ -179,32 +171,6 @@
 					<execution>
 						<configuration>
 							<skip>true</skip>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>package</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<!-- import the components list -->
-								<artifactItem>
-									<groupId>org.talend.components</groupId>
-									<artifactId>components-maven-repo</artifactId>
-									<classifier>config</classifier>
-									<type>zip</type>
-									<outputDirectory>${project.build.directory}/external-resources</outputDirectory>
-									<excludes>META-INF/**</excludes>
-								</artifactItem>
-							</artifactItems>
 						</configuration>
 					</execution>
 				</executions>
