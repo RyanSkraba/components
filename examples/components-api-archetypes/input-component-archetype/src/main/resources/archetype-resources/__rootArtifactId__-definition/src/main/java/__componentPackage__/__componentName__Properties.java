@@ -225,9 +225,7 @@ public class ${componentName}Properties extends FixedConnectorsComponentProperti
                 schema.schema.setValue(runtimeSchema);
                 result = ValidationResult.OK;
             } catch (IOException e) {
-                result = new ValidationResult().setStatus(Result.ERROR);
-                String errorMessage = getI18nMessage("error.fileReading", e.getMessage());
-                result.setMessage(errorMessage);
+                result = new ValidationResult(Result.ERROR, getI18nMessage("error.fileReading", e.getMessage()));
             }
             return result;
         }

@@ -66,8 +66,7 @@ public class ${componentName}Source extends TranslatableImpl implements BoundedS
         this.inputProperties = (${componentName}Properties) properties;
         ValidationResult result;
         if (getFilePath().isEmpty()) {
-            result = new ValidationResult().setStatus(Result.ERROR);
-            result.setMessage(getI18nMessage("error.fileNameEmpty"));
+            result = new ValidationResult(Result.ERROR, getI18nMessage("error.fileNameEmpty"));
         } else {
             result = ValidationResult.OK;
         }
@@ -91,8 +90,7 @@ public class ${componentName}Source extends TranslatableImpl implements BoundedS
         if (file.exists()) {
             result = ValidationResult.OK;
         } else {
-            result = new ValidationResult().setStatus(Result.ERROR);
-            result.setMessage(getI18nMessage("error.fileDoesntExist", getFilePath()));
+            result = new ValidationResult(Result.ERROR, getI18nMessage("error.fileDoesntExist", getFilePath()));
         }
         return result;
     }
