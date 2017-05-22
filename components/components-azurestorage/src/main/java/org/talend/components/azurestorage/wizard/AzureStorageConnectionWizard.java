@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
+import org.talend.daikon.NamedThing;
 
 public class AzureStorageConnectionWizard extends ComponentWizard {
 
@@ -46,6 +47,18 @@ public class AzureStorageConnectionWizard extends ComponentWizard {
     public void setupProperties(TAzureStorageConnectionProperties properties) {
         cProperties.setupProperties();
         cProperties.copyValuesFrom(properties);
+        if(properties.BlobSchema!=null){
+            qProperties.selectedContainerNames.setStoredValue(properties.BlobSchema);
+        }
+        
+        if(properties.QueueSchema!=null){
+            qProperties.selectedQueueNames.setStoredValue(properties.QueueSchema);
+        }
+        
+        if(properties.TableSchema!=null){
+            qProperties.selectedTableNames.setStoredValue(properties.TableSchema);
+        }
+        
         qProperties.setConnection(cProperties);
     }
 
