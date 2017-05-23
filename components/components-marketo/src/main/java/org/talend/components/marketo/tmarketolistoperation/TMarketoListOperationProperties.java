@@ -12,17 +12,15 @@
 // ============================================================================
 package org.talend.components.marketo.tmarketolistoperation;
 
-import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
-import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
-import static org.talend.components.marketo.MarketoConstants.FIELD_SUCCESS;
+import static org.talend.components.marketo.MarketoConstants.getListOperationFlowRESTSchema;
+import static org.talend.components.marketo.MarketoConstants.getListOperationFlowSOAPSchema;
+import static org.talend.components.marketo.MarketoConstants.getListOperationRejectRESTSchema;
+import static org.talend.components.marketo.MarketoConstants.getListOperationRejectSOAPSchema;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.ISchemaListener;
@@ -157,39 +155,14 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
             schemaReject.schema.setValue(inputSchema);
             return;
         }
-        //
-        final List<Field> flowFields = new ArrayList<Field>();
-        final List<Field> rejectFields = new ArrayList<Field>();
-        Field f;
         if (isApiSOAP()) {
-            f = new Field(FIELD_SUCCESS, Schema.create(Schema.Type.BOOLEAN), null, (Object) null);
-            f.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
-            f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
-            flowFields.add(f);
-            //
-            f = new Field(FIELD_ERROR_MSG, Schema.create(Schema.Type.STRING), null, (Object) null);
-            f.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
-            f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
-            rejectFields.add(f);
+            schemaFlow.schema.setValue(getListOperationFlowSOAPSchema());
+            schemaReject.schema.setValue(getListOperationRejectSOAPSchema());
+            return;
         } else {
-            f = new Field(FIELD_STATUS, Schema.create(Schema.Type.STRING), null, (Object) null);
-            f.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
-            f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
-            flowFields.add(f);
-            //
-            f = new Field(FIELD_STATUS, Schema.create(Schema.Type.STRING), null, (Object) null);
-            f.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
-            f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
-            rejectFields.add(f);
-            f = new Field(FIELD_ERROR_MSG, Schema.create(Schema.Type.STRING), null, (Object) null);
-            f.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
-            f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
-            rejectFields.add(f);
+            schemaFlow.schema.setValue(getListOperationFlowRESTSchema());
+            schemaReject.schema.setValue(getListOperationRejectRESTSchema());
         }
-        Schema flowSchema = newSchema(inputSchema, "schemaFlow", flowFields);
-        Schema rejectSchema = newSchema(inputSchema, "schemaReject", rejectFields);
-        schemaFlow.schema.setValue(flowSchema);
-        schemaReject.schema.setValue(rejectSchema);
     }
 
 }

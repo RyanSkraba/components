@@ -83,14 +83,42 @@ public class MarketoConstants {
     public static Schema getListOperationRESTSchema() {
         return SchemaBuilder.builder().record("REST").fields() //
                 .name(FIELD_LIST_ID)//
-                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")//
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
-                .type().intType().noDefault() //
-                //
+                .type().nullable().intType().noDefault() //
                 .name(FIELD_LEAD_ID)//
-                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")//
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
-                .type().intType().noDefault() //
+                .type().nullable().intType().noDefault() //
+                .endRecord();
+    }
+
+    public static Schema getListOperationFlowRESTSchema() {
+        return SchemaBuilder.builder().record("REST").fields() //
+                .name(FIELD_LIST_ID)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().intType().noDefault() //
+                .name(FIELD_LEAD_ID)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().intType().noDefault() //
+                .name(FIELD_STATUS)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .endRecord();
+    }
+
+    public static Schema getListOperationRejectRESTSchema() {
+        return SchemaBuilder.builder().record("REST").fields() //
+                .name(FIELD_LIST_ID)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().intType().noDefault() //
+                .name(FIELD_LEAD_ID)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().intType().noDefault() //
+                .name(FIELD_STATUS)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .name(FIELD_ERROR_MSG)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
                 .endRecord();
     }
 
@@ -100,21 +128,57 @@ public class MarketoConstants {
     public static Schema getListOperationSOAPSchema() {
         return SchemaBuilder.builder().record("SOAP").fields() //
                 .name(FIELD_LIST_KEY_TYPE)//
-                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")//
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
-                .type().stringType().noDefault() //
+                .type().nullable().stringType().noDefault() //
                 .name(FIELD_LIST_KEY_VALUE)//
-                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")//
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
-                .type().stringType().noDefault() //
+                .type().nullable().stringType().noDefault() //
                 .name(FIELD_LEAD_KEY_TYPE)//
-                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")//
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
-                .type().stringType().noDefault() //
+                .type().nullable().stringType().noDefault() //
                 .name(FIELD_LEAD_KEY_VALUE)//
-                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")//
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
-                .type().stringType().noDefault() //
+                .type().nullable().stringType().noDefault() //
+                .endRecord();
+    }
+
+    public static Schema getListOperationFlowSOAPSchema() {
+        return SchemaBuilder.builder().record("SOAP").fields() //
+                .name(FIELD_LIST_KEY_TYPE)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .name(FIELD_LIST_KEY_VALUE)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .name(FIELD_LEAD_KEY_TYPE)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .name(FIELD_LEAD_KEY_VALUE)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .name(FIELD_SUCCESS)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().booleanType().noDefault() //
+                .endRecord();
+    }
+
+    public static Schema getListOperationRejectSOAPSchema() {
+        return SchemaBuilder.builder().record("SOAP").fields() //
+                .name(FIELD_LIST_KEY_TYPE)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .name(FIELD_LIST_KEY_VALUE)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .name(FIELD_LEAD_KEY_TYPE)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .name(FIELD_LEAD_KEY_VALUE)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .name(FIELD_ERROR_MSG)//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
                 .endRecord();
     }
 

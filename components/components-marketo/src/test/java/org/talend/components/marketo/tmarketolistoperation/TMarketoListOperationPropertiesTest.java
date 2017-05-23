@@ -87,34 +87,24 @@ public class TMarketoListOperationPropertiesTest extends MarketoTestBase {
         // REST
         props.updateOutputSchemas();
         s = props.schemaFlow.schema.getValue();
-        assertEquals(mainFieldsCount + 1, s.getFields().size());
-        assertEquals("schemaFlow", s.getName());
-        assertNotNull(s.getField("Status"));
-        assertTrue(s.getField("Status").schema().getType().equals(Schema.Type.STRING));
+        assertEquals(MarketoConstants.getListOperationFlowRESTSchema(), s);
 
         s = props.schemaReject.schema.getValue();
-        assertEquals(mainFieldsCount + 2, s.getFields().size());
-        assertEquals("schemaReject", s.getName());
-        assertNotNull(s.getField("Status"));
-        assertTrue(s.getField("Status").schema().getType().equals(Schema.Type.STRING));
-        assertNotNull(s.getField("ERROR_MSG"));
-        assertTrue(s.getField("ERROR_MSG").schema().getType().equals(Schema.Type.STRING));
+        assertEquals(MarketoConstants.getListOperationRejectRESTSchema(), s);
         // SOAP
         props.connection.apiMode.setValue(APIMode.SOAP);
         props.afterListOperation();
         props.updateOutputSchemas();
         mainFieldsCount = props.schemaInput.schema.getValue().getFields().size();
         s = props.schemaFlow.schema.getValue();
-        assertEquals(mainFieldsCount + 1, s.getFields().size());
-        assertEquals("schemaFlow", s.getName());
+        assertEquals(MarketoConstants.getListOperationFlowSOAPSchema(), s);
         assertNotNull(s.getField("Success"));
-        assertTrue(s.getField("Success").schema().getType().equals(Schema.Type.BOOLEAN));
+        assertTrue(s.getField("Success").schema().getTypes().get(0).getType().equals(Schema.Type.BOOLEAN));
 
         s = props.schemaReject.schema.getValue();
-        assertEquals(mainFieldsCount + 1, s.getFields().size());
-        assertEquals("schemaReject", s.getName());
+        assertEquals(MarketoConstants.getListOperationRejectSOAPSchema(), s);
         assertNotNull(s.getField("ERROR_MSG"));
-        assertTrue(s.getField("ERROR_MSG").schema().getType().equals(Schema.Type.STRING));
+        assertTrue(s.getField("ERROR_MSG").schema().getTypes().get(0).getType().equals(Schema.Type.STRING));
     }
 
     @Test
