@@ -15,6 +15,9 @@ package org.talend.components.azurestorage.queue.runtime;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -53,8 +56,12 @@ public class AzureStorageQueueWriter implements Writer<Result> {
 
     private Result result;
 
+    private List<QueueMessage> messagesBuffer;
+
+    private static final int MAX_MSG_TO_ENQUEUE = 1000;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageQueueWriter.class);
-    
+
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageQueueWriter.class);
 
@@ -64,6 +71,8 @@ public class AzureStorageQueueWriter implements Writer<Result> {
         this.runtime = runtime;
         this.sink = (AzureStorageQueueSink) getWriteOperation().getSink();
         this.props = (TAzureStorageQueueOutputProperties) this.sink.properties;
+
+        this.messagesBuffer = new ArrayList<>();
     }
 
     @Override
@@ -100,29 +109,46 @@ public class AzureStorageQueueWriter implements Writer<Result> {
         Field msgContent = writeSchema.getField(AzureStorageQueueProperties.FIELD_MESSAGE_CONTENT);
         int ttl = props.timeToLiveInSeconds.getValue();
         int visibility = props.initialVisibilityDelayInSeconds.getValue();
-        try {
-            if (msgContent == null) {
-                LOGGER.error(i18nMessages.getMessage("error.VacantMessage"));
-                if (props.dieOnError.getValue()) {
-                    throw new ComponentException(new Exception(i18nMessages.getMessage("error.VacantMessage")));
-                }
-            } else {
-                content = (String) inputRecord.get(msgContent.pos());
-                CloudQueueMessage msg = new CloudQueueMessage(content);
-                msg.setMessageContent(content);
-                queue.addMessage(msg, ttl, visibility, null, null);
-                result.successCount++;
+
+        if (msgContent == null) {
+            LOGGER.error(i18nMessages.getMessage("error.VacantMessage"));
+            if (props.dieOnError.getValue()) {
+                throw new ComponentException(new Exception(i18nMessages.getMessage("error.VacantMessage")));
             }
-        } catch (StorageException e) {
-            result.rejectCount++;
-            LOGGER.error(e.getLocalizedMessage());
+        } else {
+            content = (String) inputRecord.get(msgContent.pos());
+            messagesBuffer.add(new QueueMessage(new CloudQueueMessage(content), ttl, visibility));
+        }
+
+        if (messagesBuffer.size() >= MAX_MSG_TO_ENQUEUE) {
+            sendParallelMessages();
         }
     }
 
     @Override
     public Result close() throws IOException {
+        sendParallelMessages();
         queue = null;
         return result;
+    }
+
+    private void sendParallelMessages() {
+        messagesBuffer.parallelStream().forEach(new Consumer<QueueMessage>() {
+
+            @Override
+            public void accept(QueueMessage queueMessage) {
+                try {
+                    queue.addMessage(queueMessage.getMsg(), queueMessage.getTimeToLiveInSeconds(),
+                            queueMessage.getInitialVisibilityDelayInSeconds(), null, null);
+                    result.successCount++;
+                } catch (StorageException e) {
+                    result.rejectCount++;
+                    LOGGER.error(e.getLocalizedMessage());
+                }
+            }
+        });
+
+        messagesBuffer.clear();
     }
 
     @Override

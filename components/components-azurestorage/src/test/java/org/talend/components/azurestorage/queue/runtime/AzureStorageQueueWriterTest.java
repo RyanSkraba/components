@@ -68,6 +68,7 @@ public class AzureStorageQueueWriterTest {
                 .type(AvroUtils._string()).noDefault().endRecord());
         record.put(0, "a message");
         writer.write(record);
+        writer.close();
         fail("Should have failed...");
     }
 
