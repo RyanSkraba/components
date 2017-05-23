@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.marketo.runtime;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -19,12 +22,14 @@ import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectio
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
+import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
@@ -36,6 +41,7 @@ import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OperationType;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.RESTLookupFields;
+import org.talend.daikon.avro.SchemaConstants;
 
 public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
 
@@ -251,6 +257,73 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         List<IndexedRecord> rejects = writer.getRejectedWrites();
         assertNotNull(rejects);
         assertEquals(rejects.get(0).get(6), "[1004] Lead not found.");
+    }
+
+    public void testSyncDynamic(List<IndexedRecord> records) throws Exception {
+        writer = getWriter(props);
+        writer.open("test");
+        for (IndexedRecord r : records) {
+            writer.write(r);
+        }
+        MarketoResult result = (MarketoResult) writer.close();
+        assertEquals(1, result.getApiCalls());
+        assertEquals(records.size(), result.getSuccessCount());
+        assertEquals(0, result.getRejectCount());
+        List<IndexedRecord> successes = writer.getSuccessfulWrites();
+        List<IndexedRecord> rejects = writer.getRejectedWrites();
+        assertEquals(Collections.emptyList(), rejects);
+        assertEquals(records.size(), successes.size());
+        LOG.debug("successes = {}.", successes);
+        for (IndexedRecord success : successes) {
+            assertNotNull(success.get(0));
+            assertNotNull(success.get(1));
+            assertNotNull(success.get(2));
+            assertNotNull(success.get(3));
+            assertNotNull(success.get(4));
+            assertTrue(success.get(0) instanceof Integer);
+            assertTrue(success.get(1) instanceof String);
+            assertTrue(success.get(2) instanceof String);
+            assertTrue(success.get(3) instanceof String);
+            assertTrue(success.get(4) instanceof String);
+            Integer leadId = (int) success.get(0);
+            createdLeads.add(leadId);
+            String status = success.get(success.getSchema().getField("Status").pos()).toString().toUpperCase();
+            assertThat(status, anyOf(is("CREATED"), is("UPDATED")));
+        }
+    }
+
+    @Test
+    public void testSyncLeadRESTDynamic() throws Exception {
+        props = getRESTProperties();
+        props.operationType.setValue(OperationType.createOrUpdate);
+        props.lookupField.setValue(RESTLookupFields.email);
+        props.deDupeEnabled.setValue(false);
+        props.batchSize.setValue(1);
+        props.schemaInput.setValue("schema", new org.apache.avro.Schema.Parser().parse(
+                "{\"type\":\"record\",\"name\":\"tMarketoOutput_1\",\"fields\":[{\"name\":\"id\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"id\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"id\",\"talend.field.isKey\":\"true\",\"di.column.relatedEntity\":\"\"},{\"name\":\"Status\",\"type\":[\"string\",\"null\"],\"di.table.comment\":\"\",\"talend.isLocked\":\"true\",\"talend.field.dbColumnName\":\"Status\",\"di.column.talendType\":\"id_String\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"Status\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"tMarketoOutput_1\",\"di.table.label\":\"tMarketoOutput_1\",\"di.dynamic.column.comment\":\"\",\"di.dynamic.column.name\":\"dynamic\",\"di.column.talendType\":\"id_Dynamic\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.isNullable\":\"true\",\"talend.field.scale\":\"0\",\"talend.field.dbColumnName\":\"dynamic\",\"di.column.relatedEntity\":\"\",\"di.column.relationshipType\":\"\",\"di.dynamic.column.position\":\"1\",\"include-all-fields\":\"true\"}"));
+        props.updateOutputSchemas();
+        Schema fillin = SchemaBuilder.record("fillin").fields()//
+                .name("id").type().intType().noDefault()//
+                .name("email").type().stringType().noDefault() //
+                .name("firstName").type().stringType().noDefault()//
+                .name("lastName").type().stringType().noDefault()//
+                .name("Status").type().stringType().noDefault()//
+                .endRecord();
+        fillin.addProp(SchemaConstants.INCLUDE_ALL_FIELDS, "true");
+        List<IndexedRecord> records = new ArrayList<>();
+        for (int idx = 0; idx < 5; idx++) {
+            IndexedRecord record = new GenericData.Record(fillin);
+            record.put(1, String.format("dynamic%02d@talend-dynamic.com", idx));
+            record.put(2, String.format("firstDyn%02d", idx));
+            record.put(3, String.format("lastDyn%02d", idx));
+            records.add(record);
+        }
+        props.outputOperation.setValue(OutputOperation.syncLead);
+        testSyncDynamic(Arrays.asList(records.get(0)));
+        props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
+        props.updateOutputSchemas();
+        props.batchSize.setValue(10);
+        testSyncDynamic(records);
     }
 
 }

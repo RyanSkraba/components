@@ -39,6 +39,7 @@ import org.talend.components.marketo.runtime.client.rest.type.SyncStatus;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation;
+import org.talend.daikon.avro.AvroUtils;
 
 public class MarketoOutputWriter extends MarketoWriter {
 
@@ -91,43 +92,49 @@ public class MarketoOutputWriter extends MarketoWriter {
             inputSchema = inputRecord.getSchema();
         }
         //
+        recordsToProcess.add(inputRecord);
         switch (operation) {
         case syncLead:
-            processResult(client.syncLead(properties, inputRecord));
+            processResult(client.syncLead(properties, recordsToProcess.get(0)));
+            recordsToProcess.clear();
             break;
         case syncMultipleLeads:
-            recordsToProcess.add(inputRecord);
             if (recordsToProcess.size() >= batchSize) {
                 processResult(client.syncMultipleLeads(properties, recordsToProcess));
                 recordsToProcess.clear();
             }
             break;
         case deleteLeads:
-            recordsToProcess.add(inputRecord);
             if (recordsToProcess.size() >= batchSize) {
                 processResult(((MarketoRESTClient) client).deleteLeads(recordsToProcess));
                 recordsToProcess.clear();
             }
             break;
         case syncCustomObjects:
-            processResult(((MarketoRESTClient) client).syncCustomObjects(properties, Arrays.asList(inputRecord)));
+            processResult(((MarketoRESTClient) client).syncCustomObjects(properties, recordsToProcess));
+            recordsToProcess.clear();
             break;
         case deleteCustomObjects:
-            processResult(((MarketoRESTClient) client).deleteCustomObjects(properties, Arrays.asList(inputRecord)));
+            processResult(((MarketoRESTClient) client).deleteCustomObjects(properties, recordsToProcess));
+            recordsToProcess.clear();
             break;
         case syncCompanies:
-            processResult(((MarketoRESTClient) client).syncCompanies(properties, Arrays.asList(inputRecord)));
+            processResult(((MarketoRESTClient) client).syncCompanies(properties, recordsToProcess));
+            recordsToProcess.clear();
             break;
         case deleteCompanies:
-            processResult(((MarketoRESTClient) client).deleteCompany(properties, Arrays.asList(inputRecord)));
+            processResult(((MarketoRESTClient) client).deleteCompany(properties, recordsToProcess));
+            recordsToProcess.clear();
             break;
         case syncOpportunities:
         case syncOpportunityRoles:
-            processResult(((MarketoRESTClient) client).syncOpportunities(properties, Arrays.asList(inputRecord)));
+            processResult(((MarketoRESTClient) client).syncOpportunities(properties, recordsToProcess));
+            recordsToProcess.clear();
             break;
         case deleteOpportunities:
         case deleteOpportunityRoles:
-            processResult(((MarketoRESTClient) client).deleteOpportunities(properties, Arrays.asList(inputRecord)));
+            processResult(((MarketoRESTClient) client).deleteOpportunities(properties, recordsToProcess));
+            recordsToProcess.clear();
             break;
         }
     }
@@ -164,15 +171,18 @@ public class MarketoOutputWriter extends MarketoWriter {
                 mktoResult.setRecords(tmp);
             }
         }
+        int idx = 0;
         for (SyncStatus status : mktoResult.getRecords()) {
+            IndexedRecord statusRecord = recordsToProcess.get(idx);
+            idx++;
             if (Arrays.asList("created", "updated", "deleted", "scheduled", "triggered")
                     .contains(status.getStatus().toLowerCase())) {
-                handleSuccess(fillRecord(status, flowSchema));
+                handleSuccess(fillRecord(status, flowSchema, statusRecord));
             } else {
                 if (dieOnError) {
                     throw new IOException(status.getAvailableReason());
                 }
-                handleReject(fillRecord(status, rejectSchema));
+                handleReject(fillRecord(status, rejectSchema, statusRecord));
             }
         }
     }
@@ -191,9 +201,15 @@ public class MarketoOutputWriter extends MarketoWriter {
         }
     }
 
-    public IndexedRecord fillRecord(SyncStatus status, Schema schema) {
-        IndexedRecord record = new Record(schema);
-        for (Field f : schema.getFields()) {
+    public IndexedRecord fillRecord(SyncStatus status, Schema schema, IndexedRecord record) {
+        Boolean isDynamic = Boolean.FALSE;
+        Schema currentSchema = schema;
+        if (AvroUtils.isIncludeAllFields(schema)) {
+            isDynamic = true;
+            currentSchema = record.getSchema();
+        }
+        IndexedRecord outRecord = new Record(currentSchema);
+        for (Field f : currentSchema.getFields()) {
             switch (f.name()) {
             case FIELD_LEAD_ID:
             case FIELD_ID_SOAP:
@@ -202,34 +218,38 @@ public class MarketoOutputWriter extends MarketoWriter {
                 // when the request failed, get it from input record
                 if (status.getId() == null) {
                     try {
-                        record.put(schema.getField(f.name()).pos(), inputRecord.get(inputSchema.getField(f.name()).pos()));
+                        outRecord.put(currentSchema.getField(f.name()).pos(), record.get(inputSchema.getField(f.name()).pos()));
                     } catch (NullPointerException e) {
                         LOG.error("Could not find field `{}` in schema : {}.", f.name(), e.getMessage());
                     }
                 } else {
-                    record.put(f.pos(), status.getId());
+                    outRecord.put(f.pos(), status.getId());
                 }
                 break;
             case FIELD_SUCCESS:
-                record.put(f.pos(), Boolean.parseBoolean(status.getStatus()));
+                outRecord.put(f.pos(), Boolean.parseBoolean(status.getStatus()));
                 break;
             case FIELD_STATUS:
-                record.put(f.pos(), status.getStatus());
+                outRecord.put(f.pos(), status.getStatus());
                 break;
             case FIELD_ERROR_MSG:
             case FIELD_REASON:
-                record.put(f.pos(), status.getAvailableReason());
+                outRecord.put(f.pos(), status.getAvailableReason());
                 break;
             case FIELD_MARKETO_GUID:
-                record.put(f.pos(), status.getMarketoGUID());
+                outRecord.put(f.pos(), status.getMarketoGUID());
                 break;
             case FIELD_SEQ:
-                record.put(f.pos(), status.getSeq());
+                outRecord.put(f.pos(), status.getSeq());
                 break;
             default:
-                record.put(schema.getField(f.name()).pos(), inputRecord.get(inputSchema.getField(f.name()).pos()));
+                if (isDynamic) {
+                    outRecord.put(currentSchema.getField(f.name()).pos(), record.get(f.pos()));
+                } else {
+                    outRecord.put(currentSchema.getField(f.name()).pos(), record.get(inputSchema.getField(f.name()).pos()));
+                }
             }
         }
-        return record;
+        return outRecord;
     }
 }
