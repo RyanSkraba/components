@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.Properties;
@@ -88,9 +88,9 @@ public class MarketoCustomObjectsSchemasPropertiesTest {
     @Before
     public void setUp() throws Exception {
         properties = new MarketoCustomObjectsSchemasProperties("test");
+        properties.setupProperties();
         connection = new TMarketoConnectionProperties("testconn");
         connection.setupProperties();
-        connection.apiMode.setValue(APIMode.REST);
         connection.endpoint.setValue("http://fakeendpoint.com");
         connection.clientAccessId.setValue("user0000");
         connection.secretKey.setValue("secretk");
@@ -113,13 +113,13 @@ public class MarketoCustomObjectsSchemasPropertiesTest {
         assertEquals("___DRI", properties.getRepositoryLocation());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IOException.class)
     public void testBeforeFormPresentCustomObjects() throws Exception {
         properties.beforeFormPresentCustomObjects();
         fail("Shouldn't be here");
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test // (expected = IOException.class)
     public void testAfterFormFinishCustomObjects() throws Exception {
         List<NamedThing> o = new ArrayList<>();
         o.add(new SimpleNamedThing("name", "displayName."));

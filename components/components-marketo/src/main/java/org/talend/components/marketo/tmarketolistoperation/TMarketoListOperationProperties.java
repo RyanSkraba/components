@@ -100,13 +100,6 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        if (isApiSOAP()) {
-            schemaInput.schema.setValue(MarketoConstants.getListOperationSOAPSchema());
-            updateOutputSchemas();
-        } else {
-            schemaInput.schema.setValue(MarketoConstants.getListOperationRESTSchema());
-            updateOutputSchemas();
-        }
         if (form.getName().equals(Form.MAIN)) {
             switch (listOperation.getValue()) {
             case addTo:
@@ -119,7 +112,17 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
         }
     }
 
+    @Override
     public void afterApiMode() {
+        super.afterApiMode();
+
+        if (APIMode.SOAP.equals(apiMode.getValue())) {
+            schemaInput.schema.setValue(MarketoConstants.getListOperationSOAPSchema());
+            updateOutputSchemas();
+        } else {
+            schemaInput.schema.setValue(MarketoConstants.getListOperationRESTSchema());
+            updateOutputSchemas();
+        }
         refreshLayout(getForm(Form.MAIN));
     }
 

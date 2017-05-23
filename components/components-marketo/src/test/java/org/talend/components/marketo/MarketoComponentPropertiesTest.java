@@ -21,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -44,7 +43,7 @@ public class MarketoComponentPropertiesTest {
         props.connection.setupProperties();
         props.schemaInput.setupProperties();
         props.setupProperties();
-        assertEquals(APIMode.REST, props.connection.apiMode.getValue());
+        assertEquals(MarketoComponentProperties.APIMode.REST, props.apiMode.getValue());
     }
 
     @Test

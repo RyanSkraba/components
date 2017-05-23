@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
+import org.talend.components.marketo.MarketoComponentProperties;
 
 public class TMarketoConnectionDefinitionTest {
 
@@ -62,8 +62,8 @@ public class TMarketoConnectionDefinitionTest {
 
     @Test
     public final void testEnums() {
-        assertEquals(APIMode.REST, APIMode.valueOf("REST"));
-        assertEquals(APIMode.SOAP, APIMode.valueOf("SOAP"));
+        assertEquals(MarketoComponentProperties.APIMode.REST, MarketoComponentProperties.APIMode.valueOf("REST"));
+        assertEquals(MarketoComponentProperties.APIMode.SOAP, MarketoComponentProperties.APIMode.valueOf("SOAP"));
     }
 
     @Test

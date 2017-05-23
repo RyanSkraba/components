@@ -15,11 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties.BulkImportTo;
 import org.talend.components.marketo.tmarketocampaign.TMarketoCampaignProperties;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
@@ -76,7 +76,7 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
 
         if (properties instanceof TMarketoInputProperties) {
             TMarketoInputProperties p = (TMarketoInputProperties) properties;
-            boolean useSOAP = properties.getConnectionProperties().apiMode.getValue().equals(APIMode.SOAP);
+            boolean useSOAP = properties.getApiMode().equals(MarketoComponentProperties.APIMode.SOAP);
             // Validate dynamic schema if needed
             Boolean isDynamic = AvroUtils.isIncludeAllFields(p.schemaInput.schema.getValue());
             if (useSOAP) { // no dynamic schema for SOAP !
@@ -189,16 +189,24 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
                         vr.setMessage(messages.getMessage("error.validation.customobject.customobjectname"));
                         return vr;
                     }
-                    // filterType & filterValue
-                    if (p.customObjectFilterType.getValue().isEmpty()) {
-                        vr.setStatus(Result.ERROR);
-                        vr.setMessage(messages.getMessage("error.validation.customobject.filtertype"));
-                        return vr;
-                    }
-                    if (p.customObjectFilterValues.getValue().isEmpty()) {
-                        vr.setStatus(Result.ERROR);
-                        vr.setMessage(messages.getMessage("error.validation.customobject.filtervalues"));
-                        return vr;
+                    if (p.useCompoundKey.getValue()) {
+                        if (p.compoundKey.size() == 0) {
+                            vr.setStatus(Result.ERROR);
+                            vr.setMessage(messages.getMessage("error.validation.customobject.compoundkey"));
+                            return vr;
+                        }
+                    } else {
+                        // filterType & filterValue
+                        if (p.customObjectFilterType.getValue().isEmpty()) {
+                            vr.setStatus(Result.ERROR);
+                            vr.setMessage(messages.getMessage("error.validation.customobject.filtertype"));
+                            return vr;
+                        }
+                        if (p.customObjectFilterValues.getValue().isEmpty()) {
+                            vr.setStatus(Result.ERROR);
+                            vr.setMessage(messages.getMessage("error.validation.customobject.filtervalues"));
+                            return vr;
+                        }
                     }
                 }
                 // list no checking...
@@ -227,11 +235,6 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
         // BulkExec
         if (properties instanceof TMarketoBulkExecProperties) {
             TMarketoBulkExecProperties p = (TMarketoBulkExecProperties) properties;
-            if (p.connection.apiMode.getValue().equals(APIMode.SOAP)) {
-                vr.setStatus(Result.ERROR);
-                vr.setMessage(messages.getMessage("error.validation.soap.bulkexec"));
-                return vr;
-            }
             if (StringUtils.isEmpty(p.bulkFilePath.getValue())) {
                 vr.setStatus(Result.ERROR);
                 vr.setMessage(messages.getMessage("error.validation.sink.bulk.bulkfilepath"));

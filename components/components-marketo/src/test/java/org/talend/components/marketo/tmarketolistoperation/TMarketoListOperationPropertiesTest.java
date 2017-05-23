@@ -27,9 +27,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.MarketoTestBase;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperationProperties.ListOperation;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
@@ -75,7 +75,8 @@ public class TMarketoListOperationPropertiesTest extends MarketoTestBase {
     public void testAfterApiMode() throws Exception {
         props.afterListOperation();
         assertEquals(MarketoConstants.getListOperationRESTSchema(), props.schemaInput.schema.getValue());
-        props.connection.apiMode.setValue(APIMode.SOAP);
+        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
+        props.afterApiMode();
         props.afterListOperation();
         assertEquals(MarketoConstants.getListOperationSOAPSchema(), props.schemaInput.schema.getValue());
     }
@@ -92,7 +93,7 @@ public class TMarketoListOperationPropertiesTest extends MarketoTestBase {
         s = props.schemaReject.schema.getValue();
         assertEquals(MarketoConstants.getListOperationRejectRESTSchema(), s);
         // SOAP
-        props.connection.apiMode.setValue(APIMode.SOAP);
+        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
         props.afterListOperation();
         props.updateOutputSchemas();
         mainFieldsCount = props.schemaInput.schema.getValue().getFields().size();

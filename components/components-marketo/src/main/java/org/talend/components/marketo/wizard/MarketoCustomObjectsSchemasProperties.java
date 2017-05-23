@@ -22,6 +22,7 @@ import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
+import org.talend.components.marketo.MarketoComponentProperties.APIMode;
 import org.talend.components.marketo.MarketoProvideConnectionProperties;
 import org.talend.components.marketo.runtime.MarketoSourceOrSink;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
@@ -60,6 +61,12 @@ public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesIm
     @Override
     public TMarketoConnectionProperties getConnectionProperties() {
         return connection;
+    }
+
+    @Override
+    public APIMode getApiMode() {
+        // REST only
+        return APIMode.REST;
     }
 
     public MarketoCustomObjectsSchemasProperties setConnection(TMarketoConnectionProperties connection) {

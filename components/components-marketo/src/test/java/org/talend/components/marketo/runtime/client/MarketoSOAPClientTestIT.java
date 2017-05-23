@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.SOAP;
+import static org.talend.components.marketo.MarketoComponentProperties.APIMode.SOAP;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsSOAP.ChangeDataValue;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsSOAP.NewLead;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLead;
@@ -77,11 +77,11 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         inputProperties.connection.endpoint.setValue(ENDPOINT_SOAP);
         inputProperties.connection.clientAccessId.setValue(USERID_SOAP);
         inputProperties.connection.secretKey.setValue(SECRETKEY_SOAP);
-        inputProperties.connection.apiMode.setValue(SOAP);
         inputProperties.schemaInput.setupProperties();
         inputProperties.mappingInput.setupProperties();
         inputProperties.includeTypes.setupProperties();
         inputProperties.setupProperties();
+        inputProperties.apiMode.setValue(SOAP);
         inputProperties.includeTypes.type.setValue(new ArrayList<String>());
         inputProperties.excludeTypes.setupProperties();
         inputProperties.excludeTypes.type.setValue(new ArrayList<String>());
@@ -91,24 +91,24 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         //
         listProperties = new TMarketoListOperationProperties("test");
         listProperties.connection.setupProperties();
-        listProperties.connection.apiMode.setValue(SOAP);
         listProperties.connection.endpoint.setValue(ENDPOINT_SOAP);
         listProperties.connection.clientAccessId.setValue(USERID_SOAP);
         listProperties.connection.secretKey.setValue(SECRETKEY_SOAP);
         listProperties.schemaInput.setupProperties();
         listProperties.setupProperties();
+        listProperties.apiMode.setValue(SOAP);
         listProperties.connection.setupLayout();
         listProperties.schemaInput.setupLayout();
         listProperties.setupLayout();
         //
         outProperties = new TMarketoOutputProperties("test");
         outProperties.connection.setupProperties();
-        outProperties.connection.apiMode.setValue(SOAP);
         outProperties.connection.endpoint.setValue(ENDPOINT_SOAP);
         outProperties.connection.clientAccessId.setValue(USERID_SOAP);
         outProperties.connection.secretKey.setValue(SECRETKEY_SOAP);
         outProperties.schemaInput.setupProperties();
         outProperties.setupProperties();
+        outProperties.apiMode.setValue(SOAP);
         outProperties.connection.setupLayout();
         outProperties.schemaInput.setupLayout();
         outProperties.setupLayout();
@@ -716,9 +716,10 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
 
     @Test
     public void testConvertToLeadRecord() throws Exception {
-        MarketoSource source = new MarketoSource();
         outProperties.outputOperation.setValue(OutputOperation.syncLead);
         outProperties.updateSchemaRelated();
+        outProperties.afterOutputOperation();
+        outProperties.beforeMappingInput();
         MarketoSOAPClient client = new MarketoSOAPClient(outProperties.connection);
         IndexedRecord record = new GenericData.Record(outProperties.schemaInput.schema.getValue());
         record.put(0, 10);
@@ -739,8 +740,8 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         record.put(1, "undx@undx.net");
         record.put(2, "ForeignPersonSysId");
         record.put(3, "SFDC");// CUSTOM, SFDC, NETSUITE;
-        record.put(4, "My firstName");
-        record.put(5, "My lastName");
+        record.put(5, "My firstName");
+        record.put(6, "My lastName");
         outProperties.schemaInput.schema.setValue(s);
         outProperties.beforeMappingInput();
         lr = client.convertToLeadRecord(record, outProperties.mappingInput.getNameMappingsForMarketo());

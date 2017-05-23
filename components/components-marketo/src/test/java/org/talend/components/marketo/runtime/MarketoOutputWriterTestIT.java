@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.REST;
+import static org.talend.components.marketo.MarketoComponentProperties.APIMode.REST;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,8 +35,8 @@ import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OperationType;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation;
@@ -71,7 +71,7 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         props.schemaInput.setupProperties();
         props.schemaInput.setupLayout();
         props.setupLayout();
-        props.connection.apiMode.setValue(APIMode.SOAP);
+        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
         props.schemaInput.schema.setValue(MarketoConstants.getSOAPOutputSchemaForSyncLead());
         props.schemaListener.afterSchema();
 
@@ -89,7 +89,7 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         props.schemaInput.setupProperties();
         props.schemaInput.setupLayout();
         props.setupLayout();
-        props.connection.apiMode.setValue(REST);
+        props.apiMode.setValue(REST);
         props.schemaInput.schema.setValue(MarketoConstants.getRESTOutputSchemaForSyncLead());
         props.schemaListener.afterSchema();
 

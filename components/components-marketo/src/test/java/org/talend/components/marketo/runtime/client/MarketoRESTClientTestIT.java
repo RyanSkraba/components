@@ -46,6 +46,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.runtime.MarketoSource;
 import org.talend.components.marketo.runtime.client.rest.type.SyncStatus;
@@ -53,7 +54,6 @@ import org.talend.components.marketo.runtime.client.type.ListOperationParameters
 import org.talend.components.marketo.runtime.client.type.MarketoError;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsREST;
@@ -85,7 +85,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         iprops.connection.endpoint.setValue(ENDPOINT_REST);
         iprops.connection.clientAccessId.setValue(USERID_REST);
         iprops.connection.secretKey.setValue(SECRETKEY_REST);
-        iprops.connection.apiMode.setValue(APIMode.REST);
+        iprops.apiMode.setValue(MarketoComponentProperties.APIMode.REST);
         iprops.schemaInput.setupProperties();
         iprops.mappingInput.setupProperties();
         iprops.setupProperties();
@@ -103,7 +103,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         listProperties.connection.endpoint.setValue(ENDPOINT_REST);
         listProperties.connection.clientAccessId.setValue(USERID_REST);
         listProperties.connection.secretKey.setValue(SECRETKEY_REST);
-        listProperties.connection.apiMode.setValue(APIMode.REST);
+        listProperties.apiMode.setValue(MarketoComponentProperties.APIMode.REST);
         listProperties.schemaInput.setupProperties();
         listProperties.setupProperties();
         listProperties.connection.setupLayout();
@@ -115,7 +115,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         outProperties.connection.endpoint.setValue(ENDPOINT_REST);
         outProperties.connection.clientAccessId.setValue(USERID_REST);
         outProperties.connection.secretKey.setValue(SECRETKEY_REST);
-        outProperties.connection.apiMode.setValue(APIMode.REST);
+        outProperties.apiMode.setValue(MarketoComponentProperties.APIMode.REST);
         outProperties.schemaInput.setupProperties();
         outProperties.setupProperties();
         outProperties.connection.setupLayout();
@@ -574,7 +574,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         MarketoClientService client = source.getClientService(null);
         //
         ListOperationParameters parms = new ListOperationParameters();
-        parms.setApiMode(APIMode.REST.name());
+        parms.setApiMode(MarketoComponentProperties.APIMode.REST.name());
         parms.setListId(UNDX_TEST_LIST_SMALL_ID);
         parms.setLeadIds(new Integer[] { createdLeads.get(10) });
         //
@@ -608,7 +608,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         MarketoClientService client = source.getClientService(null);
         //
         ListOperationParameters parms = new ListOperationParameters();
-        parms.setApiMode(APIMode.REST.name());
+        parms.setApiMode(MarketoComponentProperties.APIMode.REST.name());
         parms.setListId(UNDX_TEST_LIST_SMALL_ID);
         parms.setLeadIds(new Integer[] { createdLeads.get(0), createdLeads.get(1), createdLeads.get(2) });
         //
@@ -631,7 +631,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         MarketoClientService client = source.getClientService(null);
         //
         ListOperationParameters parms = new ListOperationParameters();
-        parms.setApiMode(APIMode.REST.name());
+        parms.setApiMode(MarketoComponentProperties.APIMode.REST.name());
         parms.setListId(UNDX_TEST_LIST_SMALL_ID);
         parms.setLeadIds(new Integer[] { createdLeads.get(20) });
         //

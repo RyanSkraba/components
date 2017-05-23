@@ -178,6 +178,21 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
         throw new IOException(messages.getMessage("error.reader.invalid.operation"));
     }
 
+    public boolean checkResult(MarketoRecordResult mkto) throws IOException {
+        apiCalls++;
+        boolean result;
+        if (!mkto.isSuccess()) {
+            result = false;
+            if (properties.dieOnError.getValue()) {
+                LOG.debug("mkto = {}.", mkto);
+                throw new IOException(mktoResult.getErrorsString());
+            }
+        } else {
+            result = mktoResult.getRecordCount() > 0;
+        }
+        return result;
+    }
+
     @Override
     public boolean start() throws IOException {
         Boolean startable;
@@ -189,15 +204,13 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
             properties.includeTypes.type.setValue(activities.get(activitiesListIndex++));
         }
         mktoResult = executeOperation(null);
-        startable = mktoResult.getRecordCount() > 0;
-        apiCalls++;
+        startable = checkResult(mktoResult);
         // check for activities, first batch may be empty
-        if (!startable && useActivitiesList && activitiesListIndex != activities.size()) {
+        if (!startable && mktoResult.isSuccess() && useActivitiesList && activitiesListIndex != activities.size()) {
             while (activitiesListIndex != activities.size()) {
                 properties.includeTypes.type.setValue(activities.get(activitiesListIndex++));
                 mktoResult = executeOperation(null);
-                startable = mktoResult.getRecordCount() > 0;
-                apiCalls++;
+                startable = checkResult(mktoResult);
                 if (startable) {
                     break;
                 }
@@ -231,14 +244,12 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
         }
         // fetch more data
         mktoResult = executeOperation(mktoResult.getStreamPosition());
-        boolean advanceable = mktoResult.getRecordCount() > 0;
-        apiCalls++;
-        if (!advanceable && useActivitiesList && activitiesListIndex != activities.size()) {
+        boolean advanceable = checkResult(mktoResult);
+        if (!advanceable && mktoResult.isSuccess() && useActivitiesList && activitiesListIndex != activities.size()) {
             while (activitiesListIndex != activities.size()) {
                 properties.includeTypes.type.setValue(activities.get(activitiesListIndex++));
                 mktoResult = executeOperation(mktoResult.getStreamPosition());
-                advanceable = mktoResult.getRecordCount() > 0;
-                apiCalls++;
+                advanceable = checkResult(mktoResult);
                 if (advanceable) {
                     break;
                 }

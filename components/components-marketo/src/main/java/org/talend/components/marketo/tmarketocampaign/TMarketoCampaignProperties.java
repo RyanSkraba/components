@@ -28,7 +28,6 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.helpers.TokenTable;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -84,8 +83,8 @@ public class TMarketoCampaignProperties extends MarketoComponentProperties {
     public void setupProperties() {
         super.setupProperties();
         // REST Only
-        connection.apiMode.setPossibleValues(APIMode.REST);
-        connection.apiMode.setValue(APIMode.REST);
+        apiMode.setPossibleValues(APIMode.REST);
+        apiMode.setValue(APIMode.REST);
         //
         campaignAction.setPossibleValues((Object[]) CampaignAction.values());
         campaignAction.setValue(CampaignAction.get);
@@ -115,28 +114,9 @@ public class TMarketoCampaignProperties extends MarketoComponentProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        switch (campaignAction.getValue()) {
-        case get:
-        case getById:
-            schemaInput.schema.setValue(MarketoConstants.getCampaignSchema());
-            schemaFlow.schema.setValue(MarketoConstants.getCampaignSchema());
-            break;
-        case schedule:
-            schemaInput.schema.setValue(MarketoConstants.scheduleCampaignSchema());
-            schemaFlow.schema.setValue(MarketoConstants.scheduleCampaignSchema());
-            break;
-        case trigger:
-            schemaInput.schema.setValue(MarketoConstants.triggerCampaignSchema());
-            if (triggerCampaignForLeadsInBatch.getValue()) {
-                schemaFlow.schema.setValue(MarketoConstants.getEmptySchema());
-            } else {
-                schemaFlow.schema.setValue(MarketoConstants.triggerCampaignSchemaFlow());
-            }
-            break;
-        }
-
         if (form.getName().equals(Form.MAIN)) {
             // first hide everything
+            form.getWidget(apiMode.getName()).setVisible(false); // REST ONLY
             form.getWidget(campaignId.getName()).setVisible(false);
             form.getWidget(campaignIds.getName()).setVisible(false);
             form.getWidget(campaignNames.getName()).setVisible(false);
@@ -175,11 +155,30 @@ public class TMarketoCampaignProperties extends MarketoComponentProperties {
     }
 
     public void afterCampaignAction() {
+        switch (campaignAction.getValue()) {
+        case get:
+        case getById:
+            schemaInput.schema.setValue(MarketoConstants.getCampaignSchema());
+            schemaFlow.schema.setValue(MarketoConstants.getCampaignSchema());
+            break;
+        case schedule:
+            schemaInput.schema.setValue(MarketoConstants.scheduleCampaignSchema());
+            schemaFlow.schema.setValue(MarketoConstants.scheduleCampaignSchema());
+            break;
+        case trigger:
+            schemaInput.schema.setValue(MarketoConstants.triggerCampaignSchema());
+            if (triggerCampaignForLeadsInBatch.getValue()) {
+                schemaFlow.schema.setValue(MarketoConstants.getEmptySchema());
+            } else {
+                schemaFlow.schema.setValue(MarketoConstants.triggerCampaignSchemaFlow());
+            }
+            break;
+        }
         refreshLayout(getForm(Form.MAIN));
     }
 
     public void afterTriggerCampaignForLeadsInBatch() {
-        refreshLayout(getForm(Form.MAIN));
+        afterCampaignAction();
     }
 
 }

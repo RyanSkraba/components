@@ -12,7 +12,10 @@
 // ============================================================================
 package org.talend.components.marketo;
 
+import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.DEFAULT_ENDPOINT_REST;
+import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.DEFAULT_ENDPOINT_SOAP;
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 
 import java.util.ArrayList;
@@ -28,16 +31,15 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
 public abstract class MarketoComponentProperties extends FixedConnectorsComponentProperties
-        implements MarketoProvideConnectionProperties {
+        implements MarketoProvideConnectionProperties, SerializeSetVersion {
 
-    public static final String API_SOAP = "SOAP";
-
-    public static final String API_REST = "REST";
+    public Property<APIMode> apiMode = newEnum("apiMode", APIMode.class);
 
     public TMarketoConnectionProperties connection = new TMarketoConnectionProperties("connection");
 
@@ -67,8 +69,6 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
 
     public Property<Boolean> dieOnError = newBoolean("dieOnError");
 
-    protected String currentSchemaAPI;
-
     private static final long serialVersionUID = 5587867978797981L;
 
     private transient static final Logger LOG = LoggerFactory.getLogger(MarketoComponentProperties.class);
@@ -81,9 +81,11 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
     public void setupProperties() {
         super.setupProperties();
 
+        apiMode.setValue(MarketoComponentProperties.APIMode.REST);
+        connection.setApiMode(apiMode.getValue());
+
         batchSize.setValue(100);
         dieOnError.setValue(true);
-        currentSchemaAPI = API_REST;
     }
 
     @Override
@@ -92,8 +94,8 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
 
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(connection.getForm(Form.REFERENCE));
+        mainForm.addColumn(apiMode);
         mainForm.addRow(schemaInput.getForm(Form.REFERENCE));
-
         // Advanced
         Form advancedForm = Form.create(this, Form.ADVANCED);
         advancedForm.addRow(connection.getForm(Form.ADVANCED));
@@ -102,6 +104,15 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
+
+        if (DEFAULT_ENDPOINT_REST.equals(connection.endpoint.getValue())
+                && MarketoComponentProperties.APIMode.SOAP.equals(apiMode.getValue())) {
+            connection.endpoint.setValue(DEFAULT_ENDPOINT_SOAP);
+        }
+        if (DEFAULT_ENDPOINT_SOAP.equals(connection.endpoint.getValue())
+                && MarketoComponentProperties.APIMode.REST.equals(apiMode.getValue())) {
+            connection.endpoint.setValue(DEFAULT_ENDPOINT_REST);
+        }
 
         for (Form childForm : connection.getForms()) {
             connection.refreshLayout(childForm);
@@ -149,19 +160,50 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
 
     @Override
     public TMarketoConnectionProperties getConnectionProperties() {
-        return connection.getConnectionProperties();
-    }
-
-    public String getApiMode() {
-        return (getConnectionProperties().apiMode.getValue().equals(APIMode.SOAP)) ? API_SOAP : API_REST;
+        TMarketoConnectionProperties conn = connection.getConnectionProperties();
+        // ensure that connection and component use the same APIMode
+        conn.setApiMode(getApiMode());
+        return conn;
     }
 
     public Boolean isApiSOAP() {
-        return getApiMode().equals(API_SOAP);
+        return APIMode.SOAP.equals(apiMode.getValue());
     }
 
     public Boolean isApiREST() {
-        return !isApiSOAP();
+        return APIMode.REST.equals(apiMode.getValue());
+    }
+
+    public enum APIMode {
+        REST,
+        SOAP
+    }
+
+    @Override
+    public APIMode getApiMode() {
+        return apiMode.getValue();
+    }
+
+    public void afterApiMode() {
+        getConnectionProperties().setApiMode(getApiMode());
+    }
+
+    @Override
+    public int getVersionNumber() {
+        return 1;
+    }
+
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated = super.postDeserialize(version, setup, persistent);
+        if (version < this.getVersionNumber()) {
+            if (apiMode.getValue() == null) {
+                LOG.info("[postDeserialize] Migrating API to {}.", connection.apiMode.getValue());
+                apiMode.setValue(APIMode.valueOf(connection.apiMode.getValue().name()));
+                migrated = true;
+            }
+        }
+        return migrated;
     }
 
 }

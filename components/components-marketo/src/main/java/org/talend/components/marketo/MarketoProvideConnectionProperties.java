@@ -12,10 +12,13 @@
 // ============================================================================
 package org.talend.components.marketo;
 
+import org.talend.components.marketo.MarketoComponentProperties.APIMode;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 
 public interface MarketoProvideConnectionProperties {
 
     TMarketoConnectionProperties getConnectionProperties();
+
+    APIMode getApiMode();
 
 }

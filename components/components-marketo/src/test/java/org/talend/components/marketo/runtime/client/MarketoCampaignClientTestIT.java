@@ -20,7 +20,6 @@ import static org.talend.components.marketo.tmarketocampaign.TMarketoCampaignPro
 import static org.talend.components.marketo.tmarketocampaign.TMarketoCampaignProperties.CampaignAction.getById;
 import static org.talend.components.marketo.tmarketocampaign.TMarketoCampaignProperties.CampaignAction.schedule;
 import static org.talend.components.marketo.tmarketocampaign.TMarketoCampaignProperties.CampaignAction.trigger;
-import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.REST;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -62,7 +61,6 @@ public class MarketoCampaignClientTestIT extends MarketoBaseTestIT {
         iprops.connection.endpoint.setValue(ENDPOINT_REST);
         iprops.connection.clientAccessId.setValue(USERID_REST);
         iprops.connection.secretKey.setValue(SECRETKEY_REST);
-        iprops.connection.apiMode.setValue(REST);
         iprops.schemaInput.setupProperties();
         iprops.setupProperties();
         iprops.connection.setupLayout();

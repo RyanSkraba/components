@@ -22,15 +22,16 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.talend.components.marketo.MarketoComponentDefinition.RETURN_NB_CALL;
+import static org.talend.components.marketo.MarketoComponentProperties.APIMode.REST;
+import static org.talend.components.marketo.MarketoComponentProperties.APIMode.SOAP;
 import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PARAM;
-import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.REST;
-import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.SOAP;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.CustomObject;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLead;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadActivity;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadChanges;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getMultipleLeads;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeSOAP.EMAIL;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeSOAP.IDNUM;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.StaticListSelector;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam.STATIC_LIST_NAME;
@@ -65,10 +66,10 @@ public class MarketoInputReaderTestIT extends MarketoBaseTestIT {
         props.connection.endpoint.setValue(ENDPOINT_SOAP);
         props.connection.clientAccessId.setValue(USERID_SOAP);
         props.connection.secretKey.setValue(SECRETKEY_SOAP);
-        props.connection.apiMode.setValue(SOAP);
         props.connection.setupLayout();
         props.mappingInput.setupProperties();
         props.setupProperties();
+        props.apiMode.setValue(SOAP);
         props.schemaInput.setupProperties();
         props.schemaInput.setupLayout();
         props.includeTypes.setupProperties();
@@ -86,7 +87,7 @@ public class MarketoInputReaderTestIT extends MarketoBaseTestIT {
         props.connection.endpoint.setValue(ENDPOINT_REST);
         props.connection.clientAccessId.setValue(USERID_REST);
         props.connection.secretKey.setValue(SECRETKEY_REST);
-        props.connection.apiMode.setValue(REST);
+        props.apiMode.setValue(REST);
         props.connection.setupLayout();
         props.mappingInput.setupProperties();
         props.setupProperties();
@@ -358,6 +359,21 @@ public class MarketoInputReaderTestIT extends MarketoBaseTestIT {
         reader = getReader(props);
         assertTrue(reader.start());
         fail("Shouldn't be here");
+    }
+
+    @Test(expected = IOException.class)
+    public void testLeadActivityFailSOAP() throws Exception {
+        TMarketoInputProperties props = getSOAPProperties();
+        props.inputOperation.setValue(getLeadActivity);
+        props.leadKeyTypeSOAP.setValue(IDNUM);
+        props.leadSelectorSOAP.setValue(LeadKeySelector);
+        props.afterInputOperation();
+        props.batchSize.setValue(5);
+        //
+        props.leadKeyValue.setValue("4218473");
+        reader = getReader(props);
+        reader.start();
+        fail("Should not be here");
     }
 
 }

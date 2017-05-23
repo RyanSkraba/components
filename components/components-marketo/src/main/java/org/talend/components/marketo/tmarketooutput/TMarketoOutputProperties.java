@@ -19,6 +19,7 @@ import static org.talend.components.marketo.tmarketooutput.TMarketoOutputPropert
 import static org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation.syncCustomObjects;
 import static org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation.syncLead;
 import static org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation.syncMultipleLeads;
+import static org.talend.daikon.properties.ValidationResult.OK;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
@@ -205,16 +206,6 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        LOG.debug("[refreshLayout@{}] Connection API({}) Schema `{}`.", form.getName(), getApiMode(),
-                schemaInput.schema.getValue().getName());
-
-        if (!getApiMode().equals(currentSchemaAPI)) {
-            LOG.debug("[refreshLayout@{}] Connection API({}) *mismatches* Schema `{}` API({}) : resetting schema.",
-                    form.getName(), getApiMode(), schemaInput.schema.getValue().getName(), currentSchemaAPI);
-            updateSchemaRelated();
-            LOG.debug("[refreshLayout@{}] Connection API({}) should match Schema `{}` API({}).", form.getName(), getApiMode(),
-                    schemaInput.schema.getValue().getName(), currentSchemaAPI);
-        }
 
         if (form.getName().equals(Form.MAIN)) {
             // first, hide everything
@@ -276,7 +267,7 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
             switch (outputOperation.getValue()) {
             case syncLead:
             case syncMultipleLeads:
-                return ValidationResult.OK;
+                return OK;
             case deleteLeads:
             case syncCustomObjects:
             case deleteCustomObjects:
@@ -308,7 +299,6 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
 
     public void beforeMappingInput() {
         List<String> fld = getSchemaFields();
-        mappingInput.columnName.setPossibleValues(fld);
         mappingInput.columnName.setValue(fld);
         // protect mappings...
         if (fld.size() != mappingInput.size()) {
@@ -320,8 +310,16 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
         }
     }
 
+    @Override
+    public void afterApiMode() {
+        super.afterApiMode();
+
+        updateSchemaRelated();
+        beforeMappingInput();
+        refreshLayout(getForm(Form.MAIN));
+    }
+
     public void afterOutputOperation() {
-        LOG.debug("[afterOutputOperation]");
         updateSchemaRelated();
         refreshLayout(getForm(Form.MAIN));
     }
@@ -343,7 +341,6 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
     public void updateSchemaRelated() {
         Schema s = null;
         if (isApiSOAP()) {
-            currentSchemaAPI = API_SOAP;
             // ensure we have at least one schema set
             s = MarketoConstants.getSOAPOutputSchemaForSyncLead();
             switch (outputOperation.getValue()) {
@@ -355,7 +352,6 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
                 break;
             }
         } else {
-            currentSchemaAPI = API_REST;
             // ensure we have at least one schema set
             s = MarketoConstants.getRESTOutputSchemaForSyncLead();
             switch (outputOperation.getValue()) {
@@ -378,11 +374,7 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
                 break;
             }
         }
-        LOG.debug("[updateSchemaRelated] API({}) Replacing Schema `{}` by Schema `{}`.", getApiMode(),
-                schemaInput.schema.getValue().getName(), s.getName());
         schemaInput.schema.setValue(s);
-        LOG.debug("[updateSchemaRelated] API({}) Replaced Schema. Now schema is `{}`.", getApiMode(),
-                schemaInput.schema.getValue().getName());
         updateOutputSchemas();
     }
 

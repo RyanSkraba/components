@@ -445,16 +445,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         boolean useSOAP = isApiSOAP();
-        LOG.debug("[refreshLayout@{}] Connection API({}) Schema `{}`.", form.getName(), getApiMode(),
-                schemaInput.schema.getValue().getName());
-
-        if (!getApiMode().equals(currentSchemaAPI)) {
-            LOG.debug("[refreshLayout@{}] Connection API({}) *mismatches* Schema `{}` API({}) : resetting schema.",
-                    form.getName(), getApiMode(), schemaInput.schema.getValue().getName(), currentSchemaAPI);
-            updateSchemaRelated();
-            LOG.debug("[refreshLayout@{}] Connection API({}) should match Schema `{}` API({}).", form.getName(), getApiMode(),
-                    schemaInput.schema.getValue().getName(), currentSchemaAPI);
-        }
         //
         if (form.getName().equals(Form.MAIN)) {
             // first hide everything
@@ -646,7 +636,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
     }
 
     public ValidationResult validateFetchCustomObjectSchema() {
-        ValidationResult vr = new ValidationResult();
+        ValidationResultMutable vr = new ValidationResultMutable();
         // try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(new
         // JarRuntimeInfo(MAVEN_RUNTIME_PATH,
         // DependenciesReader.computeDependenciesFilePath(MAVEN_GROUP_ID, MAVEN_RUNTIME_ARTIFACT_ID),
@@ -703,7 +693,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
 
     public void beforeMappingInput() {
         List<String> fld = getSchemaFields();
-        mappingInput.columnName.setPossibleValues(fld);
         mappingInput.columnName.setValue(fld);
         // protect mappings...
         if (fld.size() != mappingInput.size()) {
@@ -716,7 +705,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
     }
 
     public void afterInputOperation() {
-        LOG.debug("[afterInputOperation]");
         updateSchemaRelated();
         refreshLayout(getForm(Form.MAIN));
     }
@@ -757,10 +745,18 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
         refreshLayout(getForm(Form.MAIN));
     }
 
+    @Override
+    public void afterApiMode() {
+        super.afterApiMode();
+
+        updateSchemaRelated();
+        beforeInputOperation();
+        refreshLayout(getForm(Form.MAIN));
+    }
+
     public void updateSchemaRelated() {
         Schema s = null;
         if (isApiSOAP()) {
-            currentSchemaAPI = API_SOAP;
             switch (inputOperation.getValue()) {
             case getLead:
             case getMultipleLeads:
@@ -774,7 +770,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
                 break;
             }
         } else {
-            currentSchemaAPI = API_REST;
             switch (inputOperation.getValue()) {
             case getLead:
             case getMultipleLeads:
@@ -829,12 +824,8 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
                 break;
             }
         }
-
-        LOG.debug("[updateSchemaRelated] API({}) Replacing Schema `{}` by Schema `{}`.", getApiMode(),
-                schemaInput.schema.getValue().getName(), s.getName());
         schemaInput.schema.setValue(s);
-        LOG.debug("[updateSchemaRelated] API({}) Replaced Schema. Now schema is `{}`.", getApiMode(),
-                schemaInput.schema.getValue().getName());
+        beforeMappingInput();
     }
 
 }

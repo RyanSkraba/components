@@ -15,8 +15,8 @@ package org.talend.components.marketo.runtime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.REST;
-import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.SOAP;
+import static org.talend.components.marketo.MarketoComponentProperties.APIMode.REST;
+import static org.talend.components.marketo.MarketoComponentProperties.APIMode.SOAP;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getMultipleLeads;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeSOAP.EMAIL;
 
@@ -48,7 +48,7 @@ public class MarketoInputWriterTestIT extends MarketoBaseTestIT {
         propsSOAP.connection.endpoint.setValue(ENDPOINT_SOAP);
         propsSOAP.connection.clientAccessId.setValue(USERID_SOAP);
         propsSOAP.connection.secretKey.setValue(SECRETKEY_SOAP);
-        propsSOAP.connection.apiMode.setValue(SOAP);
+        propsSOAP.apiMode.setValue(SOAP);
         propsSOAP.connection.setupLayout();
         propsSOAP.mappingInput.setupProperties();
         propsSOAP.setupProperties();
@@ -65,7 +65,7 @@ public class MarketoInputWriterTestIT extends MarketoBaseTestIT {
         propsREST.connection.endpoint.setValue(ENDPOINT_REST);
         propsREST.connection.clientAccessId.setValue(USERID_REST);
         propsREST.connection.secretKey.setValue(SECRETKEY_REST);
-        propsREST.connection.apiMode.setValue(REST);
+        propsREST.apiMode.setValue(REST);
         propsREST.connection.setupLayout();
         propsREST.mappingInput.setupProperties();
         propsREST.setupProperties();

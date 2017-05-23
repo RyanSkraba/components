@@ -14,7 +14,7 @@ package org.talend.components.marketo.runtime.client;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.REST;
+import static org.talend.components.marketo.MarketoComponentProperties.APIMode.REST;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class MarketoCompanyClientTestIT extends MarketoBaseTestIT {
         iprops.connection.endpoint.setValue(ENDPOINT_REST);
         iprops.connection.clientAccessId.setValue(USERID_REST);
         iprops.connection.secretKey.setValue(SECRETKEY_REST);
-        iprops.connection.apiMode.setValue(REST);
+        iprops.apiMode.setValue(REST);
         iprops.schemaInput.setupProperties();
         iprops.mappingInput.setupProperties();
         iprops.setupProperties();
@@ -64,7 +64,7 @@ public class MarketoCompanyClientTestIT extends MarketoBaseTestIT {
         //
         oprops = new TMarketoOutputProperties("test");
         oprops.connection.setupProperties();
-        oprops.connection.apiMode.setValue(REST);
+        oprops.apiMode.setValue(REST);
         oprops.connection.endpoint.setValue(ENDPOINT_REST);
         oprops.connection.clientAccessId.setValue(USERID_REST);
         oprops.connection.secretKey.setValue(SECRETKEY_REST);
