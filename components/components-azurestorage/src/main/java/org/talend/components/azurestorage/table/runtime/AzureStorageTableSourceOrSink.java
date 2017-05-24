@@ -114,8 +114,13 @@ public class AzureStorageTableSourceOrSink extends AzureStorageSourceOrSink impl
             TableQuery<DynamicTableEntity> partitionQuery;
             partitionQuery = TableQuery.from(DynamicTableEntity.class).take(1);
             Iterable<DynamicTableEntity> entities = table.execute(partitionQuery);
-            DynamicTableEntity result = entities.iterator().next();
-            return AzureStorageAvroRegistry.get().inferSchema(result);
+            if(entities.iterator().hasNext()){
+                DynamicTableEntity result = entities.iterator().next();
+                return AzureStorageAvroRegistry.get().inferSchema(result);
+            }else{
+                return null;
+            }
+            
         } catch (InvalidKeyException | URISyntaxException | StorageException e) {
             LOGGER.error(e.getLocalizedMessage());
             throw new ComponentException(e);
