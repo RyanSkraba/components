@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
+import java.security.InvalidKeyException;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,9 +27,9 @@ import org.junit.rules.ExpectedException;
 public class SharedAccessSignatureUtilsTest {
 
     private SharedAccessSignatureUtils sharedAccessSignatureUtils;
-    
-	@Rule
-	public ExpectedException thrown= ExpectedException.none();
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     String account = "undx";
 
@@ -62,15 +63,16 @@ public class SharedAccessSignatureUtilsTest {
 
     /**
      *
+     * @throws InvalidKeyException
      * @see org.talend.components.azurestorage.utils.SharedAccessSignatureUtils#getSharedAccessSignatureUtils(String)
      */
-    @Test
-    public void getSharedAccessSignatureUtils() {
-    	thrown.expect(IllegalArgumentException.class);
-	    thrown.expectMessage("Shared Acces Signature is invalid.");
-        SharedAccessSignatureUtils sharedaccesssignatureutils = SharedAccessSignatureUtils.getSharedAccessSignatureUtils("");
-        
-        sharedaccesssignatureutils = sharedAccessSignatureUtils.getSharedAccessSignatureUtils(sas);
+    @Test(expected = InvalidKeyException.class)
+    public void getSharedAccessSignatureUtilsInvalid() throws InvalidKeyException {
+        SharedAccessSignatureUtils.getSharedAccessSignatureUtils("");
+    }
+
+    public void getSharedAccessSignatureUtilsValid() throws InvalidKeyException {
+        SharedAccessSignatureUtils sharedaccesssignatureutils = SharedAccessSignatureUtils.getSharedAccessSignatureUtils(sas);
         assertNotNull("sharedaccesssignatureutils cannot be null", sharedaccesssignatureutils);
     }
 

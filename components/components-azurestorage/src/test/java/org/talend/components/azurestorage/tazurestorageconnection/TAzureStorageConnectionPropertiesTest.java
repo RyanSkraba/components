@@ -15,11 +15,12 @@ package org.talend.components.azurestorage.tazurestorageconnection;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 
 public class TAzureStorageConnectionPropertiesTest {
 
@@ -50,11 +51,12 @@ public class TAzureStorageConnectionPropertiesTest {
         props.afterReferencedComponent();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAfterWizardFinish() throws Exception {
         props.setupProperties();
-        props.afterFormFinishWizard(null);
-        fail("Should have failed...");
+        ValidationResult vr = props.afterFormFinishWizard(null);
+        assertEquals(Result.ERROR, vr.getStatus());
+
     }
 
     @Test

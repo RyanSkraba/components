@@ -93,7 +93,7 @@ public class AzureStorageRuntimeTest {
         properties.useSharedAccessSignature.setValue(true);
         properties.sharedAccessSignature.setValue("FakeSignature=ALKNFJHGIKHJ");
         ValidationResult validationResult = this.azureStorageRuntime.initialize(runtimeContainer, properties);
-        assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
+        assertEquals(ValidationResult.Result.OK, validationResult.getStatus());
     }
 
     @Test

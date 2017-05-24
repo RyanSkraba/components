@@ -13,6 +13,7 @@
 package org.talend.components.azurestorage.utils;
 
 import java.net.URI;
+import java.security.InvalidKeyException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +33,7 @@ public class SharedAccessSignatureUtils {
     String token;
 
     private static final String SAS_PATTERN = "(http.?)?://(.*)\\.(blob|file|queue|table)\\.core\\.windows\\.net\\/(.*)";
-    
+
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(SharedAccessSignatureUtils.class);
 
@@ -44,12 +45,13 @@ public class SharedAccessSignatureUtils {
         this.token = sap;
     }
 
-    public static SharedAccessSignatureUtils getSharedAccessSignatureUtils(String sas){
+    public static SharedAccessSignatureUtils getSharedAccessSignatureUtils(String sas) throws InvalidKeyException {
         Matcher m = Pattern.compile(SharedAccessSignatureUtils.SAS_PATTERN).matcher(sas);
-        if (m.matches()) {
-            return new SharedAccessSignatureUtils(sas, m.group(1), m.group(2), m.group(3), m.group(4));
+        if (!m.matches()) {
+            throw new InvalidKeyException(i18nMessages.getMessage("error.InvalidSAS"));
         }
-        throw new IllegalArgumentException(i18nMessages.getMessage("error.InvalidSAS"));
+
+        return new SharedAccessSignatureUtils(sas, m.group(1), m.group(2), m.group(3), m.group(4));
     }
 
     public URI getURI() throws Throwable {
