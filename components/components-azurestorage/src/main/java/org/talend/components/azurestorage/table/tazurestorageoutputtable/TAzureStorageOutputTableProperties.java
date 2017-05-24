@@ -19,9 +19,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.azurestorage.table.AzureStorageTableProperties;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
@@ -80,6 +82,19 @@ public class TAzureStorageOutputTableProperties extends AzureStorageTablePropert
         actionOnData.setValue(ActionOnData.Insert);
         actionOnTable.setValue(ActionOnTable.Default);
         processOperationInBatch.setValue(false);
+        
+        Schema s = SchemaBuilder.record("Main").fields()
+                //
+                .name("PartitionKey").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true").type(AvroUtils._string()).noDefault()
+                //
+                .name("RowKey").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true").type(AvroUtils._string()).noDefault()
+                //
+                .endRecord();
+        schema.schema.setValue(s);
+        
         setSchemaListener(new ISchemaListener() {
 
             @Override

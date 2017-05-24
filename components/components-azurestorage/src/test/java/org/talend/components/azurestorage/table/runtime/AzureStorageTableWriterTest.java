@@ -31,6 +31,7 @@ import org.talend.components.azurestorage.table.avro.AzureStorageAvroRegistry;
 import org.talend.components.azurestorage.table.avro.AzureStorageTableAdaptorFactory;
 import org.talend.components.azurestorage.table.helpers.NameMappingTable;
 import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableProperties;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
 import com.microsoft.azure.storage.table.DynamicTableEntity;
@@ -38,16 +39,15 @@ import com.microsoft.azure.storage.table.DynamicTableEntity;
 public class AzureStorageTableWriterTest {
 
     AzureStorageTableWriter writer;
+    TAzureStorageOutputTableProperties p;
 
     @Before
     public void setUp() throws Exception {
         AzureStorageTableSink sink = new AzureStorageTableSink();
-        TAzureStorageOutputTableProperties p = new TAzureStorageOutputTableProperties("test");
+        p = new TAzureStorageOutputTableProperties("test");
         p.connection.setupProperties();
         p.setupProperties();
         p.tableName.setValue("test");
-        Schema s = SchemaBuilder.record("test").prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true").fields().endRecord();
-        p.schema.schema.setValue(s);
         p.dieOnError.setValue(true);
         p.nameMapping = new NameMappingTable("test");
         List<String> schemaMappings = new ArrayList<>();
@@ -64,6 +64,23 @@ public class AzureStorageTableWriterTest {
         sink.initialize(null, p);
 
         writer = (AzureStorageTableWriter) sink.createWriteOperation().createWriter(null);
+    }
+    
+    @Test
+    public void testSchema(){
+        
+        Schema s = SchemaBuilder.record("Main").fields()
+                //
+                .name("PartitionKey").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true").type(AvroUtils._string()).noDefault()
+                //
+                .name("RowKey").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true").type(AvroUtils._string()).noDefault()
+                //
+                .endRecord();
+        assertEquals(s, p.schema.schema.getValue());
+        
     }
 
     /**
