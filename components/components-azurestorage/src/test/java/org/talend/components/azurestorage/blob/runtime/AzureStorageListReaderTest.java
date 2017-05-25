@@ -21,9 +21,15 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.azurestorage.blob.helpers.RemoteBlobsTable;
 import org.talend.components.azurestorage.blob.tazurestoragelist.TAzureStorageListProperties;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 public class AzureStorageListReaderTest {
+    
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(RemoteBlobsTable.class);
 
     AzureStorageListReader reader;
 
@@ -43,10 +49,14 @@ public class AzureStorageListReaderTest {
         assertEquals("test", reader.getReturnValues().get("container"));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public final void testStart() throws IOException {
-        reader.start();
-        fail("Should have failed...");
+        try{
+            reader.start();
+        }catch(IllegalArgumentException iae){
+            assertEquals(messages.getMessage("error.VacantPrefix"),iae.getMessage());
+            
+        }
     }
 
     @Test

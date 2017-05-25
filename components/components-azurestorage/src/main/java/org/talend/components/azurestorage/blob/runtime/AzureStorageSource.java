@@ -27,6 +27,7 @@ import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzure
 import org.talend.components.azurestorage.blob.tazurestorageget.TAzureStorageGetProperties;
 import org.talend.components.azurestorage.blob.tazurestoragelist.TAzureStorageListProperties;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 
 /**
  * The AzureStorageSource provides the mechanism to supply data to other components at run-time.
@@ -80,6 +81,10 @@ public class AzureStorageSource extends AzureStorageSourceOrSink implements Boun
         if (!(this.properties instanceof AzureStorageBlobProperties))
             return null;
         AzureStorageBlobProperties p = (AzureStorageBlobProperties) properties;
+        ValidationResult vr = p.remoteBlobs.getValidationResult();
+        if(vr.getStatus().equals(Result.ERROR)){
+            throw new IllegalArgumentException(vr.getMessage());
+        }
         for (int idx = 0; idx < p.remoteBlobs.prefix.getValue().size(); idx++) {
             String prefix = (p.remoteBlobs.prefix.getValue().get(idx) != null) ? p.remoteBlobs.prefix.getValue().get(idx) : "";
             Boolean include = (p.remoteBlobs.include.getValue().get(idx) != null) ? p.remoteBlobs.include.getValue().get(idx)
@@ -89,25 +94,7 @@ public class AzureStorageSource extends AzureStorageSourceOrSink implements Boun
         return remoteBlobs;
     }
 
-    /**
-     * TODO - Refactor this redundant method with getRemoteBlobs...
-     */
-    public List<RemoteBlobGet> getRemoteBlobsGet() {
-        List<RemoteBlobGet> remoteBlobs = new ArrayList<RemoteBlobGet>();
-        if (!(this.properties instanceof TAzureStorageGetProperties))
-            return null;
-        TAzureStorageGetProperties p = (TAzureStorageGetProperties) properties;
-        for (int idx = 0; idx < p.remoteBlobsGet.prefix.getValue().size(); idx++) {
-            String prefix = (p.remoteBlobsGet.prefix.getValue().get(idx) != null) ? p.remoteBlobsGet.prefix.getValue().get(idx)
-                    : "";
-            Boolean include = (p.remoteBlobsGet.include.getValue().get(idx) != null)
-                    ? p.remoteBlobsGet.include.getValue().get(idx) : false;
-            Boolean create = (p.remoteBlobsGet.create.getValue().get(idx) != null) ? p.remoteBlobsGet.create.getValue().get(idx)
-                    : false;
-            remoteBlobs.add(new RemoteBlobGet(prefix, include, create));
-        }
-        return remoteBlobs;
-    }
+
 
     @Override
     public List<? extends BoundedSource> splitIntoBundles(long desiredBundleSizeBytes, RuntimeContainer container)

@@ -18,6 +18,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
+import org.talend.components.azurestorage.blob.runtime.AzureStorageContainerCreateRuntime;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 
@@ -43,6 +48,9 @@ public class RemoteBlobsTable extends ComponentPropertiesImpl {
 
     /** include - Include sub-directories parameters. */
     public Property<List<Boolean>> include = newProperty(LIST_BOOLEAN_TYPE, "include"); //$NON-NLS-1$
+    
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(RemoteBlobsTable.class);
 
     /**
      * Instantiates a new RemoteBlobsTable(String name).
@@ -58,6 +66,14 @@ public class RemoteBlobsTable extends ComponentPropertiesImpl {
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addColumn(prefix);
         mainForm.addColumn(include);
+    }
+
+    @Override
+    public ValidationResult getValidationResult() {
+        if(prefix.getValue()==null||prefix.getValue().isEmpty()){
+            return new ValidationResult(Result.ERROR, messages.getMessage("error.VacantPrefix"));
+        }
+        return ValidationResult.OK;
     }
 
 }

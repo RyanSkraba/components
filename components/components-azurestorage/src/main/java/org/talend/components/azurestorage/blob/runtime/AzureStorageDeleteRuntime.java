@@ -61,7 +61,7 @@ public class AzureStorageDeleteRuntime extends AzureStorageContainerRuntime
         remoteBlobsTable = componentProperties.remoteBlobs;
         this.dieOnError = componentProperties.dieOnError.getValue();
 
-        return ValidationResult.OK;
+        return componentProperties.remoteBlobs.getValidationResult();
     }
 
     @Override

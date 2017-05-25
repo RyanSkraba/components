@@ -68,7 +68,7 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
         this.dieOnError = componentProperties.dieOnError.getValue();
 
         String errorMessage = "";
-        if (remoteBlobsGet.prefix.getValue().isEmpty()) {
+        if (remoteBlobsGet.prefix.getValue()==null||remoteBlobsGet.prefix.getValue().isEmpty()) {
 
             errorMessage = messages.getMessage("error.EmptyBlobs"); //$NON-NLS-1$
         }
