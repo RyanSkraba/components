@@ -157,12 +157,13 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
     }
 
     public ValidationResult validateTestConnection() throws Exception {
-        ValidationResult vr = AzureStorageSourceOrSink.validateConnection(this);
-        if (ValidationResult.Result.OK != vr.getStatus()) {
-            return vr;
-        }
-
         try {
+            
+            ValidationResult vr = AzureStorageSourceOrSink.validateConnection(this);
+            if (ValidationResult.Result.OK != vr.getStatus()) {
+                return vr;
+            }
+
             if (useSharedAccessSignature.getValue()) {
                 String[] SAS = sharedAccessSignature.getValue().split("&");
                 boolean allowedBlob = true, allowedQueue = true, allowedtable = true;
