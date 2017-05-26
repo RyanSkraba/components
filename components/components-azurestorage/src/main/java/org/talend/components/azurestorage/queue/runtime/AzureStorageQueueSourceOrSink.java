@@ -45,7 +45,7 @@ public class AzureStorageQueueSourceOrSink extends AzureStorageSourceOrSink impl
 
     protected RuntimeContainer runtime;
 
-    private final Pattern queueCheckNamePattern = Pattern.compile("^[a-z][a-z0-9]{2,61}[a-z]$");
+    private final Pattern queueCheckNamePattern = Pattern.compile("[a-z0-9]{2,63}");
 
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageQueueSourceOrSink.class);
