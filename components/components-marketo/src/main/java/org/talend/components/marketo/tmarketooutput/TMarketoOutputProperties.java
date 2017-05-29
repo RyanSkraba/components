@@ -377,7 +377,7 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
         // seems that it may be resolved : https://jira.talendforge.org/browse/TDI-38603
         if ((outputOperation.getValue().equals(deleteLeads) && deleteLeadsInBatch.getValue())
                 || (outputOperation.getValue().equals(syncMultipleLeads) && batchSize.getValue() > 1)) {
-            schemaFlow.schema.setValue(MarketoConstants.getEmptySchema());
+            schemaFlow.schema.setValue(inputSchema);
             schemaReject.schema.setValue(MarketoConstants.getEmptySchema());
             return;
         }

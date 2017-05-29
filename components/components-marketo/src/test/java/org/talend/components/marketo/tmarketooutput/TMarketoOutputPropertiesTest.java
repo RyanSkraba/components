@@ -175,7 +175,7 @@ public class TMarketoOutputPropertiesTest {
         props.deleteLeadsInBatch.setValue(true);
         props.afterDeleteLeadsInBatch();
         assertEquals(MarketoConstants.getDeleteLeadsSchema(), props.schemaInput.schema.getValue());
-        assertEquals(MarketoConstants.getEmptySchema(), props.schemaFlow.schema.getValue());
+        assertEquals(props.schemaInput.schema.getValue().getFields(), props.schemaFlow.schema.getValue().getFields());
         // assertEquals(MarketoConstants.getDeleteLeadsSchema().getFields(),
         // props.schemaFlow.schema.getValue().getFields());
     }
