@@ -18,8 +18,10 @@ import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PDone;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.simplefileio.SimpleFileIOErrorCode;
 import org.talend.components.simplefileio.output.SimpleFileIOOutputProperties;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
+import org.talend.components.simplefileio.runtime.ugi.UgiExceptionHandler;
 import org.talend.daikon.properties.ValidationResult;
 
 public class SimpleFileIOOutputRuntime extends PTransform<PCollection<IndexedRecord>, PDone> implements
@@ -44,7 +46,8 @@ public class SimpleFileIOOutputRuntime extends PTransform<PCollection<IndexedRec
     @Override
     public PDone expand(PCollection<IndexedRecord> in) {
         // Controls the access security on the cluster.
-        UgiDoAs doAs = SimpleFileIODatastoreRuntime.getUgiDoAs(properties.getDatasetProperties().getDatastoreProperties());
+        UgiDoAs doAs = SimpleFileIODatasetRuntime.getReadWriteUgiDoAs(properties.getDatasetProperties(),
+                UgiExceptionHandler.AccessType.Write);
         String path = properties.getDatasetProperties().path.getValue();
         int limit = -1;
 
@@ -52,16 +55,16 @@ public class SimpleFileIOOutputRuntime extends PTransform<PCollection<IndexedRec
         switch (properties.getDatasetProperties().format.getValue()) {
 
         case AVRO:
-            rf = new SimpleRecordFormatAvroIO(doAs, properties.getDatasetProperties().path.getValue(), -1);
+            rf = new SimpleRecordFormatAvroIO(doAs, path, limit);
             break;
 
         case CSV:
-            rf = new SimpleRecordFormatCsvIO(doAs, properties.getDatasetProperties().path.getValue(), -1, properties
-                    .getDatasetProperties().getRecordDelimiter(), properties.getDatasetProperties().getFieldDelimiter());
+            rf = new SimpleRecordFormatCsvIO(doAs, path, limit, properties.getDatasetProperties().getRecordDelimiter(),
+                    properties.getDatasetProperties().getFieldDelimiter());
             break;
 
         case PARQUET:
-            rf = new SimpleRecordFormatParquetIO(doAs, properties.getDatasetProperties().path.getValue(), -1);
+            rf = new SimpleRecordFormatParquetIO(doAs, path, limit);
             break;
         }
 
@@ -69,6 +72,15 @@ public class SimpleFileIOOutputRuntime extends PTransform<PCollection<IndexedRec
             throw new RuntimeException("To be implemented: " + properties.getDatasetProperties().format.getValue());
         }
 
-        return rf.write(in);
+        try {
+            return rf.write(in);
+        } catch (IllegalStateException rte) {
+            // Unable to overwrite exceptions are handled here.
+            if (rte.getMessage().startsWith("Output path") && rte.getMessage().endsWith("already exists")) {
+                throw SimpleFileIOErrorCode.createOutputAlreadyExistsException(rte, path);
+            } else {
+                throw rte;
+            }
+        }
     }
 }

@@ -23,7 +23,11 @@ import org.talend.components.adapter.beam.transform.DirectConsumerCollector;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.dataset.runtime.DatasetRuntime;
 import org.talend.components.simplefileio.SimpleFileIODatasetProperties;
+import org.talend.components.simplefileio.SimpleFileIODatastoreProperties;
 import org.talend.components.simplefileio.input.SimpleFileIOInputProperties;
+import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
+import org.talend.components.simplefileio.runtime.ugi.UgiExceptionHandler;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -33,6 +37,29 @@ public class SimpleFileIODatasetRuntime implements DatasetRuntime<SimpleFileIODa
      * The dataset instance that this runtime is configured for.
      */
     private SimpleFileIODatasetProperties properties = null;
+
+    /**
+     * Helper method for any runtime to get the appropriate {@link UgiDoAs} for executing.
+     *
+     * @param datasetProperties dataset properties, containing credentials for the cluster.
+     * @param accessType the type of access to the dataset that the user will be performing.
+     * @return An object that can be used to execute actions with the correct credentials.
+     */
+    public static UgiDoAs getReadWriteUgiDoAs(SimpleFileIODatasetProperties datasetProperties,
+            UgiExceptionHandler.AccessType accessType) {
+        String path = datasetProperties.path.getValue();
+        SimpleFileIODatastoreProperties datastoreProperties = datasetProperties.getDatastoreProperties();
+        if (datastoreProperties.useKerberos.getValue()) {
+            UgiDoAs doAs = UgiDoAs.ofKerberos(datastoreProperties.kerberosPrincipal.getValue(),
+                    datastoreProperties.kerberosKeytab.getValue());
+            return new UgiExceptionHandler(doAs, accessType, datastoreProperties.kerberosPrincipal.getValue(), path);
+        } else if (datastoreProperties.userName.getValue() != null && !datastoreProperties.userName.getValue().isEmpty()) {
+            UgiDoAs doAs = UgiDoAs.ofSimple(datastoreProperties.userName.getValue());
+            return new UgiExceptionHandler(doAs, accessType, datastoreProperties.userName.getValue(), path);
+        } else {
+            return new UgiExceptionHandler(UgiDoAs.ofNone(), accessType, null, path);
+        }
+    }
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, SimpleFileIODatasetProperties properties) {
@@ -76,7 +103,13 @@ public class SimpleFileIODatasetRuntime implements DatasetRuntime<SimpleFileIODa
             p.apply(inputRuntime) //
                     .apply(Sample.<IndexedRecord> any(limit)) //
                     .apply(collector);
-            p.run().waitUntilFinish();
+            try {
+                p.run().waitUntilFinish();
+            } catch (Pipeline.PipelineExecutionException e) {
+                if (e.getCause() instanceof TalendRuntimeException)
+                    throw (TalendRuntimeException) e.getCause();
+                throw e;
+            }
         }
     }
 }

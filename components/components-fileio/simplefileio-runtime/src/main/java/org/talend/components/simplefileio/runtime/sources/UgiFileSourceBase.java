@@ -13,6 +13,7 @@
 package org.talend.components.simplefileio.runtime.sources;
 
 import java.io.IOException;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.List;
 
@@ -71,30 +72,26 @@ public abstract class UgiFileSourceBase<K, V, SourceT extends UgiFileSourceBase<
 
     /* Override with UGI if available. */
     public final long getEstimatedSizeBytes(final PipelineOptions options) {
-        try {
-            return doAs.doAs(new PrivilegedExceptionAction<Long>() {
+        return doAs.doAs(new PrivilegedAction<Long>() {
 
-                @Override
-                public Long run() {
-                    return doAsGetEstimatedSizeBytes(options);
-                }
-            });
-        } catch (Exception ie) {
-            throw new Pipeline.PipelineExecutionException(ie);
-        }
+            @Override
+            public Long run() {
+                return doAsGetEstimatedSizeBytes(options);
+            }
+        });
     }
 
     /* Override with UGI if available. */
     @Override
     public final List<? extends BoundedSource<KV<K, V>>> splitIntoBundles(final long desiredBundleSizeBytes,
             final PipelineOptions options) throws Exception {
-            return doAs.doAs(new PrivilegedExceptionAction<List<? extends BoundedSource<KV<K, V>>>>() {
+        return doAs.doAs(new PrivilegedExceptionAction<List<? extends BoundedSource<KV<K, V>>>>() {
 
-                @Override
-                public List<? extends BoundedSource<KV<K, V>>> run() throws Exception {
-                    return doAsSplitIntoBundles(desiredBundleSizeBytes, options);
-                }
-            });
+            @Override
+            public List<? extends BoundedSource<KV<K, V>>> run() throws Exception {
+                return doAsSplitIntoBundles(desiredBundleSizeBytes, options);
+            }
+        });
     }
 
     private long doAsGetEstimatedSizeBytes(final PipelineOptions options) {
@@ -123,15 +120,17 @@ public abstract class UgiFileSourceBase<K, V, SourceT extends UgiFileSourceBase<
                 return source.doAs.doAs(new PrivilegedExceptionAction<Boolean>() {
 
                     @Override
-                    public Boolean run() throws Exception {
+                    public Boolean run() throws IOException {
                         return doAsAdvance();
                     }
                 });
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (IOException e) {
+                throw e;
             } catch (Exception e) {
-                if (e instanceof IOException)
-                    throw (IOException) e;
-                else
-                    throw new Pipeline.PipelineExecutionException(e);
+                // This should never occur, since it can't be thrown by the privileged action.
+                throw new Pipeline.PipelineExecutionException(e);
             }
         }
 

@@ -112,14 +112,14 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
 
         @Override
         public void finalize(final Iterable<String> writerResults, final PipelineOptions options) throws Exception {
-                this.sink.doAs.doAs(new PrivilegedExceptionAction<Void>() {
+            this.sink.doAs.doAs(new PrivilegedExceptionAction<Void>() {
 
-                    @Override
-                    public Void run() throws Exception {
-                        ugiDoAsFinalize(writerResults, options);
-                        return null;
-                    }
-                });
+                @Override
+                public Void run() throws Exception {
+                    ugiDoAsFinalize(writerResults, options);
+                    return null;
+                }
+            });
         }
 
         protected void ugiDoAsFinalize(Iterable<String> writerResults, PipelineOptions options) throws Exception {
@@ -145,14 +145,14 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
 
             @Override
             protected void superOpen(final String uId) throws Exception {
-                    this.writeOperation.sink.doAs.doAs(new PrivilegedExceptionAction<Void>() {
+                this.writeOperation.sink.doAs.doAs(new PrivilegedExceptionAction<Void>() {
 
-                        @Override
-                        public Void run() throws Exception {
-                            ugiDoAsSuperOpen(uId);
-                            return null;
-                        }
-                    });
+                    @Override
+                    public Void run() throws Exception {
+                        ugiDoAsSuperOpen(uId);
+                        return null;
+                    }
+                });
             }
 
             protected void ugiDoAsSuperOpen(final String uId) throws Exception {
@@ -161,14 +161,14 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
 
             @Override
             public void write(final KV<K, V> value) throws Exception {
-                    this.writeOperation.sink.doAs.doAs(new PrivilegedExceptionAction<Void>() {
+                this.writeOperation.sink.doAs.doAs(new PrivilegedExceptionAction<Void>() {
 
-                        @Override
-                        public Void run() throws Exception {
-                            ugiDoAsWrite(value);
-                            return null;
-                        }
-                    });
+                    @Override
+                    public Void run() throws Exception {
+                        ugiDoAsWrite(value);
+                        return null;
+                    }
+                });
             }
 
             protected void ugiDoAsWrite(KV<K, V> value) throws Exception {
@@ -177,13 +177,13 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
 
             @Override
             public String close() throws Exception {
-                    return this.writeOperation.sink.doAs.doAs(new PrivilegedExceptionAction<String>() {
+                return this.writeOperation.sink.doAs.doAs(new PrivilegedExceptionAction<String>() {
 
-                        @Override
-                        public String run() throws Exception {
-                            return ugiDoAsClose();
-                        }
-                    });
+                    @Override
+                    public String run() throws Exception {
+                        return ugiDoAsClose();
+                    }
+                });
             }
 
             protected String ugiDoAsClose() throws Exception {

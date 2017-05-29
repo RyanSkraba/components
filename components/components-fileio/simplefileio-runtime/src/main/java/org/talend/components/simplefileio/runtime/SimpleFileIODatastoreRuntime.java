@@ -27,21 +27,6 @@ public class SimpleFileIODatastoreRuntime implements DatastoreRuntime<SimpleFile
      */
     private SimpleFileIODatastoreProperties properties = null;
 
-    /**
-     * Helper method for any runtime to get the appropriate {@link UgiDoAs} for executing.
-     * 
-     * @param properties datastore properties, containing credentials for the cluster.
-     * @return An object that can be used to execute actions with the correct credentials.
-     */
-    public static UgiDoAs getUgiDoAs(SimpleFileIODatastoreProperties properties) {
-        if (properties.useKerberos.getValue())
-            return UgiDoAs.ofKerberos(properties.kerberosPrincipal.getValue(), properties.kerberosKeytab.getValue());
-        else if (properties.userName.getValue() != null && !properties.userName.getValue().isEmpty())
-            return UgiDoAs.ofSimple(properties.userName.getValue());
-        else
-            return UgiDoAs.ofNone();
-    }
-
     @Override
     public ValidationResult initialize(RuntimeContainer container, SimpleFileIODatastoreProperties properties) {
         this.properties = properties;

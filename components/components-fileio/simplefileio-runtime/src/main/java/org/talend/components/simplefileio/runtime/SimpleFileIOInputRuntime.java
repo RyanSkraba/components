@@ -20,6 +20,7 @@ import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.simplefileio.input.SimpleFileIOInputProperties;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
+import org.talend.components.simplefileio.runtime.ugi.UgiExceptionHandler;
 import org.talend.daikon.properties.ValidationResult;
 
 public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>> implements
@@ -44,7 +45,8 @@ public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<Ind
     @Override
     public PCollection<IndexedRecord> expand(PBegin in) {
         // Controls the access security on the cluster.
-        UgiDoAs doAs = SimpleFileIODatastoreRuntime.getUgiDoAs(properties.getDatasetProperties().getDatastoreProperties());
+        UgiDoAs doAs = SimpleFileIODatasetRuntime.getReadWriteUgiDoAs(properties.getDatasetProperties(),
+                UgiExceptionHandler.AccessType.Read);
         String path = properties.getDatasetProperties().path.getValue();
         int limit = properties.limit.getValue();
 
@@ -56,8 +58,8 @@ public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<Ind
             break;
 
         case CSV:
-            rf = new SimpleRecordFormatCsvIO(doAs, path, limit, properties.getDatasetProperties().getRecordDelimiter(), properties
-                    .getDatasetProperties().getFieldDelimiter());
+            rf = new SimpleRecordFormatCsvIO(doAs, path, limit, properties.getDatasetProperties().getRecordDelimiter(),
+                    properties.getDatasetProperties().getFieldDelimiter());
             break;
 
         case PARQUET:
