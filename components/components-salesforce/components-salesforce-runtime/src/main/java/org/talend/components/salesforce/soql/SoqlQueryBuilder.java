@@ -13,7 +13,10 @@
 package org.talend.components.salesforce.soql;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,11 +52,7 @@ public class SoqlQueryBuilder {
 
     private static final String DOUBLE_QUOTE = "\"";
 
-    private static final String CUSTOM_FIELD_SUFFIX = "__c";
-
-    private static final String RELATION_ENTITY_SUFFIX = "__r";
-
-    private static final Pattern PATTERN = Pattern.compile("\\w+(__[rc]_)\\w+");
+    private static final Pattern CUSTOM_FIELD_PATTERN = Pattern.compile("[^_\\W]+(_[^_\\W])*(__[rc]){0,1}(_){0,1}");
 
     private static final String RECORDS = "_records_";
 
@@ -79,7 +78,7 @@ public class SoqlQueryBuilder {
      * <li><b>Not relational query</b><br/>
      * Each schema field represents common or custom column in module.<br/>
      * E.g.:<br/>
-     * <code>SELECT Id, Name, person_age__c FROM person__c</code></li>
+     * <code>SELECT Id, Name, Person_age__c FROM person__c</code></li>
      * <li><b>Parent to Child relation</b><br/>
      * Schema contains field(-s) that conform pattern<br/>
      * <code>{module_name}_records_{column_name}</code></li>
@@ -96,32 +95,38 @@ public class SoqlQueryBuilder {
      */
     public String buildSoqlQuery() {
         StringBuilder resultQuery = new StringBuilder();
-        List<String> complexFields = new ArrayList<>();
+        //It's preferable to have columns in order as in Schema.
+        Map<String, List<String>> complexFields = new LinkedHashMap<>();
         // This variable shows, where need to insert the sub query.
-        int childPosition = 0;
         resultQuery.append(DOUBLE_QUOTE).append(SELECT_STATEMENT).append(SPACE_SEPARATOR);
 
         for (Schema.Field field : schema.getFields()) {
             String fieldName = field.name();
             if (isChildField(fieldName)) {
-                // Catching first child field position in result query.
-                if (0 == childPosition) {
-                    childPosition = resultQuery.length();
+                String[] array = fieldName.split(RECORDS);
+                String columnName = null;
+                String moduleName = null;
+                //We expect only 2 values from splitting field tableName and columnName
+                if ((array.length != 2) || StringUtils.isBlank(moduleName = array[0]) || StringUtils.isBlank(columnName = array[1])) {
+                    // Should notify user about invalid table name or column name.
+                    TalendRuntimeException.build(SalesforceErrorCodes.INVALID_SOQL)
+                            .put(ExceptionContext.KEY_MESSAGE, "Relation Parent to Child has invalid child table name or column name")
+                            .throwIt();
                 }
-                complexFields.add(fieldName);
-            } else if (PATTERN.matcher(fieldName).matches()) {// Check if field has any relations with custom fields.
-                resultQuery.append(splitParentCustomField(fieldName)).append(COMMA_AND_SPACE);
-            } else if (fieldName.contains(UNDERSCORE) && !isCustomValues(fieldName)) {// Other relations without custom fields.
-                resultQuery.append(fieldName.replace('_', '.')).append(COMMA_AND_SPACE);
+                List<String> columns = complexFields.get(moduleName);
+                if (null == columns) {
+                    columns = new ArrayList<>();
+                    complexFields.put(moduleName, columns);
+                }
+                columns.add(columnName);
             } else {
-                // Custom and common fields.
-                resultQuery.append(fieldName).append(COMMA_AND_SPACE);
+                resultQuery.append(convertFields(fieldName)).append(COMMA_AND_SPACE);
             }
         }
 
-        // If list contains at least 1 child field, insert sub query into defined position.
-        if (!complexFields.isEmpty()) {
-            resultQuery.insert(childPosition, buildSubquery(complexFields).append(COMMA_AND_SPACE));
+        // If list contains at least 1 child field, insert sub query.
+        for (Entry<String, List<String>> entry : complexFields.entrySet()) {
+            resultQuery.append(buildSubquery(entry.getKey(), entry.getValue()).append(COMMA_AND_SPACE));
         }
 
         // Removing last comma and space from result query.
@@ -140,55 +145,27 @@ public class SoqlQueryBuilder {
      * </ul>
      * Example:<br/>
      * <ol>
-     * <li>custom_module__r_records_Name</li>
-     * <li>custom_module__r_records_custom_name__c</li>
-     * <li>custom_module__r_records_Account_Name</li>
+     * <li>module__r_records_Name</li>
+     * <li>module__r_records_name__c</li>
+     * <li>module__r_records_Account_Name</li>
      * </ol>
      *
      * <b> Result </b>
-     *  <code>(SELECT Name, custom_name__c, Account.Name FROM custom_module__r)</code>
+     *  <code>(SELECT Name, name__c, Account.Name FROM module__r)</code>
      *
      * @param inputStrings {@link java.util.List} is the list of child fields.
      * @return {@link java.lang.StringBuilder} SOQL sub query.
      */
-    private StringBuilder buildSubquery(List<String> inputStrings) {
+    private StringBuilder buildSubquery(String moduleName, List<String> inputStrings) {
         StringBuilder sb = new StringBuilder();
         sb.append(LEFT_PARENTHESIS).append(SELECT_STATEMENT).append(SPACE_SEPARATOR);
 
-        String moduleName = null;
         for (String item : inputStrings) {
-            String[] array = item.split(RECORDS);
-            String columnName = null;
-            //We expect only 2 values from splitting field tableName and columnName
-            if ((array.length != 2) || StringUtils.isBlank(array[0]) || StringUtils.isBlank(columnName = array[1])) {
-                // Should notify user about invalid table name or column name.
-                TalendRuntimeException.build(SalesforceErrorCodes.INVALID_SOQL)
-                        .put(ExceptionContext.KEY_MESSAGE, "Relation Parent to Child has invalid child table name or column name")
-                        .throwIt();
-            }
-            if (null == moduleName) {
-                moduleName = getSplittedValue(array[0]);
-            }
-            sb.append(getSplittedValue(columnName)).append(COMMA_AND_SPACE);
+            sb.append(convertFields(item)).append(COMMA_AND_SPACE);
         }
         sb.delete(sb.length() - 2, sb.length());
-        sb.append(FROM_CLAUSE).append(moduleName).append(RIGHT_PARENTHESIS);
+        sb.append(FROM_CLAUSE).append(convertFields(moduleName)).append(RIGHT_PARENTHESIS);
         return sb;
-    }
-
-    private String getSplittedValue(String value) {
-        return PATTERN.matcher(value).matches() ? splitParentCustomField(value) : !isCustomValues(value) ? value.replaceAll(UNDERSCORE, DOT) : value;
-    }
-
-    /**
-     * Checks whether <code>fieldName</code> is a name of custom field.
-     * Custom values contain <code>"__c"</code> string or <code>"__r"<code>.
-     *
-     * @param fieldName - field name in {@link org.apache.avro.Schema}.
-     * @return <code>true</code> when field is a custom, otherwise <code>false</code>.
-     */
-    private boolean isCustomValues(String fieldName) {
-        return fieldName.contains(CUSTOM_FIELD_SUFFIX) || fieldName.contains(RELATION_ENTITY_SUFFIX);
     }
 
     /**
@@ -202,38 +179,42 @@ public class SoqlQueryBuilder {
     }
 
     /**
-     * Finds all custom values in <code>fieldName</code> and replace "_" between them with ".",<br/>
-     * if the last field is not a custom, split all "_" with ".".<br/>
+     * Finds all matches that conform defined pattern for possible field names.<br/>
+     * Replace all needed "_" with ".". Only "__c" or "__r" won't be replaced.<br/>
      * Example:<br/>
      * <b>Schema</b> contains such fields:
      *      <ol>
-     *          <li><code>custom_module__r_custom_table__c_custom_name__c</code></li>
-     *          <li><code>custom_module__r_custom_table__c_Person_Name</code></li>
+     *          <li><code>Name</code></li>
+     *          <li><code>Account_Name</code></li>
+     *          <li><code>Account_customField__c</code></li>
+     *          <li><code>Account_customTable__c_customField__c</code></li>
+     *          <li><code>customTable__c_Name</code></li>
      *      </ol>
-     * <b> Result </b> must be this one:
+     * <b> Result </b> must be replaced with this one:
      *      <ol>
-     *          <li><code>custom_module__r.custom_table__c.custom_name__c</code></li>
-     *          <li><code>custom_module__r.custom_table__c.Person.Name</code></li>
+     *          <li><code>Name</code></li>
+     *          <li><code>Account.Name</code></li>
+     *          <li><code>Account.customField__c</code></li>
+     *          <li><code>Account.customTable__c.customField__c</code></li>
+     *          <li><code>customTable__c.Name</code></li>
      *      </ol>
      *
-     * @param fieldName - field name in {@link org.apache.avro.Schema}.
+     * @param input - field name in {@link org.apache.avro.Schema}.
      * @return replaced input fieldName with "." instead of "_" where needed.
      */
-    private String splitParentCustomField(String fieldName) {
-        StringBuilder sb = new StringBuilder(fieldName);
-        Matcher matcher = PATTERN.matcher(fieldName);
-        int lastPostition = 0;
-        matcher.find();
-        do {
-            sb.replace(matcher.end(1) - 1, matcher.end(1), DOT);
-            lastPostition = matcher.end(1);
-        } while (matcher.find());
 
-        if (!fieldName.endsWith(CUSTOM_FIELD_SUFFIX) && !fieldName.endsWith(RELATION_ENTITY_SUFFIX)) {
-            String nonCustomRelationField = fieldName.substring(lastPostition).replaceAll(UNDERSCORE, DOT);
-            sb.replace(lastPostition, sb.length(), nonCustomRelationField);
+    private StringBuilder convertFields(String input) {
+        StringBuilder sb = new StringBuilder(input);
+        Matcher matcher = CUSTOM_FIELD_PATTERN.matcher(input);
+        while (matcher.find()) {
+            if (-1 != matcher.start(1))
+            sb.replace(matcher.start(1), matcher.end(1), matcher.group(1).replace(UNDERSCORE, DOT));
+            if (-1 != matcher.start(3)) {
+                sb.replace(matcher.start(3), matcher.start(3) + 1, DOT);
+            }
         }
-        return sb.toString();
+
+        return sb;
     }
 
 }
