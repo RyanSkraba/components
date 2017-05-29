@@ -19,12 +19,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Descriptor of NetSuite data object model type.
  */
 public class TypeDesc {
+
+    /** Short name of data object type. */
     private String typeName;
+
+    /** Class of data object type. */
     private Class<?> typeClass;
+
+    /** List of field descriptors for this data object type. */
     private List<FieldDesc> fields;
+
+    /** Map of field descriptors by names, for faster access. */
     private Map<String, FieldDesc> fieldMap;
 
     public TypeDesc(String typeName, Class<?> typeClass, List<FieldDesc> fields) {

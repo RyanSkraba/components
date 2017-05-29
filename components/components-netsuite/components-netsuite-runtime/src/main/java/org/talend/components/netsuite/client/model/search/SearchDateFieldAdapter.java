@@ -31,7 +31,7 @@ import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.client.model.BasicMetaData;
 
 /**
- *
+ * Search field adapter for {@code SearchDateField} and {@code SearchDateCustomField}.
  */
 public class SearchDateFieldAdapter<T> extends SearchFieldAdapter<T> {
 

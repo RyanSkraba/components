@@ -17,21 +17,26 @@ import org.talend.components.netsuite.client.NsRef;
 import org.talend.components.netsuite.client.model.customfield.CustomFieldRefType;
 
 /**
- *
+ * Descriptor of custom field which is not declared as {@code member field} in data object type class
+ * and stored in {@code customFieldList}.
  */
 public class CustomFieldDesc extends FieldDesc {
-    private NsRef ref;
+
+    /** Customization ref for this field. */
+    private NsRef customizationRef;
+
+    /** Type of this custom field. */
     private CustomFieldRefType customFieldType;
 
     public CustomFieldDesc() {
     }
 
-    public NsRef getRef() {
-        return ref;
+    public NsRef getCustomizationRef() {
+        return customizationRef;
     }
 
-    public void setRef(NsRef ref) {
-        this.ref = ref;
+    public void setCustomizationRef(NsRef customizationRef) {
+        this.customizationRef = customizationRef;
     }
 
     public CustomFieldRefType getCustomFieldType() {
@@ -50,7 +55,7 @@ public class CustomFieldDesc extends FieldDesc {
         sb.append(", key=").append(key);
         sb.append(", nullable=").append(nullable);
         sb.append(", length=").append(length);
-        sb.append(", ref=").append(ref);
+        sb.append(", customizationRef=").append(customizationRef);
         sb.append(", customFieldType=").append(customFieldType);
         sb.append('}');
         return sb.toString();

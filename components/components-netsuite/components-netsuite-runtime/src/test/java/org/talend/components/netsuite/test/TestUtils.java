@@ -124,7 +124,7 @@ public class TestUtils {
 
         CustomFieldDesc fieldDesc = new CustomFieldDesc();
         fieldDesc.setCustomFieldType(customFieldRefType);
-        fieldDesc.setRef(ref);
+        fieldDesc.setCustomizationRef(ref);
         fieldDesc.setName(scriptId);
         fieldDesc.setValueType(NetSuiteDatasetRuntimeImpl.getCustomFieldValueClass(customFieldRefType));
         fieldDesc.setNullable(true);

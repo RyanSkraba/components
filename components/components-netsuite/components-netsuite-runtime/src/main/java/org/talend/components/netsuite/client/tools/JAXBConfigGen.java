@@ -31,7 +31,9 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 
 /**
+ * Generates JAXB configuration fragment for mapping of NetSuite namespaces to java package names.
  *
+ * <p>JAXBConfigGen class is not used in runtime, this tool is intended for development purposes only.
  */
 public class JAXBConfigGen {
 

@@ -21,6 +21,9 @@ import java.util.Properties;
 
 import org.apache.cxf.helpers.IOUtils;
 
+/**
+ * Holds information required for logging in of a client in NetSuite.
+ */
 public class NetSuiteCredentials {
 
     private String email;
@@ -174,6 +177,13 @@ public class NetSuiteCredentials {
         return loadFromProperties(properties, propertyPrefix);
     }
 
+    /**
+     * Load credentials from plain {@code Properties}.
+     *
+     * @param properties properties object
+     * @param prefix prefix for property keys, can be empty
+     * @return credentials object
+     */
     public static NetSuiteCredentials loadFromProperties(Properties properties, String prefix) {
         NetSuiteCredentials credentials = new NetSuiteCredentials();
         credentials.setEmail(properties.getProperty(prefix + "email"));
@@ -184,7 +194,8 @@ public class NetSuiteCredentials {
         return credentials;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -197,12 +208,14 @@ public class NetSuiteCredentials {
                 .equals(partnerId, that.partnerId) && Objects.equals(privateKey, that.privateKey);
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return Objects.hash(email, account, roleId, applicationId, numberOfSeats, id, companyId, userId, partnerId, privateKey,
                 useSsoLogin);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         final StringBuilder sb = new StringBuilder("NetSuiteCredentials{");
         sb.append("email='").append(email).append('\'');
         sb.append(", password='").append(password).append('\'');

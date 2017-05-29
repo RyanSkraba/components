@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.netsuite.util.Mapper;
 
 /**
- *
+ * Provides methods for working with {@code beans}.
  */
 public abstract class Beans {
 
@@ -37,11 +37,24 @@ public abstract class Beans {
 
     private static final Resolver propertyResolver = new DefaultResolver();
 
+    /**
+     * Get property descriptor for given instance of a bean and it's property name.
+     *
+     * @param target target bean which to get property for
+     * @param name name of property
+     * @return property descriptor or {@code null} if specified property was not found
+     */
     public static PropertyInfo getPropertyInfo(Object target, String name) {
         BeanInfo beanInfo = getBeanInfo(target.getClass());
         return beanInfo != null ? beanInfo.getProperty(name) : null;
     }
 
+    /**
+     * Get bean descriptor for given class.
+     *
+     * @param clazz class
+     * @return bean descriptor
+     */
     public static BeanInfo getBeanInfo(Class<?> clazz) {
         BeanInfo beanInfo = beanInfoCache.get(clazz);
         if (beanInfo == null) {
@@ -64,6 +77,13 @@ public abstract class Beans {
         }
     }
 
+    /**
+     * Set a value for given bean's property.
+     *
+     * @param target target bean
+     * @param expr property path
+     * @param value value to be set
+     */
     public static void setProperty(Object target, String expr, Object value) {
         try {
             Object current = target;
@@ -90,6 +110,13 @@ public abstract class Beans {
         }
     }
 
+    /**
+     * Get value of given bean's property.
+     *
+     * @param target target bean
+     * @param expr property path
+     * @return value
+     */
     public static Object getProperty(Object target, String expr) {
         try {
             Object current = target;
@@ -109,14 +136,35 @@ public abstract class Beans {
         }
     }
 
+    /**
+     * Get value of given bean's property.
+     *
+     * @param target target bean
+     * @param name name of property
+     * @return value
+     */
     public static Object getSimpleProperty(Object target, String name) {
         return getPropertyAccessor(target).get(target, name);
     }
 
+    /**
+     * Set a value for given bean's property.
+     *
+     * @param target target bean
+     * @param name name of property
+     * @param value to be set
+     */
     public static void setSimpleProperty(Object target, String name, Object value) {
         getPropertyAccessor(target).set(target, name, value);
     }
 
+    /**
+     * Get property accessor for given object.
+     *
+     * @param target target object
+     * @param <T> type of object
+     * @return property accessor
+     */
     protected static <T> PropertyAccessor<T> getPropertyAccessor(T target) {
         if (target instanceof PropertyAccess) {
             return ((PropertyAccess) target).getPropertyAccessor();
@@ -125,10 +173,22 @@ public abstract class Beans {
         }
     }
 
+    /**
+     * Get enum accessor for given enum class.
+     *
+     * @param clazz enum class
+     * @return enum accessor
+     */
     public static EnumAccessor getEnumAccessor(Class<? extends Enum> clazz) {
         return getEnumAccessorImpl(clazz);
     }
 
+    /**
+     * Get enum accessor for given enum class.
+     *
+     * @param clazz enum class
+     * @return enum accessor
+     */
     protected static AbstractEnumAccessor getEnumAccessorImpl(Class<? extends Enum> clazz) {
         EnumAccessor accessor = null;
         Method m;
@@ -151,26 +211,49 @@ public abstract class Beans {
         }
     }
 
+    /**
+     * Get mapper which maps an enum constant to string value.
+     *
+     * @param clazz enum class
+     * @return mapper
+     */
     public static Mapper<Enum, String> getEnumToStringMapper(Class<Enum> clazz) {
         return getEnumAccessorImpl(clazz).getToStringMapper();
     }
 
+    /**
+     * Get mapper which maps string value to an enum constant.
+     *
+     * @param clazz enum class
+     * @return mapper
+     */
     public static Mapper<String, Enum> getEnumFromStringMapper(Class<Enum> clazz) {
         return getEnumAccessorImpl(clazz).getFromStringMapper();
     }
 
+    /**
+     * Convert initial letter of given string value to upper case.
+     *
+     * @param value source value to be converted
+     * @return converted value
+     */
     public static String toInitialUpper(String value) {
         return value.substring(0, 1).toUpperCase() + value.substring(1);
     }
 
+    /**
+     * Convert initial letter of given string value to lower case.
+     *
+     * @param value source value to be converted
+     * @return converted value
+     */
     public static String toInitialLower(String value) {
         return value.substring(0, 1).toLowerCase() + value.substring(1);
     }
 
-    public static String toNetSuiteType(String value) {
-        return "_" + toInitialLower(value);
-    }
-
+    /**
+     * Property accessor which uses reflection to access properties.
+     */
     protected static class ReflectPropertyAccessor implements PropertyAccessor<Object> {
         protected static final ReflectPropertyAccessor INSTANCE = new ReflectPropertyAccessor();
 
@@ -310,6 +393,9 @@ public abstract class Beans {
         }
     }
 
+    /**
+     * Base class for enum accessors.
+     */
     protected static abstract class AbstractEnumAccessor implements EnumAccessor {
         protected Class<?> enumClass;
         protected Mapper<Enum, String> toStringMapper;
@@ -348,6 +434,16 @@ public abstract class Beans {
         }
     }
 
+    /**
+     * Enum accessor which uses reflection to access enum values.
+     *
+     * <p>Enum classes generated from NetSuite's XML schemas have following methods
+     * to access enum values:
+     * <ul>
+     *     <li>{@code String value()) - get NetSuite specific string value of enum</li>
+     *     <li>{@code Enum fromValue(String)) - get enum constant for NetSuite specific string value</li>
+     * </ul>
+     */
     public static class ReflectEnumAccessor extends AbstractEnumAccessor {
 
         public ReflectEnumAccessor(Class<?> enumClass) {

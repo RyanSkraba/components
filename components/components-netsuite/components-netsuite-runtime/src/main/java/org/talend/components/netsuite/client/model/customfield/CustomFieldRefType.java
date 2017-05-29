@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * Type of custom field data object type.
  */
 public enum CustomFieldRefType {
     BOOLEAN("BooleanCustomFieldRef"),
@@ -28,6 +28,7 @@ public enum CustomFieldRefType {
     SELECT("SelectCustomFieldRef"),
     MULTI_SELECT("MultiSelectCustomFieldRef");
 
+    /** Short name of NetSuite's native custom field data object type. */
     private String typeName;
 
     CustomFieldRefType(String typeName) {
@@ -38,6 +39,7 @@ public enum CustomFieldRefType {
         return typeName;
     }
 
+    /** Table of custom field ref types by custom data type names. */
     private static final Map<String, CustomFieldRefType> customFieldRefTypeMap = new HashMap<>();
 
     static {
@@ -65,10 +67,23 @@ public enum CustomFieldRefType {
         customFieldRefTypeMap.put("_timeOfDay", CustomFieldRefType.DATE);
     }
 
+    /**
+     * Get custom field data object type by NetSuite customization type.
+     *
+     * @param customizationType name of customization type
+     * @return custom field data object type or {@code null}
+     */
     public static CustomFieldRefType getByCustomizationType(String customizationType) {
         return customFieldRefTypeMap.get(customizationType);
     }
 
+    /**
+     * Get custom field data object type by NetSuite customization type and return default type
+     * if specified type is unknown.
+     *
+     * @param customizationType name of customization type
+     * @return custom field data object type or default type
+     */
     public static CustomFieldRefType getByCustomizationTypeOrDefault(String customizationType) {
         CustomFieldRefType customFieldRefType = getByCustomizationType(customizationType);
         if (customFieldRefType == null) {

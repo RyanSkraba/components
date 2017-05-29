@@ -30,7 +30,7 @@ import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
 /**
- *
+ * Base class for definitions of NetSuite components.
  */
 public abstract class NetSuiteComponentDefinition extends AbstractComponentDefinition {
 
@@ -50,7 +50,8 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
     public static final String RUNTIME_CLASS =
             "org.talend.components.netsuite.v${version}.NetSuiteRuntimeImpl";
 
-    protected static RuntimeInvoker runtimeInvoker = new SandboxRuntimeInvoker();
+    /** Responsible for invocation of NetSuite component runtime. */
+    private static RuntimeInvoker runtimeInvoker = new SandboxRuntimeInvoker();
 
     protected NetSuiteComponentDefinition(String componentName, ExecutionEngine engine1, ExecutionEngine... engines) {
         super(componentName, engine1, engines);
@@ -73,6 +74,14 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
         return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP };
     }
 
+    /**
+     * Perform an operation using {@link NetSuiteDatasetRuntime}.
+     *
+     * @param properties properties object which can provide connection properties
+     * @param func an operation
+     * @param <R> type of operation result
+     * @return result of operation
+     */
     public static <R> R withDatasetRuntime(final NetSuiteProvideConnectionProperties properties,
             final Function<NetSuiteDatasetRuntime, R> func) {
         return withRuntime(properties, new Function<NetSuiteRuntime, R>() {
@@ -84,6 +93,14 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
         });
     }
 
+    /**
+     * Perform an operation using {@link NetSuiteRuntime}.
+     *
+     * @param properties properties object which can provide connection properties
+     * @param func an operation
+     * @param <R> type of operation result
+     * @return result of operation
+     */
     public static <R> R withRuntime(final NetSuiteProvideConnectionProperties properties,
             final Function<NetSuiteRuntime, R> func) {
 
@@ -92,6 +109,14 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
                 properties.getConnectionProperties(), func);
     }
 
+    /**
+     * Get {@code RuntimeInfo} using given {@code NetSuiteProvideConnectionProperties} and
+     * name of target runtime class.
+     *
+     * @param properties properties object which can provide connection properties
+     * @param runtimeClassName name of target runtime class
+     * @return {@code RuntimeInfo}
+     */
     public static RuntimeInfo getRuntimeInfo(final NetSuiteProvideConnectionProperties properties,
             final String runtimeClassName) {
 
@@ -105,6 +130,14 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
         }
     }
 
+    /**
+     * Get {@code RuntimeInfo} using given target version of NetSuite and
+     * name of target runtime class.
+     *
+     * @param version target version of NetSuite
+     * @param runtimeClassName name of target runtime class
+     * @return {@code RuntimeInfo}
+     */
     public static RuntimeInfo getRuntimeInfo(final NetSuiteVersion version, final String runtimeClassName) {
         String versionString = version.getMajorAsString("_");
         String artifactId = MAVEN_ARTIFACT_ID.replace("${version}", versionString);
@@ -118,6 +151,13 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
         return runtimeInvoker;
     }
 
+    /**
+     * Set invoker of operations which require {@link NetSuiteRuntime}.
+     *
+     * <p>This method is intended for testing purposes only.
+     *
+     * @param runtimeInvoker invoker to be set
+     */
     public static void setRuntimeInvoker(RuntimeInvoker runtimeInvoker) {
         if (runtimeInvoker == null) {
             throw new IllegalArgumentException("Runtime invoker can't be null");
@@ -125,6 +165,9 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
         NetSuiteComponentDefinition.runtimeInvoker = runtimeInvoker;
     }
 
+    /**
+     * Holds design-time related data for a component.
+     */
     public static class DesignTimeContext implements NetSuiteRuntime.Context {
         protected Map<String, Object> attributes = new HashMap<>();
 
@@ -144,13 +187,28 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
         }
     }
 
+    /**
+     * Invoker of an operation which require {@link NetSuiteRuntime}.
+     */
     public interface RuntimeInvoker {
 
+        /**
+         * Invoke an operation using {@link NetSuiteRuntime}.
+         *
+         * @param context to be passed to {@link NetSuiteRuntime}
+         * @param properties connection properties object
+         * @param func operation to be performed
+         * @param <R> type of operation result
+         * @return result of operation
+         */
         <R> R invokeRuntime(NetSuiteRuntime.Context context,
                 NetSuiteConnectionProperties properties,
                 Function<NetSuiteRuntime, R> func);
     }
 
+    /**
+     * Invokes operations using sanboxing mechanism.
+     */
     public static class SandboxRuntimeInvoker implements RuntimeInvoker {
 
         @Override

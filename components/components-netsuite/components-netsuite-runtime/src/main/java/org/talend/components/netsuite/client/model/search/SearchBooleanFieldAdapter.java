@@ -20,7 +20,7 @@ import java.util.List;
 import org.talend.components.netsuite.client.model.BasicMetaData;
 
 /**
- *
+ * Search field adapter for {@code SearchBooleanField} and {@code SearchBooleanCustomField}.
  */
 public class SearchBooleanFieldAdapter<T> extends SearchFieldAdapter<T> {
 

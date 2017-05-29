@@ -17,7 +17,7 @@ import org.apache.avro.Schema;
 import org.talend.daikon.avro.AvroRegistry;
 
 /**
- *
+ * Special converter which converts any value to {@code null}.
  */
 public class NullConverter<T> extends AvroRegistry.Unconverted<T> {
 

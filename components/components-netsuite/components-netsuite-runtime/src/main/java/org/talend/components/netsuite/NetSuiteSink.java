@@ -15,14 +15,12 @@ package org.talend.components.netsuite;
 
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.output.NetSuiteOutputProperties;
 import org.talend.components.netsuite.output.NetSuiteWriteOperation;
-import org.talend.daikon.properties.ValidationResult;
 
 /**
- *
+ * Base class for NetSuite sinks.
  */
 public abstract class NetSuiteSink extends NetSuiteSourceOrSink implements Sink {
 
@@ -36,8 +34,4 @@ public abstract class NetSuiteSink extends NetSuiteSourceOrSink implements Sink 
                         NetSuiteOutputProperties.class, properties.getClass()));
     }
 
-    @Override
-    public ValidationResult validate(RuntimeContainer container) {
-        return super.validate(container);
-    }
 }

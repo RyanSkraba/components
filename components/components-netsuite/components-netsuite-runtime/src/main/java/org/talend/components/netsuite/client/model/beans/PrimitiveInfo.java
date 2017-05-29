@@ -16,7 +16,7 @@ package org.talend.components.netsuite.client.model.beans;
 import java.util.HashMap;
 
 /**
- *
+ * Utility class which provides meta information about primitive property value types.
  */
 public class PrimitiveInfo {
 

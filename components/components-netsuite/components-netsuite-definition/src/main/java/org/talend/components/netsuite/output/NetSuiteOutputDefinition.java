@@ -24,7 +24,15 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
+ * Definition of NetSuite Output component.
  *
+ *<p>Output component provides following functionality:
+ * <ul>
+ *     <li>Add record(s)</li>
+ *     <li>Update record(s)</li>
+ *     <li>Upsert (Update or Add) record(s)</li>
+ *     <li>Delete record(s)</li>
+ * </ul>
  */
 public class NetSuiteOutputDefinition extends NetSuiteComponentDefinition {
 
@@ -39,6 +47,12 @@ public class NetSuiteOutputDefinition extends NetSuiteComponentDefinition {
         return true;
     }
 
+    /**
+     * Indicate that a runner of component should check availability of records
+     * in outgoing flow(s).
+     *
+     * @return true
+     */
     @Override
     public boolean isConditionalInputs() {
         return true;

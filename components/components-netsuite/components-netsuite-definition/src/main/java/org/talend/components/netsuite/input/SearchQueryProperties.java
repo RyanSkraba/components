@@ -25,18 +25,22 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
 /**
+ * Properties of search query conditions table.
  *
+ * <p>Contains table where each row is a search condition for NetSuite search query.
+ * Search conditions has following fields:
+ * <ul>
+ *     <li>Search field name</li>
+ *     <li>Search operator name</li>
+ *     <li>First search value</li>
+ *     <li>Second search value</li>
+ * </ul>
+ * Some search operators don't use any value and some require both values.
  */
 public class SearchQueryProperties extends ComponentPropertiesImpl {
 
-    /**
-     *
-     */
     private static final TypeLiteral<List<String>> LIST_STRING_TYPE = new TypeLiteral<List<String>>() {};
 
-    /**
-     *
-     */
     private static final TypeLiteral<List<Object>> LIST_OBJECT_TYPE = new TypeLiteral<List<Object>>() {};
 
     /**

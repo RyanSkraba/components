@@ -39,7 +39,8 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.serialize.PostDeserializeSetup;
 
 /**
- *
+ * NetSuite Output component's Properties which holds information about
+ * target record type, output options and outgoing flows.
  */
 public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
 
@@ -134,6 +135,8 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
     }
 
     public ValidationResult beforeModuleName() throws Exception {
+        // Before selecting of a target record type we should provide
+        // set of record types that are available for work.
         try {
             List<NamedThing> types = getRecordTypes();
             moduleName.setPossibleNamedThingValues(types);
@@ -145,6 +148,9 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
     }
 
     public ValidationResult afterModuleName() throws Exception {
+        // After selecting of target record type we should:
+        // - Set up main schema which will be used for records emitted by component
+        // - Set up schema for outgoing flows (normal and reject flows)
         try {
             setupSchema();
             setupOutgoingSchema();
@@ -185,7 +191,7 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
         }
     }
 
-    protected void afterMainSchema() {
+    private void afterMainSchema() {
         try {
             Schema schema = main.schema.getValue();
 
@@ -278,7 +284,12 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
         });
     }
 
-    protected void setupSchema() {
+    /**
+     * Set up main schema for component.
+     *
+     * <p>For updating and deletion schemas are different.
+     */
+    private void setupSchema() {
         switch (action.getValue()) {
         case ADD:
         case UPDATE:
@@ -291,7 +302,12 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
         }
     }
 
-    protected void setupOutgoingSchema() {
+    /**
+     * Set up schema for outgoing flows.
+     *
+     * <p>For updating and deletion schemas are different.
+     */
+    private void setupOutgoingSchema() {
         flowSchema.schema.setValue(null);
         rejectSchema.schema.setValue(null);
 
@@ -307,7 +323,10 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
         }
     }
 
-    protected void setupSchemaForUpdate() {
+    /**
+     * Set up main schema for <i>Add/Update/Upsert</i> output action.
+     */
+    private void setupSchemaForUpdate() {
         assertModuleName();
 
         final String typeName = moduleName.getStringValue();
@@ -316,7 +335,10 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
         main.schema.setValue(schema);
     }
 
-    protected void setupOutgoingSchemaForUpdate() {
+    /**
+     * Set up outgoing flow schema for <i>Add/Update/Upsert</i> output action.
+     */
+    private void setupOutgoingSchemaForUpdate() {
         assertModuleName();
 
         final String typeName = moduleName.getStringValue();
@@ -329,7 +351,10 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
         rejectSchema.schema.setValue(rejectFlowSchema);
     }
 
-    protected void setupSchemaForDelete() {
+    /**
+     * Set up main schema for <i>Delete</i> output action.
+     */
+    private void setupSchemaForDelete() {
         assertModuleName();
 
         final String typeName = moduleName.getStringValue();
@@ -338,6 +363,9 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
         main.schema.setValue(schema);
     }
 
+    /**
+     * Set up outgoing flow schema for <i>Delete</i> output action.
+     */
     protected void setupOutgoingSchemaForDelete() {
         assertModuleName();
 

@@ -13,21 +13,38 @@
 
 package org.talend.components.netsuite.client.model;
 
-import org.talend.components.netsuite.client.NsRef;
-
 /**
- *
+ * Holds information about record type.
  */
 public class RecordTypeInfo {
+
+    /**
+     * Name identifying record type.
+     *
+     * <p>For standard record types name is the same as {@link RecordTypeDesc#getTypeName()}.
+     */
     protected String name;
+
+    /** Record type descriptor. */
     protected RecordTypeDesc recordType;
 
+    /**
+     * Create instance of record type info using given record type descriptor.
+     *
+     * @param recordType record type descriptor
+     */
     public RecordTypeInfo(RecordTypeDesc recordType) {
         this.name = recordType.getTypeName();
         this.recordType = recordType;
     }
 
-    public RecordTypeInfo(String name, RecordTypeDesc recordType) {
+    /**
+     * Create instance of record type info using given custom name and record type descriptor.
+     *
+     * @param name custom name
+     * @param recordType record type descriptor
+     */
+    protected RecordTypeInfo(String name, RecordTypeDesc recordType) {
         this.name = name;
         this.recordType = recordType;
     }
@@ -36,6 +53,11 @@ public class RecordTypeInfo {
         return name;
     }
 
+    /**
+     * Get display name of record type.
+     *
+     * @return display name
+     */
     public String getDisplayName() {
         return recordType.getTypeName();
     }
@@ -44,17 +66,13 @@ public class RecordTypeInfo {
         return recordType;
     }
 
+    /**
+     * Get type of reference for this record type.
+     *
+     * @return type of reference
+     */
     public RefType getRefType() {
         return RefType.RECORD_REF;
-    }
-
-    public NsRef createRef(String internalId, String externalId) {
-        NsRef ref = new NsRef();
-        ref.setRefType(getRefType());
-        ref.setType(getRecordType().getType());
-        ref.setInternalId(internalId);
-        ref.setExternalId(externalId);
-        return ref;
     }
 
     @Override

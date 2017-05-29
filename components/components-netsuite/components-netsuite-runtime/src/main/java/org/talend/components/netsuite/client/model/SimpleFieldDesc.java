@@ -14,10 +14,12 @@
 package org.talend.components.netsuite.client.model;
 
 /**
- *
+ * Descriptor of field which is declared as {@code member field} in data object type class.
  */
 public class SimpleFieldDesc extends FieldDesc {
-    protected String propertyName;
+
+    /** Name of property ({@code member field}) corresponding this field. */
+    private String propertyName;
 
     public SimpleFieldDesc() {
     }

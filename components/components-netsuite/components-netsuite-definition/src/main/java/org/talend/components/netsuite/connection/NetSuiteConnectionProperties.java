@@ -43,7 +43,7 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.serialize.PostDeserializeSetup;
 
 /**
- *
+ * Properties of NetSuite connection component.
  */
 public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implements NetSuiteProvideConnectionProperties {
 
@@ -56,6 +56,9 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
     public static final String DEFAULT_ENDPOINT_URL = "https://webservices.netsuite.com/services/NetSuitePort_"
             + DEFAULT_API_VERSION.getMajorAsString();
 
+    /**
+     * List of versions supported by NetSuite components.
+     */
     public static final List<String> API_VERSIONS = Collections.unmodifiableList(Arrays.asList("2016.2", "2014.2"));
 
     public final Property<String> name = newString("name").setRequired();
@@ -75,6 +78,11 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
 
     public final Property<String> applicationId = newString("applicationId");
 
+    /**
+     * Specifies whether NetSuite customizations are enabled.
+     * If customizations are enabled then NetSuite runtime retrieves custom record types and
+     * custom fields which are exposed for components.
+     */
     public final Property<Boolean> customizationEnabled = newBoolean("customizationEnabled");
 
     public final PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
@@ -82,6 +90,10 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
     public final ComponentReferenceProperties<NetSuiteConnectionProperties> referencedComponent = new ComponentReferenceProperties(
             "referencedComponent", NetSuiteConnectionDefinition.COMPONENT_NAME);
 
+    /**
+     * Holds data that can be used by NetSuite runtime when components are edited by a component designer.
+     * This object is not serialized and intended to be used in design time only.
+     */
     protected transient NetSuiteRuntime.Context designTimeContext;
 
     public NetSuiteConnectionProperties(String name) {
@@ -164,6 +176,15 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
         return getEffectiveConnectionProperties();
     }
 
+    /**
+     * Return connection properties object which is currently in effect.
+     *
+     * <p>If this object references to another connection component then a referenced
+     * connection properties will be returned. Otherwise, this connection properties
+     * object will be returned.
+     *
+     * @return connection properties object
+     */
     public NetSuiteConnectionProperties getEffectiveConnectionProperties() {
         String refComponentId = getReferencedComponentId();
         if (refComponentId != null) {
@@ -176,10 +197,20 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
         return this;
     }
 
+    /**
+     * Return identifier of referenced connection component.
+     *
+     * @return referenced connection component's ID or {@code null}
+     */
     public String getReferencedComponentId() {
         return referencedComponent.componentInstanceId.getStringValue();
     }
 
+    /**
+     * Return referenced connection properties.
+     *
+     * @return referenced connection properties or {@code null}
+     */
     public NetSuiteConnectionProperties getReferencedConnectionProperties() {
         NetSuiteConnectionProperties refProps = referencedComponent.getReference();
         if (refProps != null) {
@@ -193,6 +224,11 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
         refreshLayout(getForm(Form.REFERENCE));
     }
 
+    /**
+     * Return version of NetSuite.
+     *
+     * @return version object
+     */
     public NetSuiteVersion getApiVersion() {
         if (apiVersion.getValue() != null) {
             String value = apiVersion.getStringValue();
@@ -220,11 +256,19 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
         return vrm;
     }
 
+    /**
+     * Return design-time context object for this connection properties.
+     *
+     * @return context object
+     */
     public NetSuiteRuntime.Context getDesignTimeContext() {
+        // If the component refers to another component
+        // then we should use design-time context from referenced connection properties.
         NetSuiteConnectionProperties refProps = referencedComponent.getReference();
         if (refProps != null) {
             return refProps.getDesignTimeContext();
         }
+        // Lazily create and return context object.
         if (designTimeContext == null) {
             designTimeContext = new NetSuiteComponentDefinition.DesignTimeContext();
         }
@@ -238,6 +282,10 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
         return migrated;
     }
 
+    /**
+     * Performs initialization of {@link #apiVersion} property for old components
+     * that didn't have this property.
+     */
     private void migrateApiVersion() {
         if (apiVersion.getValue() == null) {
             if (endpoint.getValue() != null) {
@@ -253,6 +301,7 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
                 }
             }
         }
+        // Initialize possible values for apiVersion property.
         if (apiVersion.getPossibleValues().isEmpty()) {
             apiVersion.setPossibleValues(API_VERSIONS);
         }

@@ -164,7 +164,7 @@ public abstract class DefaultCustomMetaDataSource<PortT> implements CustomMetaDa
                 customizationRef.setInternalId(internalId);
                 customizationRef.setScriptId(scriptId);
 
-                customFieldDesc.setRef(customizationRef);
+                customFieldDesc.setCustomizationRef(customizationRef);
                 customFieldDesc.setName(customizationRef.getScriptId());
                 customFieldDesc.setCustomFieldType(customFieldRefType);
 
@@ -272,7 +272,7 @@ public abstract class DefaultCustomMetaDataSource<PortT> implements CustomMetaDa
         if (recordCustomFieldMap != null) {
             return;
         }
-        recordCustomFieldMap = retrieveCustomRecordCustomFields(recordTypeInfo.getRecordType(), recordTypeInfo.getRef());
+        recordCustomFieldMap = retrieveCustomRecordCustomFields(recordTypeInfo.getRecordType(), recordTypeInfo.getCustomizationRef());
         customRecordCustomFieldMap.put(recordTypeInfo.getName(), recordCustomFieldMap);
     }
 

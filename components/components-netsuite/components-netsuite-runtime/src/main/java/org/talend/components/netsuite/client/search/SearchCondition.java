@@ -16,11 +16,17 @@ package org.talend.components.netsuite.client.search;
 import java.util.List;
 
 /**
- *
+ * Holds data for single condition of a search query.
  */
 public class SearchCondition {
+
+    /** Name of target field. */
     private String fieldName;
+
+    /** Name of search operator to be applied. */
     private String operatorName;
+
+    /** Search values to be used. */
     private List<String> values;
 
     public SearchCondition() {

@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.talend.components.netsuite.client.model.BasicMetaData;
 
 /**
- *
+ * Search field adapter for {@code SearchMultiSelectField} and {@code SearchMultiSelectCustomField}.
  */
 public class SearchMultiSelectFieldAdapter<T> extends SearchFieldAdapter<T> {
 

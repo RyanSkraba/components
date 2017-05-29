@@ -22,6 +22,9 @@ import org.talend.components.netsuite.connection.NetSuiteConnectionDefinition;
 import org.talend.components.netsuite.input.NetSuiteInputDefinition;
 import org.talend.components.netsuite.output.NetSuiteOutputDefinition;
 
+/**
+ * Definition of NetSuite component family.
+ */
 @Component(
         name = Constants.COMPONENT_INSTALLER_PREFIX + NetSuiteFamilyDefinition.NAME,
         provide = ComponentInstaller.class

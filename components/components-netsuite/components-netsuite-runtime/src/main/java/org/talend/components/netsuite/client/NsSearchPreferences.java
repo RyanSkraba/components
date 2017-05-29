@@ -14,13 +14,17 @@
 package org.talend.components.netsuite.client;
 
 /**
+ * Holds information about general NetSuite client's search preferences.
  *
+ * <p>This data object mirrors NetSuite's native {@code SearchPreferences} data object.
  */
 public class NsSearchPreferences {
 
-    protected Boolean bodyFieldsOnly;
-    protected Boolean returnSearchColumns;
-    protected Integer pageSize;
+    private Boolean bodyFieldsOnly;
+
+    private Boolean returnSearchColumns;
+
+    private Integer pageSize;
 
     public Boolean getBodyFieldsOnly() {
         return bodyFieldsOnly;

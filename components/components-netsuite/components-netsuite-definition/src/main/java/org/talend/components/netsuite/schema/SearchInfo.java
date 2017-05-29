@@ -18,12 +18,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Holds design-time specific information about search data model.
  */
 public class SearchInfo {
-    protected String typeName;
-    protected List<SearchFieldInfo> fields;
-    protected Map<String, SearchFieldInfo> fieldMap;
+
+    /** Name of search data object type */
+    private String typeName;
+
+    /** List of search fields */
+    private List<SearchFieldInfo> fields;
+
+    /** Map of search fields by names */
+    private Map<String, SearchFieldInfo> fieldMap;
 
     public SearchInfo(String typeName, List<SearchFieldInfo> fields) {
         this.typeName = typeName;

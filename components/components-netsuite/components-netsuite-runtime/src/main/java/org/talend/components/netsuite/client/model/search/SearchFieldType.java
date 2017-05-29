@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * Type of search field.
  */
 public enum SearchFieldType {
     BOOLEAN("SearchBooleanField"),
@@ -36,8 +36,10 @@ public enum SearchFieldType {
     CUSTOM_SELECT("SearchEnumMultiSelectCustomField"),
     CUSTOM_STRING("SearchStringCustomField");
 
+    /** Short name of NetSuite's native search field data object type. */
     private final String fieldTypeName;
 
+    /** Table of search operators by search field types. */
     private static final Map<SearchFieldType, SearchFieldOperatorType> fieldOperatorMap;
 
     static {
@@ -56,6 +58,12 @@ public enum SearchFieldType {
         return fieldTypeName;
     }
 
+    /**
+     * Get search field type for given search field type name.
+     *
+     * @param fieldTypeName name of search field type
+     * @return search field type
+     */
     public static SearchFieldType getByFieldTypeName(String fieldTypeName) {
         for (SearchFieldType value : values()) {
             if (value.fieldTypeName.equals(fieldTypeName)) {
@@ -65,6 +73,12 @@ public enum SearchFieldType {
         throw new IllegalArgumentException("Unknown field type name: " + fieldTypeName);
     }
 
+    /**
+     * Get search operator type for given search field type.
+     *
+     * @param searchFieldType search field type
+     * @return search operator type or {@code null}
+     */
     public static SearchFieldOperatorType getOperatorType(final SearchFieldType searchFieldType) {
         return fieldOperatorMap.get(searchFieldType);
     }

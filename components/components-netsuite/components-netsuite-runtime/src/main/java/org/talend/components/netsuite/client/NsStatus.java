@@ -17,10 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Holds information about NetSuite status (read/write operation status etc.).
  *
+ * <p>This data object is mirror of NetSuite's native {@code Status} data object.
  */
 public class NsStatus {
+
+    /** Indicates whether status is 'success'. */
     private boolean success;
+
+    /** Details of status. */
     private List<Detail> details;
 
     public NsStatus() {
@@ -59,10 +65,20 @@ public class NsStatus {
         return sb.toString();
     }
 
+    /**
+     * Type of status.
+     *
+     * <p>This enum is mirror of NetSuite's native {@code StatusDetailType} enum.
+     */
     public enum Type {
         ERROR, WARN, INFO
     }
 
+    /**
+     * Holds information about NetSuite status detail.
+     *
+     * <p>This data object is mirror of NetSuite's native {@code StatusDetail} data object.
+     */
     public static class Detail {
         private Type type;
         private String code;

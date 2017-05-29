@@ -21,7 +21,7 @@ import org.talend.components.netsuite.client.model.beans.Beans;
 import com.google.common.collect.ImmutableMap;
 
 /**
- *
+ * Custom field adapter for {@link BasicRecordType#ENTITY_CUSTOM_FIELD} type.
  */
 public class EntityCustomFieldAdapter<T> extends CustomFieldAdapter<T> {
 

@@ -26,7 +26,7 @@ import org.talend.daikon.properties.presentation.Form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- *
+ * Root properties of NetSuite Input component.
  */
 public class NetSuiteInputProperties extends FixedConnectorsComponentProperties
         implements NetSuiteProvideConnectionProperties {

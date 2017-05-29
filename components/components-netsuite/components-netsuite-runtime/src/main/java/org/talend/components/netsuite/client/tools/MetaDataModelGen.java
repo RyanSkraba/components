@@ -46,7 +46,9 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 /**
+ * Generates descriptors for NetSuite record types and search record types.
  *
+ * <p>MetaDataModelGen class is not used in runtime, this tool is intended for development purposes only.
  */
 public class MetaDataModelGen {
     protected final Logger logger = LoggerFactory.getLogger(getClass());

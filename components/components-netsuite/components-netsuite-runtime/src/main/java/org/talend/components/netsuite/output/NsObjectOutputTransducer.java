@@ -43,14 +43,23 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
+ * Responsible for translating of input {@code IndexedRecord} to output NetSuite data object.
  *
+ * <p>Output NetSuite data object can be {@code Record} or {@code RecordRef}.
  */
 public class NsObjectOutputTransducer extends NsObjectTransducer {
-    protected String typeName;
-    protected boolean reference;
 
-    protected TypeDesc typeDesc;
-    protected RecordTypeInfo recordTypeInfo;
+    /** Name of target NetSuite data model object type. */
+    private String typeName;
+
+    /** Specifies whether output NetSuite data object is {@code RecordRef}. */
+    private boolean reference;
+
+    /** Descriptor of NetSuite data object type. */
+    private TypeDesc typeDesc;
+
+    /** Information about target record type. */
+    private RecordTypeInfo recordTypeInfo;
 
     public NsObjectOutputTransducer(NetSuiteClientService<?> clientService, String typeName) {
         super(clientService);
@@ -66,58 +75,30 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
         this.reference = reference;
     }
 
-    protected void prepare() {
+    /**
+     * Prepare processing of data object.
+     */
+    private void prepare() {
         if (typeDesc != null) {
             return;
         }
 
         recordTypeInfo = metaDataSource.getRecordType(typeName);
         if (reference) {
+            // If target NetSuite data object is record ref then
+            // we should get descriptor for RecordRef type.
             typeDesc = metaDataSource.getTypeInfo(recordTypeInfo.getRefType().getTypeName());
         } else {
             typeDesc = metaDataSource.getTypeInfo(typeName);
         }
     }
 
-    public NsRef getRef(IndexedRecord indexedRecord) {
-        prepare();
-
-        Schema schema = indexedRecord.getSchema();
-        return getRef(schema, indexedRecord);
-    }
-
-    protected NsRef getRef(Schema schema, IndexedRecord indexedRecord) {
-        if (recordTypeInfo == null) {
-            return null;
-        }
-
-        Schema.Field internalIdField = NetSuiteDatasetRuntimeImpl.getNsFieldByName(schema, "internalId");
-        String internalId = internalIdField != null ? (String) indexedRecord.get(internalIdField.pos()) : null;
-
-        Schema.Field externalIdField = NetSuiteDatasetRuntimeImpl.getNsFieldByName(schema, "externalId");
-        String externalId = externalIdField != null ? (String) indexedRecord.get(externalIdField.pos()) : null;
-
-        if (internalId == null && externalId == null) {
-            return null;
-        }
-
-        NsRef ref;
-        if (recordTypeInfo instanceof CustomRecordTypeInfo) {
-            CustomRecordTypeInfo customRecordTypeInfo = (CustomRecordTypeInfo) recordTypeInfo;
-
-            Schema.Field scriptIdField = NetSuiteDatasetRuntimeImpl.getNsFieldByName(schema, "scriptId");
-            String scriptId = scriptIdField != null ? (String) indexedRecord.get(scriptIdField.pos()) : null;
-
-            Schema.Field typeIdField = NetSuiteDatasetRuntimeImpl.getNsFieldByName(schema, "typeId");
-            String typeId = typeIdField != null ? (String) indexedRecord.get(typeIdField.pos()) : null;
-
-            ref = customRecordTypeInfo.createRef(internalId, externalId, scriptId, typeId);
-        } else {
-            ref = recordTypeInfo.createRef(internalId, externalId);
-        }
-        return ref;
-    }
-
+    /**
+     * Translate input {@code IndexedRecord} to output NetSuite data object.
+     *
+     * @param indexedRecord indexed record to be processed
+     * @return NetSuite data object
+     */
     public Object write(IndexedRecord indexedRecord) {
         prepare();
 
@@ -136,8 +117,10 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
 
         Object nsObject = clientService.getBasicMetaData().createInstance(targetTypeName);
 
+        // Names of fields to be null'ed.
         Set<String> nullFieldNames = new HashSet<>();
 
+        // Custom fields by names.
         Map<String, Object> customFieldMap = Collections.emptyMap();
 
         if (!reference && beanInfo.getProperty("customFieldList") != null) {
@@ -166,6 +149,8 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
             writeField(nsObject, fieldDesc, customFieldMap, nullFieldNames, value);
         }
 
+        // Set record type identification data
+
         if (reference) {
             if (recordTypeInfo.getRefType() == RefType.RECORD_REF) {
                 FieldDesc recTypeFieldDesc = typeDesc.getField("type");
@@ -176,7 +161,7 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
 
             } else if (recordTypeInfo.getRefType() == RefType.CUSTOM_RECORD_REF) {
                 CustomRecordTypeInfo customRecordTypeInfo = (CustomRecordTypeInfo) recordTypeInfo;
-                NsRef customizationRef = customRecordTypeInfo.getRef();
+                NsRef customizationRef = customRecordTypeInfo.getCustomizationRef();
 
                 FieldDesc typeIdFieldDesc = typeDesc.getField("typeId");
                 nullFieldNames.remove("typeId");
@@ -189,7 +174,7 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
                 CustomRecordTypeInfo customRecordTypeInfo = (CustomRecordTypeInfo) recordTypeInfo;
 
                 FieldDesc recTypeFieldDesc = typeDesc.getField("recType");
-                NsRef recordTypeRef = customRecordTypeInfo.getRef();
+                NsRef recordTypeRef = customRecordTypeInfo.getCustomizationRef();
 
                 // Create custom record type ref as JSON to create native RecordRef
                 ObjectNode recordRefNode = JsonNodeFactory.instance.objectNode();
@@ -201,6 +186,8 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
                         false, nullFieldNames, recordRefNode.toString());
             }
         }
+
+        // Set null fields
 
         if (!nullFieldNames.isEmpty() && beanInfo.getProperty("nullFieldList") != null) {
             Object nullFieldListWrapper = clientService.getBasicMetaData()

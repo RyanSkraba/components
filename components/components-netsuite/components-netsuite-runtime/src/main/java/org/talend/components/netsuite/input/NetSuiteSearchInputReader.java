@@ -37,11 +37,14 @@ import org.talend.components.netsuite.client.search.SearchCondition;
 import org.talend.components.netsuite.client.search.SearchQuery;
 
 /**
- *
+ * Responsible for execution of NetSuite search and retrieving of search results.
  */
 public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedRecord> {
 
+    /** NetSuite client used. */
     private transient NetSuiteClientService<?> clientService;
+
+    /** Source of meta data. */
     private transient MetaDataSource metaDataSource;
 
     private transient NsObjectInputTransducer transducer;
@@ -50,13 +53,18 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
 
     private NetSuiteInputProperties properties;
 
+    /** Number of retrieved records. */
     private int dataCount;
 
     private RuntimeContainer container;
 
+    /** Search result set. */
     private ResultSet<?> resultSet;
 
+    /** Last retrieved NetSuite record. */
     private Object currentRecord;
+
+    /** Last indexed record. */
     private IndexedRecord currentIndexedRecord;
 
     public NetSuiteSearchInputReader(RuntimeContainer container,
@@ -74,6 +82,8 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
 
             clientService = ((NetSuiteSource) getCurrentSource()).getClientService();
 
+            // Set up MetaDataSource which retrieves customization meta data from schema.
+            // We use MetaDataSource from NetSuite client as base source.
             MetaDataSource originalMetaDataSource = clientService.getMetaDataSource();
             metaDataSource = clientService.createDefaultMetaDataSource();
             metaDataSource.setCustomizationEnabled(originalMetaDataSource.isCustomizationEnabled());
@@ -81,6 +91,7 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
                     clientService.getBasicMetaData(), originalMetaDataSource.getCustomMetaDataSource(), schema);
             metaDataSource.setCustomMetaDataSource(schemaCustomMetaDataSource);
 
+            // Execute search and get search result set.
             resultSet = search();
 
             return advance();
@@ -94,7 +105,7 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
         try {
             if (resultSet.next()) {
                 currentRecord = resultSet.get();
-                currentIndexedRecord = transduceRecord(currentRecord);
+                currentIndexedRecord = transducer.read(currentRecord);
                 dataCount++;
                 return true;
             }
@@ -121,11 +132,18 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
         return result.toMap();
     }
 
-    protected ResultSet<?> search() throws NetSuiteException {
+    /**
+     * Build and execute NetSuite search query.
+     *
+     * @return
+     * @throws NetSuiteException if an error occurs during execution of search
+     */
+    private ResultSet<?> search() throws NetSuiteException {
         SearchQuery search = buildSearchQuery();
 
         RecordTypeInfo recordTypeInfo = search.getRecordTypeInfo();
 
+        // Set up object translator
         transducer = new NsObjectInputTransducer(clientService, schema, recordTypeInfo.getName());
         transducer.setMetaDataSource(metaDataSource);
 
@@ -133,11 +151,18 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
         return resultSet;
     }
 
-    protected SearchQuery buildSearchQuery() {
+    /**
+     * Build search query from properties.
+     *
+     * @return search query object
+     */
+    private SearchQuery buildSearchQuery() {
         String target = properties.module.moduleName.getStringValue();
 
         SearchQuery search = clientService.newSearch(metaDataSource);
         search.target(target);
+
+        // Build search conditions
 
         List<String> fieldNames = properties.module.searchQuery.field.getValue();
         if (fieldNames != null && !fieldNames.isEmpty()) {
@@ -153,17 +178,34 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
         return search;
     }
 
-    protected SearchCondition buildSearchCondition(String fieldName, String operator, Object value1, Object value2) {
+    /**
+     * Build search condition.
+     *
+     * @param fieldName name of search field
+     * @param operator name of search operator
+     * @param value1 first search value
+     * @param value2 second search value
+     * @return
+     */
+    private SearchCondition buildSearchCondition(String fieldName, String operator, Object value1, Object value2) {
         List<String> values = buildSearchConditionValueList(value1, value2);
         return new SearchCondition(fieldName, operator, values);
     }
 
-    protected List<String> buildSearchConditionValueList(Object value1, Object value2) {
+    /**
+     * Build search value list.
+     *
+     * @param value1 first search value
+     * @param value2 second search value
+     * @return
+     */
+    private List<String> buildSearchConditionValueList(Object value1, Object value2) {
         if (value1 == null) {
             return null;
         }
 
         List<String> valueList;
+        // First, check whether first value is collection of values
         if (value1 instanceof Collection) {
             Collection<?> elements = (Collection<?>) value1;
             valueList = new ArrayList<>(elements.size());
@@ -173,6 +215,7 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
                 }
             }
         } else {
+            // Create value list from value pair
             valueList = new ArrayList<>(2);
             String sValue1 = value1 != null ? value1.toString() : null;
             if (StringUtils.isNotEmpty(sValue1)) {
@@ -186,9 +229,5 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
         }
 
         return valueList;
-    }
-
-    protected IndexedRecord transduceRecord(Object record) throws IOException {
-        return transducer.read(record);
     }
 }

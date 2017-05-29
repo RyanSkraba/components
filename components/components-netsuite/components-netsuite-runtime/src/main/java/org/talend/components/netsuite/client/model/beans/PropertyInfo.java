@@ -16,7 +16,10 @@ package org.talend.components.netsuite.client.model.beans;
 import java.lang.reflect.Method;
 
 /**
+ * Descriptor of bean's property.
  *
+ * <p>This is simplified version of {@link java.beans.PropertyDescriptor} and is intended
+ * to be used for beans generated from NetSuite's XML schemas.
  */
 public class PropertyInfo {
     private String name;
@@ -59,5 +62,17 @@ public class PropertyInfo {
 
     public String getWriteMethodName() {
         return writeMethodName;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("PropertyInfo{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", readType=").append(readType);
+        sb.append(", writeType=").append(writeType);
+        sb.append(", readMethodName='").append(readMethodName).append('\'');
+        sb.append(", writeMethodName='").append(writeMethodName).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

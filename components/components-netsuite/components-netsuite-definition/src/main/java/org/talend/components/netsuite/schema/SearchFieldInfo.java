@@ -14,10 +14,14 @@
 package org.talend.components.netsuite.schema;
 
 /**
- *
+ * Holds design-time specific information about single search field.
  */
 public class SearchFieldInfo {
+
+    /** Name of search field. */
     private String name;
+
+    /** Type of value */
     private Class<?> valueType;
 
     public SearchFieldInfo(String name, Class<?> valueType) {

@@ -30,7 +30,8 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
 /**
- *
+ * NetSuite Input component's Properties which holds information about
+ * target record type and search related properties.
  */
 public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
 
@@ -68,6 +69,8 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
     }
 
     public ValidationResult beforeModuleName() throws Exception {
+        // Before selecting of a target record type we should provide
+        // set of record types that are available for searching.
         try {
             List<NamedThing> searchableTypes = getSearchableTypes();
             moduleName.setPossibleNamedThingValues(searchableTypes);
@@ -79,6 +82,9 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
     }
 
     public ValidationResult afterModuleName() throws Exception {
+        // After selecting of target record type we should:
+        // - Set up main schema which will be used for records emitted by component
+        // - Set up search query design-time model
         try {
             setupSchema();
             setupSearchSchema();
@@ -96,14 +102,20 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
         refreshLayout(getForm(Form.MAIN));
     }
 
-    protected void setupSchema() {
+    /**
+     * Set up main schema for outgoing flow.
+     */
+    private void setupSchema() {
         assertModuleName();
 
         Schema schema = getSchema(moduleName.getStringValue());
         main.schema.setValue(schema);
     }
 
-    protected void setupSearchSchema() {
+    /**
+     * Set up search query design-time model.
+     */
+    private void setupSearchSchema() {
         assertModuleName();
 
         SearchInfo searchSchema = getSearchInfo(moduleName.getValue());
@@ -112,12 +124,15 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
             fieldNames.add(field.getName());
         }
 
+        // Set up list of available search fields
         searchQuery.field.setPossibleValues(fieldNames);
         searchQuery.field.setValue(new ArrayList<String>());
 
+        // Set up list of search operators
         searchQuery.operator.setPossibleValues(getSearchFieldOperators());
         searchQuery.operator.setValue(new ArrayList<String>());
 
+        // Clear search values
         searchQuery.value1.setValue(new ArrayList<>());
         searchQuery.value2.setValue(new ArrayList<>());
 

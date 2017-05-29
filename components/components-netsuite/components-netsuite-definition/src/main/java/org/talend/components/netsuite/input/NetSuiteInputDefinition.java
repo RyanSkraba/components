@@ -20,11 +20,12 @@ import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.netsuite.NetSuiteComponentDefinition;
-import org.talend.components.netsuite.NetSuiteModuleProperties;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
+ * Definition of NetSuite Input component.
  *
+ * <p>Input component is responsible for searching of NetSuite records.
  */
 public class NetSuiteInputDefinition extends NetSuiteComponentDefinition {
 

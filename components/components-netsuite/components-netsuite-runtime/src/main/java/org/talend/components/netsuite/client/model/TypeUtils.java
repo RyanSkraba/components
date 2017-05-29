@@ -24,10 +24,17 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import org.talend.components.netsuite.client.NetSuiteException;
 
 /**
- *
+ * Provides utility methods to work with NetSuite native data object types.
  */
 public abstract class TypeUtils {
 
+    /**
+     * Traverse XML data object hierarchy and collect all descendants of a root class.
+     *
+     * @param rootClass root class of type hierarchy
+     * @param clazz type class to be processed
+     * @param classes set to collect type classes
+     */
     public static void collectXmlTypes(Class<?> rootClass, Class<?> clazz, Set<Class<?>> classes) {
         if (classes.contains(clazz)) {
             return;
@@ -46,6 +53,14 @@ public abstract class TypeUtils {
         }
     }
 
+    /**
+     * Create new instance of given class.
+     *
+     * @param clazz target class to instantiate
+     * @param <T> type of instance
+     * @return instance of class
+     * @throws NetSuiteException if an error occurs during instantiation
+     */
     public static <T> T createInstance(Class<T> clazz) throws NetSuiteException {
         try {
             T target = clazz.cast(clazz.newInstance());

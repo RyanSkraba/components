@@ -24,7 +24,7 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
- *
+ * Definition of NetSuite Connection component.
  */
 public class NetSuiteConnectionDefinition extends NetSuiteComponentDefinition {
 

@@ -17,7 +17,7 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
 /**
- *
+ * Provides translated messages for runtime related classes.
  */
 public abstract class NetSuiteRuntimeI18n {
 

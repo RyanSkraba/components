@@ -41,7 +41,7 @@ import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.java8.Function;
 
 /**
- *
+ * NetSuiteClientService provides access to remote NetSuite endpoint.
  */
 public abstract class NetSuiteClientService<PortT> {
 
@@ -61,32 +61,55 @@ public abstract class NetSuiteClientService<PortT> {
     protected NetSuiteCredentials credentials;
 
     protected NsSearchPreferences searchPreferences;
+
     protected NsPreferences preferences;
 
+    /** Used for synchronization of access to NetSuite port. */
     protected ReentrantLock lock = new ReentrantLock();
 
+    /** Specifies whether logging of SOAP messages is enabled. Intended for test/debug purposes. */
     protected boolean messageLoggingEnabled = false;
 
+    /** Web Service connection timeout, in milliseconds. */
     protected long connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
+
+    /** Web Service response receiving timeout, in milliseconds. */
     protected long receiveTimeout = DEFAULT_RECEIVE_TIMEOUT;
 
+    /** Number of retries for an operation. */
     protected int retryCount = 3;
+
+    /** Number of retries before (re-)login. */
     protected int retriesBeforeLogin = 2;
+
+    /** Interval between retries. */
     protected int retryInterval = 5;
 
+    /** Size of search result page. */
     protected int searchPageSize = DEFAULT_SEARCH_PAGE_SIZE;
+
+    /** Specifies whether to return record body fields only. */
     protected boolean bodyFieldsOnly = true;
+
+    /** Specifies whether to return search columns. */
     protected boolean returnSearchColumns = false;
 
+    /** Specifies whether to treat warnings as errors. */
     protected boolean treatWarningsAsErrors = false;
+
+    /** Specifies whether to disable validation for mandatory custom fields. */
     protected boolean disableMandatoryCustomFieldValidation = false;
 
+    /** Specifies whether to use request level credentials. */
     protected boolean useRequestLevelCredentials = false;
 
+    /** Flag indicating whether the client is logged in. */
     protected boolean loggedIn = false;
 
+    /** NetSuite Web Service port implementor. */
     protected PortT port;
 
+    /** Source of meta data. */
     protected MetaDataSource metaDataSource;
 
     protected NetSuiteClientService() {
@@ -160,6 +183,11 @@ public abstract class NetSuiteClientService<PortT> {
         this.useRequestLevelCredentials = useRequestLevelCredentials;
     }
 
+    /**
+     * Log in to NetSuite.
+     *
+     * @throws NetSuiteException if an error occurs during logging in
+     */
     public void login() throws NetSuiteException {
         lock.lock();
         try {
@@ -169,56 +197,199 @@ public abstract class NetSuiteClientService<PortT> {
         }
     }
 
-    public SearchQuery newSearch() throws NetSuiteException {
+    /**
+     * Create new search query object.
+     *
+     * @return search query object
+     */
+    public SearchQuery newSearch() {
         return newSearch(getMetaDataSource());
     }
 
-    public SearchQuery newSearch(MetaDataSource metaDataSource) throws NetSuiteException {
+    /**
+     * Create new search query object using given meta data source.
+     *
+     * @param metaDataSource meta data source
+     * @return search query object
+     */
+    public SearchQuery newSearch(MetaDataSource metaDataSource) {
         return new SearchQuery(this, metaDataSource);
     }
 
+    /**
+     * Search records.
+     *
+     * <p>Retrieval of search results uses pagination. To retrieve next page use
+     * {@link #searchMoreWithId(String, int)} method.
+     *
+     * @param searchRecord search record to be sent to NetSuite
+     * @param <RecT> type of record data object
+     * @param <SearchT> type of search record data object
+     * @return search result wrapper object
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RecT, SearchT> NsSearchResult<RecT> search(final SearchT searchRecord)
             throws NetSuiteException;
 
+    /**
+     * Retrieve search results page by index.
+     *
+     * @param pageIndex page index
+     * @param <RecT> type of record data object
+     * @return search result wrapper object
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RecT> NsSearchResult<RecT> searchMore(final int pageIndex)
             throws NetSuiteException;
 
+    /**
+     * Retrieve search results page by search ID and page index.
+     *
+     * @param searchId identifier of search
+     * @param pageIndex page index
+     * @param <RecT> type of record data object
+     * @return search result wrapper object
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RecT> NsSearchResult<RecT> searchMoreWithId(final String searchId, final int pageIndex)
             throws NetSuiteException;
 
+    /**
+     * Retrieve next search results page.
+     *
+     * @param <RecT> type of record data object
+     * @return search result wrapper object
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RecT> NsSearchResult<RecT> searchNext()
             throws NetSuiteException;
 
+    /**
+     * Retrieve a record by record ref.
+     *
+     * @param ref record ref data object
+     * @param <RecT> type of record data object
+     * @param <RefT> type of record ref data object
+     * @return read response wrapper object
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RecT, RefT> NsReadResponse<RecT> get(final RefT ref)
             throws NetSuiteException;
 
+    /**
+     * Retrieve records by record refs.
+     *
+     * @param refs list of record refs
+     * @param <RecT> type of record data object
+     * @param <RefT> type of record ref data object
+     * @return list of read response wrapper objects
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RecT, RefT> List<NsReadResponse<RecT>> getList(final List<RefT> refs)
             throws NetSuiteException;
 
+    /**
+     * Add a record.
+     *
+     * @param record record data object to be sent to NetSuite
+     * @param <RecT> type of record data object
+     * @param <RefT> type of record ref data object
+     * @return write response wrapper object
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RecT, RefT> NsWriteResponse<RefT> add(final RecT record)
             throws NetSuiteException;
 
+    /**
+     * Add records.
+     *
+     * @param records list of record data objects to be sent to NetSuite
+     * @param <RecT> type of record data object
+     * @param <RefT> type of record ref data object
+     * @return list of write response wrapper objects
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RecT, RefT> List<NsWriteResponse<RefT>> addList(final List<RecT> records)
             throws NetSuiteException;
 
+    /**
+     * Update a record.
+     *
+     * @param record record data object to be sent to NetSuite
+     * @param <RecT> type of record data object
+     * @param <RefT> type of record ref data object
+     * @return write response wrapper object
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RecT, RefT> NsWriteResponse<RefT> update(final RecT record)
             throws NetSuiteException;
 
+    /**
+     * Update records.
+     *
+     * @param records list of record data objects to be sent to NetSuite
+     * @param <RecT> type of record data object
+     * @param <RefT> type of record ref data object
+     * @return list of write response wrapper objects
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RecT, RefT> List<NsWriteResponse<RefT>> updateList(final List<RecT> records)
             throws NetSuiteException;
 
+    /**
+     * Upsert a record.
+     *
+     * @param record record data object to be sent to NetSuite
+     * @param <RecT> type of record data object
+     * @param <RefT> type of record ref data object
+     * @return write response wrapper object
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RecT, RefT> NsWriteResponse<RefT> upsert(final RecT record)
             throws NetSuiteException;
 
+    /**
+     * Upsert records.
+     *
+     * @param records list of record data objects to be sent to NetSuite
+     * @param <RecT> type of record data object
+     * @param <RefT> type of record ref data object
+     * @return list of write response wrapper objects
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RecT, RefT> List<NsWriteResponse<RefT>> upsertList(final List<RecT> records)
             throws NetSuiteException;
 
+    /**
+     * Delete a record.
+     *
+     * @param ref record ref data object to be sent to NetSuite
+     * @param <RefT> type of record ref data object
+     * @return write response wrapper object
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RefT> NsWriteResponse<RefT> delete(final RefT ref)
             throws NetSuiteException;
 
+    /**
+     * Delete records.
+     *
+     * @param refs list of record ref data objects to be sent to NetSuite
+     * @param <RefT> type of record ref data object
+     * @return list of write response wrapper objects
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public abstract <RefT> List<NsWriteResponse<RefT>> deleteList(final List<RefT> refs)
             throws NetSuiteException;
 
+    /**
+     * Execute an operation that use NetSuite web service port.
+     *
+     * @param op operation to be executed
+     * @param <R> type of operation result
+     * @return result of operation
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     public <R> R execute(PortOperation<R, PortT> op) throws NetSuiteException {
         if (useRequestLevelCredentials) {
             return executeUsingRequestLevelCredentials(op);
@@ -227,6 +398,15 @@ public abstract class NetSuiteClientService<PortT> {
         }
     }
 
+    /**
+     * Execute an operation within client lock.
+     *
+     * @param func operation to be executed
+     * @param param parameter object
+     * @param <T> type of parameter
+     * @param <R> type of result
+     * @return result of execution
+     */
     public <T, R> R executeWithLock(Function<T, R> func, T param) {
         lock.lock();
         try {
@@ -236,21 +416,50 @@ public abstract class NetSuiteClientService<PortT> {
         }
     }
 
+    /**
+     * Get basic meta data used by this client.
+     *
+     * @return basic meta data
+     */
     public abstract BasicMetaData getBasicMetaData();
 
+    /**
+     * Get meta data source used by this client.
+     *
+     * @return meta data source
+     */
     public MetaDataSource getMetaDataSource() {
         return metaDataSource;
     }
 
+    /**
+     * Create new instance of default meta data source.
+     *
+     * @return meta data source
+     */
     public MetaDataSource createDefaultMetaDataSource() {
         return new DefaultMetaDataSource(this);
     }
 
+    /**
+     * Create new instance of customization meta data source.
+     *
+     * @return customization meta data source
+     */
     public abstract CustomMetaDataSource createDefaultCustomMetaDataSource();
 
+    /**
+     * Execute an operation as logged-in client.
+     *
+     * @param op operation to be executed
+     * @param <R> type of operation result
+     * @return result of execution
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     protected <R> R executeUsingLogin(PortOperation<R, PortT> op) throws NetSuiteException {
         lock.lock();
         try {
+            // Log in if required
             login(false);
 
             R result = null;
@@ -279,6 +488,14 @@ public abstract class NetSuiteClientService<PortT> {
         }
     }
 
+    /**
+     * Execute an operation using request level credentials.
+     *
+     * @param op operation to be executed
+     * @param <R> type of operation result
+     * @return result of execution
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     private <R> R executeUsingRequestLevelCredentials(PortOperation<R, PortT> op) throws NetSuiteException {
         lock.lock();
         try {
@@ -306,6 +523,12 @@ public abstract class NetSuiteClientService<PortT> {
         }
     }
 
+    /**
+     * Set a SOAP header to be sent to NetSuite in request
+     *
+     * @param port port
+     * @param header header to be set
+     */
     protected void setHeader(PortT port, Header header) {
         BindingProvider provider = (BindingProvider) port;
         Map<String, Object> requestContext = provider.getRequestContext();
@@ -318,10 +541,21 @@ public abstract class NetSuiteClientService<PortT> {
         list.add(header);
     }
 
+    /**
+     * Remove a SOAP header from header list to be sent to NetSuite
+     *
+     * @param name name identifying a header
+     */
     protected void removeHeader(QName name) {
         removeHeader(port, name);
     }
 
+    /**
+     * Remove a SOAP header from header list to be sent to NetSuite
+     *
+     * @param port port
+     * @param name name identifying a header
+     */
     protected void removeHeader(PortT port, QName name) {
         BindingProvider provider = (BindingProvider) port;
         Map<String, Object> requestContext = provider.getRequestContext();
@@ -329,6 +563,12 @@ public abstract class NetSuiteClientService<PortT> {
         removeHeader(list, name);
     }
 
+    /**
+     * Remove a SOAP header from given header list.
+     *
+     * @param list header list
+     * @param name name identifying a header
+     */
     private void removeHeader(List<Header> list, QName name) {
         if (list != null) {
             Iterator<Header> headerIterator = list.iterator();
@@ -341,10 +581,21 @@ public abstract class NetSuiteClientService<PortT> {
         }
     }
 
+    /**
+     * Forcibly re-log in the client.
+     *
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     private void relogin() throws NetSuiteException {
         login(true);
     }
 
+    /**
+     * Log in the client.
+     *
+     * @param relogin specifies whether the client should be forcibly re-logged in
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     private void login(boolean relogin) throws NetSuiteException {
         if (relogin) {
             loggedIn = false;
@@ -380,8 +631,18 @@ public abstract class NetSuiteClientService<PortT> {
         loggedIn = true;
     }
 
+    /**
+     * Perform 'log out' operation.
+     *
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     protected abstract void doLogout() throws NetSuiteException;
 
+    /**
+     * Perform 'log in' operation.
+     *
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     protected abstract void doLogin() throws NetSuiteException;
 
     public long getConnectionTimeout() {
@@ -446,10 +707,30 @@ public abstract class NetSuiteClientService<PortT> {
         }
     }
 
+    /**
+     * Check whether given error can be worked around by retrying.
+     *
+     * @param t error to be checked
+     * @return {@code true} if the error can be worked around, {@code false} otherwise
+     */
     protected abstract boolean errorCanBeWorkedAround(Throwable t);
 
+    /**
+     * Check whether given error can be requires new log-in.
+     *
+     * @param t error to be checked
+     * @return {@code true} if the error requies new log-in, {@code false} otherwise
+     */
     protected abstract boolean errorRequiresNewLogin(Throwable t);
 
+    /**
+     * Set preferences for given port.
+     *
+     * @param port port which to set preferences for
+     * @param nsPreferences general preferences
+     * @param nsSearchPreferences search preferences
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     protected void setPreferences(PortT port,
             NsPreferences nsPreferences, NsSearchPreferences nsSearchPreferences) throws NetSuiteException {
 
@@ -473,6 +754,12 @@ public abstract class NetSuiteClientService<PortT> {
         }
     }
 
+    /**
+     * Set log-in specific SOAP headers for given port.
+     *
+     * @param port port
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     protected void setLoginHeaders(PortT port) throws NetSuiteException {
         if (!StringUtils.isEmpty(credentials.getApplicationId())) {
             Object applicationInfo = createNativeApplicationInfo(credentials);
@@ -490,10 +777,21 @@ public abstract class NetSuiteClientService<PortT> {
         }
     }
 
+    /**
+     * Remove log-in specific SOAP headers for given port.
+     *
+     * @param port port
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     protected void remoteLoginHeaders(PortT port) throws NetSuiteException {
         removeHeader(port, new QName(getPlatformMessageNamespaceUri(), "applicationInfo"));
     }
 
+    /**
+     * Set HTTP client policy for given port.
+     *
+     * @param port port
+     */
     protected void setHttpClientPolicy(PortT port) {
         Client proxy = ClientProxy.getClient(port);
         HTTPConduit conduit = (HTTPConduit) proxy.getConduit();
@@ -503,18 +801,66 @@ public abstract class NetSuiteClientService<PortT> {
         conduit.setClient(httpClientPolicy);
     }
 
+    /**
+     * Get URI for 'platform message' namespace.
+     *
+     * @return namespace URI
+     */
     protected abstract String getPlatformMessageNamespaceUri();
 
+    /**
+     * Create instance of NetSuite's {@code Preferences} native data object.
+     *
+     * @param nsPreferences source preferences data object
+     * @param <T> type of native data object
+     * @return {@code Preferences} data object
+     */
     protected abstract <T> T createNativePreferences(NsPreferences nsPreferences);
 
+    /**
+     * Create instance of NetSuite's {@code SearchPreferences} native data object.
+     *
+     * @param nsSearchPreferences source search preferences data object
+     * @param <T> type of native data object
+     * @return {@code SearchPreferences} data object
+     */
     protected abstract <T> T createNativeSearchPreferences(NsSearchPreferences nsSearchPreferences);
 
+    /**
+     * Create instance of NetSuite's {@code ApplicationInfo} native data object.
+     *
+     * @param nsCredentials credentials data object
+     * @param <T> type of native data object
+     * @return {@code ApplicationInfo} data object
+     */
     protected abstract <T> T createNativeApplicationInfo(NetSuiteCredentials nsCredentials);
 
+    /**
+     * Create instance of NetSuite's {@code Passport} native data object.
+     *
+     * @param nsCredentials credentials data object
+     * @param <T> type of native data object
+     * @return {@code Passport} data object
+     */
     protected abstract <T> T createNativePassport(NetSuiteCredentials nsCredentials);
 
+    /**
+     * Get instance of NetSuite web service port implementation.
+     *
+     * @param defaultEndpointUrl default URL of NetSuite endpoint
+     * @param account  NetSuite account number
+     * @return port
+     * @throws NetSuiteException if an error occurs during performing of operation
+     */
     protected abstract PortT getNetSuitePort(String defaultEndpointUrl, String account) throws NetSuiteException;
 
+    /**
+     * Check 'log-in' operation status and throw {@link NetSuiteException} if status indicates that
+     * an error occurred or exception message is present.
+     *
+     * @param status status object to be checked, if present
+     * @param exceptionMessage exception message, if present
+     */
     protected void checkLoginError(NsStatus status, String exceptionMessage) {
         if (status == null || !status.isSuccess()) {
             StringBuilder sb = new StringBuilder();
@@ -529,10 +875,23 @@ public abstract class NetSuiteClientService<PortT> {
         }
     }
 
+    /**
+     * Operation that requires NetSuite port.
+     *
+     * @param <R> type of operation result
+     * @param <PortT> type of NetSuite port implementation
+     */
     public interface PortOperation<R, PortT> {
         R execute(PortT port) throws Exception;
     }
 
+    /**
+     * Check status of an operation and throw {@link NetSuiteException} if status indicates that
+     * an error occurred.
+     *
+     * @param status status object to be checked
+     * @throws NetSuiteException if status indicates an error
+     */
     public static void checkError(NsStatus status) throws NetSuiteException {
         if (!status.getDetails().isEmpty()) {
             NsStatus.Detail detail = status.getDetails().get(0);

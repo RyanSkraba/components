@@ -30,7 +30,7 @@ import org.talend.daikon.properties.property.Property;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- *
+ * Root properties of NetSuite Output component.
  */
 public class NetSuiteOutputProperties extends FixedConnectorsComponentProperties
         implements NetSuiteProvideConnectionProperties {

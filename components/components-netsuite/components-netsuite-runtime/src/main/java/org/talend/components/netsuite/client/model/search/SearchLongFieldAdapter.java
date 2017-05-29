@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.talend.components.netsuite.client.model.BasicMetaData;
 
 /**
- *
+ * Search field adapter for {@code SearchLongField} and {@code SearchLongCustomField}.
  */
 public class SearchLongFieldAdapter<T> extends SearchFieldAdapter<T> {
 

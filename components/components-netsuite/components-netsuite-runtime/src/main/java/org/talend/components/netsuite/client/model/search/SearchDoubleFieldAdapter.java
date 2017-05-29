@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.talend.components.netsuite.client.model.BasicMetaData;
 
 /**
- *
+ * Search field adapter for {@code SearchDoubleField} and {@code SearchDoubleCustomField}.
  */
 public class SearchDoubleFieldAdapter<T> extends SearchFieldAdapter<T> {
 

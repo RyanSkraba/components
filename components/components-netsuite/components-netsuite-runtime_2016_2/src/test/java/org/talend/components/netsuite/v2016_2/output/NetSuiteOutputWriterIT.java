@@ -622,8 +622,8 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
             record.setCustomFieldList(new CustomFieldList());
 
             BooleanCustomFieldRef customFieldRef1 = new BooleanCustomFieldRef();
-            customFieldRef1.setScriptId(customFieldDesc1.getRef().getScriptId());
-            customFieldRef1.setInternalId(customFieldDesc1.getRef().getInternalId());
+            customFieldRef1.setScriptId(customFieldDesc1.getCustomizationRef().getScriptId());
+            customFieldRef1.setInternalId(customFieldDesc1.getCustomizationRef().getInternalId());
             customFieldRef1.setValue(true);
 
             record.getCustomFieldList().getCustomField().add(customFieldRef1);

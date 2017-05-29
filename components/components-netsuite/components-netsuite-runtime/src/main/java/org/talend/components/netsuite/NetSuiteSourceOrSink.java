@@ -32,16 +32,19 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
 /**
- *
+ * Base class NetSuite sources and sinks.
  */
 public abstract class NetSuiteSourceOrSink implements SourceOrSink {
 
     protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
+    /** Creates instance of NetSuite client. */
     protected NetSuiteClientFactory<?> clientFactory;
 
+    /** Properties to be used by source/sink. */
     protected NetSuiteProvideConnectionProperties properties;
 
+    /** Endpoint object. */
     protected transient NetSuiteEndpoint endpoint;
 
     public NetSuiteClientFactory<?> getClientFactory() {
@@ -53,7 +56,7 @@ public abstract class NetSuiteSourceOrSink implements SourceOrSink {
     }
 
     @Override
-    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
+    public ValidationResult initialize(final RuntimeContainer container, final ComponentProperties properties) {
         this.properties = (NetSuiteProvideConnectionProperties) properties;
         NetSuiteEndpoint.ConnectionConfig connectionConfig =
                 NetSuiteEndpoint.createConnectionConfig(getConnectionProperties());
@@ -95,18 +98,39 @@ public abstract class NetSuiteSourceOrSink implements SourceOrSink {
         }
     }
 
+    /**
+     * Get connection properties used by this source/sink.
+     *
+     * @return connection properties
+     */
     public NetSuiteConnectionProperties getConnectionProperties() {
         return properties.getConnectionProperties();
     }
 
+    /**
+     * Get properties used by this source/sink.
+     *
+     * @return properties
+     */
     public NetSuiteProvideConnectionProperties getProperties() {
         return properties;
     }
 
+    /**
+     * Get NetSuite client used by this source/sink.
+     *
+     * @return client
+     * @throws NetSuiteException if an error occurs during connecting
+     */
     public NetSuiteClientService<?> getClientService() throws NetSuiteException {
         return endpoint.getClientService();
     }
 
+    /**
+     * Assert that given version of NetSuite API match the version implemented by runtime.
+     *
+     * @param apiVersion version to be checked
+     */
     protected void assertApiVersion(final NetSuiteVersion apiVersion) {
         if (!clientFactory.getApiVersion().isSameMajor(apiVersion)) {
             throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),

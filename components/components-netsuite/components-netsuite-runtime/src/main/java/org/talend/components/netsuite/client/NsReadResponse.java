@@ -13,8 +13,19 @@
 
 package org.talend.components.netsuite.client;
 
+/**
+ * Holds information about NetSuite read response.
+ *
+ * <p>This data object is simple mirror of NetSuite's native {@code ReadResponse} data object.
+ *
+ * @param <RecT> type of record data object
+ */
 public class NsReadResponse<RecT> {
+
+    /** Status of 'read' operation. */
     private NsStatus status;
+
+    /** NetSuite's native record data object. */
     private RecT record;
 
     public NsReadResponse() {

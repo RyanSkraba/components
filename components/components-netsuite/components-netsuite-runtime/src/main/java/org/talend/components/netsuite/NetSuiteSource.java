@@ -22,10 +22,9 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.input.NetSuiteInputProperties;
 import org.talend.components.netsuite.input.NetSuiteSearchInputReader;
-import org.talend.daikon.properties.ValidationResult;
 
 /**
- *
+ * Base class for NetSuite sources.
  */
 public abstract class NetSuiteSource extends NetSuiteSourceOrSink implements BoundedSource {
 
@@ -58,8 +57,4 @@ public abstract class NetSuiteSource extends NetSuiteSourceOrSink implements Bou
                         NetSuiteInputProperties.class, properties.getClass()));
     }
 
-    @Override
-    public ValidationResult validate(RuntimeContainer container) {
-        return super.validate(container);
-    }
 }

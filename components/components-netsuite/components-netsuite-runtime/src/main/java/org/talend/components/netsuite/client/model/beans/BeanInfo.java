@@ -21,11 +21,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Descriptor of a bean.
  *
+ * <p>This is simplified version of {@link java.beans.BeanInfo} and is intended
+ * to be used for beans generated from NetSuite's XML schemas.
  */
 public class BeanInfo {
 
+    /** Properties of bean. */
     private List<PropertyInfo> properties;
+
+    /** Table of properties by names, for faster access. */
     private Map<String, PropertyInfo> propertyMap;
 
     public BeanInfo(PropertyInfo[] properties) {
@@ -52,4 +58,11 @@ public class BeanInfo {
         return propertyMap.get(name);
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("BeanInfo{");
+        sb.append("properties=").append(properties);
+        sb.append('}');
+        return sb.toString();
+    }
 }

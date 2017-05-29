@@ -18,10 +18,16 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
 /**
- *
+ * Provides utility methods for component exceptions.
  */
 public abstract class ComponentExceptions {
 
+    /**
+     * Compose {@code ValidationResult} for given exception.
+     *
+     * @param ex exception
+     * @return {@code ValidationResult}
+     */
     public static ValidationResult exceptionToValidationResult(Exception ex) {
         ValidationResult vr = null;
         if (ex instanceof ComponentException) {
@@ -33,6 +39,12 @@ public abstract class ComponentExceptions {
         return vr;
     }
 
+    /**
+     * Compose {@link ComponentException} for given exception
+     *
+     * @param ex exception
+     * @return {@code ComponentException}
+     */
     public static ComponentException asComponentExceptionWithValidationResult(Exception ex) {
         if (ex instanceof ComponentException && (((ComponentException) ex).getValidationResult() != null)) {
             return ((ComponentException) ex);

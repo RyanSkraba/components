@@ -16,9 +16,14 @@ package org.talend.components.netsuite;
 import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
 
 /**
- *
+ * Contract for a properties object which can provide {@link NetSuiteConnectionProperties}.
  */
 public interface NetSuiteProvideConnectionProperties {
 
+    /**
+     * Return connection properties used by this properties object.
+     *
+     * @return connection properties
+     */
     NetSuiteConnectionProperties getConnectionProperties();
 }

@@ -14,14 +14,21 @@
 package org.talend.components.netsuite.client;
 
 /**
+ * Holds information about NetSuite client's general preferences.
  *
+ * <p>This data object mirrors NetSuite's native {@code Preferences} data object.
  */
 public class NsPreferences {
-    protected Boolean warningAsError;
-    protected Boolean disableMandatoryCustomFieldValidation;
-    protected Boolean disableSystemNotesForCustomFields;
-    protected Boolean ignoreReadOnlyFields;
-    protected Boolean runServerSuiteScriptAndTriggerWorkflows;
+
+    private Boolean warningAsError;
+
+    private Boolean disableMandatoryCustomFieldValidation;
+
+    private Boolean disableSystemNotesForCustomFields;
+
+    private Boolean ignoreReadOnlyFields;
+
+    private Boolean runServerSuiteScriptAndTriggerWorkflows;
 
     public Boolean getWarningAsError() {
         return warningAsError;

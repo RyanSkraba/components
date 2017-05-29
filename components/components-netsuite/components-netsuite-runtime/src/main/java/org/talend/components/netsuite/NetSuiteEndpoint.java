@@ -26,19 +26,37 @@ import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
 
 /**
- *
+ * Represents NetSuite Web Service endpoint.
  */
 public class NetSuiteEndpoint {
 
+    /** Creates instance of NetSuite client. */
     private NetSuiteClientFactory<?> clientFactory;
+
+    /** Connection configuration for this endpoint. */
     private ConnectionConfig connectionConfig;
+
+    /** NetSuite client. */
     private NetSuiteClientService<?> clientService;
 
+    /**
+     * Creates new instance using given client factory and connection configuration.
+     *
+     * @param clientFactory client factory
+     * @param connectionConfig connection configuration
+     */
     public NetSuiteEndpoint(NetSuiteClientFactory<?> clientFactory, ConnectionConfig connectionConfig) {
         this.clientFactory = clientFactory;
         this.connectionConfig = connectionConfig;
     }
 
+    /**
+     * Create connection configuration for given connection properties.
+     *
+     * @param properties connection properties
+     * @return connection configuration
+     * @throws NetSuiteException if connection configuration not valid
+     */
     public static ConnectionConfig createConnectionConfig(
             NetSuiteConnectionProperties properties) throws NetSuiteException {
 
@@ -125,6 +143,12 @@ public class NetSuiteEndpoint {
         }
     }
 
+    /**
+     * Connect to NetSuite remote endpoint.
+     *
+     * @return NetSuite client
+     * @throws NetSuiteException if an error occurs during connecting
+     */
     public NetSuiteClientService<?> connect() throws NetSuiteException {
         clientService = connect(connectionConfig);
 
@@ -135,6 +159,15 @@ public class NetSuiteEndpoint {
         return connectionConfig;
     }
 
+    /**
+     * Return NetSuite client.
+     *
+     * <p>If endpoint is not yet connected then the method creates client and
+     * connects ({@link #connect()}) to NetSuite.
+     *
+     * @return client
+     * @throws NetSuiteException if an error occurs during connecting
+     */
     public NetSuiteClientService<?> getClientService() throws NetSuiteException {
         if (clientService == null) {
             clientService = connect();
@@ -142,7 +175,14 @@ public class NetSuiteEndpoint {
         return clientService;
     }
 
-    protected NetSuiteClientService<?> connect(ConnectionConfig connectionConfig)
+    /**
+     * Creates new NetSuite client and connects to NetSuite remote endpoint.
+     *
+     * @param connectionConfig connection configuration
+     * @return client
+     * @throws NetSuiteException if an error occurs during connecting
+     */
+    private NetSuiteClientService<?> connect(ConnectionConfig connectionConfig)
             throws NetSuiteException {
 
         NetSuiteClientService<?> clientService = clientFactory.createClient();
@@ -157,6 +197,9 @@ public class NetSuiteEndpoint {
         return clientService;
     }
 
+    /**
+     * Holds configuration for connecting to NetSuite.
+     */
     public static class ConnectionConfig {
         private URL endpointUrl;
         private NetSuiteVersion apiVersion;

@@ -24,7 +24,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Responsible for introspection of beans and detecting of properties.
  *
+ * <p>This is simplified version of {@link java.beans.Introspector} and is intended
+ * to be used for beans generated from NetSuite's XML schemas.
  */
 public class BeanIntrospector {
 
@@ -34,12 +37,25 @@ public class BeanIntrospector {
         return instance;
     }
 
+    /**
+     * Detect and get properties for given class.
+     *
+     * @param className name of class to be introspected
+     * @return properties
+     * @throws ClassNotFoundException if class was not found
+     */
     public List<PropertyInfo> getProperties(String className) throws ClassNotFoundException {
         Class clazz = Class.forName(className);
         Collection<PropertyInfo> propertyInfos = getProperties(getMethods(clazz));
         return new ArrayList<>(propertyInfos);
     }
 
+    /**
+     * Detect and get properties for given set of methods.
+     *
+     * @param methods methods to be scanned
+     * @return properties
+     */
     protected Set<PropertyInfo> getProperties(Set<Method> methods) {
         Map<String, Method> getters = new HashMap<>();
         Map<String, List<Method>> setters = new HashMap<>();

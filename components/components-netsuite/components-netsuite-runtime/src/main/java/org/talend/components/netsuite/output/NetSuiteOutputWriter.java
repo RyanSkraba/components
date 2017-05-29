@@ -49,6 +49,7 @@ import org.talend.components.netsuite.client.model.TypeDesc;
  */
 public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
+    /** Write operation which created this writer. */
     private final NetSuiteWriteOperation writeOperation;
 
     // Holds accumulated write responses for a current batch
@@ -60,6 +61,7 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
     // Holds accumulated rejected write result records for a current batch
     private final List<IndexedRecord> rejectedWrites = new ArrayList<>();
 
+    /** Specifies whether to throw exception for write errors. */
     private boolean exceptionForErrors = true;
 
     private int batchSize = NetSuiteOutputProperties.DEFAULT_BATCH_SIZE;
@@ -71,16 +73,22 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
 
     protected NetSuiteClientService<?> clientService;
 
+    /** Source of meta data used. */
     protected MetaDataSource metaDataSource;
 
+    /** Main schema. */
     protected Schema schema;
 
+    /** Schema for outgoing success flow. */
     protected Schema flowSchema;
 
+    /** Schema for outgoing reject flow. */
     protected Schema rejectSchema;
 
+    /** Descriptor of target NetSuite data model object type. */
     protected TypeDesc typeDesc;
 
+    /** Translates {@code IndexedRecord} to NetSuite data object. */
     protected NsObjectOutputTransducer transducer;
 
     public NetSuiteOutputWriter(NetSuiteWriteOperation writeOperation, MetaDataSource metaDataSource) {
@@ -135,6 +143,7 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
         try {
             clientService = writeOperation.getSink().getClientService();
 
+            // Get descriptor of target NetSuite data model object type.
             String typeName = writeOperation.getProperties().module.moduleName.getValue();
             typeDesc = metaDataSource.getTypeInfo(typeName);
 
@@ -149,6 +158,11 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
         }
     }
 
+    /**
+     * Initialize transducer.
+     *
+     * <p>Subclasses can override this method to customize transducer.
+     */
     protected void initTransducer() {
         transducer = new NsObjectOutputTransducer(clientService, typeDesc.getTypeName());
         transducer.setMetaDataSource(metaDataSource);
@@ -161,6 +175,7 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
         inputRecordList.add(record);
 
         if (inputRecordList.size() == batchSize) {
+            // If batch is full then submit it.
             flush();
         }
     }
@@ -207,6 +222,12 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
         }
     }
 
+    /**
+     * Process NetSuite write response and produce result record for outgoing flow.
+     *
+     * @param response write response to be processed
+     * @param indexedRecord indexed record which was submitted
+     */
     private void processWriteResponse(NsWriteResponse<RefT> response, IndexedRecord indexedRecord) {
         writeResponses.add(response);
         if (response.getStatus().isSuccess()) {
@@ -224,12 +245,22 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
         result.totalCount++;
     }
 
+    /**
+     * Clear accumulated write results.
+     */
     private void clearWriteFeedback() {
         writeResponses.clear();
         successfulWrites.clear();
         rejectedWrites.clear();
     }
 
+    /**
+     * Create record for outgoing {@code success} flow.
+     *
+     * @param response write response
+     * @param record indexed record which was written
+     * @return result record
+     */
     private IndexedRecord createSuccessRecord(NsWriteResponse<RefT> response, IndexedRecord record) {
         NsRef ref = NsRef.fromNativeRef(response.getRef());
 
@@ -261,6 +292,13 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
         return targetRecord;
     }
 
+    /**
+     * Create record for outgoing {@code reject} flow.
+     *
+     * @param response write response
+     * @param record indexed record which was submitted
+     * @return result record
+     */
     private IndexedRecord createRejectRecord(NsWriteResponse<RefT> response, IndexedRecord record) {
         GenericData.Record targetRecord = new GenericData.Record(rejectSchema);
 

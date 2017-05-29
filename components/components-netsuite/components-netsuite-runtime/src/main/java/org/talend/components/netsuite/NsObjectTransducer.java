@@ -55,21 +55,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 /**
- *
+ * Responsible for translating of NetSuite data object to/from {@code IndexedRecord}.
  */
 public abstract class NsObjectTransducer {
 
+    /** NetSuite client used. */
     protected NetSuiteClientService<?> clientService;
 
+    /** Source of meta data used. */
     protected MetaDataSource metaDataSource;
 
+    /** XML data type factory used. */
     protected final DatatypeFactory datatypeFactory;
 
+    /** JSON-Object mapper used. */
     protected final ObjectMapper objectMapper;
 
+    /** Cached value converters by value class. */
     protected Map<Class<?>, AvroConverter<?, ?>> valueConverterCache = new HashMap<>();
 
-    public NsObjectTransducer(NetSuiteClientService<?> clientService) {
+    /**
+     * Creates instance of transducer using given NetSuite client.
+     *
+     * @param clientService client to be used
+     */
+    protected NsObjectTransducer(NetSuiteClientService<?> clientService) {
         this.clientService = clientService;
 
         try {
@@ -80,6 +90,7 @@ public abstract class NsObjectTransducer {
 
         objectMapper = new ObjectMapper();
 
+        // Customize typing of JSON objects.
         objectMapper.setDefaultTyping(new NsTypeResolverBuilder(clientService.getBasicMetaData()));
 
         // Register JAXB annotation module to perform mapping of data model objects to/from JSON.
@@ -109,6 +120,14 @@ public abstract class NsObjectTransducer {
         return objectMapper;
     }
 
+    /**
+     * Get dynamic schema using given type descriptor and design schema.
+     *
+     * @param typeDesc NetSuite data model object type descriptor
+     * @param designSchema design schema
+     * @param targetSchemaName name of target schema
+     * @return schema with all fields
+     */
     protected Schema getDynamicSchema(TypeDesc typeDesc, Schema designSchema, String targetSchemaName) {
         Map<String, FieldDesc> fieldMap = typeDesc.getFieldMap();
 
@@ -185,12 +204,29 @@ public abstract class NsObjectTransducer {
         return schema;
     }
 
+    /**
+     * Create schema field for given NetSuite data model object field descriptor.
+     *
+     * @param fieldDesc field descriptor
+     * @return schema field
+     */
     protected Schema.Field createSchemaField(FieldDesc fieldDesc) {
         Schema avroFieldType = NetSuiteDatasetRuntimeImpl.inferSchemaForField(fieldDesc);
         Schema.Field avroField = new Schema.Field(fieldDesc.getName(), avroFieldType, null, (Object) null);
         return avroField;
     }
 
+    /**
+     * Build and get map of field values by names, including custom fields.
+     *
+     * <p>Custom fields in data model object are stored in separate {@code customFieldList} field
+     * as list of {@code CustomFieldRef} objects.
+     *
+     * @param nsObject NetSuite data model object which to extract field values from
+     * @param schema target schema
+     * @param typeDesc type descriptor
+     * @return table of fields' values by field names
+     */
     protected Map<String, Object> getMapView(Object nsObject, Schema schema, TypeDesc typeDesc) {
         Map<String, Object> valueMap = new HashMap<>();
 
@@ -198,7 +234,11 @@ public abstract class NsObjectTransducer {
         Map<String, FieldDesc> fieldMap = typeDesc.getFieldMap();
 
         Map<String, CustomFieldDesc> customFieldMap = new HashMap<>();
+
+        // Extract normal fields
+
         for (Schema.Field field : schema.getFields()) {
+            // Get actual name of the field
             String nsFieldName = NetSuiteDatasetRuntimeImpl.getNsFieldName(field);
             FieldDesc fieldDesc = fieldMap.get(nsFieldName);
 
@@ -207,12 +247,15 @@ public abstract class NsObjectTransducer {
             }
 
             if (fieldDesc instanceof CustomFieldDesc) {
+                // It's custom field, we will extract it in next stage.
                 customFieldMap.put(nsFieldName, (CustomFieldDesc) fieldDesc);
             } else {
                 Object value = getSimpleProperty(nsObject, fieldDesc.getName());
                 valueMap.put(nsFieldName, value);
             }
         }
+
+        // Extract custom fields
 
         if (!customFieldMap.isEmpty() &&
                 beanInfo.getProperty("customFieldList") != null) {
@@ -301,9 +344,10 @@ public abstract class NsObjectTransducer {
     protected void writeCustomField(Object nsObject, CustomFieldDesc fieldDesc, Map<String, Object> customFieldMap,
             boolean replace, Collection<String> nullFieldNames, Object value) {
 
-        NsRef ref = fieldDesc.getRef();
+        NsRef ref = fieldDesc.getCustomizationRef();
         CustomFieldRefType customFieldRefType = fieldDesc.getCustomFieldType();
 
+        // Create custom field list wrapper if required
         Object customFieldListWrapper = getSimpleProperty(nsObject, "customFieldList");
         if (customFieldListWrapper == null) {
             customFieldListWrapper = clientService.getBasicMetaData().createInstance("CustomFieldList");
@@ -323,8 +367,9 @@ public abstract class NsObjectTransducer {
             }
         } else {
             if (customField == null) {
+                // Custom field instance doesn't exist,
+                // create new instance and set identifiers
                 customField = clientService.getBasicMetaData().createInstance(customFieldRefType.getTypeName());
-
                 setSimpleProperty(customField, "scriptId", ref.getScriptId());
                 setSimpleProperty(customField, "internalId", ref.getInternalId());
 
@@ -362,6 +407,13 @@ public abstract class NsObjectTransducer {
         }
     }
 
+    /**
+     * Determine value class for given custom field type.
+     *
+     * @param customFieldRefType custom field type
+     * @return value class or {@code null} for
+     *         {@link CustomFieldRefType#SELECT} and {@link CustomFieldRefType#MULTI_SELECT} types
+     */
     protected Class<?> getCustomFieldValueConverterTargetClass(CustomFieldRefType customFieldRefType) {
         Class<?> valueClass;
         switch (customFieldRefType) {
@@ -389,8 +441,14 @@ public abstract class NsObjectTransducer {
         return valueClass;
     }
 
+    /**
+     * Get value converter for given field descriptor.
+     *
+     * @param fieldDesc field descriptor
+     * @return value converter
+     */
     public AvroConverter<?, ?> getValueConverter(FieldDesc fieldDesc) {
-        Class<?> valueClass = null;
+        Class<?> valueClass;
         if (fieldDesc instanceof CustomFieldDesc) {
             CustomFieldDesc customFieldDesc = (CustomFieldDesc) fieldDesc;
             CustomFieldRefType customFieldRefType = customFieldDesc.getCustomFieldType();
@@ -409,6 +467,14 @@ public abstract class NsObjectTransducer {
         return converter;
     }
 
+    /**
+     * Get value converter for given class.
+     *
+     * <p>Converters are created on demand and cached.
+     *
+     * @param valueClass value class
+     * @return value converter or {@code null}
+     */
     public AvroConverter<?, ?> getValueConverter(Class<?> valueClass) {
         AvroConverter<?, ?> converter = valueConverterCache.get(valueClass);
         if (converter == null) {
@@ -420,6 +486,12 @@ public abstract class NsObjectTransducer {
         return converter;
     }
 
+    /**
+     * Create new instance of value converter for given class.
+     *
+     * @param valueClass value class
+     * @return value converter or {@code null}
+     */
     protected AvroConverter<?, ?> createValueConverter(Class<?> valueClass) {
         if (valueClass == Boolean.TYPE || valueClass == Boolean.class ||
                 valueClass == Integer.TYPE || valueClass == Integer.class ||

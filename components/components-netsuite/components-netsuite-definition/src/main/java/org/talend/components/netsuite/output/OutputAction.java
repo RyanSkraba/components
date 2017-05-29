@@ -14,7 +14,7 @@
 package org.talend.components.netsuite.output;
 
 /**
- *
+ * Output actions supported by NetSuite output component.
  */
 public enum OutputAction {
     ADD, UPDATE, UPSERT, DELETE

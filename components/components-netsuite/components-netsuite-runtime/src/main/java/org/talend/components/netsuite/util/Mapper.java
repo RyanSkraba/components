@@ -14,9 +14,15 @@
 package org.talend.components.netsuite.util;
 
 /**
- *
+ * Performs mapping of an input value to an output value.
  */
 public interface Mapper<I, O> {
 
+    /**
+     * Map a value.
+     *
+     * @param input source value
+     * @return mapped value
+     */
     O map(I input);
 }

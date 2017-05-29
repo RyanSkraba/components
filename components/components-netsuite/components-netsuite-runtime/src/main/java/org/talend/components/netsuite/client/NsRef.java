@@ -24,15 +24,40 @@ import org.talend.components.netsuite.client.model.beans.BeanInfo;
 import org.talend.components.netsuite.client.model.beans.Beans;
 
 /**
+ * Holds information about NetSuite's reference.
  *
+ * <p>NetSuite data model uses different data object for each type of reference.
+ * The {@code NsRef} combines fields of all types of references, type of reference is specified
+ * by {@link #refType} field.
+ *
+ * <p>Supported reference types:
+ * <ul>
+ *     <li>{@code RecordRef}</li>
+ *     <li>{@code CustomRecordRef}</li>
+ *     <li>{@code CustomizationRef}</li>
+ * </ul>
  */
 public class NsRef {
+
+    /** Type of reference. */
     private RefType refType;
+
+    /** Name of a referenced object. Can be {@code null}. */
     private String name;
+
+    /** Name of record type. Can be {@code null}. */
     private String type;
+
+    /** Internal ID of a referenced object. */
     private String internalId;
+
+    /** External ID of a referenced object. */
     private String externalId;
+
+    /** Script ID of a referenced object. */
     private String scriptId;
+
+    /** Identifier of a referenced object's type. */
     private String typeId;
 
     public RefType getRefType() {
@@ -91,6 +116,12 @@ public class NsRef {
         this.typeId = typeId;
     }
 
+    /**
+     * Create NetSuite's native ref data object from this ref object.
+     *
+     * @param basicMetaData basic meta data to be used
+     * @return ref data object
+     */
     public Object toNativeRef(BasicMetaData basicMetaData) {
         Object ref = basicMetaData.createInstance(refType.getTypeName());
         BeanInfo beanInfo = Beans.getBeanInfo(ref.getClass());
@@ -107,6 +138,12 @@ public class NsRef {
         return ref;
     }
 
+    /**
+     * Create ref object from NetSuite's native ref data object.
+     *
+     * @param ref native ref data object
+     * @return ref object
+     */
     public static NsRef fromNativeRef(Object ref) {
         String typeName = ref.getClass().getSimpleName();
         RefType refType = RefType.getByTypeName(typeName);

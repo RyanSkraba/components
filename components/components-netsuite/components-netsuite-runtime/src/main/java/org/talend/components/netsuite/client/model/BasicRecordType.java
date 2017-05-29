@@ -14,7 +14,7 @@
 package org.talend.components.netsuite.client.model;
 
 /**
- *
+ * Basic types of NetSuite records.
  */
 public enum BasicRecordType {
     CRM_CUSTOM_FIELD("crmCustomField", null),
@@ -34,7 +34,10 @@ public enum BasicRecordType {
     CUSTOM_TRANSACTION("customTransaction", "transaction"),
     CUSTOM_TRANSACTION_TYPE("customTransactionType", "transaction");
 
+    /** Name of NetSuite record type, as defined by {@code RecordType}. */
     private String type;
+
+    /** Name of NetSuite search record type, as defined by {@code SearchRecordType}. */
     private String searchType;
 
     BasicRecordType(String type, String searchType) {
@@ -50,6 +53,13 @@ public enum BasicRecordType {
         return searchType;
     }
 
+    /**
+     * Get basic record type enum constant by name of record type.
+     *
+     * @param type name of a record type
+     * @return basic record type enum constant or {@code null} if type name
+     *         doesn't match any known type
+     */
     public static BasicRecordType getByType(String type) {
         for (BasicRecordType value : values()) {
             if (value.type.equals(type)) {

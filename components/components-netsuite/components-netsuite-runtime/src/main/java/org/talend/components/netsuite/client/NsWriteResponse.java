@@ -13,8 +13,19 @@
 
 package org.talend.components.netsuite.client;
 
+/**
+ * Holds information about NetSuite write response.
+ *
+ * <p>This data object is simple mirror of NetSuite's native {@code WriteResponse} data object.
+ *
+ * @param <RefT> type of record ref data object
+ */
 public class NsWriteResponse<RefT> {
+
+    /** Status of 'write' operation. */
     private NsStatus status;
+
+    /** NetSuite's native record ref data object. */
     private RefT ref;
 
     public NsWriteResponse() {

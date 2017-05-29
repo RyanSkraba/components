@@ -21,7 +21,7 @@ import java.util.List;
 import org.talend.components.netsuite.client.model.BasicMetaData;
 
 /**
- *
+ * Search field adapter for {@code SearchEnumMultiSelectField} and {@code SearchEnumMultiSelectCustomField}.
  */
 public class SearchEnumMultiSelectFieldAdapter<T> extends SearchFieldAdapter<T> {
 

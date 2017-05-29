@@ -40,30 +40,57 @@ import org.talend.components.netsuite.client.model.search.SearchFieldOperatorTyp
 import org.talend.components.netsuite.client.model.search.SearchFieldType;
 
 /**
+ * Responsible for building of NetSuite search record.
  *
+ * <p>Example:
+ * <pre>
+ *     NetSuiteClientService clientService = ...;
+ *
+ *     SearchQuery s = clientService.newSearch();
+ *     s.target("Account");
+ *     s.condition(new SearchCondition("Type", "List.anyOf", Arrays.asList("bank")));
+ *     s.condition(new SearchCondition("Balance", "Double.greaterThanOrEqualTo", Arrays.asList("10000.0", "")));
+ *
+ *     SearchResultSet rs = s.search();
+ * </pre>
+ *
+ * @see NetSuiteClientService#search(Object)
  */
 public class SearchQuery<SearchT, RecT> {
 
-    protected NetSuiteClientService<?> clientService;
-    protected MetaDataSource metaDataSource;
+    private NetSuiteClientService<?> clientService;
+    private MetaDataSource metaDataSource;
 
-    protected String recordTypeName;
-    protected RecordTypeInfo recordTypeInfo;
-    protected SearchRecordTypeDesc searchRecordTypeDesc;
+    /** Name of target record type. */
+    private String recordTypeName;
 
-    protected SearchT search;             // search class' instance
-    protected SearchT searchBasic;        // search basic class' instance
-    protected SearchT searchAdvanced;     // search advanced class' instance
+    /** Meta information for target record type. */
+    private RecordTypeInfo recordTypeInfo;
 
-    protected String savedSearchId;
+    /** Descriptor of search record. */
+    private SearchRecordTypeDesc searchRecordTypeDesc;
 
-    protected List<Object> customFieldList = new ArrayList<>();
+    private SearchT search;             // search class' instance
+    private SearchT searchBasic;        // search basic class' instance
+    private SearchT searchAdvanced;     // search advanced class' instance
 
-    public SearchQuery(NetSuiteClientService<?> clientService, MetaDataSource metaDataSource) throws NetSuiteException {
+    private String savedSearchId;
+
+    /** List of custom search fields. */
+    private List<Object> customFieldList = new ArrayList<>();
+
+    public SearchQuery(NetSuiteClientService<?> clientService, MetaDataSource metaDataSource) {
         this.clientService = clientService;
         this.metaDataSource = metaDataSource != null ? metaDataSource : clientService.getMetaDataSource();
     }
 
+    /**
+     * Set target for search.
+     *
+     * @param recordTypeName name of target record type
+     * @return this search query object
+     * @throws NetSuiteException if an error occurs during obtaining of meta data for record type
+     */
     public SearchQuery target(final String recordTypeName) throws NetSuiteException {
         this.recordTypeName = recordTypeName;
 
@@ -93,6 +120,11 @@ public class SearchQuery<SearchT, RecT> {
         return searchRecordTypeDesc;
     }
 
+    /**
+     * Performs lazy initialization of search query.
+     *
+     * @throws NetSuiteException if an error occurs during obtaining of meta data
+     */
     private void initSearch() throws NetSuiteException {
         if (searchBasic != null) {
             return;
@@ -127,6 +159,13 @@ public class SearchQuery<SearchT, RecT> {
         }
     }
 
+    /**
+     * Add condition for search query.
+     *
+     * @param condition condition to be added
+     * @return
+     * @throws NetSuiteException if an error occurs during adding of condition
+     */
     public SearchQuery condition(SearchCondition condition)
             throws NetSuiteException {
 
@@ -173,6 +212,14 @@ public class SearchQuery<SearchT, RecT> {
         return this;
     }
 
+    /**
+     * Process search condition and update search record.
+     *
+     * @param searchRecord search record
+     * @param condition condition
+     * @return search field built for this condition
+     * @throws NetSuiteException if an error occurs during processing of condition
+     */
     private Object processConditionForSearchRecord(Object searchRecord, SearchCondition condition) throws NetSuiteException {
         String fieldName = toInitialLower(condition.getFieldName());
         BeanInfo beanInfo = Beans.getBeanInfo(searchRecord.getClass());
@@ -182,6 +229,14 @@ public class SearchQuery<SearchT, RecT> {
         return searchField;
     }
 
+    /**
+     * Process search condition and update search record.
+     *
+     * @param fieldType type of search field
+     * @param condition condition
+     * @return search field built for this condition
+     * @throws NetSuiteException if an error occurs during processing of condition
+     */
     private Object processCondition(SearchFieldType fieldType, SearchCondition condition) throws NetSuiteException {
         try {
             String searchFieldName = toInitialLower(condition.getFieldName());
@@ -197,6 +252,12 @@ public class SearchQuery<SearchT, RecT> {
         }
     }
 
+    /**
+     * Finalize building of search query and get built NetSuite's search record object.
+     *
+     * @return
+     * @throws NetSuiteException if an error occurs during updating of search record
+     */
     public SearchT toNativeQuery() throws NetSuiteException {
         initSearch();
 
@@ -210,7 +271,7 @@ public class SearchQuery<SearchT, RecT> {
 
         } else if (BasicRecordType.CUSTOM_RECORD == basicRecordType) {
             CustomRecordTypeInfo customRecordTypeInfo = (CustomRecordTypeInfo) recordTypeInfo;
-            NsRef customizationRef = customRecordTypeInfo.getRef();
+            NsRef customizationRef = customRecordTypeInfo.getCustomizationRef();
 
             Object recType = metaDataSource.getBasicMetaData().createInstance(RefType.CUSTOMIZATION_REF.getTypeName());
             setProperty(recType, "scriptId", customizationRef.getScriptId());
@@ -219,7 +280,7 @@ public class SearchQuery<SearchT, RecT> {
             setProperty(searchBasic, "recType", recType);
         }
 
-
+        // Set custom fields
         if (!customFieldList.isEmpty()) {
             Object customFieldListWrapper = metaDataSource.getBasicMetaData()
                     .createInstance("SearchCustomFieldList");
@@ -245,6 +306,12 @@ public class SearchQuery<SearchT, RecT> {
         return searchRecord;
     }
 
+    /**
+     * Finalize building of search query and perform search.
+     *
+     * @return
+     * @throws NetSuiteException if an error occurs during execution of search
+     */
     public SearchResultSet<RecT> search() throws NetSuiteException {
         Object searchRecord = toNativeQuery();
         NsSearchResult result = clientService.search(searchRecord);

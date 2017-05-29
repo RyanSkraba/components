@@ -23,12 +23,20 @@ import java.util.List;
 import org.talend.components.netsuite.util.Mapper;
 
 /**
- *
+ * Descriptor of search field operator type.
  */
 public class SearchFieldOperatorTypeDesc<T> {
+
+    /** Search field operator type. */
     private SearchFieldOperatorType operatorType;
+
+    /** Class of NetSuite's native search operator. */
     private Class<T> operatorClass;
+
+    /** Used to convert NetSuite search operator to string value. */
     private Mapper<T, String> mapper;
+
+    /** Used to convert operator string value to NetSuite search operator. */
     private Mapper<String, T> reverseMapper;
 
     public SearchFieldOperatorTypeDesc(SearchFieldOperatorType operatorType, Class<T> operatorClass,
@@ -68,6 +76,12 @@ public class SearchFieldOperatorTypeDesc<T> {
         return reverseMapper.map(stringValue);
     }
 
+    /**
+     * Get name for search field operator object.
+     *
+     * @param value search operator object
+     * @return name of operator
+     */
     public SearchFieldOperatorName getOperatorName(Object value) {
         if (operatorType == SearchFieldOperatorType.BOOLEAN) {
             return SearchFieldOperatorType.SearchBooleanFieldOperator.NAME;
@@ -76,6 +90,14 @@ public class SearchFieldOperatorTypeDesc<T> {
         }
     }
 
+    /**
+     * Get search field operator for given name of operator.
+     *
+     * @see SearchFieldOperatorName#getQualifiedName()
+     *
+     * @param qualifiedName full name of an operator
+     * @return search field operator object
+     */
     public Object getOperator(String qualifiedName) {
         SearchFieldOperatorName opName = new SearchFieldOperatorName(qualifiedName);
         if (operatorType == SearchFieldOperatorType.BOOLEAN) {
@@ -93,10 +115,21 @@ public class SearchFieldOperatorTypeDesc<T> {
         }
     }
 
+    /**
+     * Check whether this descriptor contains given operator.
+     *
+     * @param operatorName name of an operator
+     * @return {@code true} if this descriptor contains specified operator, {@code false} otherwise
+     */
     public boolean hasOperator(SearchFieldOperatorName operatorName) {
         return operatorType.getDataType().equals(operatorName.getDataType());
     }
 
+    /**
+     * Get names of all operators provided by this descriptor.
+     *
+     * @return names of operators
+     */
     public List<SearchFieldOperatorName> getOperatorNames() {
         if (operatorClass.isEnum()) {
             Enum[] values = ((Class<? extends Enum>) getOperatorClass()).getEnumConstants();
@@ -112,6 +145,11 @@ public class SearchFieldOperatorTypeDesc<T> {
         }
     }
 
+    /**
+     * Get all operators provided by this descriptor.
+     *
+     * @return operators
+     */
     public List<?> getOperators() {
         if (operatorClass.isEnum()) {
             Enum[] values = ((Class<? extends Enum>) getOperatorClass()).getEnumConstants();
@@ -128,6 +166,14 @@ public class SearchFieldOperatorTypeDesc<T> {
                 SearchFieldOperatorType.SearchBooleanFieldOperator.class, null, null);
     }
 
+    /**
+     * Create search field operator descriptor for NetSuite's search field operator enum class.
+     *
+     * @param operatorType type of operator
+     * @param clazz enum class
+     * @param <T> type of search operator data object
+     * @return search field operator descriptor
+     */
     public static <T> SearchFieldOperatorTypeDesc<T> createForEnum(SearchFieldOperatorType operatorType, Class<T> clazz) {
         return new SearchFieldOperatorTypeDesc<>(operatorType, clazz,
                 (Mapper<T, String>) getEnumToStringMapper((Class<Enum>) clazz),
