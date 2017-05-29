@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -62,8 +63,6 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
 
     private transient Schema writeSchema;
 
-    private IndexedRecord inputRecord;
-
     private Result result;
 
     private AzureStorageTableSink sink;
@@ -95,6 +94,10 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
     private Map<String, String> nameMappings;
 
     private Boolean useNameMappings = Boolean.FALSE;
+
+    private static final int MAX_RECORDS_TO_ENQUEUE = 250;
+
+    private List<IndexedRecord> recordToEnqueue = new ArrayList<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageTableWriter.class);
 
@@ -202,16 +205,52 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         rejectedWrites = new ArrayList<>();
 
         result.totalCount++;
-        inputRecord = (IndexedRecord) object;
+        IndexedRecord inputRecord = (IndexedRecord) object;
         // This for dynamic which would get schema from the first record
         if (writeSchema == null) {
             writeSchema = ((IndexedRecord) object).getSchema();
         }
 
+        if (processOperationInBatch) {
+            DynamicTableEntity entity = createDynamicEntityFromInputRecord(inputRecord, writeSchema);
+            addOperationToBatch(entity, inputRecord);
+        } else {
+            recordToEnqueue.add(inputRecord);
+            if (recordToEnqueue.size() >= MAX_RECORDS_TO_ENQUEUE) {
+                processParallelRecords();
+            }
+        }
+    }
+
+    private void processParallelRecords() {
+        recordToEnqueue.parallelStream().forEach(new Consumer<IndexedRecord>() {
+
+            @Override
+            public void accept(IndexedRecord record) {
+                try {
+                    DynamicTableEntity entity = createDynamicEntityFromInputRecord(record, writeSchema);
+                    TableOperation ope = getTableOperation(entity);
+                    table.execute(ope);
+                    handleSuccess(record, 1);
+                } catch (StorageException e) {
+                    LOGGER.error(i18nMessages.getMessage("error.ProcessSingleOperation", actionData, e.getLocalizedMessage()), e);
+
+                    if (properties.dieOnError.getValue()) {
+                        throw new ComponentException(e);
+                    }
+                    handleReject(record, e, 1);
+                }
+            }
+        });
+        recordToEnqueue.clear();
+    }
+
+    private DynamicTableEntity createDynamicEntityFromInputRecord(IndexedRecord indexedRecord, Schema schema) {
         DynamicTableEntity entity = new DynamicTableEntity();
         HashMap<String, EntityProperty> entityProps = new HashMap<>();
-        for (Field f : writeSchema.getFields()) {
-            if (inputRecord.get(f.pos()) == null) {
+        for (Field f : schema.getFields()) {
+
+            if (indexedRecord.get(f.pos()) == null) {
                 continue; // record value may be null, No need to set the property in azure in this case
             }
 
@@ -230,22 +269,22 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
 
             if (sName.equals(AzureStorageTableProperties.TABLE_PARTITION_KEY)
                     || mName.equals(AzureStorageTableProperties.TABLE_PARTITION_KEY)) {
-                entity.setPartitionKey((String) inputRecord.get(f.pos()));
+                entity.setPartitionKey((String) indexedRecord.get(f.pos()));
             } else if (sName.equals(AzureStorageTableProperties.TABLE_ROW_KEY)
                     || mName.equals(AzureStorageTableProperties.TABLE_ROW_KEY)) {
-                entity.setRowKey((String) inputRecord.get(f.pos()));
+                entity.setRowKey((String) indexedRecord.get(f.pos()));
             } else if (sName.equals(AzureStorageTableProperties.TABLE_TIMESTAMP)
                     || mName.equals(AzureStorageTableProperties.TABLE_TIMESTAMP)) {
                 // nop : managed by server
             } else { // that's some properties !
                 if (fSchema.getType().equals(Type.BOOLEAN)) {
-                    entityProps.put(mName, new EntityProperty((Boolean) inputRecord.get(f.pos())));
+                    entityProps.put(mName, new EntityProperty((Boolean) indexedRecord.get(f.pos())));
                 } else if (fSchema.getType().equals(Type.DOUBLE)) {
-                    entityProps.put(mName, new EntityProperty((Double) inputRecord.get(f.pos())));
+                    entityProps.put(mName, new EntityProperty((Double) indexedRecord.get(f.pos())));
                 } else if (fSchema.getType().equals(Type.INT)) {
-                    entityProps.put(mName, new EntityProperty((Integer) inputRecord.get(f.pos())));
+                    entityProps.put(mName, new EntityProperty((Integer) indexedRecord.get(f.pos())));
                 } else if (fSchema.getType().equals(Type.BYTES)) {
-                    entityProps.put(mName, new EntityProperty((byte[]) inputRecord.get(f.pos())));
+                    entityProps.put(mName, new EntityProperty((byte[]) indexedRecord.get(f.pos())));
                 }
                 //
                 else if (fSchema.getType().equals(Type.LONG)) {
@@ -255,7 +294,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
                         String pattern = fSchema.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
                         if (pattern != null && !pattern.isEmpty()) {
                             try {
-                                dt = new SimpleDateFormat(pattern).parse(inputRecord.get(f.pos()).toString());
+                                dt = new SimpleDateFormat(pattern).parse(indexedRecord.get(f.pos()).toString());
                             } catch (ParseException e) {
                                 LOGGER.error(i18nMessages.getMessage("error.ParseError", e));
                                 if (properties.dieOnError.getValue()) {
@@ -263,32 +302,26 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
                                 }
                             }
                         } else {
-                            dt = (Date) inputRecord.get(f.pos());
+                            dt = (Date) indexedRecord.get(f.pos());
                         }
 
                         entityProps.put(mName, new EntityProperty(dt));
                     } else {
-                        entityProps.put(mName, new EntityProperty((Long) inputRecord.get(f.pos())));
+                        entityProps.put(mName, new EntityProperty((Long) indexedRecord.get(f.pos())));
                     }
                 }
                 //
                 else if (fSchema.getType().equals(Type.STRING)) {
-                    entityProps.put(mName, new EntityProperty((String) inputRecord.get(f.pos())));
+                    entityProps.put(mName, new EntityProperty((String) indexedRecord.get(f.pos())));
                 } else { // use string as default type...
-                    entityProps.put(mName, new EntityProperty((String) inputRecord.get(f.pos())));
+                    entityProps.put(mName, new EntityProperty((String) indexedRecord.get(f.pos())));
                 }
             }
         }
         // Etag is needed for some operations (delete, merge, replace) but we rely only on PK and RK for those ones.
         entity.setEtag("*");
         entity.setProperties(entityProps);
-
-        if (processOperationInBatch) {
-            addOperationToBatch(entity, inputRecord);
-
-        } else {
-            processSingleOperation(entity);
-        }
+        return entity;
     }
 
     /**
@@ -310,6 +343,11 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             LOGGER.debug(i18nMessages.getMessage("debug.ExecutingBrtch", batchOperationsCount));
             processBatch();
         }
+
+        if (recordToEnqueue.size() > 0) {
+            processParallelRecords();
+        }
+
         table = null;
         client = null;
         return result;
@@ -356,21 +394,6 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         }
 
         return tableOpe;
-    }
-
-    private void processSingleOperation(DynamicTableEntity entity) throws IOException {
-        try {
-            TableOperation ope = getTableOperation(entity);
-            table.execute(ope);
-            handleSuccess(inputRecord, 1);
-        } catch (StorageException e) {
-            LOGGER.error(i18nMessages.getMessage("error.ProcessSingleOperation", actionData, e.getLocalizedMessage()));
-
-            if (properties.dieOnError.getValue()) {
-                throw new ComponentException(e);
-            }
-            handleReject(inputRecord, e, 1);
-        }
     }
 
     private void addOperationToBatch(DynamicTableEntity entity, IndexedRecord record) throws IOException {

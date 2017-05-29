@@ -118,6 +118,7 @@ public class AzureStorageTableWriterTest {
         }
         writer.write(null);
         writer.write(record);
+        writer.close();
     }
 
     /**
