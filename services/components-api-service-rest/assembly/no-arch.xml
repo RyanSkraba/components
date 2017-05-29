@@ -11,7 +11,7 @@
             <directory>${project.basedir}/target/classes</directory>
             <outputDirectory>${file.separator}config</outputDirectory>
             <excludes>
-            	<exclude>banner.txt</exclude>
+                <exclude>banner.txt</exclude>
             </excludes>
             <includes>
                 <include>*.*</include>
@@ -23,9 +23,19 @@
             <outputDirectory>${file.separator}</outputDirectory>
             <filtered>true</filtered>
             <fileMode>0755</fileMode>
+            <lineEnding>windows</lineEnding>
+            <includes>
+                <include>*.bat</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/scripts</directory>
+            <outputDirectory>${file.separator}</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>0755</fileMode>
+            <lineEnding>unix</lineEnding>
             <includes>
                 <include>*.sh</include>
-                <include>*.bat</include>
             </includes>
         </fileSet>
         <!-- Maven repo for runtime -->

@@ -1,6 +1,6 @@
-Components API Service REST with all components
+Components API Service REST
 ===
-This is a module that packages together the Web Service along with all the components packaged the maven-component-repo module.
+This module packages the Web Service together with required components. This module should be with other Talend Products (DataPrep etc).
 
 
 ###Run locally:
@@ -8,8 +8,8 @@ This is a module that packages together the Web Service along with all the compo
 ```
 mvn clean package
 cd target
-unzip components-api-service-rest-all-components-{current_version}-SNAPSHOT.zip
-cd components-api-service-rest-all-components-{current_version}-SNAPSHOT
+unzip components-api-service-rest-{current_version}-SNAPSHOT.zip
+cd components-api-service-rest-{current_version}-SNAPSHOT
 ./start.sh
 ```
 
@@ -20,7 +20,7 @@ mvn -Pdocker install
 
 ###Run docker: 
 ```
-docker run -p 8989:8989 -d --name tcomp-service registry.datapwn.com/talend/tcomp-components-api-service-rest-all-components-master:{your_latest_tag}
+docker run -p 8989:8989 -d --name tcomp-service registry.datapwn.com/talend/tcomp-components-api-service-rest-local:{your_latest_tag}
 ```
 *Note:* you must logon **docker registry** first:
 ```

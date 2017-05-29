@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
-    <property name="LOG_FILE" value="logs/components-service.log"/>
-    <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+    <property name="LOG_PATH" value="logs" />
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/components-service.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/components-service.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <layout class="org.talend.daikon.logging.event.layout.LogbackJSONLayout">
+            <param name="LocationInfo" value="false" />
+        </layout>
+    </appender>
     <root level="INFO">
         <appender-ref ref="FILE" />
         <appender-ref ref="CONSOLE" />

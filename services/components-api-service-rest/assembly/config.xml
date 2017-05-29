@@ -12,7 +12,7 @@
             <directory>${project.basedir}/target/classes</directory>
             <outputDirectory>${file.separator}config</outputDirectory>
             <excludes>
-            	<exclude>banner.txt</exclude>
+                <exclude>banner.txt</exclude>
             </excludes>
             <includes>
                 <include>*.*</include>
@@ -21,8 +21,17 @@
         <fileSet>
             <directory>${project.basedir}/scripts</directory>
             <outputDirectory>${file.separator}</outputDirectory>
+            <lineEnding>windows</lineEnding>
             <includes>
-                <include>*.*</include>
+                <include>*.bat</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/scripts</directory>
+            <outputDirectory>${file.separator}</outputDirectory>
+            <lineEnding>unix</lineEnding>
+            <includes>
+                <include>*.sh</include>
             </includes>
         </fileSet>
     </fileSets>
