@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.talend.components.marketo.MarketoComponentProperties.APIMode.REST;
 import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
 import static org.talend.components.marketo.MarketoConstants.FIELD_SUCCESS;
 
@@ -34,8 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.marketo.MarketoComponentDefinition;
-import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperationProperties;
 import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperationProperties.ListOperation;
 
@@ -65,7 +64,7 @@ public class MarketoListOperationWriterTestIT extends MarketoBaseTestIT {
         props.connection.endpoint.setValue(ENDPOINT_SOAP);
         props.connection.clientAccessId.setValue(USERID_SOAP);
         props.connection.secretKey.setValue(SECRETKEY_SOAP);
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
+        props.connection.apiMode.setValue(APIMode.SOAP);
         props.connection.setupLayout();
         props.setupProperties();
         props.schemaInput.setupProperties();
@@ -84,7 +83,7 @@ public class MarketoListOperationWriterTestIT extends MarketoBaseTestIT {
         props.connection.endpoint.setValue(ENDPOINT_REST);
         props.connection.clientAccessId.setValue(USERID_REST);
         props.connection.secretKey.setValue(SECRETKEY_REST);
-        props.apiMode.setValue(REST);
+        props.connection.apiMode.setValue(APIMode.REST);
         props.setupProperties();
         props.schemaInput.setupProperties();
         props.connection.setupLayout();

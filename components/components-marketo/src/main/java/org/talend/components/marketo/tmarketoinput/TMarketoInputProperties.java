@@ -745,15 +745,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
         refreshLayout(getForm(Form.MAIN));
     }
 
-    @Override
-    public void afterApiMode() {
-        super.afterApiMode();
-
-        updateSchemaRelated();
-        beforeInputOperation();
-        refreshLayout(getForm(Form.MAIN));
-    }
-
     public void updateSchemaRelated() {
         Schema s = null;
         if (isApiSOAP()) {

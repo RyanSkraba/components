@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.talend.components.marketo.MarketoComponentProperties.APIMode.SOAP;
+import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.SOAP;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsSOAP.ChangeDataValue;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsSOAP.NewLead;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLead;
@@ -81,7 +81,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         inputProperties.mappingInput.setupProperties();
         inputProperties.includeTypes.setupProperties();
         inputProperties.setupProperties();
-        inputProperties.apiMode.setValue(SOAP);
+        inputProperties.connection.apiMode.setValue(SOAP);
         inputProperties.includeTypes.type.setValue(new ArrayList<String>());
         inputProperties.excludeTypes.setupProperties();
         inputProperties.excludeTypes.type.setValue(new ArrayList<String>());
@@ -96,7 +96,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         listProperties.connection.secretKey.setValue(SECRETKEY_SOAP);
         listProperties.schemaInput.setupProperties();
         listProperties.setupProperties();
-        listProperties.apiMode.setValue(SOAP);
+        listProperties.connection.apiMode.setValue(SOAP);
         listProperties.connection.setupLayout();
         listProperties.schemaInput.setupLayout();
         listProperties.setupLayout();
@@ -108,7 +108,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         outProperties.connection.secretKey.setValue(SECRETKEY_SOAP);
         outProperties.schemaInput.setupProperties();
         outProperties.setupProperties();
-        outProperties.apiMode.setValue(SOAP);
+        outProperties.connection.apiMode.setValue(SOAP);
         outProperties.connection.setupLayout();
         outProperties.schemaInput.setupLayout();
         outProperties.setupLayout();

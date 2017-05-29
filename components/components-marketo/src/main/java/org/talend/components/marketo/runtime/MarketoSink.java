@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.tmarketocampaign.TMarketoCampaignProperties;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector;
@@ -74,7 +74,7 @@ public class MarketoSink extends MarketoSourceOrSink implements Sink {
             }
             // lead selector must be LeadKeySelector
             LeadSelector selector;
-            if (properties.getApiMode().equals(MarketoComponentProperties.APIMode.SOAP)) {
+            if (APIMode.SOAP.equals(properties.getConnectionProperties().apiMode.getValue())) {
                 selector = ((TMarketoInputProperties) properties).leadSelectorSOAP.getValue();
             } else {
                 selector = ((TMarketoInputProperties) properties).leadSelectorREST.getValue();

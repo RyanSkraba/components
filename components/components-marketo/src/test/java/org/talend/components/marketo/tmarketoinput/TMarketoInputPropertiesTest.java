@@ -27,9 +27,9 @@ import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.MarketoTestBase;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsREST;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsSOAP;
@@ -222,7 +222,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         // SOAP
         //
         // SOAP API Mode - getLead
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
+        props.connection.apiMode.setValue(APIMode.SOAP);
         props.inputOperation.setValue(InputOperation.getLead);
         props.refreshLayout(props.getForm(Form.MAIN));
         assertTrue(f.getWidget(tl_operation).isVisible());
@@ -420,7 +420,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         props.afterInputOperation();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadChanges(), props.schemaInput.schema.getValue());
 
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
+        props.connection.apiMode.setValue(APIMode.SOAP);
         props.inputOperation.setValue(InputOperation.getLead);
         props.afterInputOperation();
         props.updateSchemaRelated();
@@ -453,7 +453,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         props.afterInputOperation();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadChanges(), props.schemaInput.schema.getValue());
         // SOAP
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
+        props.connection.apiMode.setValue(APIMode.SOAP);
         props.inputOperation.setValue(InputOperation.getLead);
         props.afterInputOperation();
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
@@ -466,7 +466,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         props.inputOperation.setValue(InputOperation.getLeadChanges);
         props.afterInputOperation();
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadChanges(), props.schemaInput.schema.getValue());
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
+        props.connection.apiMode.setValue(APIMode.SOAP);
     }
 
     @Test
@@ -801,7 +801,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     public void testValidateInputOperation() throws Exception {
         assertEquals(Result.OK, props.validateInputOperation().getStatus());
         props.inputOperation.setValue(InputOperation.CustomObject);
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
+        props.connection.apiMode.setValue(APIMode.SOAP);
         assertEquals(Result.ERROR, props.validateInputOperation().getStatus());
     }
 
@@ -818,16 +818,16 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     @Test
     public void testTDI38475() throws Exception {
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
-        props.afterApiMode();
+        props.connection.apiMode.setValue(APIMode.SOAP);
+        props.afterInputOperation();
         props.refreshLayout(props.getForm(Form.ADVANCED));
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
         props.refreshLayout(props.getForm(Form.MAIN));
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
+        props.connection.apiMode.setValue(APIMode.SOAP);
         props.afterInputOperation();
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.REST);
+        props.connection.apiMode.setValue(APIMode.REST);
         props.afterInputOperation();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
     }

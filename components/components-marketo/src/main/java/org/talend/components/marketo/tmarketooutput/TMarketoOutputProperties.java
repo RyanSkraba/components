@@ -310,15 +310,6 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
         }
     }
 
-    @Override
-    public void afterApiMode() {
-        super.afterApiMode();
-
-        updateSchemaRelated();
-        beforeMappingInput();
-        refreshLayout(getForm(Form.MAIN));
-    }
-
     public void afterOutputOperation() {
         updateSchemaRelated();
         refreshLayout(getForm(Form.MAIN));

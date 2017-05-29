@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.MarketoProvideConnectionProperties;
 import org.talend.components.marketo.runtime.client.MarketoClientService;
@@ -26,6 +25,7 @@ import org.talend.components.marketo.runtime.client.rest.type.FieldDescription;
 import org.talend.components.marketo.runtime.client.type.MarketoException;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
@@ -336,7 +336,7 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
         if (client == null) {
             try {
                 TMarketoConnectionProperties conn = getEffectiveConnection(container);
-                if (MarketoComponentProperties.APIMode.SOAP.equals(properties.getApiMode())) {
+                if (APIMode.SOAP.equals(conn.apiMode.getValue())) {
                     client = new MarketoSOAPClient(conn);
                 } else {
                     client = new MarketoRESTClient(conn);

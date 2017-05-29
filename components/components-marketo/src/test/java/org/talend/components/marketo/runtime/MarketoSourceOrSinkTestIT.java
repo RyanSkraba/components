@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.marketo.MarketoComponentProperties;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.avro.SchemaConstants;
@@ -102,7 +102,7 @@ public class MarketoSourceOrSinkTestIT extends MarketoBaseTestIT {
         assertEquals("Marketo REST API Client [].", sos.getClientService(null).toString());// 2times for cache
         props.setupProperties();
         sos = new MarketoSourceOrSink();
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
+        props.connection.apiMode.setValue(APIMode.SOAP);
         props.connection.endpoint.setValue("https://www.marketo.com");
         sos.initialize(null, props);
         assertEquals("Marketo SOAP API Client [null].", sos.getClientService(null).toString());

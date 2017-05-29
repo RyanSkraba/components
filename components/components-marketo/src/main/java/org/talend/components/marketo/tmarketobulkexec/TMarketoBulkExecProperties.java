@@ -23,6 +23,7 @@ import java.util.Set;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.RESTLookupFields;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -84,8 +85,8 @@ public class TMarketoBulkExecProperties extends MarketoComponentProperties {
     public void setupProperties() {
         super.setupProperties();
 
-        apiMode.setPossibleValues(APIMode.REST);
-        apiMode.setValue(APIMode.REST);
+        connection.apiMode.setPossibleValues(APIMode.REST);
+        connection.apiMode.setValue(APIMode.REST);
 
         schemaInput.schema.setValue(MarketoConstants.getBulkImportLeadSchema());
 
@@ -129,8 +130,6 @@ public class TMarketoBulkExecProperties extends MarketoComponentProperties {
             form.getWidget(listId.getName()).setVisible(leadParamsVisibles);
             form.getWidget(partitionName.getName()).setVisible(leadParamsVisibles);
             form.getWidget(customObjectName.getName()).setVisible(!leadParamsVisibles);
-
-            form.getWidget(apiMode.getName()).setVisible(false);
         }
     }
 

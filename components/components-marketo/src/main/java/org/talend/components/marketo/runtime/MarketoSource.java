@@ -15,11 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties.BulkImportTo;
 import org.talend.components.marketo.tmarketocampaign.TMarketoCampaignProperties;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
@@ -76,7 +76,7 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
 
         if (properties instanceof TMarketoInputProperties) {
             TMarketoInputProperties p = (TMarketoInputProperties) properties;
-            boolean useSOAP = properties.getApiMode().equals(MarketoComponentProperties.APIMode.SOAP);
+            boolean useSOAP = APIMode.SOAP.equals(properties.getConnectionProperties().apiMode.getValue());
             // Validate dynamic schema if needed
             Boolean isDynamic = AvroUtils.isIncludeAllFields(p.schemaInput.schema.getValue());
             if (useSOAP) { // no dynamic schema for SOAP !

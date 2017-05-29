@@ -26,8 +26,8 @@ import org.apache.avro.Schema;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OperationType;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.RESTLookupFields;
@@ -96,7 +96,7 @@ public class TMarketoOutputPropertiesTest {
         assertEquals(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads().getFields().size(),
                 props.schemaReject.schema.getValue().getFields().size());
 
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
+        props.connection.apiMode.setValue(APIMode.SOAP);
         props.updateSchemaRelated();
         props.outputOperation.setValue(OutputOperation.syncLead);
         props.afterOutputOperation();
@@ -131,7 +131,7 @@ public class TMarketoOutputPropertiesTest {
         assertTrue(props.deDupeEnabled.getValue());
         assertFalse(props.getForm(Form.MAIN).getWidget(props.operationType.getName()).isVisible());
         assertFalse(props.getForm(Form.MAIN).getWidget(props.lookupField.getName()).isVisible());
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
+        props.connection.apiMode.setValue(APIMode.SOAP);
         props.updateSchemaRelated();
         assertTrue(props.deDupeEnabled.getValue());
         assertFalse(props.getForm(Form.MAIN).getWidget(props.operationType.getName()).isVisible());

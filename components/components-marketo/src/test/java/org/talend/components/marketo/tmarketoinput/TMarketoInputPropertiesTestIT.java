@@ -14,7 +14,7 @@ package org.talend.components.marketo.tmarketoinput;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.talend.components.marketo.MarketoComponentProperties.APIMode.REST;
+import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.REST;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -38,7 +38,7 @@ public class TMarketoInputPropertiesTestIT extends MarketoBaseTestIT {
         props.connection.endpoint.setValue(ENDPOINT_REST);
         props.connection.clientAccessId.setValue(USERID_REST);
         props.connection.secretKey.setValue(SECRETKEY_REST);
-        props.apiMode.setValue(REST);
+        props.connection.apiMode.setValue(REST);
         props.schemaInput.setupProperties();
         props.setupProperties();
         props.connection.setupLayout();

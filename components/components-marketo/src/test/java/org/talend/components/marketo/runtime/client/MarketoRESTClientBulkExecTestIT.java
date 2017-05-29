@@ -27,13 +27,13 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.runtime.MarketoBaseTestIT;
 import org.talend.components.marketo.runtime.MarketoSource;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties.BulkImportTo;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.daikon.properties.ValidationResult.Result;
 
 public class MarketoRESTClientBulkExecTestIT extends MarketoBaseTestIT {
@@ -141,7 +141,7 @@ public class MarketoRESTClientBulkExecTestIT extends MarketoBaseTestIT {
         props.bulkFilePath.setValue(leadCSV);
         props.logDownloadPath.setValue("/Users/undx/mp/");
         props.pollWaitTime.setValue(1);
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.SOAP);
+        props.connection.apiMode.setValue(APIMode.SOAP);
         props.connection.endpoint.setValue(ENDPOINT_SOAP);
         props.connection.clientAccessId.setValue(USERID_SOAP);
         props.connection.secretKey.setValue(SECRETKEY_SOAP);
@@ -151,7 +151,7 @@ public class MarketoRESTClientBulkExecTestIT extends MarketoBaseTestIT {
         MarketoSource source = new MarketoSource();
         source.initialize(null, props);
         assertEquals(Result.ERROR, source.validate(null).getStatus());
-        props.apiMode.setValue(MarketoComponentProperties.APIMode.REST);
+        props.connection.apiMode.setValue(APIMode.REST);
         props.connection.endpoint.setValue(ENDPOINT_REST);
         props.connection.clientAccessId.setValue(USERID_REST);
         props.connection.secretKey.setValue(SECRETKEY_REST);

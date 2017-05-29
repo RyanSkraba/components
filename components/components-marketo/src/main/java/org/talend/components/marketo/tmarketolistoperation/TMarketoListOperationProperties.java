@@ -27,6 +27,7 @@ import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
@@ -100,6 +101,14 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
+        if (APIMode.SOAP.equals(getConnectionProperties().apiMode.getValue())) {
+            schemaInput.schema.setValue(MarketoConstants.getListOperationSOAPSchema());
+            updateOutputSchemas();
+        } else {
+            schemaInput.schema.setValue(MarketoConstants.getListOperationRESTSchema());
+            updateOutputSchemas();
+        }
+
         if (form.getName().equals(Form.MAIN)) {
             switch (listOperation.getValue()) {
             case addTo:
@@ -110,20 +119,6 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
                 form.getWidget(multipleOperation.getName()).setVisible(false);
             }
         }
-    }
-
-    @Override
-    public void afterApiMode() {
-        super.afterApiMode();
-
-        if (APIMode.SOAP.equals(apiMode.getValue())) {
-            schemaInput.schema.setValue(MarketoConstants.getListOperationSOAPSchema());
-            updateOutputSchemas();
-        } else {
-            schemaInput.schema.setValue(MarketoConstants.getListOperationRESTSchema());
-            updateOutputSchemas();
-        }
-        refreshLayout(getForm(Form.MAIN));
     }
 
     public void afterListOperation() {
