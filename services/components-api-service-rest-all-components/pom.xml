@@ -277,7 +277,7 @@
 										<image>
 											<name>${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}</name>
 											<build>
-												<from>registry.datapwn.com/talend/microservices-base:1.latest</from>
+												<from>${talend_docker_registry}/talend/microservices-base:1.latest</from>
 												<tags>
 													<tag>${project.version}-${docker_tag_suffix}</tag>
 												</tags>
