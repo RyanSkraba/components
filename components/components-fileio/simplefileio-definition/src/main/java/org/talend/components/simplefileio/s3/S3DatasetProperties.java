@@ -37,13 +37,13 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
             S3DatastoreDefinition.NAME);
 
     // S3 Connectivity
-    public Property<S3Region> region = PropertyFactory.newEnum("region", S3Region.class).setValue(S3Region.DEFAULT);
+    public Property<S3Region> region = PropertyFactory.newEnum("region", S3Region.class).setValue(S3Region.DEFAULT).setRequired();
 
-    public Property<String> unknownRegion = PropertyFactory.newString("unknownRegion", "us-east-1");
+    public Property<String> unknownRegion = PropertyFactory.newString("unknownRegion", "us-east-1").setRequired();
 
-    public Property<String> bucket = PropertyFactory.newString("bucket");
+    public Property<String> bucket = PropertyFactory.newString("bucket").setRequired();
 
-    public Property<String> object = PropertyFactory.newString("object");
+    public Property<String> object = PropertyFactory.newString("object").setRequired();
 
     public Property<Boolean> encryptDataInMotion = PropertyFactory.newBoolean("encryptDataInMotion", false);
 

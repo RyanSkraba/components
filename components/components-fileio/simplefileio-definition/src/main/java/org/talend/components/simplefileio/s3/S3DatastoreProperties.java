@@ -23,7 +23,7 @@ import org.talend.daikon.properties.property.PropertyFactory;
 
 public class S3DatastoreProperties extends PropertiesImpl implements DatastoreProperties {
 
-    public Property<Boolean> specifyCredentials = PropertyFactory.newBoolean("specifyCredentials", true);
+    public Property<Boolean> specifyCredentials = PropertyFactory.newBoolean("specifyCredentials", true).setRequired();
 
     public Property<String> accessKey = PropertyFactory.newString("accessKey");
 
