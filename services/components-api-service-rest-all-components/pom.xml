@@ -273,6 +273,7 @@
 									<goal>build</goal>
 								</goals>
 								<configuration>
+									<autoPull>once</autoPull>
 									<images>
 										<image>
 											<name>${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}</name>
