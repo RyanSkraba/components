@@ -1,0 +1,84 @@
+{
+  "jsonSchema": {
+    "title": "Salesforce data set",
+    "type": "object",
+    "properties": {
+      "sourceType": {
+        "title": "Source type",
+        "type": "string",
+        "enumNames": [
+          "Module selection",
+          "SOQL query"
+        ],
+        "enum": [
+          "MODULE_SELECTION",
+          "SOQL_QUERY"
+        ]
+      },
+      "moduleName": {
+        "title": "Salesforce module",
+        "type": "string"
+      },
+      "query": {
+        "title": "Query",
+        "type": "string"
+      },
+      "datastore": {
+        "title": "properties.datastore.displayName",
+        "type": "string"
+      },
+      "main": {
+        "title": "",
+        "type": "object",
+        "properties": {
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "required": [
+      "sourceType",
+      "moduleName"
+    ]
+  },
+  "properties": {
+    "sourceType": "MODULE_SELECTION",
+    "datastore": "SalesforceDatastore",
+    "main": {
+      "schema": "{\"type\":\"record\",\"name\":\"EmptyRecord\",\"fields\":[]}"
+    },
+    "@definitionName": "SalesforceDataset"
+  },
+  "uiSchema": {
+    "sourceType": {
+      "ui:widget": "radio",
+      "ui:options": {
+        "inline": "true"
+      },
+      "ui:trigger": [
+        "after"
+      ]
+    },
+    "moduleName": {
+      "ui:widget": "datalist"
+    },
+    "query": {
+      "ui:widget": "hidden"
+    },
+    "ui:order": [
+      "sourceType",
+      "moduleName",
+      "query",
+      "datastore",
+      "main"
+    ],
+    "datastore": {
+      "ui:widget": "hidden"
+    },
+    "main": {
+      "ui:widget": "hidden"
+    }
+  }
+}

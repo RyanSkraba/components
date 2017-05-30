@@ -1,0 +1,28 @@
+{
+  "jsonSchema": {
+    "title": "S3 Input Properties",
+    "type": "object",
+    "properties": {
+      "limit": {
+        "title": "",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "limit"
+    ]
+  },
+  "properties": {
+    "limit": -1,
+    "@definitionName": "S3Input"
+  },
+  "uiSchema": {
+    "ui:order": [
+      "limit"
+    ],
+    "limit": {
+      "ui:widget": "hidden"
+    },
+    "ui:widget": "hidden"
+  }
+}

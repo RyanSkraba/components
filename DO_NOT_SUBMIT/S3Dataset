@@ -1,0 +1,213 @@
+{
+  "jsonSchema": {
+    "title": "S3 Dataset Properties",
+    "type": "object",
+    "properties": {
+      "region": {
+        "title": "Region",
+        "type": "string",
+        "enumNames": [
+          "Please select a region",
+          "Asia Pacific (Mumbai)",
+          "Asia Pacific (Singapore)",
+          "Asia Pacific (Sydney)",
+          "Asia Pacific (Tokyo)",
+          "Asia Pacific (Seoul)",
+          "China (Beijing) ",
+          "EU (Ireland)",
+          "EU (London)",
+          "EU (Frankfurt)",
+          "AWS GovCloud (US)",
+          "Canada (Central)",
+          "South America (Sao Paulo)",
+          "US Standard",
+          "US EAST (Ohio)",
+          "US West (N. California)",
+          "US West (Oregon)",
+          "Other"
+        ],
+        "enum": [
+          "DEFAULT",
+          "AP_SOUTH_1",
+          "AP_SOUTHEAST_1",
+          "AP_SOUTHEAST_2",
+          "AP_NORTHEAST_1",
+          "AP_NORTHEAST_2",
+          "CN_NORTH_1",
+          "EU_WEST_1",
+          "EU_WEST_2",
+          "EU_CENTRAL_1",
+          "GovCloud",
+          "CA_CENTRAL_1",
+          "SA_EAST_1",
+          "US_EAST_1",
+          "US_EAST_2",
+          "US_WEST_1",
+          "US_WEST_2",
+          "OTHER"
+        ]
+      },
+      "unknownRegion": {
+        "title": "Endpoint",
+        "type": "string"
+      },
+      "bucket": {
+        "title": "Bucket",
+        "type": "string"
+      },
+      "object": {
+        "title": "Object",
+        "type": "string"
+      },
+      "encryptDataInMotion": {
+        "title": "Encrypt data in motion",
+        "type": "boolean"
+      },
+      "kmsForDataInMotion": {
+        "title": "KMS customer master key",
+        "type": "string"
+      },
+      "encryptDataAtRest": {
+        "title": "Encrypt data at rest",
+        "type": "boolean"
+      },
+      "kmsForDataAtRest": {
+        "title": "KMS customer master key",
+        "type": "string"
+      },
+      "format": {
+        "title": "Format",
+        "type": "string",
+        "enumNames": [
+          "CSV",
+          "AVRO",
+          "PARQUET"
+        ],
+        "enum": [
+          "CSV",
+          "AVRO",
+          "PARQUET"
+        ]
+      },
+      "recordDelimiter": {
+        "title": "Record Delimiter",
+        "type": "string",
+        "enumNames": [
+          "LF(\"\\n\")",
+          "CR(\"\\r\")",
+          "CRLF(\"\\r\\n\")",
+          "Other"
+        ],
+        "enum": [
+          "LF",
+          "CR",
+          "CRLF",
+          "OTHER"
+        ]
+      },
+      "specificRecordDelimiter": {
+        "title": "Specific Record Delimiter",
+        "type": "string"
+      },
+      "fieldDelimiter": {
+        "title": "Field Delimiter",
+        "type": "string",
+        "enumNames": [
+          "Semicolon",
+          "Comma",
+          "Tabulation",
+          "Space",
+          "Other"
+        ],
+        "enum": [
+          "SEMICOLON",
+          "COMMA",
+          "TABULATION",
+          "SPACE",
+          "OTHER"
+        ]
+      },
+      "specificFieldDelimiter": {
+        "title": "Specific Field Delimiter",
+        "type": "string"
+      }
+    },
+    "required": [
+      "format"
+    ]
+  },
+  "properties": {
+    "region": "DEFAULT",
+    "unknownRegion": "us-east-1",
+    "encryptDataInMotion": false,
+    "encryptDataAtRest": false,
+    "format": "CSV",
+    "recordDelimiter": "LF",
+    "specificRecordDelimiter": "\\n",
+    "fieldDelimiter": "SEMICOLON",
+    "specificFieldDelimiter": ";",
+    "@definitionName": "S3Dataset"
+  },
+  "uiSchema": {
+    "region": {
+      "ui:trigger": [
+        "after"
+      ]
+    },
+    "unknownRegion": {
+      "ui:widget": "hidden"
+    },
+    "encryptDataInMotion": {
+      "ui:trigger": [
+        "after"
+      ]
+    },
+    "kmsForDataInMotion": {
+      "ui:widget": "hidden"
+    },
+    "encryptDataAtRest": {
+      "ui:trigger": [
+        "after"
+      ]
+    },
+    "kmsForDataAtRest": {
+      "ui:widget": "hidden"
+    },
+    "format": {
+      "ui:trigger": [
+        "after"
+      ]
+    },
+    "recordDelimiter": {
+      "ui:trigger": [
+        "after"
+      ]
+    },
+    "specificRecordDelimiter": {
+      "ui:widget": "hidden"
+    },
+    "fieldDelimiter": {
+      "ui:trigger": [
+        "after"
+      ]
+    },
+    "specificFieldDelimiter": {
+      "ui:widget": "hidden"
+    },
+    "ui:order": [
+      "region",
+      "unknownRegion",
+      "bucket",
+      "object",
+      "encryptDataInMotion",
+      "kmsForDataInMotion",
+      "encryptDataAtRest",
+      "kmsForDataAtRest",
+      "format",
+      "recordDelimiter",
+      "specificRecordDelimiter",
+      "fieldDelimiter",
+      "specificFieldDelimiter"
+    ]
+  }
+}

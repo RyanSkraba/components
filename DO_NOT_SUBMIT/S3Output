@@ -1,0 +1,14 @@
+{
+  "jsonSchema": {
+    "title": "S3 Output Properties",
+    "type": "object",
+    "properties": {}
+  },
+  "properties": {
+    "@definitionName": "S3Output"
+  },
+  "uiSchema": {
+    "ui:order": [],
+    "ui:widget": "hidden"
+  }
+}

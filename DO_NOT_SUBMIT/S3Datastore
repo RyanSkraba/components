@@ -1,0 +1,36 @@
+{
+  "jsonSchema": {
+    "title": "S3 Dataset Properties",
+    "type": "object",
+    "properties": {
+      "specifyCredentials": {
+        "title": "Specify aws credentials",
+        "type": "boolean"
+      },
+      "accessKey": {
+        "title": "Access key",
+        "type": "string"
+      },
+      "secretKey": {
+        "title": "Secret key",
+        "type": "string"
+      }
+    }
+  },
+  "properties": {
+    "specifyCredentials": true,
+    "@definitionName": "S3Datastore"
+  },
+  "uiSchema": {
+    "specifyCredentials": {
+      "ui:trigger": [
+        "after"
+      ]
+    },
+    "ui:order": [
+      "specifyCredentials",
+      "accessKey",
+      "secretKey"
+    ]
+  }
+}
