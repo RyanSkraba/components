@@ -366,9 +366,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
             } else {
                 int listId;
                 if (parameters.listParam.getValue().equals(ListParam.STATIC_LIST_NAME)) {
-                    listId = getListIdByName(parameters.listParamValue.getValue());
+                    listId = getListIdByName(parameters.listParamListName.getValue());
                 } else {
-                    listId = Integer.parseInt(parameters.listParamValue.getValue());
+                    listId = parameters.listParamListId.getValue();
                 }
                 current_uri = new StringBuilder(basicPath) //
                         .append(API_PATH_LIST)//

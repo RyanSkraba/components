@@ -68,7 +68,8 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         String tl_leadKeyValue = props.leadKeyValue.getName();
         String tl_leadKeyValues = props.leadKeyValues.getName();
         String tl_listParam = props.listParam.getName();
-        String tl_listParamValue = props.listParamValue.getName();
+        String tl_listParamValue = props.listParamListName.getName();
+        String tl_listParamListId = props.listParamListId.getName();
         String tl_oldestUpdateDate = props.oldestUpdateDate.getName();
         String tl_latestUpdateDate = props.latestUpdateDate.getName();
         String tl_setIncludeTypes = props.setIncludeTypes.getName();
@@ -139,14 +140,23 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         // REST API Mode - getMultipleLeads - StaticList
         props.inputOperation.setValue(getMultipleLeads);
         props.leadSelectorREST.setValue(LeadSelector.StaticListSelector);
+        props.listParam.setValue(ListParam.STATIC_LIST_NAME);
         props.refreshLayout(props.getForm(Form.MAIN));
         assertTrue(f.getWidget(tl_operation).isVisible());
         assertTrue(f.getWidget(tl_mappingInput).isVisible());
         assertTrue(f.getWidget(tl_dieOnError).isVisible());
-        //
         assertTrue(f.getWidget(tl_leadSelectorREST).isVisible());
         assertTrue(f.getWidget(tl_listParam).isVisible());
         assertTrue(f.getWidget(tl_listParamValue).isVisible());
+        assertFalse(f.getWidget(tl_listParamListId).isVisible());
+        //
+        props.leadSelectorREST.setValue(LeadSelector.StaticListSelector);
+        props.listParam.setValue(ListParam.STATIC_LIST_ID);
+        props.refreshLayout(props.getForm(Form.MAIN));
+        assertTrue(f.getWidget(tl_leadSelectorREST).isVisible());
+        assertTrue(f.getWidget(tl_listParam).isVisible());
+        assertFalse(f.getWidget(tl_listParamValue).isVisible());
+        assertTrue(f.getWidget(tl_listParamListId).isVisible());
         //
         assertFalse(f.getWidget(tl_leadKeyTypeREST).isVisible());
         assertFalse(f.getWidget(tl_leadSelectorSOAP).isVisible());
@@ -279,6 +289,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         // SOAP API Mode - getMultipleLeads - StaticList
         props.inputOperation.setValue(getMultipleLeads);
         props.leadSelectorSOAP.setValue(LeadSelector.StaticListSelector);
+        props.listParam.setValue(ListParam.STATIC_LIST_NAME);
         props.refreshLayout(props.getForm(Form.MAIN));
         assertTrue(f.getWidget(tl_operation).isVisible());
         assertTrue(f.getWidget(tl_mappingInput).isVisible());
@@ -287,6 +298,14 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertTrue(f.getWidget(tl_leadSelectorSOAP).isVisible());
         assertTrue(f.getWidget(tl_listParam).isVisible());
         assertTrue(f.getWidget(tl_listParamValue).isVisible());
+        assertFalse(f.getWidget(tl_listParamListId).isVisible());
+        //
+        props.listParam.setValue(ListParam.STATIC_LIST_ID);
+        props.refreshLayout(props.getForm(Form.MAIN));
+        assertTrue(f.getWidget(tl_leadSelectorSOAP).isVisible());
+        assertTrue(f.getWidget(tl_listParam).isVisible());
+        assertFalse(f.getWidget(tl_listParamValue).isVisible());
+        assertTrue(f.getWidget(tl_listParamListId).isVisible());
         //
         assertFalse(f.getWidget(tl_leadKeyTypeREST).isVisible());
         assertFalse(f.getWidget(tl_leadSelectorREST).isVisible());

@@ -24,6 +24,7 @@ import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector;
+import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -114,10 +115,19 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
                     }
                     break;
                 case StaticListSelector:
-                    if (p.listParamValue.getValue().isEmpty()) {
-                        vr.setStatus(Result.ERROR);
-                        vr.setMessage(messages.getMessage("error.validation.listparamvalue"));
-                        return vr;
+                    if (ListParam.STATIC_LIST_NAME.equals(p.listParam.getValue())) {
+
+                        if (p.listParamListName.getValue().isEmpty()) {
+                            vr.setStatus(Result.ERROR);
+                            vr.setMessage(messages.getMessage("error.validation.listparamvalue"));
+                            return vr;
+                        }
+                    } else {
+                        if (p.listParamListId.getValue() == null) {
+                            vr.setStatus(Result.ERROR);
+                            vr.setMessage(messages.getMessage("error.validation.listparamvalue"));
+                            return vr;
+                        }
                     }
                     break;
                 case LastUpdateAtSelector:

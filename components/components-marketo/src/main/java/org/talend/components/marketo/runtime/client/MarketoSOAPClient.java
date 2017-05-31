@@ -15,7 +15,6 @@ package org.talend.components.marketo.runtime.client;
 import static com.marketo.mktows.ActivityType.fromValue;
 import static com.marketo.mktows.LeadKeyRef.valueOf;
 import static com.marketo.mktows.ListOperationType.ISMEMBEROFLIST;
-import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static javax.crypto.Mac.getInstance;
 import static javax.xml.datatype.DatatypeFactory.newInstance;
@@ -437,13 +436,13 @@ public class MarketoSOAPClient extends MarketoClient {
         //
         if (parameters.leadSelectorSOAP.getValue().equals(StaticListSelector)) {
             LOG.info("StaticListSelector - List type : {} with value : {}.", parameters.listParam.getValue(),
-                    parameters.listParamValue.getValue());
+                    parameters.listParamListName.getValue());
 
             StaticListSelector staticListSelector = new StaticListSelector();
             ObjectFactory objectFactory = new ObjectFactory();
             if (parameters.listParam.getValue().equals(STATIC_LIST_NAME)) {
                 JAXBElement<String> listName = objectFactory
-                        .createStaticListSelectorStaticListName(parameters.listParamValue.getValue());
+                        .createStaticListSelectorStaticListName(parameters.listParamListName.getValue());
                 staticListSelector.setStaticListName(listName);
 
             } else {
@@ -453,7 +452,7 @@ public class MarketoSOAPClient extends MarketoClient {
                 // 29912 -> our list FIELD_ID !
                 // B2 -> tab in the UI
                 JAXBElement<Integer> listId = objectFactory
-                        .createStaticListSelectorStaticListId(parseInt(parameters.listParamValue.getValue())); //
+                        .createStaticListSelectorStaticListId(parameters.listParamListId.getValue()); //
                 staticListSelector.setStaticListId(listId);
             }
             request.setLeadSelector(staticListSelector);

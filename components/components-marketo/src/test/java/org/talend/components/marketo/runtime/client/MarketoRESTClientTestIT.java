@@ -314,7 +314,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         iprops.batchSize.setValue(4); // we have at least 5 members with createDatasets.
         iprops.leadSelectorREST.setValue(StaticListSelector);
         iprops.listParam.setValue(STATIC_LIST_NAME);
-        iprops.listParamValue.setValue(UNDX_TEST_LIST_SMALL);
+        iprops.listParamListName.setValue(UNDX_TEST_LIST_SMALL);
         MarketoSource source = new MarketoSource();
         source.initialize(null, iprops);
         MarketoClientService client = source.getClientService(null);
@@ -334,7 +334,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         iprops.batchSize.setValue(104);
         iprops.leadSelectorREST.setValue(StaticListSelector);
         iprops.listParam.setValue(STATIC_LIST_NAME);
-        iprops.listParamValue.setValue(UNDX_TEST_LIST_SMALL);
+        iprops.listParamListName.setValue(UNDX_TEST_LIST_SMALL);
         MarketoSource source = new MarketoSource();
         source.initialize(null, iprops);
         MarketoClientService client = source.getClientService(null);
@@ -361,7 +361,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         //
         iprops.leadSelectorREST.setValue(StaticListSelector);
         iprops.listParam.setValue(STATIC_LIST_NAME);
-        iprops.listParamValue.setValue("undx_test_list******");
+        iprops.listParamListName.setValue("undx_test_list******");
         MarketoSource source = new MarketoSource();
         source.initialize(null, iprops);
         MarketoClientService client = source.getClientService(null);
@@ -383,7 +383,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         //
         iprops.leadSelectorREST.setValue(StaticListSelector);
         iprops.listParam.setValue(STATIC_LIST_ID);
-        iprops.listParamValue.setValue(UNDX_TEST_LIST_SMALL_ID.toString());
+        iprops.listParamListId.setValue(UNDX_TEST_LIST_SMALL_ID);
         MarketoSource source = new MarketoSource();
         source.initialize(null, iprops);
         MarketoClientService client = source.getClientService(null);
@@ -405,7 +405,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         //
         iprops.leadSelectorREST.setValue(StaticListSelector);
         iprops.listParam.setValue(STATIC_LIST_ID);
-        iprops.listParamValue.setValue("-666");
+        iprops.listParamListName.setValue("-666");
         MarketoSource source = new MarketoSource();
         source.initialize(null, iprops);
         MarketoClientService client = source.getClientService(null);
