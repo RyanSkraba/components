@@ -660,8 +660,9 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         ListOperationParameters parms = new ListOperationParameters();
         parms.setApiMode(SOAP.name());
         parms.setListKeyValue(UNDX_TEST_LIST_SMALL);
-        parms.setLeadKeyValue(
-                new String[] { createdLeads.get(0).toString(), createdLeads.get(1).toString(), createdLeads.get(2).toString() });
+        parms.setStrict(true);
+        parms.setLeadKeyValue(new String[] { createdLeads.get(0).toString(), createdLeads.get(1).toString(),
+                createdLeads.get(2).toString(), "12345" });
         //
         MarketoSyncResult result = client.isMemberOfList(parms);
         LOG.debug("result = {}.", result);
