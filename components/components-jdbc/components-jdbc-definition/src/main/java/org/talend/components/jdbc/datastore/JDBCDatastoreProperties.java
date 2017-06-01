@@ -16,6 +16,7 @@ import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,12 +30,15 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.dataprep.DBType;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
@@ -42,6 +46,8 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
 public class JDBCDatastoreProperties extends PropertiesImpl implements DatastoreProperties, RuntimeSettingProvider {
+
+    public static final Logger LOG = LoggerFactory.getLogger(JDBCDatastoreProperties.class);
 
     private transient Map<String, DBType> dyTypesInfo = new HashMap<String, DBType>();
 
@@ -51,8 +57,20 @@ public class JDBCDatastoreProperties extends PropertiesImpl implements Datastore
         super(name);
 
         String config_file = System.getProperty(CONFIG_FILE_lOCATION_KEY);
-        try (InputStream is = config_file != null ? (new FileInputStream(config_file))
-                : this.getClass().getClassLoader().getResourceAsStream("db_type_config.json")) {
+        InputStream is;
+        if (config_file != null) {// priority to the system property
+            try {
+                is = new FileInputStream(config_file);
+            } catch (FileNotFoundException e) {
+                throw new ComponentException(CommonErrorCodes.UNABLE_TO_READ_CONTENT, e);
+            }
+        } else {// then look in the classpath
+            is = this.getClass().getClassLoader().getResourceAsStream("jdbc_config.json");
+            if (is == null) {// use the default provided configuration file
+                is = this.getClass().getClassLoader().getResourceAsStream("db_type_config.json");
+            } // else already set.
+        }
+        try {
             JSONParser parser = new JSONParser();
             JSONArray ja = null;
             try {
@@ -78,6 +96,14 @@ public class JDBCDatastoreProperties extends PropertiesImpl implements Datastore
 
         } catch (IOException e) {
             throw new ComponentException(e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    LOG.error("failed to close JDBC config file", e);
+                }
+            } // else nothing to close
         }
     }
 

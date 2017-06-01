@@ -36,34 +36,43 @@
 			dependencies for the REST service -->
 		<dependency>
 			<groupId>org.talend.components</groupId>
+			<artifactId>components-jira</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>localio-runtime</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
 			<artifactId>s3-runtime-di</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>jms-runtime_1_1</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jdbc-runtime</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.libraries</groupId>
+			<artifactId>mysql-connector-java-5.1.30-bin</artifactId>
+			<version>6.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jdbc-runtime-beam</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-salesforce-runtime</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>org.eclipse.jetty</groupId>
@@ -75,31 +84,26 @@
 			<groupId>org.talend.components</groupId>
 			<artifactId>kafka-runtime</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>elasticsearch-runtime_2_4</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>simplefileio-runtime</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>processing-runtime</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>bigquery-runtime</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>javax.servlet</groupId>
@@ -111,19 +115,16 @@
 			<groupId>org.talend.components</groupId>
 			<artifactId>pubsub-runtime</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.beam</groupId>
 			<artifactId>beam-sdks-java-io-hdfs</artifactId>
 			<version>${beam.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-client</artifactId>
 			<version>${hadoop.version}</version>
-			<scope>test</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -135,7 +136,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>10.12.1.1</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

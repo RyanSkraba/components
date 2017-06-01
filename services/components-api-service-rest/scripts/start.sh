@@ -38,11 +38,11 @@ APP_CLASSPATH="${classpath.linux}"
 if [ ! -z "$CLASSPATH" ] ; then
   APP_CLASSPATH="$CLASSPATH":
 fi
-APP_CLASSPATH="$APP_CLASSPATH:./config"
+APP_CLASSPATH="$APP_CLASSPATH:./config:./config/default"
 
 APP_CLASS="org.talend.components.service.rest.Application"
 
-JAVA_OPTS="-Xmx2048m -Dfile.encoding=UTF-8 -Dorg.ops4j.pax.url.mvn.localRepository=\"$PWD/.m2\" -Dorg.ops4j.pax.url.mvn.settings=\"$PWD/config/settings.xml\" -Dorg.talend.component.jdbc.config.file=\"$PWD/config/jdbc_config.json\""
+JAVA_OPTS="-Xmx2048m -Dfile.encoding=UTF-8 -Dorg.ops4j.pax.url.mvn.localRepository=\"$PWD/.m2\" -Dorg.ops4j.pax.url.mvn.settings=\"$PWD/config/settings.xml\" -Dcomponent.default.config.folder=\"$PWD/config/default\""
 
 # If HADOOP_CONF_DIR is not set, try to get it from in the application properties, then add it to the classpath.
 if [ -z "$HADOOP_CONF_DIR" ] ; then
@@ -60,6 +60,16 @@ if [ -z "$KRB5_CONFIG" ] ; then
 fi
 if [ ! -z "$KRB5_CONFIG" ] ; then
   JAVA_OPTS="$JAVA_OPTS -Djava.security.krb5.conf=$KRB5_CONFIG"
+fi
+
+
+# If PAX_MVN_REPO is not set, try to get it from the application properties, then add it to the java options. 
+if [ -z "$PAX_MVN_REPO" ] ; then
+  PAX_MVN_REPO=$(grep "^pax.mvn.repo=" config/application.properties) && \
+      export PAX_MVN_REPO=$(expr $PAX_MVN_REPO : 'pax.mvn.repo=\(.*\)')
+fi
+if [ ! -z "$PAX_MVN_REPO" ] ; then
+  JAVA_OPTS="$JAVA_OPTS -Dorg.ops4j.pax.url.mvn.repositories=$PAX_MVN_REPO"
 fi
 
 THE_CMD="$JAVA_BIN $JAVA_OPTS -cp \"$APP_CLASSPATH\" $APP_CLASS $*"  

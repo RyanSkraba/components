@@ -13,6 +13,7 @@
 package org.talend.components.service.rest;
 
 import org.springframework.boot.SpringApplication;
+import org.talend.components.service.spring.SpringTestApp;
 
 /**
  * this only serves the purpose of starting a debugging session from an IDE easily.
@@ -20,6 +21,6 @@ import org.springframework.boot.SpringApplication;
 public class TestApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(SpringTestApp.class, args);
     }
 }

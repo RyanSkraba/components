@@ -163,7 +163,6 @@
 			<version>10.12.1.1</version>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 	<!-- dependencyManagement block may be added here and components bom may 
 		be included to manage versions -->
@@ -182,6 +181,7 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<!-- create the jar only with rest service classes, excluding configuration files -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<executions>
@@ -248,19 +248,11 @@
 						</configuration>
 					</execution>
 					<execution>
+						<!-- generate test jar, I am not sure it enven used -->
 						<id>test-jar</id>
 						<goals>
 							<goal>test-jar</goal>
 						</goals>
-					</execution>
-
-					<execution>
-						<id>package-service</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<!-- bind to a non existing phase to avoid service jar creation -->
-						<phase>never</phase>
 					</execution>
 				</executions>
 			</plugin>
@@ -315,6 +307,7 @@
 				<version>3.0.0</version>
 				<executions>
 					<execution>
+						<!-- creates the simple bare service zip -->
 						<id>no-arch-package</id>
 						<phase>package</phase>
 						<goals>
@@ -328,6 +321,7 @@
 						</configuration>
 					</execution>
 					<execution>
+						<!-- creates config zip package to be used by any other packaging modules such as as all components -->
 						<id>config-package</id>
 						<phase>package</phase>
 						<goals>
@@ -342,6 +336,7 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<!-- removes jdbc runtime jar from the integration tests classpath -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<executions>
@@ -356,18 +351,14 @@
 							</classpathDependencyExcludes>
 						</configuration>
 					</execution>
-
 				</executions>
 			</plugin>
 
 		</plugins>
 		<resources>
 			<resource>
-				<!-- This enable maven defined variables in banner.txt as ${project.version} -->
+				<!-- This enable maven defined variables in banner.txt as ${project.version} and application.properties-->
 				<directory>src/main/resources</directory>
-				<!-- <includes> -->
-				<!-- <include>banner.txt</include> -->
-				<!-- </includes> -->
 				<filtering>true</filtering>
 			</resource>
 		</resources>
