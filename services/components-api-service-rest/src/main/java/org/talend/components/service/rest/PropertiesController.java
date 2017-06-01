@@ -46,6 +46,12 @@ public interface PropertiesController {
     String getProperties(@PathVariable("definitionName") String definitionName,
             @RequestParam(required = false, defaultValue = Form.MAIN) String formName);
 
+    /**
+     *  Get a properties (UI spec) with a payload that contains existing data.
+     */
+    @RequestMapping(value = "{definitionName}", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
+    String initializeProperties(@RequestParam(required = false, defaultValue = Form.MAIN) String formName, @RequestBody PropertiesDto propertiesContainer);
+
     /** Validate the coherence of a set of properties for a specific component. **/
     @RequestMapping(value = "{definitionName}/validate", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE)
     ResponseEntity<ValidationResultsDto> validateProperties(@RequestBody PropertiesDto propertiesContainer);
