@@ -29,6 +29,7 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -47,6 +48,12 @@ import org.talend.daikon.avro.SchemaConstants;
 public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceInputReaderTestIT.class);
+
+    @Before
+    public void setup() throws Throwable {
+        deleteAllAccountTestRows();
+    }
+
 
     public static Schema SCHEMA_QUERY_ACCOUNT = SchemaBuilder.builder().record("Schema").fields() //
             .name("Id").type().stringType().noDefault() //
@@ -101,22 +108,29 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         runInputTest(true, true);
     }
 
-    // Need to think about more flexible implementation of this IT.
-    @Ignore
+    @Ignore("Our Salesforce credentials were used too many time in ITs they may create huge amount of data and this test can execute too long")
     @Test
     public void testBulkApiWithPkChunking() throws Throwable {
-        int count = 200;
         TSalesforceInputProperties properties = createTSalesforceInputProperties(false, true);
-        properties.pkChunking.setValue(true);
-        properties.chunkSize.setValue(100);
         properties.manualQuery.setValue(false);
+
+        // Some records can't be erased by deleteAllAccountTestRows(),
+        // they have relations to other tables, we need to extract them(count) from main test.
+        List<IndexedRecord> readRows = readRows(properties);
+        int defaultRecordsInSalesforce = readRows.size();
+
+        properties.pkChunking.setValue(true);
+        // This all test were run to many times and created/deleted huge amount of data,
+        // to avoid Error: TotalRequests Limit exceeded lets get data with chunk size 100_000(default on Salesforce)
+        properties.chunkSize.setValue(TSalesforceInputProperties.DEFAULT_CHUNK_SIZE);
+        int count = 1500;
         String random = createNewRandom();
         List<IndexedRecord> outputRows = makeRows(random, count, true);
         outputRows = writeRows(random, properties, outputRows);
         try {
-            List<IndexedRecord> readRows = readRows(properties);
+            readRows = readRows(properties);
             LOGGER.info("Read rows count - {}", readRows.size());
-            Assert.assertTrue(readRows.size() >= outputRows.size());
+            Assert.assertEquals((readRows.size() - defaultRecordsInSalesforce), outputRows.size());
         } finally {
             deleteRows(outputRows, properties);
         }

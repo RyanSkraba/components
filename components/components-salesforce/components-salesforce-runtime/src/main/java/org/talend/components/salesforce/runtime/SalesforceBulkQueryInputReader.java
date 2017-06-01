@@ -49,7 +49,7 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
         if (bulkRuntime == null) {
             bulkRuntime = new SalesforceBulkRuntime(((SalesforceSource) getCurrentSource()).connect(container).bulkConnection);
             if (((TSalesforceInputProperties) properties).pkChunking.getValue()) {
-                bulkRuntime.setChunkSize(((TSalesforceInputProperties) properties).chunkSize.getValue());
+                bulkRuntime.setChunkProperties((TSalesforceInputProperties) properties);
             }
         }
         try {

@@ -102,9 +102,13 @@ public class SalesforceBulkRuntime {
 
     private int chunkSize;
 
+    private int chunkSleepTime;
+
     private static final String PK_CHUNKING_HEADER_NAME = "Sforce-Enable-PKChunking";
 
     private static final String CHUNK_SIZE_PROPERTY_NAME = "chunkSize=";
+
+    private static final int MAX_BATCH_EXECUTION_TIME = 600 * 1000;
 
     public SalesforceBulkRuntime(BulkConnection bulkConnection) throws IOException {
         this.bulkConnection = bulkConnection;
@@ -119,20 +123,17 @@ public class SalesforceBulkRuntime {
     }
 
     /**
-     * Set value for chunk size. Maximum value is 250_000.
+     * Sets up chunk size and chunk sleep time for big chunks.
      *
-     * @param chunkSize - value for batches size.
+     * @param properties - Salesforce input properties.
      */
-    public void setChunkSize(int chunkSize) {
-        if (chunkSize > TSalesforceInputProperties.MAX_CHUNK_SIZE) {
-            LOGGER.warn("Chunk size was set to max value - 250000.");
-            this.chunkSize = TSalesforceInputProperties.MAX_CHUNK_SIZE;
-        } else if (chunkSize <= 0){
-            LOGGER.warn("Chunk size was set to default value - 100000.");
-            this.chunkSize = TSalesforceInputProperties.DEFAULT_CHUNK_SIZE;
-        } else {
-            this.chunkSize = chunkSize;
-        }
+    public void setChunkProperties(TSalesforceInputProperties properties) {
+        this.chunkSize = properties.chunkSize.getValue() > TSalesforceInputProperties.MAX_CHUNK_SIZE
+                ? TSalesforceInputProperties.MAX_CHUNK_SIZE
+                : properties.chunkSize.getValue() <= 0 ? TSalesforceInputProperties.DEFAULT_CHUNK_SIZE
+                        : properties.chunkSize.getValue();
+        this.chunkSleepTime = properties.chunkSleepTime.getValue() > 0 ? properties.chunkSleepTime.getValue() * 1000
+                : TSalesforceInputProperties.DEFAULT_CHUNK_SLEEP_TIME * 1000;
     }
 
     private void setBulkOperation(String sObjectType, OutputAction userOperation, String externalIdFieldName,
@@ -655,11 +656,21 @@ public class SalesforceBulkRuntime {
      * Retrieve resultId(-s) from job batches info.
      * Results will be retrieved only from completed batches.
      *
+     * When pk chunking is enabled, we need to go through all batches in the job.
+     * More information on Salesforce documentation:
+     * https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/
+     * asynch_api_code_curl_walkthrough_pk_chunking.htm
+     *
+     * If some batches were queued or in progress, we must wait till they completed or failed/notprocessed.
+     * Quick instructions for primary key chunking flow may be read here:
+     * https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/asynch_api_bulk_query_processing.htm
+     *
      * @param info - batch info from created job.
      * @throws AsyncApiException
      * @throws ConnectionException
+     * @throws InterruptedException
      */
-    private void retrieveResultsOfQuery(BatchInfo info) throws AsyncApiException, ConnectionException {
+    private void retrieveResultsOfQuery(BatchInfo info) throws AsyncApiException, ConnectionException, InterruptedException {
 
         if (BatchStateEnum.Completed == info.getState()) {
             QueryResultList list = getQueryResultList(job.getId(), info.getId());
@@ -667,30 +678,67 @@ public class SalesforceBulkRuntime {
             this.batchInfoList = Collections.singletonList(info);
             return;
         }
-
-        /*
-         * When pk chunking is enabled, we need to go through all batches in the job.
-         * More information on Salesforce documentation:
-         * https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/asynch_api_code_curl_walkthrough_pk_chunking.htm
-         */
-        BatchInfoList batchInfoList = getBatchInfoList(job.getId());
-        // BatchInfo list has a default size 0;
-        Set<String> resultSet = new HashSet<>(batchInfoList.getBatchInfo().length);
+        BatchInfoList batchInfoList = null;
+        Set<String> resultSet = new HashSet<>();
+        boolean isInProgress = true;
+        while (isInProgress) {
+            batchInfoList = getBatchInfoList(job.getId());
+            isInProgress = isJobBatchesInProgress(batchInfoList, info);
+            if (isInProgress) {
+                Thread.sleep(chunkSleepTime);
+                long processingTime = System.currentTimeMillis() - job.getCreatedDate().getTimeInMillis();
+                if (processingTime > MAX_BATCH_EXECUTION_TIME) {
+                    // Break processing and return processed data if any batch was processed.
+                    break;
+                }
+            }
+        }
         for (BatchInfo batch : batchInfoList.getBatchInfo()) {
-            // BatchStateEnum.InProgress what is the workflow for this status?(should we wait or skip)
             if (batch.getId().equals(info.getId())) {
                 continue;
-            } else if (BatchStateEnum.Completed == batch.getState()) {
-                resultSet.addAll(Arrays.asList(getQueryResultList(job.getId(), batch.getId()).getResult()));
-            } else if (BatchStateEnum.Failed == batch.getState()) {
-                //What if only 1 batch failed and others succeeded.
-                TalendRuntimeException.build(SalesforceErrorCodes.ERROR_IN_BULK_QUERY_PROCESSING)
-                        .put(ExceptionContext.KEY_MESSAGE, batch.getStateMessage()).throwIt();
             }
+            resultSet.addAll(Arrays.asList(getQueryResultList(job.getId(), batch.getId()).getResult()));
         }
 
         queryResultIDs = resultSet.iterator();
         this.batchInfoList = Arrays.asList(batchInfoList.getBatchInfo());
+    }
+
+    /**
+     * Checks if job batch infos were processed correctly. Only if all batches were {@link BatchStateEnum#Completed} are acceptable.<br/>
+     * If any of batches returns {@link BatchStateEnum#Failed} or {@link BatchStateEnum#NotProcessed} - throws an exception.
+     *
+     * @param batchInfoList - batch infos related to the specific job.
+     * @param info - batch info for query batch.
+     * @return true - if job is not processed fully, otherwise - false.
+     */
+    private boolean isJobBatchesInProgress(BatchInfoList batchInfoList, BatchInfo info) {
+        for (BatchInfo batch : batchInfoList.getBatchInfo()) {
+            if (batch.getId().equals(info.getId())) {
+                continue;
+            }
+
+            /*
+             * More details about every batch state can be found here:
+             * https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/asynch_api_batches_interpret_status.htm
+             */
+            switch (batch.getState()) {
+            case Completed:
+                break;
+            case NotProcessed:
+                /* If batch was not processed we should abort further execution.
+                 * From official documentation:
+                 * The batch won’t be processed. This state is assigned when a job is aborted while the batch is queued.
+                 */
+            case Failed:
+                TalendRuntimeException.build(SalesforceErrorCodes.ERROR_IN_BULK_QUERY_PROCESSING)
+                        .put(ExceptionContext.KEY_MESSAGE, batch.getStateMessage()).throwIt();
+            case Queued:
+            case InProgress:
+                return true;
+            }
+        }
+        return false;
     }
 
     public String nextResultId() {

@@ -79,9 +79,13 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     public static final int DEFAULT_CHUNK_SIZE = 100_000;
 
+    public static final int DEFAULT_CHUNK_SLEEP_TIME = 15;
+
     public Property<Boolean> pkChunking = newBoolean("pkChunking", false);
 
     public Property<Integer> chunkSize = newInteger("chunkSize", DEFAULT_CHUNK_SIZE);
+
+    public Property<Integer> chunkSleepTime = newInteger("chunkSleepTime", DEFAULT_CHUNK_SLEEP_TIME);
 
     public TSalesforceInputProperties(@JsonProperty("name") String name) {
         super(name);
@@ -115,6 +119,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(pkChunking);
         advancedForm.addRow(chunkSize);
+        advancedForm.addRow(chunkSleepTime);
         advancedForm.addRow(batchSize);
         advancedForm.addRow(normalizeDelimiter);
         advancedForm.addRow(columnNameDelimiter);
@@ -209,6 +214,10 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         refreshLayout(getForm(Form.ADVANCED));
     }
 
+    public void afterPkChunkingSleepTime() {
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
@@ -223,8 +232,9 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         }
         if (Form.ADVANCED.equals(form.getName())) {
             boolean isBulkQuery = queryMode.getValue().equals(QueryMode.Bulk);
-            form.getWidget(pkChunking.getName()).setHidden(!isBulkQuery);
+            form.getWidget(pkChunking.getName()).setVisible(isBulkQuery);
             form.getWidget(chunkSize.getName()).setVisible(isBulkQuery && pkChunking.getValue());
+            form.getWidget(chunkSleepTime.getName()).setVisible(isBulkQuery && pkChunking.getValue());
             form.getWidget(normalizeDelimiter.getName()).setHidden(isBulkQuery);
             form.getWidget(columnNameDelimiter.getName()).setHidden(isBulkQuery);
             form.getWidget(batchSize.getName()).setHidden(isBulkQuery);
