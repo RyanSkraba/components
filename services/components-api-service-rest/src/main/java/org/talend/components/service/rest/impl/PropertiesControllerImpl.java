@@ -196,7 +196,7 @@ public class PropertiesControllerImpl implements PropertiesController {
         if (properties == null) {
             return "{}";
         }
-        properties.refreshLayout(properties.getForm(formName));
+        properties.refreshLayout(properties.getPreferredForm(formName));
         return jsonSerializationHelper.toJson(formName, properties);
     }
 
