@@ -349,7 +349,18 @@ public class SalesforceBulkRuntime {
         JobInfo closeJob = new JobInfo();
         closeJob.setId(job.getId());
         closeJob.setState(JobStateEnum.Closed);
-        updateJob(closeJob);
+        try {
+            bulkConnection.updateJob(closeJob);
+        } catch (AsyncApiException sfException) {
+            if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
+                SalesforceRuntimeCommon.renewSession(bulkConnection.getConfig());
+                closeJob();
+            } else if (AsyncExceptionCode.InvalidJobState.equals(sfException.getExceptionCode())) {
+                // Job is already closed on Salesforce side. We don't need to close it again.
+                return;
+            }
+            throw sfException;
+        }
     }
 
     public void setAwaitTime(long awaitTime) {

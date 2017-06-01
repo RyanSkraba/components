@@ -122,6 +122,23 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         }
     }
 
+    @Test
+    public void testClosingAlreadyClosedJob() {
+        try {
+            TSalesforceInputProperties properties = createTSalesforceInputProperties(false, true);
+            properties.manualQuery.setValue(false);
+            SalesforceBulkQueryInputReader reader = (SalesforceBulkQueryInputReader) this.<IndexedRecord>createBoundedReader(properties);
+            reader.start();
+            reader.close();
+            // Job could be closed on Salesforce side and previously we tried to close it again, we shouldn't do that.
+            // We can emulate this like calling close the job second time.
+            reader.close();
+        } catch(Throwable t) {
+            Assert.fail("This test shouldn't throw any errors, since we're closing already closed job");
+        }
+
+    }
+
     protected TSalesforceInputProperties createTSalesforceInputProperties(boolean emptySchema, boolean isBulkQury)
             throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
