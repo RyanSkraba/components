@@ -15,13 +15,11 @@ package org.talend.components.marketo.tmarketoinput;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.Company;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.CustomObject;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLead;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadActivity;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadChanges;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getMultipleLeads;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.StandardAction.get;
 
 import java.util.Collections;
 
@@ -849,26 +847,6 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         props.connection.apiMode.setValue(APIMode.REST);
         props.afterInputOperation();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
-    }
-
-    @Test
-    public void testCompany() throws Exception {
-        props.refreshLayout(props.getForm(Form.MAIN));
-        Form f = props.getForm(Form.MAIN);
-        assertFalse(f.getWidget(props.standardAction).isVisible());
-        assertFalse(f.getWidget(props.customObjectFilterType).isVisible());
-        assertFalse(f.getWidget(props.customObjectFilterValues).isVisible());
-        //
-        props.inputOperation.setValue(Company);
-        props.afterInputOperation();
-        assertEquals(MarketoConstants.getCustomObjectDescribeSchema(), props.schemaInput.schema.getValue());
-        props.standardAction.setValue(get);
-        props.afterStandardAction();
-        props.refreshLayout(props.getForm(Form.MAIN));
-        assertEquals(MarketoConstants.getCompanySchema(), props.schemaInput.schema.getValue());
-        assertTrue(f.getWidget(props.standardAction).isVisible());
-        assertTrue(f.getWidget(props.customObjectFilterType).isVisible());
-        assertTrue(f.getWidget(props.customObjectFilterValues).isVisible());
     }
 
     @Test

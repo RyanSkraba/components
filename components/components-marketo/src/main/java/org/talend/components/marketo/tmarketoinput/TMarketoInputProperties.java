@@ -15,10 +15,7 @@ package org.talend.components.marketo.tmarketoinput;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PARAM;
 import static org.talend.components.marketo.MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.Company;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.CustomObject;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.Opportunity;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.OpportunityRole;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLead;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadActivity;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadChanges;
@@ -72,10 +69,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
         getMultipleLeads, // retrieves lead records in batch.
         getLeadActivity, // retrieves the history of activity records for a single lead identified by the provided key.
         getLeadChanges, // checks the changes on Lead data in Marketo DB.
-        CustomObject, // CO Operation
-        Company, //
-        Opportunity, //
-        OpportunityRole //
+        CustomObject // CO Operation
     }
 
     public enum LeadSelector {
@@ -594,37 +588,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
                     break;
                 }
             }
-            // Companies
-            // TODO add fetch schema for companies
-            if (inputOperation.getValue().equals(Company)) {
-                form.getWidget(mappingInput.getName()).setVisible(false);
-                form.getWidget(standardAction.getName()).setVisible(true);
-                switch (standardAction.getValue()) {
-                case describe:
-                    break;
-                case get:
-                    form.getWidget(customObjectFilterType.getName()).setVisible(true);
-                    form.getWidget(customObjectFilterValues.getName()).setVisible(true);
-                    form.getWidget(batchSize.getName()).setVisible(true);
-                    break;
-                }
-            }
-            // Opportunities*
-            if (inputOperation.getValue().equals(Opportunity) || inputOperation.getValue().equals(OpportunityRole)) {
-                form.getWidget(mappingInput.getName()).setVisible(false);
-                form.getWidget(standardAction.getName()).setVisible(true);
-                switch (standardAction.getValue()) {
-                case describe:
-                    break;
-                case get:
-                    form.getWidget(useCompoundKey.getName()).setVisible(true);
-                    form.getWidget(customObjectFilterType.getName()).setVisible(!useCompoundKey.getValue());
-                    form.getWidget(customObjectFilterValues.getName()).setVisible(!useCompoundKey.getValue());
-                    form.getWidget(compoundKey.getName()).setVisible(useCompoundKey.getValue());
-                    form.getWidget(batchSize.getName()).setVisible(true);
-                    break;
-                }
-            }
         }
     }
 
@@ -637,9 +600,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
             case getLeadChanges:
                 return ValidationResult.OK;
             case CustomObject:
-            case Company:
-            case Opportunity:
-            case OpportunityRole:
                 ValidationResultMutable vr = new ValidationResultMutable();
                 vr.setStatus(Result.ERROR);
                 vr.setMessage(messages.getMessage("error.validation.customobjects.nosoap"));
@@ -798,36 +758,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
                     break;
                 case get:
                     s = MarketoConstants.getCustomObjectRecordSchema();
-                    break;
-                }
-                break;
-            case Company:
-                switch (standardAction.getValue()) {
-                case describe:
-                    s = MarketoConstants.getCustomObjectDescribeSchema();
-                    break;
-                case get:
-                    s = MarketoConstants.getCompanySchema();
-                    break;
-                }
-                break;
-            case Opportunity:
-                switch (standardAction.getValue()) {
-                case describe:
-                    s = MarketoConstants.getCustomObjectDescribeSchema();
-                    break;
-                case get:
-                    s = MarketoConstants.getOpportunitySchema();
-                    break;
-                }
-                break;
-            case OpportunityRole:
-                switch (standardAction.getValue()) {
-                case describe:
-                    s = MarketoConstants.getCustomObjectDescribeSchema();
-                    break;
-                case get:
-                    s = MarketoConstants.getOpportunityRoleSchema();
                     break;
                 }
                 break;

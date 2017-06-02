@@ -18,7 +18,6 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties.BulkImportTo;
-import org.talend.components.marketo.tmarketocampaign.TMarketoCampaignProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
@@ -281,23 +280,6 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
                 }
             }
         }
-        // Campaign
-        if (properties instanceof TMarketoCampaignProperties) {
-            TMarketoCampaignProperties p = (TMarketoCampaignProperties) properties;
-            switch (p.campaignAction.getValue()) {
-            case get:
-                break;
-            case getById:
-            case schedule:
-            case trigger:
-                if (StringUtils.isEmpty(p.campaignId.getStringValue())) {
-                    vr.setStatus(Result.ERROR);
-                    vr.setMessage(messages.getMessage("error.validation.campaign.byid"));
-                    return vr;
-                }
-                break;
-            }
-        }
         return vr;
     }
 
@@ -308,9 +290,6 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
         }
         if (properties instanceof TMarketoBulkExecProperties) {
             return new MarketoBulkExecReader(adaptor, this, (TMarketoBulkExecProperties) properties);
-        }
-        if (properties instanceof TMarketoCampaignProperties) {
-            return new MarketoCampaignReader(adaptor, this, (TMarketoCampaignProperties) properties);
         }
         return null;
     }

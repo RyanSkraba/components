@@ -15,7 +15,7 @@ package org.talend.components.marketo.runtime.client;
 import org.talend.components.marketo.runtime.client.type.MarketoException;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 
-public class MarketoRESTClient extends MarketoOpportunityClient implements MarketoClientServiceExtended {
+public class MarketoRESTClient extends MarketoBulkExecClient implements MarketoClientServiceExtended {
 
     public MarketoRESTClient(TMarketoConnectionProperties connection) throws MarketoException {
         super(connection);
