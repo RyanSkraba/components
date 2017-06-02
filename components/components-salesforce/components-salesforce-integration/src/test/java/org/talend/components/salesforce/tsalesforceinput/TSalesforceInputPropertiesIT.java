@@ -62,7 +62,11 @@ public class TSalesforceInputPropertiesIT {
         Assert.assertTrue(validationResult.getMessage().startsWith(expectedMessage));
     }
 
-    @Test
+    /*
+    * If the logic changes for this test please specify appropriate timeout.
+    * The average execution time for this test less than 1 sec.
+    */
+    @Test(timeout = 30_000)
     public void testValidateGuessSchemaInvalidCredentials() {
         // Prepare properties for test without credentials
         setupProperties();

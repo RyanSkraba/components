@@ -21,8 +21,12 @@ public class SalesforceDatastoreRuntimeTestIT {
             Assert.assertTrue(result.getMessage(), result.getStatus() == ValidationResult.Result.OK);
         }
     }
-    
-    @Test
+
+    /*
+    * If the logic changes for this test please specify appropriate timeout.
+    * The average execution time for this test less than 1 sec.
+    */
+    @Test(timeout = 30_000)
     public void testDoHealthChecksWithFail() {
         SalesforceDatastoreProperties datastore = new SalesforceDatastoreProperties("datastore");
         CommonTestUtils.setValueForDatastoreProperties(datastore);

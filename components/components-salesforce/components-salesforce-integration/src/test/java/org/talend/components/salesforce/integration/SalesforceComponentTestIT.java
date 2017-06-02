@@ -414,7 +414,11 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
     }
 
-    @Test
+    /*
+     * If the logic changes for this test please specify appropriate timeout.
+     * The average execution time for this test 1.7-1.8 sec.
+     */
+    @Test(timeout = 30_000)
     public void testLoginFail() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
         props.userPassword.userId.setValue("blah");
@@ -573,7 +577,11 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         }
     }
 
-    @Test
+    /*
+     * If the logic changes for this test please specify appropriate timeout.
+     * The average execution time for this test 1.4-1.9 sec.
+     */
+    @Test(timeout = 30_000)
     public void testInputConnectionRef() throws Throwable {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
