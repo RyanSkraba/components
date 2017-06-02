@@ -13,6 +13,7 @@
 package org.talend.components.marketo.tmarketooutput;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
@@ -50,4 +51,8 @@ public class TMarketoOutputDefinitionTest {
         assertNotNull(def.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.INCOMING_AND_OUTGOING));
     }
 
+    @Test
+    public void testNotStartable() {
+        assertFalse(def.isStartable());
+    }
 }

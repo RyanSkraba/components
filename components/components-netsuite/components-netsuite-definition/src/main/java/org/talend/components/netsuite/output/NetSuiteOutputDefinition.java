@@ -44,7 +44,7 @@ public class NetSuiteOutputDefinition extends NetSuiteComponentDefinition {
 
     @Override
     public boolean isStartable() {
-        return true;
+        return false;
     }
 
     /**

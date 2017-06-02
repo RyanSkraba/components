@@ -55,7 +55,7 @@ public interface ComponentDefinition extends Definition<ComponentProperties> {
 
     /**
      * FIXME - is this really necessary? create the ComponentProperties and initialize it's properties only and not the
-     * UI Layout not usefull for runtime
+     * UI Layout not useful for runtime
      */
     ComponentProperties createRuntimeProperties();
 
@@ -121,7 +121,7 @@ public interface ComponentDefinition extends Definition<ComponentProperties> {
     boolean isDataAutoPropagate();
 
     /**
-     * Return flag specifying whether component's input/output data is conditional.
+     * Specifies whether component's input/output data is conditional.
      *
      * <p>For example, an output component which has <i>success</i> and <i>reject</i> outgoing flows
      * should return {@code true} to instruct a <code>runner</code> that output data should be checked
@@ -137,6 +137,21 @@ public interface ComponentDefinition extends Definition<ComponentProperties> {
      */
     boolean isRejectAfterClose();
 
+    /**
+     * Specifies whether component can start data processing flow.
+     *
+     * <p>For example, an output component has {@link ConnectorTopology#INCOMING_AND_OUTGOING} topology and
+     * requires an input. Such component should return {@code false} to instruct a <code>runner</code> that
+     * it can't be used as a start component in data processing flow.
+     *
+     * <p>Another example is an input component that has {@link ConnectorTopology#OUTGOING} topology.
+     * Such component should return {@code true} to instruct a <code>runner</code> that
+     * it can be used as a start component in data processing flow.
+     *
+     * @see #getSupportedConnectorTopologies()
+     *
+     * @return {@code true} if component can start data processing flow, {@code false} otherwise
+     */
     boolean isStartable();
 
     // FIXME - An ENUM perhaps?
