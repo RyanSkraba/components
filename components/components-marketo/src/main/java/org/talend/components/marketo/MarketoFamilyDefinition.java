@@ -16,7 +16,6 @@ import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecDefinition;
-import org.talend.components.marketo.tmarketocampaign.TMarketoCampaignDefinition;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionDefinition;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputDefinition;
 import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperationDefinition;
@@ -37,7 +36,6 @@ public class MarketoFamilyDefinition extends AbstractComponentFamilyDefinition i
                 new TMarketoListOperationDefinition(), //
                 new TMarketoOutputDefinition(), //
                 new TMarketoBulkExecDefinition(), //
-                new TMarketoCampaignDefinition(), //
                 new MarketoConnectionWizardDefinition(), //
                 new MarketoConnectionEditWizardDefinition());
     }

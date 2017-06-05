@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.marketo.tmarketocampaign.TMarketoCampaignProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
@@ -89,20 +88,6 @@ public class MarketoSink extends MarketoSourceOrSink implements Sink {
                 vr.setStatus(Result.ERROR);
                 vr.setMessage(messages.getMessage("error.validation.leadkeyvalues"));
                 return vr;
-            }
-        }
-        // Campaign
-        if (properties instanceof TMarketoCampaignProperties) {
-            TMarketoCampaignProperties p = (TMarketoCampaignProperties) properties;
-            switch (p.campaignAction.getValue()) {
-            case schedule:
-            case trigger:
-                if (StringUtils.isEmpty(p.campaignId.getStringValue())) {
-                    vr.setStatus(Result.ERROR);
-                    vr.setMessage(messages.getMessage("error.validation.campaign.byid"));
-                    return vr;
-                }
-                break;
             }
         }
 

@@ -29,7 +29,6 @@ import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProper
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
-import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.StandardAction;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.i18n.GlobalI18N;
@@ -133,29 +132,10 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
         MarketoRecordResult r = new MarketoRecordResult();
         Schema describeSchema = MarketoConstants.getCustomObjectDescribeSchema();
         ip.connection = properties.getConnectionProperties();
-        switch (schemaName) {
-        case RESOURCE_COMPANY:
-            ip.inputOperation.setValue(InputOperation.Company);
-            ip.standardAction.setValue(StandardAction.describe);
-            r = client.describeCompanies(ip);
-            break;
-        case RESOURCE_OPPORTUNITY:
-            ip.inputOperation.setValue(InputOperation.Opportunity);
-            ip.standardAction.setValue(StandardAction.describe);
-            r = client.describeOpportunity(ip);
-            break;
-        case RESOURCE_OPPORTUNITY_ROLE:
-            ip.inputOperation.setValue(InputOperation.OpportunityRole);
-            ip.standardAction.setValue(StandardAction.describe);
-            r = client.describeOpportunity(ip);
-            break;
-        default:
-            ip.inputOperation.setValue(InputOperation.CustomObject);
-            ip.customObjectAction.setValue(CustomObjectAction.describe);
-            ip.customObjectName.setValue(schemaName);
-            r = client.describeCustomObject(ip);
-            break;
-        }
+        ip.inputOperation.setValue(InputOperation.CustomObject);
+        ip.customObjectAction.setValue(CustomObjectAction.describe);
+        ip.customObjectName.setValue(schemaName);
+        r = client.describeCustomObject(ip);
         if (!r.isSuccess()) {
             return null;
         }
@@ -199,29 +179,10 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
         MarketoRecordResult r = new MarketoRecordResult();
         Schema describeSchema = MarketoConstants.getCustomObjectDescribeSchema();
         ip.connection = properties.getConnectionProperties();
-        switch (resource) {
-        case RESOURCE_COMPANY:
-            ip.inputOperation.setValue(InputOperation.Company);
-            ip.standardAction.setValue(StandardAction.describe);
-            r = client.describeCompanies(ip);
-            break;
-        case RESOURCE_OPPORTUNITY:
-            ip.inputOperation.setValue(InputOperation.Opportunity);
-            ip.standardAction.setValue(StandardAction.describe);
-            r = client.describeOpportunity(ip);
-            break;
-        case RESOURCE_OPPORTUNITY_ROLE:
-            ip.inputOperation.setValue(InputOperation.OpportunityRole);
-            ip.standardAction.setValue(StandardAction.describe);
-            r = client.describeOpportunity(ip);
-            break;
-        default:
-            ip.inputOperation.setValue(InputOperation.CustomObject);
-            ip.customObjectAction.setValue(CustomObjectAction.describe);
-            ip.customObjectName.setValue(resource);
-            r = client.describeCustomObject(ip);
-            break;
-        }
+        ip.inputOperation.setValue(InputOperation.CustomObject);
+        ip.customObjectAction.setValue(CustomObjectAction.describe);
+        ip.customObjectName.setValue(resource);
+        r = client.describeCustomObject(ip);
         if (!r.isSuccess()) {
             return null;
         }

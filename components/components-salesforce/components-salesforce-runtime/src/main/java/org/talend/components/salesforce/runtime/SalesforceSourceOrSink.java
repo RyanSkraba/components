@@ -18,7 +18,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -35,7 +37,6 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.runtime.ProxyPropertiesRuntimeHelper;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.components.salesforce.common.SalesforceRuntimeSourceOrSink;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
@@ -96,17 +97,6 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
             return SalesforceRuntimeCommon.exceptionToValidationResult(ex);
         }
         return vr;
-    }
-
-    public static ValidationResult validateConnection(SalesforceProvideConnectionProperties properties) {
-        ClassLoader classLoader = SalesforceSourceOrSink.class.getClassLoader();
-        RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(SalesforceSourceOrSink.class.getCanonicalName());
-        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
-                classLoader)) {
-            SalesforceSourceOrSink ss = (SalesforceSourceOrSink) sandboxedInstance.getInstance();
-            ss.initialize(null, (ComponentProperties) properties);
-            return ss.validate(null);
-        }
     }
 
     /**
@@ -298,11 +288,29 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
         }
     }
 
+    private static RuntimeInfo getStaticRuntimeInfo() {
+        // since the runtime is executed from this class we don't need any dependencies, they should be resolved
+        // already.
+        return new RuntimeInfo() {
+
+            @Override
+            public String getRuntimeClassName() {
+                return SalesforceSourceOrSink.class.getName();
+            }
+
+            @Override
+            public List<URL> getMavenUrlDependencies() {
+                return Collections.emptyList();
+            }
+        };
+    }
+
     public static List<NamedThing> getSchemaNames(RuntimeContainer container, SalesforceProvideConnectionProperties properties)
             throws IOException {
         ClassLoader classLoader = SalesforceSourceOrSink.class.getClassLoader();
-        RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(SalesforceSourceOrSink.class.getCanonicalName());
-        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
+        // we use Sandbox to isolated some system properties set by
+        // org.talend.components.salesforce.runtime.common.SalesforceRuntimeCommon.enableTLSv11AndTLSv12ForJava7()
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(getStaticRuntimeInfo(),
                 classLoader)) {
             SalesforceSourceOrSink ss = (SalesforceSourceOrSink) sandboxedInstance.getInstance();
             ss.initialize(null, (ComponentProperties) properties);
@@ -312,6 +320,37 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
             } catch (Exception ex) {
                 throw new ComponentException(SalesforceRuntimeCommon.exceptionToValidationResult(ex));
             }
+        }
+    }
+
+    public static ValidationResult validateConnection(SalesforceProvideConnectionProperties properties) {
+        ClassLoader classLoader = SalesforceSourceOrSink.class.getClassLoader();
+        // we use Sandbox to isolated some system properties set by
+        // org.talend.components.salesforce.runtime.common.SalesforceRuntimeCommon.enableTLSv11AndTLSv12ForJava7()
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(getStaticRuntimeInfo(),
+                classLoader)) {
+            SalesforceSourceOrSink ss = (SalesforceSourceOrSink) sandboxedInstance.getInstance();
+            ss.initialize(null, (ComponentProperties) properties);
+            return ss.validate(null);
+        }
+    }
+
+    public static Schema getSchema(RuntimeContainer container, SalesforceProvideConnectionProperties properties, String module)
+            throws IOException {
+        ClassLoader classLoader = SalesforceSourceOrSink.class.getClassLoader();
+        // we use Sandbox to isolated some system properties set by
+        // org.talend.components.salesforce.runtime.common.SalesforceRuntimeCommon.enableTLSv11AndTLSv12ForJava7()
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(getStaticRuntimeInfo(),
+                classLoader)) {
+            SalesforceSourceOrSink ss = (SalesforceSourceOrSink) sandboxedInstance.getInstance();
+            ss.initialize(null, (ComponentProperties) properties);
+            PartnerConnection connection = null;
+            try {
+                connection = ss.connect(container).connection;
+            } catch (IOException ex) {
+                throw new ComponentException(SalesforceRuntimeCommon.exceptionToValidationResult(ex));
+            }
+            return ss.getSchema(connection, module);
         }
     }
 
@@ -334,24 +373,6 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
             returnList.add(new SimpleNamedThing(obj.getName(), obj.getLabel()));
         }
         return returnList;
-    }
-
-    public static Schema getSchema(RuntimeContainer container, SalesforceProvideConnectionProperties properties, String module)
-            throws IOException {
-        ClassLoader classLoader = SalesforceSourceOrSink.class.getClassLoader();
-        RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(SalesforceSourceOrSink.class.getCanonicalName());
-        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
-                classLoader)) {
-            SalesforceSourceOrSink ss = (SalesforceSourceOrSink) sandboxedInstance.getInstance();
-            ss.initialize(null, (ComponentProperties) properties);
-            PartnerConnection connection = null;
-            try {
-                connection = ss.connect(container).connection;
-            } catch (IOException ex) {
-                throw new ComponentException(SalesforceRuntimeCommon.exceptionToValidationResult(ex));
-            }
-            return ss.getSchema(connection, module);
-        }
     }
 
     @Override

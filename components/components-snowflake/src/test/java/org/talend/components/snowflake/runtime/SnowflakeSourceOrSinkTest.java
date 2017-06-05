@@ -80,14 +80,14 @@ public class SnowflakeSourceOrSinkTest {
 
         Schema expectedSchema = SchemaBuilder.builder().record("Schema").fields().name("field").type().stringType().noDefault()
                 .endRecord();
-        expectedSchema.getField("field").schema().addProp(SchemaConstants.TALEND_COLUMN_IS_KEY, "true");
+        expectedSchema.getField("field").addProp(SchemaConstants.TALEND_COLUMN_IS_KEY, "true");
 
         LOGGER.debug("expected schema: " + expectedSchema);
 
         Connection connectionMock = Mockito.mock(Connection.class);
 
         Mockito.when(runtimeContainerMock.getComponentData(Matchers.anyString(), Matchers.anyString()))
-                .thenReturn((SnowflakeConnectionProperties) snowflakeSourceOrSink.properties);
+                .thenReturn(snowflakeSourceOrSink.properties);
 
         DatabaseMetaData databaseMetaDataMock = Mockito.mock(DatabaseMetaData.class);
         ResultSet resultSetMock = Mockito.mock(ResultSet.class);
@@ -131,8 +131,8 @@ public class SnowflakeSourceOrSinkTest {
         LOGGER.debug("result schema: " + resultSchema);
 
         Assert.assertNotNull(resultSchema);
-        Assert.assertEquals(expectedSchema.getField("field").schema().getProp(SchemaConstants.TALEND_COLUMN_IS_KEY),
-                resultSchema.getField("field").schema().getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+        Assert.assertEquals(expectedSchema.getField("field").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY),
+                resultSchema.getField("field").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
         Assert.assertEquals(expectedSchema, resultSchema);
     }
 

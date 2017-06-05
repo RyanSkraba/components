@@ -66,7 +66,11 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
-    @Test
+    /*
+    * If the logic changes for this test please specify appropriate timeout.
+    * The average execution time for this test in range 1 - 3 sec.
+    */
+    @Test(timeout = 30_000)
     public void testBasicLogin() throws Throwable {
         File sessionFolder = new File(tempFolder.getRoot().getPath() + "/tsalesforceconnection/");
         assertEquals(0, sessionFolder.getTotalSpace());
@@ -87,7 +91,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
     }
 
     @Ignore("Need to solve test failed randomly")
-    @Test
+    @Test(timeout = 30_000)
     public void testUseExistingConnection() throws Throwable {
         File sessionFolder = new File(tempFolder.getRoot().getPath() + "/tsalesforceconnection_1/");
         assertEquals(0, sessionFolder.getTotalSpace());
@@ -189,7 +193,11 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
 
     }
 
-    @Test
+    /*
+    * If the logic changes for this test please specify appropriate timeout.
+    * The average execution time for this test 3.2-4.7 sec.
+    */
+    @Test(timeout = 40_000)
     public void testInputReuseSession() throws Throwable {
         File sessionFolder = new File(tempFolder.getRoot().getPath() + "/tsalesforceinput/");
         assertEquals(0, sessionFolder.getTotalSpace());
@@ -286,7 +294,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
     }
 
     @Ignore("Need to solve test failed randomly")
-    @Test
+    @Test(timeout = 30_000)
     public void testOutputReuseSession() throws Throwable {
         File sessionFolder = new File(tempFolder.getRoot().getPath() + "/tsalesforceoutput/");
         assertEquals(0, sessionFolder.getTotalSpace());

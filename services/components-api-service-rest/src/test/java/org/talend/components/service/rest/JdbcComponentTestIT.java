@@ -313,6 +313,49 @@ public class JdbcComponentTestIT {
     }
 
     @Test
+    public void initializeJDBCDatastoreProperties() throws java.io.IOException {
+        // given
+        PropertiesDto properties = new PropertiesDto();
+        properties.setProperties(getJdbcDataStoreProperties());
+
+        // when
+        Response response = given().content(properties).contentType(APPLICATION_JSON_UTF8_VALUE) //
+                .accept(APPLICATION_JSON_UTF8_VALUE) //
+                .expect().statusCode(200).log().ifError() //
+                .post("properties/{definitionName}", DATA_STORE_DEFINITION_NAME);
+
+        // then
+        ObjectNode jdbcProperties = mapper.readerFor(ObjectNode.class).readValue(response.asInputStream());
+        // should resemble jdbc_data_store_form.json
+        assertNotNull(jdbcProperties.get("jsonSchema"));
+        assertNotNull(jdbcProperties.get("properties"));
+        assertNotNull(jdbcProperties.get("uiSchema"));
+        assertEquals("JDBCDatastore", jdbcProperties.get("properties").get("@definitionName").textValue());
+    }
+
+    @Test
+    public void initializeJDBCDatasetProperties() throws java.io.IOException {
+        // given
+        PropertiesDto propertiesDto = new PropertiesDto();
+        propertiesDto.setProperties(getFileAsObjectNode("jdbc_data_set_properties_no_schema.json"));
+        propertiesDto.setDependencies(singletonList(getJdbcDataStoreProperties()));
+        String dataSetDefinitionName = "JDBCDataset";
+
+        // when
+        Response response = given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
+                .accept(APPLICATION_JSON_UTF8_VALUE) //
+                .expect().statusCode(200).log().ifError() //
+                .post("properties/{definitionName}", dataSetDefinitionName);
+
+        // then
+        ObjectNode jdbcProperties = mapper.readerFor(ObjectNode.class).readValue(response.asInputStream());
+        assertNotNull(jdbcProperties.get("jsonSchema"));
+        assertNotNull(jdbcProperties.get("properties"));
+        assertNotNull(jdbcProperties.get("uiSchema"));
+        assertEquals("JDBCDataset", jdbcProperties.get("properties").get("@definitionName").textValue());
+    }
+
+    @Test
     public void getJdbcDefinition() throws java.io.IOException {
         // when
         Response response = given().accept(APPLICATION_JSON_UTF8_VALUE) //

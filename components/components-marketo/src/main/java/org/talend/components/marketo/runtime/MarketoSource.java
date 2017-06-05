@@ -18,12 +18,12 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties.BulkImportTo;
-import org.talend.components.marketo.tmarketocampaign.TMarketoCampaignProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector;
+import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -114,10 +114,19 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
                     }
                     break;
                 case StaticListSelector:
-                    if (p.listParamValue.getValue().isEmpty()) {
-                        vr.setStatus(Result.ERROR);
-                        vr.setMessage(messages.getMessage("error.validation.listparamvalue"));
-                        return vr;
+                    if (ListParam.STATIC_LIST_NAME.equals(p.listParam.getValue())) {
+
+                        if (p.listParamListName.getValue().isEmpty()) {
+                            vr.setStatus(Result.ERROR);
+                            vr.setMessage(messages.getMessage("error.validation.listparamvalue"));
+                            return vr;
+                        }
+                    } else {
+                        if (p.listParamListId.getValue() == null) {
+                            vr.setStatus(Result.ERROR);
+                            vr.setMessage(messages.getMessage("error.validation.listparamvalue"));
+                            return vr;
+                        }
                     }
                     break;
                 case LastUpdateAtSelector:
@@ -271,23 +280,6 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
                 }
             }
         }
-        // Campaign
-        if (properties instanceof TMarketoCampaignProperties) {
-            TMarketoCampaignProperties p = (TMarketoCampaignProperties) properties;
-            switch (p.campaignAction.getValue()) {
-            case get:
-                break;
-            case getById:
-            case schedule:
-            case trigger:
-                if (StringUtils.isEmpty(p.campaignId.getStringValue())) {
-                    vr.setStatus(Result.ERROR);
-                    vr.setMessage(messages.getMessage("error.validation.campaign.byid"));
-                    return vr;
-                }
-                break;
-            }
-        }
         return vr;
     }
 
@@ -298,9 +290,6 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
         }
         if (properties instanceof TMarketoBulkExecProperties) {
             return new MarketoBulkExecReader(adaptor, this, (TMarketoBulkExecProperties) properties);
-        }
-        if (properties instanceof TMarketoCampaignProperties) {
-            return new MarketoCampaignReader(adaptor, this, (TMarketoCampaignProperties) properties);
         }
         return null;
     }

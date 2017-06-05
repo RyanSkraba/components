@@ -111,8 +111,8 @@ public class MarketoListOperationWriterTestIT extends MarketoBaseTestIT {
         record.put(0, "MKTOLISTNAME");
         record.put(1, UNDX_TEST_LIST_SMALL);
         record.put(2, "IDNUM");
-        // record.put(3, 2767254);
-        record.put(3, createdLeads.get(0));
+        record.put(3, 276);
+        // record.put(3, createdLeads.get(0));
         //
         writer = getWriter(props);
         writer.open("test");
@@ -368,5 +368,141 @@ public class MarketoListOperationWriterTestIT extends MarketoBaseTestIT {
         writer.close();
         assertEquals(TEST_NB_LEADS, writer.result.getTotalCount());
         assertEquals(TEST_NB_LEADS, writer.result.getSuccessCount() + writer.result.getRejectCount());
+    }
+
+    @Test
+    public void testTDI38666IsMemberOf() throws Exception {
+        props = getSOAPProperties();
+        props.listOperation.setValue(ListOperation.isMemberOf);
+        props.afterListOperation();
+        //
+        int lead_not_in = 2769023;
+        int lead_is_in = 2767042;
+        int lead_not_exists = 123245;
+        //
+        List<IndexedRecord> records = new ArrayList<>();
+        IndexedRecord record = new GenericData.Record(props.schemaInput.schema.getValue());
+        record.put(0, "MKTOLISTNAME");
+        record.put(1, UNDX_TEST_LIST_SMALL);
+        record.put(2, "IDNUM");
+        record.put(3, lead_is_in);
+        records.add(record);
+        record = new GenericData.Record(props.schemaInput.schema.getValue());
+        record.put(0, "MKTOLISTNAME");
+        record.put(1, UNDX_TEST_LIST_SMALL);
+        record.put(2, "IDNUM");
+        record.put(3, lead_not_in);
+        records.add(record);
+        record = new GenericData.Record(props.schemaInput.schema.getValue());
+        record.put(0, "MKTOLISTNAME");
+        record.put(1, UNDX_TEST_LIST_SMALL);
+        record.put(2, "IDNUM");
+        record.put(3, lead_not_exists);
+        records.add(record);
+        //
+        // Strict is false
+        //
+        props.dieOnError.setValue(false);
+        //
+        // the lead is in the list
+        //
+        LOG.warn("[testTDI38666IsMemberOf] IN the list");
+        writer = getWriter(props);
+        writer.open("test");
+        writer.write(records.get(0));
+        assertEquals(1, writer.result.getTotalCount());
+        assertEquals(1, writer.result.getSuccessCount());
+        assertEquals(0, writer.result.getRejectCount());
+        assertEquals(1, writer.result.getApiCalls());
+        //
+        // the lead is not in the list
+        //
+        LOG.warn("[testTDI38666IsMemberOf] NOT IN the list");
+        writer = getWriter(props);
+        writer.open("test");
+        writer.write(records.get(1));
+        assertEquals(1, writer.result.getTotalCount());
+        assertEquals(1, writer.result.getSuccessCount());
+        assertEquals(0, writer.result.getRejectCount());
+        assertEquals(1, writer.result.getApiCalls());
+        //
+        // the lead doesn't exist
+        //
+        LOG.warn("[testTDI38666IsMemberOf] DOES NOT EXIST");
+        writer = getWriter(props);
+        writer.open("test");
+        writer.write(records.get(2));
+        assertEquals(1, writer.result.getTotalCount());
+        assertEquals(1, writer.result.getSuccessCount());
+        assertEquals(0, writer.result.getRejectCount());
+        assertEquals(1, writer.result.getApiCalls());
+        //
+        // ALL 3
+        //
+        LOG.warn("[testTDI38666IsMemberOf] ALL 3's");
+        writer = getWriter(props);
+        writer.open("test");
+        for (IndexedRecord r : records) {
+            writer.write(r);
+        }
+        LOG.debug("writer.getRejectedWrites() = {}.", writer.getRejectedWrites());
+        assertEquals(3, writer.result.getTotalCount());
+        assertEquals(3, writer.result.getSuccessCount());
+        assertEquals(0, writer.result.getRejectCount());
+        assertEquals(3, writer.result.getApiCalls());
+        //
+        // Strict is true
+        //
+        props.dieOnError.setValue(true);
+        LOG.warn("[testTDI38666IsMemberOf] STRICT MODE");
+        LOG.warn("[testTDI38666IsMemberOf] STRICT MODE");
+        LOG.warn("[testTDI38666IsMemberOf] STRICT MODE");
+        //
+        // the lead is in the list
+        //
+        LOG.warn("[testTDI38666IsMemberOf] IN the list");
+        writer = getWriter(props);
+        writer.open("test");
+        writer.write(records.get(0));
+        assertEquals(1, writer.result.getTotalCount());
+        assertEquals(1, writer.result.getSuccessCount());
+        assertEquals(0, writer.result.getRejectCount());
+        assertEquals(1, writer.result.getApiCalls());
+        //
+        // the lead is not in the list
+        //
+        LOG.warn("[testTDI38666IsMemberOf] NOT IN the list");
+        writer = getWriter(props);
+        writer.open("test");
+        writer.write(records.get(1));
+        assertEquals(1, writer.result.getTotalCount());
+        assertEquals(1, writer.result.getSuccessCount());
+        assertEquals(0, writer.result.getRejectCount());
+        assertEquals(1, writer.result.getApiCalls());
+        //
+        // the lead doesn't exist
+        //
+        LOG.warn("[testTDI38666IsMemberOf] DOES NOT EXIST");
+        writer = getWriter(props);
+        writer.open("test");
+        writer.write(records.get(2));
+        assertEquals(1, writer.result.getTotalCount());
+        assertEquals(1, writer.result.getSuccessCount());
+        assertEquals(0, writer.result.getRejectCount());
+        assertEquals(1, writer.result.getApiCalls());
+        //
+        // ALL 3
+        //
+        LOG.warn("[testTDI38666IsMemberOf] ALL 3's");
+        writer = getWriter(props);
+        writer.open("test");
+        for (IndexedRecord r : records) {
+            writer.write(r);
+        }
+        LOG.debug("writer.getRejectedWrites() = {}.", writer.getRejectedWrites());
+        assertEquals(3, writer.result.getTotalCount());
+        assertEquals(3, writer.result.getSuccessCount());
+        assertEquals(0, writer.result.getRejectCount());
+        assertEquals(3, writer.result.getApiCalls());
     }
 }

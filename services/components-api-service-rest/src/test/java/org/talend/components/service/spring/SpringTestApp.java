@@ -24,7 +24,8 @@ import org.talend.daikon.spring.BndToSpringBeanNameGenerator;
  * Main Spring application to launch the component service for tests purposes.
  */
 @SpringBootApplication
-@ComponentScan(basePackages = "org.talend.components", nameGenerator = BndToSpringBeanNameGenerator.class, //
+@ComponentScan(basePackages = { "org.talend.components",
+        "org.talend.daikon" }, nameGenerator = BndToSpringBeanNameGenerator.class, //
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = aQute.bnd.annotation.component.Component.class), //
         excludeFilters = { //
                 @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*Osgi"),

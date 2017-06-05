@@ -31,6 +31,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.apache.avro.Schema;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -85,6 +86,13 @@ public class OsgiSalesforceEsbTestIT extends SalesforceTestBase {
         return osgiCompService;
     }
 
+    @BeforeClass
+    public static void unsetPaxMavenRepo() {
+        // we set the pax maven repo to some non existing value cause those tested API should not rely on maven but
+        // rather on OSGI only.
+        System.setProperty("org.ops4j.pax.url.mvn.localRepository", "");
+    }
+
     @Test
     public void showbundleContext() throws InvalidSyntaxException {
         System.out.println(" CLASS IS LOCATED :" + this.getClass().getResource(""));
@@ -108,14 +116,14 @@ public class OsgiSalesforceEsbTestIT extends SalesforceTestBase {
     }
 
     @Test
-    public void testGetSchemaNames() throws IOException {
+    public void testStaticGetSchemaNames() throws IOException {
         SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
         List<NamedThing> schemaNames = SalesforceSourceOrSink.getSchemaNames(null, scp);
         assertTrue(schemaNames.size() > 50);
     }
 
     @Test
-    public void testGetSchema() throws IOException {
+    public void testStaticGetSchema() throws IOException {
         SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
         Schema schema = SalesforceSourceOrSink.getSchema(null, scp, EXISTING_MODULE_NAME);
         assertNotNull(schema);
@@ -124,7 +132,7 @@ public class OsgiSalesforceEsbTestIT extends SalesforceTestBase {
     }
 
     @Test
-    public void testGetSchemaFail() throws IOException {
+    public void testStaticGetSchemaFail() throws IOException {
         SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
         try {
             Schema schema = SalesforceSourceOrSink.getSchema(null, scp, "module that does not exist");

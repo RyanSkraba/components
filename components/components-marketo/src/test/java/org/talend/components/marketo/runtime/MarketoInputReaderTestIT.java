@@ -160,7 +160,7 @@ public class MarketoInputReaderTestIT extends MarketoBaseTestIT {
         props.inputOperation.setValue(getMultipleLeads);
         props.leadSelectorSOAP.setValue(StaticListSelector);
         props.listParam.setValue(STATIC_LIST_NAME);
-        props.listParamValue.setValue(UNDX_TEST_LIST_SMALL);
+        props.listParamListName.setValue(UNDX_TEST_LIST_SMALL);
         props.batchSize.setValue(50);
         props.afterInputOperation();
         reader = getReader(props);

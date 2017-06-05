@@ -191,6 +191,16 @@ public class PropertiesControllerImpl implements PropertiesController {
     }
 
     @Override
+    public String initializeProperties(String formName, PropertiesDto propertiesContainer) {
+        Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
+        if (properties == null) {
+            return "{}";
+        }
+        properties.refreshLayout(properties.getPreferredForm(formName));
+        return jsonSerializationHelper.toJson(formName, properties);
+    }
+
+    @Override
     public String getDatasetProperties(String definitionName, String formName, PropertiesDto propertiesContainer) {
         DatastoreDefinition<DatastoreProperties> datastoreDefinition = propertiesHelpers.getDataStoreDefinition(definitionName);
         notNull(datastoreDefinition, "Could not find data store definition of name %s", definitionName);

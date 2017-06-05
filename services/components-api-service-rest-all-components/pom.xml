@@ -48,6 +48,14 @@
 			<version>2.4.7</version>
 		</dependency>
 		<dependency>
+			<!-- only there for running test app in the IDE for now -->
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-maven-repo</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-maven-repo</artifactId>
 			<version>${project.version}</version>
@@ -110,7 +118,6 @@
 	<build>
 		<plugins>
 			<plugin>
-
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>3.0.0</version>
@@ -136,7 +143,7 @@
 									<artifactId>components-maven-repo</artifactId>
 									<classifier>config</classifier>
 									<type>zip</type>
-									<outputDirectory>${project.build.directory}/external-resources</outputDirectory>
+									<outputDirectory>${project.build.directory}/external-resources/config</outputDirectory>
 									<excludes>META-INF/**</excludes>
 								</artifactItem>
 								<!-- import the service scripts and configuration files -->
@@ -273,6 +280,7 @@
 									<goal>build</goal>
 								</goals>
 								<configuration>
+									<autoPull>once</autoPull>
 									<images>
 										<image>
 											<name>${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}</name>

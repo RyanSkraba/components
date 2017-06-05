@@ -118,24 +118,6 @@ public class MarketoOutputWriter extends MarketoWriter {
             processResult(((MarketoRESTClient) client).deleteCustomObjects(properties, recordsToProcess));
             recordsToProcess.clear();
             break;
-        case syncCompanies:
-            processResult(((MarketoRESTClient) client).syncCompanies(properties, recordsToProcess));
-            recordsToProcess.clear();
-            break;
-        case deleteCompanies:
-            processResult(((MarketoRESTClient) client).deleteCompany(properties, recordsToProcess));
-            recordsToProcess.clear();
-            break;
-        case syncOpportunities:
-        case syncOpportunityRoles:
-            processResult(((MarketoRESTClient) client).syncOpportunities(properties, recordsToProcess));
-            recordsToProcess.clear();
-            break;
-        case deleteOpportunities:
-        case deleteOpportunityRoles:
-            processResult(((MarketoRESTClient) client).deleteOpportunities(properties, recordsToProcess));
-            recordsToProcess.clear();
-            break;
         }
     }
 

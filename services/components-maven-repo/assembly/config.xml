@@ -10,7 +10,7 @@
         <!-- configuration files -->
         <fileSet>
             <directory>${project.basedir}/config</directory>
-            <outputDirectory>${file.separator}/config</outputDirectory>
+            <outputDirectory>${file.separator}</outputDirectory>
             <includes>
                 <include>*.*</include>
             </includes>
@@ -18,7 +18,7 @@
         <!-- component list file -->
         <fileSet>
             <directory>${project.build.directory}/config</directory>
-            <outputDirectory>${file.separator}/config</outputDirectory>
+            <outputDirectory>${file.separator}</outputDirectory>
             <includes>
                 <include>*.*</include>
             </includes>

@@ -117,4 +117,9 @@ public class NetSuiteOutputDefinitionTest {
     public void testRejectAfterCloseFlag() {
         assertFalse(definition.isRejectAfterClose());
     }
+
+    @Test
+    public void testNotStartable() {
+        assertFalse(definition.isStartable());
+    }
 }

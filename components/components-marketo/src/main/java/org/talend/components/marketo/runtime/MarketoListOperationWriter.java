@@ -157,6 +157,7 @@ public class MarketoListOperationWriter extends MarketoWriter {
         listOpeParms = new ListOperationParameters();
         listOpeParms.setApiMode(api);
         listOpeParms.setOperation(operation.name());
+        listOpeParms.setStrict(dieOnError);
         if (use_soap_api) {
             listOpeParms.setListKeyType(record.get(inputSchema.getField(FIELD_LIST_KEY_TYPE).pos()).toString());
             listOpeParms.setListKeyValue(record.get(inputSchema.getField(FIELD_LIST_KEY_VALUE).pos()).toString());
@@ -224,7 +225,7 @@ public class MarketoListOperationWriter extends MarketoWriter {
         }
         for (SyncStatus status : mktoResult.getRecords()) {
             if (Arrays.asList("true", "added", "removed", "notmemberof", "memberof").contains(status.getStatus().toLowerCase())
-                    || (properties.isApiSOAP() && isMemberOf.equals(operation))) {
+                    || (properties.isApiSOAP() && !addTo.equals(operation))) {
                 handleSuccess(fillRecord(status, flowSchema));
             } else {
                 if (dieOnError) {

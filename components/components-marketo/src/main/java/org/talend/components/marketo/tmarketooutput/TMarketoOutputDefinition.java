@@ -35,6 +35,11 @@ public class TMarketoOutputDefinition extends MarketoComponentDefinition {
     }
 
     @Override
+    public boolean isStartable() {
+        return false;
+    }
+
+    @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TMarketoOutputProperties.class;
     }

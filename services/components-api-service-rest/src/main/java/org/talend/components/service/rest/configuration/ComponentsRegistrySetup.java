@@ -14,16 +14,20 @@ package org.talend.components.service.rest.configuration;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Properties;
 import java.util.regex.Pattern;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.common.ComponentServiceImpl;
@@ -36,27 +40,25 @@ import org.talend.daikon.runtime.RuntimeUtil;
  * Configuration that deals with ComponentRegistry setup.
  */
 @Configuration
-@PropertySource(value = "classpath:components.list", name = ComponentsRegistrySetup.TCOMP_COMPONENTS_LIST_RESOURCE_NAME, ignoreResourceNotFound = true)
+@AutoConfigureAfter({ DefaultComponentConfiguration.class })
 public class ComponentsRegistrySetup {
 
     public static final String TCOMP_COMPONENTS_LIST_PROP = "tcomp.components.list";
 
-    public static final String TCOMP_COMPONENTS_LIST_RESOURCE_NAME = "tcomp.components.list.properties";
+    public static final String TCOMP_COMPONENTS_LIST_RESOURCE_PATH = "components.list";
 
     /** This class' logger. */
     private static final Logger LOGGER = getLogger(ComponentsRegistrySetup.class);
-
-    private static final String List = null;
-
-    @Autowired
-    private ApplicationContext context;
-
-    private DefinitionRegistry registry;
 
     @Autowired
     ConfigurableEnvironment env;
 
     private DefinitionRegistry definitionRegistry;
+
+    @PostConstruct
+    public void init() {
+        //
+    }
 
     @Bean
     public ComponentService getComponentService() {
@@ -78,16 +80,22 @@ public class ComponentsRegistrySetup {
     DefinitionRegistry createDefinitionRegistry() {
         RuntimeUtil.registerMavenUrlHandler();
         // read the list of components and register them
-        org.springframework.core.env.PropertySource<?> propertySource = env.getPropertySources()
-                .get(TCOMP_COMPONENTS_LIST_RESOURCE_NAME);
-        if (propertySource != null) {
-            LOGGER.info("Component list properties found");
-            String compListStr = (String) propertySource.getProperty(TCOMP_COMPONENTS_LIST_PROP);
-            if (compListStr != null) {
-                definitionRegistry = ServiceSpiFactory.createDefinitionRegistry(extractComponentsUrls(compListStr));
-            } // else return the default registry
-        } else {// else return the default registry
-            LOGGER.warn("Component list properties not found");
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(TCOMP_COMPONENTS_LIST_RESOURCE_PATH)) {
+            if (is != null) {
+                LOGGER.info("Component list file found");
+                Properties properties = new Properties();
+                properties.load(is);
+                String compListStr = (String) properties.get(TCOMP_COMPONENTS_LIST_PROP);
+                if (compListStr != null) {
+                    return ServiceSpiFactory.createDefinitionRegistry(extractComponentsUrls(compListStr));
+                } else {// else no definition file found.
+                    LOGGER.warn("Component list properties not found");
+                }
+            } else {
+                LOGGER.warn("Component list file not found in the application classpath");
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to load the component liste file", e);
         }
         // using the spi registry
         return ServiceSpiFactory.getDefinitionRegistry();
