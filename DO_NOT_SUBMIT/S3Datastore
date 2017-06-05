@@ -4,7 +4,7 @@
     "type": "object",
     "properties": {
       "specifyCredentials": {
-        "title": "Specify aws credentials",
+        "title": "Specify AWS credentials",
         "type": "boolean"
       },
       "accessKey": {
@@ -15,7 +15,10 @@
         "title": "Secret key",
         "type": "string"
       }
-    }
+    },
+    "required": [
+      "specifyCredentials"
+    ]
   },
   "properties": {
     "specifyCredentials": true,
@@ -26,6 +29,9 @@
       "ui:trigger": [
         "after"
       ]
+    },
+    "secretKey": {
+      "ui:widget": "password"
     },
     "ui:order": [
       "specifyCredentials",

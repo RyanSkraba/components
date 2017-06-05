@@ -25,6 +25,7 @@ import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -93,7 +94,7 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
         // S3
         mainForm.addRow(region);
         mainForm.addRow(unknownRegion);
-        mainForm.addRow(bucket);
+        mainForm.addRow(Widget.widget(bucket).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
         mainForm.addRow(object);
         mainForm.addRow(encryptDataInMotion);
         mainForm.addRow(kmsForDataInMotion);

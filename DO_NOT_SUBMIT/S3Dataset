@@ -93,9 +93,9 @@
         "title": "Record Delimiter",
         "type": "string",
         "enumNames": [
-          "LF(\"\\n\")",
-          "CR(\"\\r\")",
-          "CRLF(\"\\r\\n\")",
+          "LF",
+          "CR",
+          "CRLF",
           "Other"
         ],
         "enum": [
@@ -133,6 +133,10 @@
       }
     },
     "required": [
+      "region",
+      "unknownRegion",
+      "bucket",
+      "object",
       "format"
     ]
   },
@@ -156,6 +160,9 @@
     },
     "unknownRegion": {
       "ui:widget": "hidden"
+    },
+    "bucket": {
+      "ui:widget": "datalist"
     },
     "encryptDataInMotion": {
       "ui:trigger": [
