@@ -51,6 +51,8 @@ public class MarketoOutputWriter extends MarketoWriter {
 
     private OutputOperation operation;
 
+    private Schema dynamicSchema;
+
     private static final Logger LOG = LoggerFactory.getLogger(MarketoOutputWriter.class);
 
     public MarketoOutputWriter(WriteOperation writeOperation, RuntimeContainer runtime) {
@@ -188,7 +190,10 @@ public class MarketoOutputWriter extends MarketoWriter {
         Schema currentSchema = schema;
         if (AvroUtils.isIncludeAllFields(schema)) {
             isDynamic = true;
-            currentSchema = record.getSchema();
+            if (dynamicSchema == null) {
+                dynamicSchema = MarketoSourceOrSink.mergeDynamicSchemas(record.getSchema(), schema);
+            }
+            currentSchema = dynamicSchema;
         }
         IndexedRecord outRecord = new Record(currentSchema);
         for (Field f : currentSchema.getFields()) {

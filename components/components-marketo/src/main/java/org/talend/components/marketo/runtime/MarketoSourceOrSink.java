@@ -31,6 +31,8 @@ import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.Custo
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
@@ -309,6 +311,54 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
             LOG.debug("ClientService : {}", client);
         }
         return client;
+    }
+
+    public static Field generateNewField(Field origin) {
+        Schema.Field field = new Schema.Field(origin.name(), origin.schema(), origin.doc(), origin.defaultVal(), origin.order());
+        field.getObjectProps().putAll(origin.getObjectProps());
+        for (Map.Entry<String, Object> entry : origin.getObjectProps().entrySet()) {
+            field.addProp(entry.getKey(), entry.getValue());
+        }
+        return field;
+    }
+
+    public static Schema mergeDynamicSchemas(Schema data, Schema flow) {
+        // TODO when https://jira.talendforge.org/browse/TDKN-154 will be resolved, use the new property here!
+        String dynamicFieldProperty = flow.getProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION);
+        int dynamicFieldPosition = -1;
+        if (AvroUtils.isIncludeAllFields(flow) && dynamicFieldProperty != null) {
+            dynamicFieldPosition = Integer.valueOf(dynamicFieldProperty);
+        }
+        List<Field> mergeFields = new ArrayList<>();
+        for (Field f : flow.getFields()) {
+            if (f.pos() == dynamicFieldPosition) {
+                for (Field cf : data.getFields()) {
+                    // don't add field in that exists in flow schema
+                    if (flow.getField(cf.name()) == null) {
+                        mergeFields.add(generateNewField(cf));
+                    }
+                }
+                // add field from flow at after dynamic index if exists
+                if (flow.getFields().get(f.pos()) != null) {
+                    mergeFields.add(generateNewField(f));
+                }
+            } else {
+                mergeFields.add(generateNewField(f));
+            }
+        }
+        // dynamic column is at the end
+        if (dynamicFieldPosition >= flow.getFields().size()) {
+            for (Field cf : data.getFields()) {
+                // don't add field in that exists in flow schema
+                if (flow.getField(cf.name()) == null) {
+                    mergeFields.add(generateNewField(cf));
+                }
+            }
+        }
+        Schema merged = Schema.createRecord("merged", "", "0", false);
+        merged.setFields(mergeFields);
+
+        return merged;
     }
 
 }
