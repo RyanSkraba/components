@@ -337,9 +337,9 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         if (isOutputConnection) {
-            return Collections.singleton(MAIN_CONNECTOR);
+            return Collections.singleton(FLOW_CONNECTOR);
         } else {
-            return Collections.emptySet();
+            return Collections.singleton(MAIN_CONNECTOR);
         }
     }
 
@@ -386,6 +386,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
 
             @Override
             public void afterSchema() {
+                schemaFlow.schema.setValue(schemaInput.schema.getValue());
                 beforeMappingInput();
             }
         });
@@ -764,6 +765,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
             }
         }
         schemaInput.schema.setValue(s);
+        schemaFlow.schema.setValue(s);
         beforeMappingInput();
     }
 

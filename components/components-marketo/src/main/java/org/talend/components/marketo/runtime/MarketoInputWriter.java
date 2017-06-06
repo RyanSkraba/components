@@ -13,19 +13,25 @@
 package org.talend.components.marketo.runtime;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.common.runtime.GenericAvroRegistry;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
-import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.daikon.avro.AvroUtils;
 
 public class MarketoInputWriter extends MarketoWriter {
 
     TMarketoInputProperties properties;
+
+    Boolean isDynamic = Boolean.FALSE;
 
     private transient static final Logger LOG = LoggerFactory.getLogger(MarketoInputWriter.class);
 
@@ -33,12 +39,42 @@ public class MarketoInputWriter extends MarketoWriter {
         super(writeOperation, container);
     }
 
+    public void adaptSchemaToDynamic() throws IOException {
+        Schema design = this.properties.schemaInput.schema.getValue();
+        if (!isDynamic) {
+            return;
+        }
+        try {
+            Schema runtimeSchema;
+            runtimeSchema = sink.getDynamicSchema("", design);
+            // preserve mappings to re-apply them after
+            Map<String, String> mappings = properties.mappingInput.getNameMappingsForMarketo();
+            List<String> columnNames = new ArrayList<>();
+            List<String> mktoNames = new ArrayList<>();
+            for (Field f : runtimeSchema.getFields()) {
+                columnNames.add(f.name());
+                if (mappings.get(f.name()) != null) {
+                    mktoNames.add(mappings.get(f.name()));
+                } else {
+                    mktoNames.add("");
+                }
+            }
+            properties.mappingInput.columnName.setValue(columnNames);
+            properties.mappingInput.marketoColumnName.setValue(mktoNames);
+            properties.schemaInput.schema.setValue(runtimeSchema);
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+            throw e;
+        }
+    }
+
     @Override
     public void open(String uId) throws IOException {
         super.open(uId);
         properties = (TMarketoInputProperties) sink.properties;
         flowSchema = properties.schemaFlow.schema.getValue();
-
+        dieOnError = properties.dieOnError.getValue();
+        isDynamic = AvroUtils.isIncludeAllFields(this.properties.schemaInput.schema.getValue());
     }
 
     @Override
@@ -46,33 +82,34 @@ public class MarketoInputWriter extends MarketoWriter {
         if (object == null) {
             return;
         }
-
-        if (null == factory) {
-            factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) GenericAvroRegistry.get()
-                    .createIndexedRecordConverter(object.getClass());
-        }
-        inputRecord = factory.convertToAvro(object);
+        successfulWrites.clear();
+        //
+        inputRecord = (IndexedRecord) object;
         result.totalCount++;
         result.apiCalls++;
         // This for dynamic which would get schema from the first record
         if (inputSchema == null) {
-            inputSchema = ((IndexedRecord) object).getSchema();
+            inputSchema = inputRecord.getSchema();
+            if (isDynamic) {
+                adaptSchemaToDynamic();
+            }
         }
         //
         Object lkv = inputRecord.get(inputSchema.getField(properties.leadKeyValues.getValue()).pos());
-        LOG.debug("lkv = {}.", lkv);
         // switch between column name in design and column value for runtime
         properties.leadKeyValues.setValue(lkv.toString());
-
         MarketoRecordResult result = client.getMultipleLeads(properties, null);
         if (!result.isSuccess()) {
+            if (dieOnError) {
+                throw new IOException(result.getErrorsString());
+            }
             LOG.error(result.getErrors().toString());
         }
-        IndexedRecord record = result.getRecords().get(0);
-        successfulWrites.clear();
-        if (record != null) {
-            this.result.successCount++;
-            successfulWrites.add(record);
+        for (IndexedRecord record : result.getRecords()) {
+            if (record != null) {
+                this.result.successCount++;
+                successfulWrites.add(record);
+            }
         }
     }
 }

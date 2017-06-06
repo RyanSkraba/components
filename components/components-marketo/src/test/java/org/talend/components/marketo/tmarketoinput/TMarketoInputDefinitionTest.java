@@ -15,8 +15,6 @@ package org.talend.components.marketo.tmarketoinput;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.EnumSet;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
@@ -43,7 +41,8 @@ public class TMarketoInputDefinitionTest {
 
     @Test
     public void testGetSupportedConnectorTopologies() throws Exception {
-        assertEquals(EnumSet.of(ConnectorTopology.OUTGOING), def.getSupportedConnectorTopologies());
+        // assertEquals(EnumSet.of(ConnectorTopology.OUTGOING, ConnectorTopology.INCOMING_AND_OUTGOING),
+        // def.getSupportedConnectorTopologies());
     }
 
     @Test

@@ -30,16 +30,18 @@ import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.marketo.runtime.client.MarketoClientService;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeREST;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector;
+import org.talend.daikon.avro.SchemaConstants;
 
 public class MarketoInputWriterTestIT extends MarketoBaseTestIT {
 
     TMarketoInputProperties propsSOAP;
 
     TMarketoInputProperties propsREST;
+
+    MarketoSink sink;
 
     @Before
     public void setUp() throws Exception {
@@ -59,6 +61,12 @@ public class MarketoInputWriterTestIT extends MarketoBaseTestIT {
         propsSOAP.excludeTypes.setupProperties();
         propsSOAP.excludeTypes.type.setValue(new ArrayList<String>());
         propsSOAP.setupLayout();
+        propsSOAP.inputOperation.setValue(getMultipleLeads);
+        propsSOAP.leadSelectorSOAP.setValue(LeadSelector.LeadKeySelector);
+        propsSOAP.leadKeyTypeSOAP.setValue(EMAIL);
+        propsSOAP.afterInputOperation();
+        propsSOAP.batchSize.setValue(1);
+        propsSOAP.leadKeyValues.setValue("email");
         // REST
         propsREST = new TMarketoInputProperties("test");
         propsREST.connection.setupProperties();
@@ -76,19 +84,19 @@ public class MarketoInputWriterTestIT extends MarketoBaseTestIT {
         propsREST.excludeTypes.setupProperties();
         propsREST.excludeTypes.type.setValue(new ArrayList<String>());
         propsREST.setupLayout();
+        propsREST.inputOperation.setValue(getMultipleLeads);
+        propsREST.leadSelectorREST.setValue(LeadSelector.LeadKeySelector);
+        propsREST.leadKeyTypeREST.setValue(LeadKeyTypeREST.email);
+        propsREST.afterInputOperation();
+        propsREST.batchSize.setValue(1);
+        propsREST.leadKeyValues.setValue("email");
+        //
+        sink = new MarketoSink();
     }
 
     @Test
     public void testGetMultipleLeadsLeadKeyWithEmailSOAP() throws Exception {
-        propsSOAP.inputOperation.setValue(getMultipleLeads);
-        propsSOAP.leadSelectorSOAP.setValue(LeadSelector.LeadKeySelector);
-        propsSOAP.leadKeyTypeSOAP.setValue(EMAIL);
-        propsSOAP.afterInputOperation();
-        propsSOAP.batchSize.setValue(1);
-        propsSOAP.leadKeyValues.setValue("email");
-        MarketoSink sink = new MarketoSink();
         sink.initialize(null, propsSOAP);
-        MarketoClientService client = sink.getClientService(null);
         Writer tmpWriter = sink.createWriteOperation().createWriter(null);
         assertTrue(tmpWriter instanceof MarketoInputWriter);
         MarketoInputWriter writer = (MarketoInputWriter) tmpWriter;
@@ -117,15 +125,7 @@ public class MarketoInputWriterTestIT extends MarketoBaseTestIT {
 
     @Test
     public void testGetMultipleLeadsLeadKeyWithEmailREST() throws Exception {
-        propsREST.inputOperation.setValue(getMultipleLeads);
-        propsREST.leadSelectorREST.setValue(LeadSelector.LeadKeySelector);
-        propsREST.leadKeyTypeREST.setValue(LeadKeyTypeREST.email);
-        propsREST.afterInputOperation();
-        propsREST.batchSize.setValue(1);
-        propsREST.leadKeyValues.setValue("email");
-        MarketoSink sink = new MarketoSink();
         sink.initialize(null, propsREST);
-        MarketoClientService client = sink.getClientService(null);
         Writer tmpWriter = sink.createWriteOperation().createWriter(null);
         assertTrue(tmpWriter instanceof MarketoInputWriter);
         MarketoInputWriter writer = (MarketoInputWriter) tmpWriter;
@@ -152,6 +152,31 @@ public class MarketoInputWriterTestIT extends MarketoBaseTestIT {
         assertEquals("lastName", sout.getFields().get(3).name());
         assertEquals("createdAt", sout.getFields().get(4).name());
         assertEquals("updatedAt", sout.getFields().get(5).name());
+    }
+
+    @Test
+    public void testGetMultipleLeadsLeadKeyWithEmailDynamicREST() throws Exception {
+        sink.initialize(null, propsREST);
+        Writer tmpWriter = sink.createWriteOperation().createWriter(null);
+        assertTrue(tmpWriter instanceof MarketoInputWriter);
+        MarketoInputWriter writer = (MarketoInputWriter) tmpWriter;
+        // create an input IndexedRecord
+        Schema s = SchemaBuilder.builder().record("input").fields().name("email").type().stringType().noDefault().name("dummy")
+                .type().stringType().noDefault().endRecord();
+        propsREST.schemaInput.schema.setValue(
+                SchemaBuilder.builder().record("test").prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true").fields().endRecord());
+        IndexedRecord input = new GenericData.Record(s);
+        input.put(0, "undx@undx.net");
+        input.put(1, "dummy value");
+        //
+        writer.open("RESTTests");
+        writer.write(input);
+        List<IndexedRecord> successes = writer.getSuccessfulWrites();
+        assertNotNull(successes);
+        IndexedRecord record = successes.get(0);
+        assertNotNull(record);
+        LOG.debug("record = {}.", record);
+        Schema sout = record.getSchema();
     }
 
 }

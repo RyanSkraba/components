@@ -409,7 +409,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     @Test
     public void testGetAllSchemaPropertiesConnectors() {
         assertEquals(Collections.singleton(props.MAIN_CONNECTOR), props.getAllSchemaPropertiesConnectors(true));
-        assertEquals(Collections.emptySet(), props.getAllSchemaPropertiesConnectors(false));
+        assertEquals(Collections.singleton(props.FLOW_CONNECTOR), props.getAllSchemaPropertiesConnectors(false));
     }
 
     @Test

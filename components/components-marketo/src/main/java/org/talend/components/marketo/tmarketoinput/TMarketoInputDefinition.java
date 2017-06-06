@@ -36,7 +36,7 @@ public class TMarketoInputDefinition extends MarketoComponentDefinition {
 
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-        return EnumSet.of(ConnectorTopology.OUTGOING);
+        return EnumSet.of(ConnectorTopology.OUTGOING, ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING);
     }
 
     @Override
@@ -44,6 +44,11 @@ public class TMarketoInputDefinition extends MarketoComponentDefinition {
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
         assertConnectorTopologyCompatibility(connectorTopology);
-        return getCommonRuntimeInfo(this.getClass().getClassLoader(), RUNTIME_SOURCE_CLASS);
+        if (ConnectorTopology.INCOMING.equals(connectorTopology)
+                || ConnectorTopology.INCOMING_AND_OUTGOING.equals(connectorTopology)) {
+            return getCommonRuntimeInfo(this.getClass().getClassLoader(), RUNTIME_SINK_CLASS);
+        } else {
+            return getCommonRuntimeInfo(this.getClass().getClassLoader(), RUNTIME_SOURCE_CLASS);
+        }
     }
 }
