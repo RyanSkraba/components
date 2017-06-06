@@ -127,12 +127,12 @@ public class SoqlQueryBuilderTest {
      */
     @Test
     public void testBuildSoqlQueryWithCustomTable() {
-        String expected = "\"SELECT Id, SLAExpirationDate__c FROM talendCustom__c\"";
+        String expected = "\"SELECT Id, SLAExpirationDate__c FROM talend_custom__c\"";
 
         Schema schema = SchemaBuilder.record("Result").fields().requiredString("Id").requiredString("SLAExpirationDate__c")
                 .endRecord();
 
-        String queryFromBuilder = new SoqlQueryBuilder(schema, "talendCustom__c").buildSoqlQuery();
+        String queryFromBuilder = new SoqlQueryBuilder(schema, "talend_custom__c").buildSoqlQuery();
 
         Assert.assertEquals(expected, queryFromBuilder);
     }
@@ -144,16 +144,16 @@ public class SoqlQueryBuilderTest {
     @Test
     public void testBuildSoqlQueryWithCustomTablesChildToParent() {
         String expected =
-                "\"SELECT talendCustom__c.Name, talendCustom__c.customName__c, talendContact__c.Name, talendContact__c.Account.Name FROM talendCustom__c\"";
+                "\"SELECT talend_custom__c.Name, talend_custom__c.custom_name__c, talend_contact__r.Name, talend_contact__r.Account.Name FROM talend_custom__c\"";
 
         Schema schema = SchemaBuilder.record("Result").fields()
-                .requiredString("talendCustom__c_Name")
-                .requiredString("talendCustom__c_customName__c")
-                .requiredString("talendContact__c_Name")
-                .requiredString("talendContact__c_Account_Name")
+                .requiredString("talend_custom__c_Name")
+                .requiredString("talend_custom__c_custom_name__c")
+                .requiredString("talend_contact__r_Name")
+                .requiredString("talend_contact__r_Account_Name")
                 .endRecord();
 
-        String queryFromBuilder = new SoqlQueryBuilder(schema, "talendCustom__c").buildSoqlQuery();
+        String queryFromBuilder = new SoqlQueryBuilder(schema, "talend_custom__c").buildSoqlQuery();
 
         Assert.assertEquals(expected, queryFromBuilder);
     }
@@ -164,18 +164,18 @@ public class SoqlQueryBuilderTest {
      */
     @Test
     public void testBuildSoqlQueryWithCustomTablesParentToChild() {
-        String expected = "\"SELECT Name, Contact.title__c, (SELECT custom.lastName, custom.name__c, talend.account__c.custom.lastName__c, talend.account__c.Age FROM talend.custom__r) FROM contact__c\"";
+        String expected = "\"SELECT Name, (SELECT custom.lastName, custom_name__c, talend_account__c.custom_lastName__c, talend_account__c.Age FROM talend_custom__r), contact_title__c FROM talend_contact__c\"";
 
         Schema schema = SchemaBuilder.record("Result").fields()
                 .requiredString("Name")
                 .requiredString("talend_custom__r_records_custom_lastName")
-                .requiredString("Contact_title__c")
+                .requiredString("contact_title__c")
                 .requiredString("talend_custom__r_records_custom_name__c")
                 .requiredString("talend_custom__r_records_talend_account__c_custom_lastName__c")
                 .requiredString("talend_custom__r_records_talend_account__c_Age")
                 .endRecord();
 
-        String queryFromBuilder = new SoqlQueryBuilder(schema, "contact__c").buildSoqlQuery();
+        String queryFromBuilder = new SoqlQueryBuilder(schema, "talend_contact__c").buildSoqlQuery();
 
         Assert.assertEquals(expected, queryFromBuilder);
     }
@@ -186,16 +186,16 @@ public class SoqlQueryBuilderTest {
      */
     @Test
     public void testBuildSoqlQueryWithComplexChildTableNameParentToChild() {
-        String expected = "\"SELECT Name, Contact.title__c, (SELECT custom.lastName, talend.account__c.Age FROM talend.contact__c.Persons) FROM contact__c\"";
+        String expected = "\"SELECT Name, (SELECT custom.lastName, talend_account__c.Age FROM talend_contact__c.Persons), contact_title__c FROM talend_contact__c\"";
 
         Schema schema = SchemaBuilder.record("Result").fields()
                 .requiredString("Name")
                 .requiredString("talend_contact__c_Persons_records_custom_lastName")
-                .requiredString("Contact_title__c")
+                .requiredString("contact_title__c")
                 .requiredString("talend_contact__c_Persons_records_talend_account__c_Age")
                 .endRecord();
 
-        String queryFromBuilder = new SoqlQueryBuilder(schema, "contact__c").buildSoqlQuery();
+        String queryFromBuilder = new SoqlQueryBuilder(schema, "talend_contact__c").buildSoqlQuery();
 
         Assert.assertEquals(expected, queryFromBuilder);
     }

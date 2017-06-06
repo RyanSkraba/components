@@ -164,8 +164,8 @@ public class TSalesforceInputPropertiesIT {
         String expectedQuery = "\"SELECT Id, Name FROM Module\"";
 
         Schema schema = SchemaBuilder.record("Result").fields()
-                .requiredString(field1)
-                .requiredString(field2)
+                .name(field1).type().stringType().noDefault()
+                .name(field2).type().stringType().noDefault()
                 .endRecord();
 
         SalesforceModuleProperties salesforceModuleProperties = new SalesforceModuleProperties("properties");
@@ -187,60 +187,14 @@ public class TSalesforceInputPropertiesIT {
         Assert.assertNull(expectedMessage);
     }
 
-    @Test
-    public void testValidateGuessQueryComplexCustomFields() {
-        String expectedQuery = "\"SELECT Id, Name, (SELECT Contact.customField__c, CreatedBy.Name FROM Contacts) FROM Account\"";
-
-        Schema schema = SchemaBuilder.record("Result").fields()
-                .requiredString("Id")
-                .requiredString("Name")
-                .requiredString("Contacts_records_Contact_customField__c")
-                .requiredString("Contacts_records_CreatedBy_Name")
-                .endRecord();
-
-        SalesforceModuleProperties salesforceModuleProperties = new SalesforceModuleProperties("properties");
-        salesforceModuleProperties.moduleName.setValue("Account");
-        salesforceModuleProperties.main.schema.setValue(schema);
-
-        properties.module = salesforceModuleProperties;
-
-        properties.validateGuessQuery();
-
-        Assert.assertEquals(expectedQuery, properties.query.getValue());
-    }
-
-    @Test
-    public void testValidateGuessQueryMultipleParentToChildRelation() {
-        String expectedQuery = "\"SELECT Id, Name, (SELECT LastName, FirstName FROM Contacts), (SELECT customTable__c.Id, customTable__c.Name FROM customTable__r), (SELECT Contact.Account.CreatedBy.Name, Note.Id FROM Account.Notes) FROM Account\"";
-
-        Schema schema = SchemaBuilder.record("Result").fields()
-                .requiredString("Id")
-                .requiredString("Name")
-                .requiredString("Contacts_records_LastName")
-                .requiredString("Contacts_records_FirstName")
-                .requiredString("customTable__r_records_customTable__c_Id")
-                .requiredString("customTable__r_records_customTable__c_Name")
-                .requiredString("Account_Notes_records_Contact_Account_CreatedBy_Name")
-                .requiredString("Account_Notes_records_Note_Id")
-                .endRecord();
-
-        SalesforceModuleProperties salesforceModuleProperties = new SalesforceModuleProperties("properties");
-        salesforceModuleProperties.moduleName.setValue("Account");
-        salesforceModuleProperties.main.schema.setValue(schema);
-
-        properties.module = salesforceModuleProperties;
-
-        properties.validateGuessQuery();
-
-        Assert.assertEquals(expectedQuery, properties.query.getValue());
-    }
-
     /**
      * Checks {@link TSalesforceInputProperties#guessQuery} returns empty {@link java.lang.String}
      * when schema does not include any fields
      */
     @Test
     public void testValidateGuessQueryEmptySchema() throws Exception {
+        final String field1 = "Id";
+        final String field2 = "Name";
         final String moduleName = "Module";
 
         String expectedQuery = "";
