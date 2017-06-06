@@ -205,7 +205,7 @@ public abstract class NetSuiteMockTestBase extends AbstractNetSuiteTestBase {
     }
 
     protected class RecordComposer<T extends Record> extends SimpleObjectComposer<T> {
-        Map<String, CustomFieldSpec<RecordType, CustomizationFieldType>> customFieldSpecs;
+        protected Map<String, CustomFieldSpec<RecordType, CustomizationFieldType>> customFieldSpecs;
 
         public RecordComposer(Class<T> clazz,
                 Map<String, CustomFieldSpec<RecordType, CustomizationFieldType>> customFieldSpecs) {

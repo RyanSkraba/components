@@ -104,7 +104,7 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
             Collections.sort(fieldDescList, FieldDescComparator.INSTANCE);
 
             Schema schema = inferSchemaForType(typeDesc.getTypeName(), fieldDescList);
-            augmentSchemaWithCustomMetaData(schema, recordTypeInfo, fieldDescList);
+            augmentSchemaWithCustomMetaData(metaDataSource, schema, recordTypeInfo, fieldDescList);
 
             return schema;
         } catch (NetSuiteException e) {
@@ -174,7 +174,7 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
             Collections.sort(fieldDescList, FieldDescComparator.INSTANCE);
 
             Schema schema = inferSchemaForType(typeDesc.getTypeName(), fieldDescList);
-            augmentSchemaWithCustomMetaData(schema, recordTypeInfo, typeDesc.getFields());
+            augmentSchemaWithCustomMetaData(metaDataSource, schema, recordTypeInfo, typeDesc.getFields());
 
             return schema;
         } catch (NetSuiteException e) {
@@ -200,7 +200,7 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
             Collections.sort(fieldDescList, FieldDescComparator.INSTANCE);
 
             Schema schema = inferSchemaForType(typeDesc.getTypeName(), fieldDescList);
-            augmentSchemaWithCustomMetaData(schema, referencedRecordTypeInfo, null);
+            augmentSchemaWithCustomMetaData(metaDataSource, schema, referencedRecordTypeInfo, null);
 
             return schema;
         } catch (NetSuiteException e) {
@@ -482,11 +482,12 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
     /**
      * Augment a given <code>Schema</code> with customization related meta data.
      *
+     * @param metaDataSource source of meta data
      * @param schema schema to be augmented
      * @param recordTypeInfo information about record type to be used for augmentation
      * @param fieldDescList list of field descriptors to be used for augmentation
      */
-    protected void augmentSchemaWithCustomMetaData(final Schema schema,
+    public static void augmentSchemaWithCustomMetaData(final MetaDataSource metaDataSource, final Schema schema,
             final RecordTypeInfo recordTypeInfo, final Collection<FieldDesc> fieldDescList) {
 
         if (recordTypeInfo == null) {

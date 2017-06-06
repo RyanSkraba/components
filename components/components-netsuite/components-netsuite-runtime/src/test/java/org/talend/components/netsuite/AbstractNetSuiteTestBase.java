@@ -13,6 +13,7 @@
 
 package org.talend.components.netsuite;
 
+import static org.talend.components.netsuite.client.model.beans.Beans.getProperty;
 import static org.talend.components.netsuite.client.model.beans.Beans.setProperty;
 import static org.talend.components.netsuite.client.model.beans.Beans.setSimpleProperty;
 
@@ -29,6 +30,10 @@ import org.apache.avro.Schema;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.netsuite.client.MetaDataSource;
+import org.talend.components.netsuite.client.model.CustomFieldDesc;
+import org.talend.components.netsuite.client.model.FieldDesc;
+import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.client.model.beans.BeanInfo;
 import org.talend.components.netsuite.client.model.beans.Beans;
 import org.talend.components.netsuite.client.model.beans.PropertyInfo;
@@ -88,7 +93,7 @@ public abstract class AbstractNetSuiteTestBase {
         return null;
     }
 
-    protected static <T> List<T> makeNsObjects(SimpleObjectComposer<T> composer, int count) throws Exception {
+    protected static <T> List<T> makeNsObjects(ObjectComposer<T> composer, int count) throws Exception {
         List<T> recordList = new ArrayList<>();
         while (count > 0) {
             T record = composer.composeObject();
@@ -192,6 +197,54 @@ public abstract class AbstractNetSuiteTestBase {
             T nsObject = AbstractNetSuiteTestBase.composeObject(clazz);
             setSimpleProperty(nsObject, "type", null);
             return nsObject;
+        }
+    }
+
+    public static class SimpleRecordComposer<T> implements ObjectComposer<T> {
+        protected MetaDataSource metaDataSource;
+        protected TypeDesc typeDesc;
+
+        public SimpleRecordComposer(MetaDataSource metaDataSource, TypeDesc typeDesc) {
+            this.metaDataSource = metaDataSource;
+            this.typeDesc = typeDesc;
+        }
+
+        @Override
+        public T composeObject() throws Exception {
+            T record = (T) AbstractNetSuiteTestBase.composeObject(typeDesc.getTypeClass());
+
+            List<Object> customFields = new ArrayList<>();
+            for (FieldDesc fieldDesc : typeDesc.getFields()) {
+                if (fieldDesc instanceof CustomFieldDesc) {
+                    CustomFieldDesc customFieldDesc = fieldDesc.asCustom();
+                    Object customField = metaDataSource.getBasicMetaData().createInstance(
+                            customFieldDesc.getCustomFieldType().getTypeName());
+
+                    Beans.setProperty(customField, "scriptId",
+                            customFieldDesc.getCustomizationRef().getScriptId());
+                    Beans.setProperty(customField, "internalId",
+                            customFieldDesc.getCustomizationRef().getInternalId());
+
+                    BeanInfo beanInfo = Beans.getBeanInfo(customField.getClass());
+                    PropertyInfo valuePropInfo = beanInfo.getProperty("value");
+
+                    Object value = composeValue(valuePropInfo.getWriteType());
+                    if (value != null) {
+                        Beans.setProperty(customField, "value", value);
+                    }
+
+                    customFields.add(customField);
+                }
+            }
+
+            if (!customFields.isEmpty()) {
+                Beans.setProperty(record, "customFieldList",
+                        metaDataSource.getBasicMetaData().createInstance("CustomFieldList"));
+                List<Object> customFieldList = (List<Object>) getProperty(record, "customFieldList.customField");
+                customFieldList.addAll(customFields);
+            }
+
+            return record;
         }
     }
 

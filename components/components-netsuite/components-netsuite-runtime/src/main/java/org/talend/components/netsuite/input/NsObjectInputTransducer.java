@@ -62,7 +62,7 @@ public class NsObjectInputTransducer extends NsObjectTransducer {
      * @return indexed record
      */
     public IndexedRecord read(Object data) {
-        prepare(data);
+        prepare();
 
         Map<String, FieldDesc> fieldMap = typeDesc.getFieldMap();
         Map<String, Object> mapView = getMapView(data, runtimeSchema, typeDesc);
@@ -87,10 +87,8 @@ public class NsObjectInputTransducer extends NsObjectTransducer {
 
     /**
      * Prepare processing of data object.
-     *
-     * @param nsObject data object to be processed
      */
-    private void prepare(Object nsObject) {
+    private void prepare() {
         if (runtimeSchema != null) {
             return;
         }
@@ -98,8 +96,7 @@ public class NsObjectInputTransducer extends NsObjectTransducer {
         if (AvroUtils.isIncludeAllFields(schema)) {
             // It's dynamic schema, we should use dynamic schema as runtime schema.
 
-            TypeDesc typeDescByClass = metaDataSource.getTypeInfo(nsObject.getClass());
-            typeDesc = metaDataSource.getTypeInfo(typeDescByClass.getTypeName());
+            typeDesc = metaDataSource.getTypeInfo(typeName);
             runtimeSchema = getDynamicSchema(typeDesc, schema, typeDesc.getTypeName());
 
             // Replace custom meta data source with SchemaCustomMetaDataSource

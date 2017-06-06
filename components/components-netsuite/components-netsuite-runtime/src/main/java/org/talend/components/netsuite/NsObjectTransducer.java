@@ -41,6 +41,7 @@ import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NsRef;
 import org.talend.components.netsuite.client.model.CustomFieldDesc;
 import org.talend.components.netsuite.client.model.FieldDesc;
+import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.components.netsuite.client.model.SimpleFieldDesc;
 import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.client.model.beans.BeanInfo;
@@ -129,6 +130,8 @@ public abstract class NsObjectTransducer {
      * @return schema with all fields
      */
     protected Schema getDynamicSchema(TypeDesc typeDesc, Schema designSchema, String targetSchemaName) {
+        RecordTypeInfo recordTypeInfo = metaDataSource.getRecordType(typeDesc.getTypeName());
+
         Map<String, FieldDesc> fieldMap = typeDesc.getFieldMap();
 
         String dynamicPosProp = designSchema.getProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION);
@@ -201,6 +204,8 @@ public abstract class NsObjectTransducer {
         }
 
         Schema schema = Schema.createRecord(targetSchemaName, null, null, false, fields);
+        NetSuiteDatasetRuntimeImpl.augmentSchemaWithCustomMetaData(metaDataSource,
+                schema, recordTypeInfo, typeDesc.getFields());
         return schema;
     }
 
