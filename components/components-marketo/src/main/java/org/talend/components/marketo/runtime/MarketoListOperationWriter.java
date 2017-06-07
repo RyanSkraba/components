@@ -52,8 +52,6 @@ public class MarketoListOperationWriter extends MarketoWriter {
 
     private ListOperation operation;
 
-    private Boolean dieOnError;
-
     private static final Logger LOG = LoggerFactory.getLogger(MarketoListOperationWriter.class);
 
     public MarketoListOperationWriter(WriteOperation writeOperation, RuntimeContainer runtime) {
@@ -159,11 +157,11 @@ public class MarketoListOperationWriter extends MarketoWriter {
         listOpeParms.setOperation(operation.name());
         listOpeParms.setStrict(dieOnError);
         if (use_soap_api) {
-            listOpeParms.setListKeyType(record.get(inputSchema.getField(FIELD_LIST_KEY_TYPE).pos()).toString());
-            listOpeParms.setListKeyValue(record.get(inputSchema.getField(FIELD_LIST_KEY_VALUE).pos()).toString());
-            listOpeParms.setLeadKeyType(record.get(inputSchema.getField(FIELD_LEAD_KEY_TYPE).pos()).toString());
-            listOpeParms
-                    .setLeadKeyValue(new String[] { record.get(inputSchema.getField(FIELD_LEAD_KEY_VALUE).pos()).toString() });
+            listOpeParms.setListKeyType(String.valueOf(record.get(inputSchema.getField(FIELD_LIST_KEY_TYPE).pos())));
+            listOpeParms.setListKeyValue(String.valueOf(record.get(inputSchema.getField(FIELD_LIST_KEY_VALUE).pos())));
+            listOpeParms.setLeadKeyType(String.valueOf(record.get(inputSchema.getField(FIELD_LEAD_KEY_TYPE).pos())));
+            listOpeParms.setLeadKeyValue(
+                    new String[] { String.valueOf(record.get(inputSchema.getField(FIELD_LEAD_KEY_VALUE).pos())) });
         } else {
             listOpeParms.setListId((Integer) record.get(inputSchema.getField(FIELD_LIST_ID).pos()));
             listOpeParms.setLeadIds(new Integer[] { (Integer) record.get(inputSchema.getField(FIELD_LEAD_ID).pos()) });
@@ -174,7 +172,7 @@ public class MarketoListOperationWriter extends MarketoWriter {
 
     public ListOperationParameters addLeadKeyToListOperationParameters(IndexedRecord record) {
         if (use_soap_api) {
-            listOpeParms.getLeadKeyValue().add(record.get(inputSchema.getField(FIELD_LEAD_KEY_VALUE).pos()).toString());
+            listOpeParms.getLeadKeyValue().add(String.valueOf(record.get(inputSchema.getField(FIELD_LEAD_KEY_VALUE).pos())));
         } else {
             listOpeParms.getLeadIds().add((Integer) record.get(inputSchema.getField(FIELD_LEAD_ID).pos()));
         }

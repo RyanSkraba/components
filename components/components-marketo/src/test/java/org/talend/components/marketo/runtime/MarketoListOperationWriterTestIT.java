@@ -505,4 +505,42 @@ public class MarketoListOperationWriterTestIT extends MarketoBaseTestIT {
         assertEquals(0, writer.result.getRejectCount());
         assertEquals(3, writer.result.getApiCalls());
     }
+
+    @Test
+    public void testTDI38958() throws Exception {
+        // there should be not NPE in the case.
+        // The error should be returned by the API.
+        props = getSOAPProperties();
+        props.listOperation.setValue(ListOperation.addTo);
+        props.multipleOperation.setValue(false);
+        Schema s = props.schemaInput.schema.getValue();
+        writer = getWriter(props);
+        writer.open("test");
+        IndexedRecord record = new GenericData.Record(s);
+        record.put(0, "MKTOLISTNAME");
+        record.put(1, UNDX_TEST_LIST_SMALL);
+        record.put(2, "IDNUM");
+        record.put(3, null);
+        try {
+            writer.write(record);
+            writer.close();
+        } catch (IOException e) {
+            assertTrue(e.getMessage().contains("Client received SOAP Fault from server: 20102 - "
+                    + "Input error Please see the server log to find more detail regarding exact cause of the failure."));
+        }
+        props = getRESTProperties();
+        props.listOperation.setValue(ListOperation.addTo);
+        s = props.schemaInput.schema.getValue();
+        writer = getWriter(props);
+        writer.open("test");
+        record = new GenericData.Record(s);
+        record.put(0, UNDX_TEST_LIST_SMALL_ID);
+        record.put(1, null);
+        try {
+            writer.write(record);
+            writer.close();
+        } catch (IOException e) {
+            assertTrue(e.getMessage().contains("[1001] For input string: \"null\" failed to convert to a number"));
+        }
+    }
 }
