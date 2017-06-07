@@ -14,7 +14,7 @@
 package org.talend.components.service.rest.impl;
 
 /**
- * Sent back to API caller if an error occurs. It ccontains a unique code, a message with a title to display to end user and a cause.
+ * Sent back to API caller if an error occurs. It contains a unique code, a message with a title to display to end user and a cause.
  */
 public class ApiError {
 

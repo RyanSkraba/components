@@ -14,23 +14,30 @@
 package org.talend.components.service.rest.impl;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.Validate.notNull;
+import static org.talend.components.api.component.ConnectorTopology.INCOMING;
+import static org.talend.components.api.component.runtime.ExecutionEngine.BEAM;
+import static org.talend.components.api.component.runtime.ExecutionEngine.DI;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.function.Function;
 
-import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.avro.io.Encoder;
-import org.apache.avro.io.EncoderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.runtime.ExecutionEngine;
+import org.talend.components.api.component.runtime.Sink;
+import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.api.component.runtime.WriterDataSupplier;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.dataset.runtime.DatasetRuntime;
@@ -43,10 +50,12 @@ import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
-import org.talend.daikon.java8.Consumer;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ServiceImplementation
 @SuppressWarnings("unchecked")
@@ -57,6 +66,9 @@ public class RuntimeControllerImpl implements RuntimesController {
     @Autowired
     private PropertiesHelpers propertiesHelpers;
 
+    @Autowired
+    private ObjectMapper mapper;
+    
     @Override
     public ResponseEntity<ValidationResultsDto> validateDataStoreConnection(String dataStoreDefinitionName,
             PropertiesDto propertiesContainer) {
@@ -102,9 +114,53 @@ public class RuntimeControllerImpl implements RuntimesController {
         return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(response, limit, false));
     }
 
+    @Override
+    public void writeData(InputStream rawPayload) throws IOException {
+
+        // 1) Read payload (with data as a stream of course)
+        DatasetWritePayload payload = DatasetWritePayload.readData(rawPayload, mapper);
+        String definitionName = payload.getConfiguration().getDefinitionName();
+
+        // 2) Create properties
+        Properties properties = propertiesHelpers.propertiesFromDto(payload.getConfiguration());
+        if (properties instanceof ComponentProperties) {
+            ComponentProperties componentProperties = (ComponentProperties) properties;
+
+            // 3) Retrieve component definition to be able to create the runtime
+            final ComponentDefinition definition = propertiesHelpers.getDefinition(ComponentDefinition.class, definitionName);
+
+            // 4) Get the execution engine
+            ExecutionEngine executionEngine;
+            if (definition.isSupportingExecutionEngines(DI)) {
+                executionEngine = DI;
+                // 5) Create the sandbox
+                try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(
+                        definition.getRuntimeInfo(executionEngine, componentProperties, INCOMING),
+                        definition.getClass().getClassLoader())) {
+                    Sink datasetRuntimeInstance = (Sink) instance.getInstance();
+                    datasetRuntimeInstance.initialize(null, componentProperties);
+
+                    Iterator<IndexedRecord> data = payload.getData();
+                    WriteOperation writeOperation = datasetRuntimeInstance.createWriteOperation();
+                    // Supplier return null to signify end of data stream => see WriterDataSupplier.writeData
+                    WriterDataSupplier<?, IndexedRecord> stringWriterDataSupplier = new WriterDataSupplier<Object, IndexedRecord>(
+                            writeOperation, () -> data.hasNext() ? data.next() : null, null);
+
+                    stringWriterDataSupplier.writeData();
+                }
+            } else if (definition.isSupportingExecutionEngines(BEAM)) {
+                throw new UnsupportedOperationException("Beam runtime is not available for dataset write through HTTP API.");
+            } else {
+                throw new TalendRuntimeException(CommonErrorCodes.UNREGISTERED_DEFINITION);
+            }
+        } else if (properties instanceof DatasetProperties) {
+            throw new UnsupportedOperationException("HTTP API is only able to write using component implementations. Not " + properties.getClass());
+        }
+    }
+
     private <T> T useDatasetRuntime(String datasetDefinitionName, //
-            PropertiesDto formData, //
-            Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, T> consumer) {
+                                    PropertiesDto formData, //
+                                    Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, T> consumer) {
 
         // 1) get dataset properties from supplied data
         DatasetProperties datasetProperties = propertiesHelpers.propertiesFromDto(formData);
@@ -126,66 +182,4 @@ public class RuntimeControllerImpl implements RuntimesController {
         }
     }
 
-    private static class DatasetContentWriter implements Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, Void> {
-
-        private final Integer limit;
-
-        private final boolean json;
-
-        private final OutputStream output;
-
-        /**
-         * @param limit the number of records to write
-         * @param json true to write JSon, false for binary Avro
-         */
-        DatasetContentWriter(OutputStream output, Integer limit, boolean json) {
-            this.output = output;
-            this.limit = limit;
-            this.json = json;
-        }
-
-        @Override
-        public Void apply(DatasetRuntime<DatasetProperties<DatastoreProperties>> dr) {
-            try {
-                final Encoder[] encoder = { null };
-
-                dr.getSample(limit == null ? MAX_VALUE : limit, new Consumer<IndexedRecord>() {
-
-                    GenericDatumWriter<IndexedRecord> writer = null;
-
-                    @Override
-                    public void accept(IndexedRecord ir) {
-                        if (writer == null) {
-                            writer = new GenericDatumWriter<>(ir.getSchema());
-                            try {
-                                if (json) {
-                                    encoder[0] = EncoderFactory.get().jsonEncoder(ir.getSchema(), output);
-                                } else {
-                                    encoder[0] = EncoderFactory.get().binaryEncoder(output, null);
-                                }
-                            } catch (IOException ioe) {
-                                throw new RuntimeException(ioe);
-                            }
-
-                        }
-                        writeIndexedRecord(writer, encoder[0], ir);
-                    }
-                });
-                if (encoder[0] != null)
-                    encoder[0].flush();
-            } catch (RuntimeException | IOException e) {
-                log.error("Couldn't create Avro records JSon encoder.", e);
-                throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
-            }
-            return null;
-        }
-
-        private void writeIndexedRecord(GenericDatumWriter<IndexedRecord> writer, Encoder encoder, IndexedRecord indexedRecord) {
-            try {
-                writer.write(indexedRecord, encoder);
-            } catch (IOException e) {
-                log.warn("Couldn't serialize Avro record.", e);
-            }
-        }
-    }
 }

@@ -15,8 +15,10 @@ package org.talend.components.service.rest;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.springframework.http.ResponseEntity;
@@ -73,5 +75,16 @@ public interface RuntimesController {
                                                  @RequestParam(value = "from", required = false) Integer from,
                                                  @RequestParam(value = "limit", required = false) Integer limit,
                                                  OutputStream response);
+
+    /**
+     * Write Data using a Talend component.
+     * <p>
+     * The payload sent to this endpoint must contain all metadata then data to write data. Payload is formatted using
+     * {@link org.talend.components.service.rest.impl.DatasetWritePayload} that contains first components properties to
+     * open the right output then a streaming array of data in AVRO format.
+     * </p>
+     */
+    @RequestMapping(value = "data", method = PUT, consumes = APPLICATION_JSON_UTF8_VALUE)
+    void writeData(InputStream payload) throws IOException;
 
 }

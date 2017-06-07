@@ -13,10 +13,12 @@
 
 package org.talend.components.service.rest.impl;
 
-import java.nio.charset.StandardCharsets;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.IOUtils.toInputStream;
+
 import java.util.List;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.talend.components.api.service.ComponentService;
@@ -29,8 +31,7 @@ import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ReferenceProperties;
 
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.io.IOUtils.toInputStream;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Component
 public class PropertiesHelpers {
@@ -46,11 +47,11 @@ public class PropertiesHelpers {
 
     public <T extends Properties> T propertiesFromDto(PropertiesDto propertiesContainer) {
         T properties = (T) jsonSerializationHelper.toProperties(
-                toInputStream(propertiesContainer.getProperties().toString(), StandardCharsets.UTF_8));
+                toInputStream(propertiesContainer.getProperties().toString(), UTF_8));
         List<ObjectNode> dependencies = propertiesContainer.getDependencies();
         if (dependencies != null && !dependencies.isEmpty()) {
             List<Properties> props = dependencies.stream() //
-                    .map(on -> jsonSerializationHelper.toProperties(toInputStream(on.toString(), StandardCharsets.UTF_8))) //
+                    .map(on -> jsonSerializationHelper.toProperties(toInputStream(on.toString(), UTF_8))) //
                     .collect(toList());
             props.add(properties);
             ReferenceProperties.resolveReferenceProperties(props, definitionServiceDelegate);

@@ -24,6 +24,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -100,6 +102,37 @@ public class JdbcComponentTestIT {
     @After
     public void tearDown() {
         db.shutdown();
+    }
+
+    @Test
+    public void setDatasetData_DiRuntime() throws Exception {
+        // given
+        String payload = IOUtils
+                .toString(getClass().getResourceAsStream("jdbc_component_write_properties_on_DI.json"))
+                .replace("{jdbc_url}", dbUrl);
+
+        // when
+        given().content(payload)
+                .contentType(APPLICATION_JSON_UTF8_VALUE) //
+                .expect().statusCode(200).log().ifError() //
+                .put("runtimes/data");
+
+        // then
+        Statement statement = db.getConnection().createStatement();
+        ResultSet countRS = statement.executeQuery("SELECT COUNT(*) AS count FROM users");
+        countRS.next();
+        assertEquals(101, countRS.getInt("count"));
+        
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM users WHERE email='david.bowie@awesome.uk'");
+
+        while (resultSet.next()) {  
+            assertEquals("1", resultSet.getString("id"));
+            assertEquals("David", resultSet.getString("first_name"));
+            assertEquals("Bowie", resultSet.getString("last_name"));
+            assertEquals("david.bowie@awesome.uk", resultSet.getString("email"));
+            assertEquals("male", resultSet.getString("gender"));
+            assertEquals("127.0.0.1", resultSet.getString("ip_address"));
+        }
     }
 
     @Test

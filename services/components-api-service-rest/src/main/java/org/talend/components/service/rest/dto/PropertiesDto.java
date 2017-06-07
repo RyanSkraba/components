@@ -13,13 +13,16 @@
 
 package org.talend.components.service.rest.dto;
 
+import static java.util.Collections.emptyList;
+import static org.talend.daikon.serialize.jsonschema.JsonSchemaConstants.DEFINITION_NAME_JSON_METADATA;
+
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static java.util.Collections.emptyList;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PropertiesDto {
@@ -44,5 +47,21 @@ public class PropertiesDto {
 
     public void setProperties(ObjectNode properties) {
         this.properties = properties;
+    }
+
+    /**
+     * Fetch from properties the definition name metadata.
+     *
+     * @return the corresponding definition name or null if not present.
+     * @see org.talend.daikon.serialize.jsonschema.JsonSchemaConstants#DEFINITION_NAME_JSON_METADATA
+     */
+    @JsonIgnore
+    public String getDefinitionName() {
+        JsonNode jsonNode = properties.get(DEFINITION_NAME_JSON_METADATA);
+        if (jsonNode != null && jsonNode.isTextual()) {
+            return jsonNode.textValue();
+        }
+        return null;
+
     }
 }
