@@ -18,12 +18,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_REST;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.junit.Before;
 import org.junit.Test;
-import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.runtime.client.rest.type.FieldDescription.ApiFieldName;
 import org.talend.daikon.avro.SchemaConstants;
 
@@ -125,12 +125,12 @@ public class FieldDescriptionTest {
         fd.setDataType("date");
         af = fd.toAvroField();
         assertEquals("LONG", af.schema().getType().toString());
-        assertEquals(MarketoConstants.DATETIME_PATTERN_REST, af.getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_REST, af.getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("java.util.Date", af.getProp(SchemaConstants.JAVA_CLASS_FLAG));
         fd.setDataType("datetime");
         af = fd.toAvroField();
         assertEquals("LONG", af.schema().getType().toString());
-        assertEquals(MarketoConstants.DATETIME_PATTERN_REST, af.getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_REST, af.getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("java.util.Date", af.getProp(SchemaConstants.JAVA_CLASS_FLAG));
         fd.setId(null);
         af = fd.toAvroField();
@@ -162,10 +162,10 @@ public class FieldDescriptionTest {
         assertEquals("STRING", r.getField("brand").schema().getType().toString());
         assertEquals("LONG", r.getField("createdAt").schema().getType().toString());
         assertEquals("java.util.Date", r.getField("createdAt").getProp(SchemaConstants.JAVA_CLASS_FLAG));
-        assertEquals("yyyy-MM-dd'T'HH:mm:ss'Z'", r.getField("createdAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_REST, r.getField("createdAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("LONG", r.getField("updatedAt").schema().getType().toString());
         assertEquals("java.util.Date", r.getField("updatedAt").getProp(SchemaConstants.JAVA_CLASS_FLAG));
-        assertEquals("yyyy-MM-dd'T'HH:mm:ss'Z'", r.getField("updatedAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_REST, r.getField("updatedAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
     }
 
 }

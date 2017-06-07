@@ -13,6 +13,8 @@
 package org.talend.components.marketo;
 
 import static org.junit.Assert.assertEquals;
+import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_REST;
+import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_SOAP;
 
 import org.apache.avro.Schema;
 import org.junit.Test;
@@ -40,8 +42,7 @@ public class MarketoConstantsTest {
         assertEquals("true", ref.getField("Id").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
         assertEquals("LONG", ref.getField("ActivityDateTime").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("ActivityDateTime").getProp(SchemaConstants.JAVA_CLASS_FLAG));
-        assertEquals("yyyy-MM-dd'T'HH:mm:ss'.000Z'",
-                ref.getField("ActivityDateTime").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_SOAP, ref.getField("ActivityDateTime").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("STRING", ref.getField("ActivityType").schema().getTypes().get(0).getType().toString());
         assertEquals("STRING", ref.getField("MktgAssetName").schema().getTypes().get(0).getType().toString());
         assertEquals("STRING", ref.getField("MktPersonId").schema().getTypes().get(0).getType().toString());
@@ -55,8 +56,7 @@ public class MarketoConstantsTest {
         assertEquals("true", ref.getField("Id").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
         assertEquals("LONG", ref.getField("ActivityDateTime").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("ActivityDateTime").getProp(SchemaConstants.JAVA_CLASS_FLAG));
-        assertEquals("yyyy-MM-dd'T'HH:mm:ss'.000Z'",
-                ref.getField("ActivityDateTime").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_SOAP, ref.getField("ActivityDateTime").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("STRING", ref.getField("ActivityType").schema().getTypes().get(0).getType().toString());
         assertEquals("STRING", ref.getField("MktgAssetName").schema().getTypes().get(0).getType().toString());
         assertEquals("STRING", ref.getField("MktPersonId").schema().getTypes().get(0).getType().toString());
@@ -113,10 +113,10 @@ public class MarketoConstantsTest {
         assertEquals("STRING", ref.getField("description").schema().getTypes().get(0).getType().toString());
         assertEquals("LONG", ref.getField("createdAt").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("createdAt").getProp(SchemaConstants.JAVA_CLASS_FLAG));
-        assertEquals("yyyy-MM-dd'T'HH:mm:ss'Z'", ref.getField("createdAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_REST, ref.getField("createdAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("LONG", ref.getField("updatedAt").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("updatedAt").getProp(SchemaConstants.JAVA_CLASS_FLAG));
-        assertEquals("yyyy-MM-dd'T'HH:mm:ss'Z'", ref.getField("updatedAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_REST, ref.getField("updatedAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("STRING", ref.getField("idField").schema().getTypes().get(0).getType().toString());
         assertEquals("STRING", ref.getField("dedupeFields").schema().getTypes().get(0).getType().toString());
         assertEquals("STRING", ref.getField("searchableFields").schema().getTypes().get(0).getType().toString());
@@ -132,10 +132,10 @@ public class MarketoConstantsTest {
         assertEquals("INT", ref.getField("seq").schema().getType().toString());
         assertEquals("LONG", ref.getField("createdAt").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("createdAt").getProp(SchemaConstants.JAVA_CLASS_FLAG));
-        assertEquals("yyyy-MM-dd'T'HH:mm:ss'Z'", ref.getField("createdAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_REST, ref.getField("createdAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("LONG", ref.getField("updatedAt").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("updatedAt").getProp(SchemaConstants.JAVA_CLASS_FLAG));
-        assertEquals("yyyy-MM-dd'T'HH:mm:ss'Z'", ref.getField("updatedAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_REST, ref.getField("updatedAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
 
     }
 
@@ -159,10 +159,10 @@ public class MarketoConstantsTest {
         assertEquals("STRING", ref.getField("lastName").schema().getTypes().get(0).getType().toString());
         assertEquals("LONG", ref.getField("createdAt").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("createdAt").getProp(SchemaConstants.JAVA_CLASS_FLAG));
-        assertEquals("yyyy-MM-dd'T'HH:mm:ss'Z'", ref.getField("createdAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_REST, ref.getField("createdAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("LONG", ref.getField("updatedAt").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("updatedAt").getProp(SchemaConstants.JAVA_CLASS_FLAG));
-        assertEquals("yyyy-MM-dd'T'HH:mm:ss'Z'", ref.getField("updatedAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_REST, ref.getField("updatedAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
     }
 
     @Test
@@ -173,7 +173,7 @@ public class MarketoConstantsTest {
         assertEquals("INT", ref.getField("leadId").schema().getTypes().get(0).getType().toString());
         assertEquals("LONG", ref.getField("activityDate").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("activityDate").getProp(SchemaConstants.JAVA_CLASS_FLAG));
-        assertEquals("yyyy-MM-dd'T'HH:mm:ss'Z'", ref.getField("activityDate").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_REST, ref.getField("activityDate").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("INT", ref.getField("activityTypeId").schema().getTypes().get(0).getType().toString());
         assertEquals("STRING", ref.getField("activityTypeValue").schema().getTypes().get(0).getType().toString());
         assertEquals("STRING", ref.getField("fields").schema().getTypes().get(0).getType().toString());
@@ -187,7 +187,7 @@ public class MarketoConstantsTest {
         assertEquals("INT", ref.getField("leadId").schema().getTypes().get(0).getType().toString());
         assertEquals("LONG", ref.getField("activityDate").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("activityDate").getProp(SchemaConstants.JAVA_CLASS_FLAG));
-        assertEquals("yyyy-MM-dd'T'HH:mm:ss'Z'", ref.getField("activityDate").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(DATETIME_PATTERN_REST, ref.getField("activityDate").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("INT", ref.getField("activityTypeId").schema().getTypes().get(0).getType().toString());
         assertEquals("STRING", ref.getField("activityTypeValue").schema().getTypes().get(0).getType().toString());
         assertEquals("INT", ref.getField("primaryAttributeValueId").schema().getTypes().get(0).getType().toString());

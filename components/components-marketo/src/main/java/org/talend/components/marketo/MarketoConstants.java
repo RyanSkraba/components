@@ -66,7 +66,7 @@ public class MarketoConstants {
 
     public static final String DATETIME_PATTERN_PARAM = "yyyy-MM-dd HH:mm:ss Z";
 
-    public static final String DATETIME_PATTERN_REST = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final String DATETIME_PATTERN_REST = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     public static final String DATETIME_PATTERN_SOAP = "yyyy-MM-dd'T'HH:mm:ss'.000Z'";
 

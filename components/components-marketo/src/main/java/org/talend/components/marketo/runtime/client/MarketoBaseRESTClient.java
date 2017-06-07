@@ -24,8 +24,6 @@ import java.net.ProtocolException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -41,6 +39,9 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.marketo.runtime.client.rest.response.LeadResult;
@@ -426,14 +427,14 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
         case LONG:
             String clazz = field.getProp(SchemaConstants.JAVA_CLASS_FLAG);
             String pattr = field.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
-            if ((clazz != null && clazz.equals(Date.class.getCanonicalName())) || (pattr != null && !pattr.isEmpty())) {
+            if ((clazz != null && clazz.equals(Date.class.getCanonicalName())) || !StringUtils.isEmpty(pattr)) {
                 Date dt = null;
                 try {
-                    dt = new SimpleDateFormat(pattr).parse(value.toString());
+                    // Mkto returns datetime in UTC and Follows W3C format (ISO 8601).
+                    dt = new DateTime(value.toString(), DateTimeZone.forID("UTC")).toDate();
                     return (T) dt;
-                } catch (ParseException e) {
-                    LOG.error("Error while parsing date : {} with pattern {}.", e.getMessage(),
-                            field.getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+                } catch (Exception e) {
+                    LOG.error("Error while parsing date : {}.", e.getMessage());
                 }
             } else {
                 return (T) Long.valueOf(value.toString());

@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo.runtime;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,6 +31,7 @@ import static org.talend.components.marketo.tmarketoinput.TMarketoInputPropertie
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadActivity;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadChanges;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getMultipleLeads;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeREST.email;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeSOAP.EMAIL;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeSOAP.IDNUM;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
@@ -41,12 +43,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Test;
 import org.slf4j.Logger;
+import org.talend.components.marketo.runtime.client.MarketoClientService;
+import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeREST;
@@ -376,4 +381,24 @@ public class MarketoInputReaderTestIT extends MarketoBaseTestIT {
         fail("Should not be here");
     }
 
+    @Test
+    public void testTDI38956() throws Exception {
+        TMarketoInputProperties props = getRESTProperties();
+        props.inputOperation.setValue(getLead);
+        props.leadKeyTypeREST.setValue(email);
+        props.afterInputOperation();
+        String email = EMAIL_LEAD_TEST;
+        props.leadKeyValue.setValue(email);
+        MarketoSource source = new MarketoSource();
+        source.initialize(null, props);
+        MarketoClientService client = source.getClientService(null);
+        MarketoRecordResult result = client.getLead(props, null);
+        LOG.debug("{}", result);
+        List<IndexedRecord> records = result.getRecords();
+        assertNotEquals(emptyList(), records);
+        IndexedRecord record = records.get(0);
+        assertNotNull(record);
+        assertNotNull(record.get(4));// createdAt shouldn't be null
+        assertNotNull(record.get(5));// updatedAt shouldn't be null
+    }
 }
