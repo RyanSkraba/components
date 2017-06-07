@@ -109,16 +109,6 @@ public class AzureStorageTableComponentsTest {
         assertEquals(connectors, p.getAllSchemaPropertiesConnectors(false));
     }
 
-    /**
-     *
-     * @see org.talend.components.azurestorage.table.AzureStorageTableProperties#validateNameMapping()
-     */
-    @Test
-    public void testValidateNameMapping() {
-        ValidationResult result = properties.validateNameMapping();
-        assertNotNull("result cannot be null", result);
-    }
-
     @Test
     public void testGetAllSchemaPropertiesConnectors() {
         HashSet<PropertyPathConnector> connectors = new HashSet<>();

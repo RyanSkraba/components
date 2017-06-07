@@ -26,8 +26,10 @@ import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.azurestorage.table.AzureStorageTableProperties;
 import org.talend.components.azurestorage.table.helpers.FilterExpressionTable;
+import org.talend.components.azurestorage.table.helpers.NameMappingTable;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -44,6 +46,8 @@ public class TAzureStorageInputTableProperties extends AzureStorageTableProperti
     public Property<String> producedFilter = newString("producedFilter");
     
     public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
+    
+    public NameMappingTable nameMapping = new NameMappingTable("nameMapping");
 
     public TAzureStorageInputTableProperties(String name) {
         super(name);
@@ -107,6 +111,10 @@ public class TAzureStorageInputTableProperties extends AzureStorageTableProperti
         mainForm.getWidget(producedFilter.getName()).setReadonly(true);
         //
         mainForm.addRow(dieOnError);
+        
+        Form advancedForm = new Form(this, Form.ADVANCED);
+        advancedForm.addRow(widget(nameMapping).setWidgetType(Widget.TABLE_WIDGET_TYPE));
+
     }
 
     @Override
@@ -135,6 +143,10 @@ public class TAzureStorageInputTableProperties extends AzureStorageTableProperti
     public void afterFilterExpression() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.ADVANCED));
+    }
+    
+    public ValidationResult validateNameMapping() {
+        return nameMapping.validateNameMappings();
     }
 
 }

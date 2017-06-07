@@ -58,8 +58,6 @@ public class AzureStorageTableProperties extends FixedConnectorsComponentPropert
 
     public Property<String> tableName = PropertyFactory.newString("tableName").setRequired();
 
-    public NameMappingTable nameMapping = new NameMappingTable("nameMapping");
-
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
     protected transient PropertyPathConnector FLOW_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow");
@@ -98,9 +96,6 @@ public class AzureStorageTableProperties extends FixedConnectorsComponentPropert
         main.addRow(tableName);
         main.addRow(schema.getForm(Form.REFERENCE));
 
-        Form advancedForm = new Form(this, Form.ADVANCED);
-        advancedForm.addRow(widget(nameMapping).setWidgetType(Widget.TABLE_WIDGET_TYPE));
-
         Form wizardForm = Form.create(this, FORM_WIZARD);
         wizardForm.addRow(name);
         wizardForm.addRow(tableName);
@@ -134,9 +129,6 @@ public class AzureStorageTableProperties extends FixedConnectorsComponentPropert
         this.schemaListener = schemaListener;
     }
 
-    public ValidationResult validateNameMapping() {
-        return nameMapping.validateNameMappings();
-    }
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {

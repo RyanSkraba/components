@@ -49,7 +49,6 @@ public class AzureStorageTableWriterTest {
         p.setupProperties();
         p.tableName.setValue("test");
         p.dieOnError.setValue(true);
-        p.nameMapping = new NameMappingTable("test");
         List<String> schemaMappings = new ArrayList<>();
         List<String> propertyMappings = new ArrayList<>();
 
@@ -57,9 +56,6 @@ public class AzureStorageTableWriterTest {
         propertyMappings.add("datyMapped");
         schemaMappings.add("inty");
         propertyMappings.add("intyMapped");
-
-        p.nameMapping.schemaColumnName.setValue(schemaMappings);
-        p.nameMapping.entityPropertyName.setValue(propertyMappings);
 
         sink.initialize(null, p);
 
@@ -72,11 +68,11 @@ public class AzureStorageTableWriterTest {
         Schema s = SchemaBuilder.record("Main").fields()
                 //
                 .name("PartitionKey").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "true").type(AvroUtils._string()).noDefault()
+                .type(AvroUtils._string()).noDefault()
                 //
                 .name("RowKey").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "true").type(AvroUtils._string()).noDefault()
+                .type(AvroUtils._string()).noDefault()
                 //
                 .endRecord();
         assertEquals(s, p.schema.schema.getValue());

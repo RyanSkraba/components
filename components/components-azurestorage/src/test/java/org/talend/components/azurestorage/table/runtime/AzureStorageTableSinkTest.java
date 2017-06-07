@@ -23,6 +23,8 @@ import java.security.InvalidKeyException;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableProperties;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageException;
@@ -30,13 +32,18 @@ import com.microsoft.azure.storage.StorageException;
 public class AzureStorageTableSinkTest {
 
     AzureStorageTableSink sink;
+    TAzureStorageOutputTableProperties p;
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageTableSink.class);
 
     @Before
     public void setUp() throws Exception {
         sink = new AzureStorageTableSink();
-        TAzureStorageOutputTableProperties p = new TAzureStorageOutputTableProperties("test");
+        p = new TAzureStorageOutputTableProperties("test");
         p.connection.setupProperties();
         p.setupProperties();
+
         sink.initialize(null, p);
     }
 
@@ -63,7 +70,14 @@ public class AzureStorageTableSinkTest {
      */
     @Test
     public final void testValidate() {
-        assertEquals(ValidationResult.Result.ERROR, sink.validate(null).getStatus());
+        assertEquals(i18nMessages.getMessage("message.VacantName"), sink.validate(null).getMessage());
+        p.tableName.setValue("testtable");
+        sink.initialize(null, p);
+        assertEquals(i18nMessages.getMessage("error.invalidPartitionOrRowKey"), sink.validate(null).getMessage());
+        p.partitionKey.setStoredValue("PartitionKey");
+        p.rowKey.setStoredValue("RowKey");
+        sink.initialize(null, p);
+        assertEquals(ValidationResult.Result.OK, sink.validate(null).getStatus());
     }
 
     /**

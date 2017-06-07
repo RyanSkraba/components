@@ -44,6 +44,7 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
+import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageErrorCodeStrings;
 import com.microsoft.azure.storage.StorageException;
@@ -91,9 +92,9 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
 
     private List<IndexedRecord> rejectedWrites = new ArrayList<>();
 
-    private Map<String, String> nameMappings;
-
-    private Boolean useNameMappings = Boolean.FALSE;
+    private String partitionKey;
+    
+    private String rowKey;
 
     private static final int MAX_RECORDS_TO_ENQUEUE = 250;
 
@@ -112,9 +113,8 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         tableName = properties.tableName.getValue();
         actionData = properties.actionOnData.getValue();
         processOperationInBatch = properties.processOperationInBatch.getValue();
-        nameMappings = properties.nameMapping.getNameMappings();
-        if (nameMappings != null)
-            useNameMappings = true;
+        partitionKey = properties.partitionKey.getStringValue();
+        rowKey = properties.rowKey.getStringValue();
     }
 
     @Override
@@ -255,10 +255,8 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             }
 
             String sName = f.name(); // schema name
-            String mName = getMappedNameIfNecessary(sName); // mapped name
-
             Schema fSchema = f.schema();
-            if (fSchema.getType() == Type.UNION) {
+            if (fSchema.getType() == Type.STRING.UNION) {
                 for (Schema s : f.schema().getTypes()) {
                     if (s.getType() != Type.NULL) {
                         fSchema = s;
@@ -267,24 +265,22 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
                 }
             }
 
-            if (sName.equals(AzureStorageTableProperties.TABLE_PARTITION_KEY)
-                    || mName.equals(AzureStorageTableProperties.TABLE_PARTITION_KEY)) {
+
+            if (sName.equals(AzureStorageTableProperties.TABLE_PARTITION_KEY)) {
                 entity.setPartitionKey((String) indexedRecord.get(f.pos()));
-            } else if (sName.equals(AzureStorageTableProperties.TABLE_ROW_KEY)
-                    || mName.equals(AzureStorageTableProperties.TABLE_ROW_KEY)) {
+            } else if (sName.equals(AzureStorageTableProperties.TABLE_ROW_KEY)) {
                 entity.setRowKey((String) indexedRecord.get(f.pos()));
-            } else if (sName.equals(AzureStorageTableProperties.TABLE_TIMESTAMP)
-                    || mName.equals(AzureStorageTableProperties.TABLE_TIMESTAMP)) {
+            } else if (sName.equals(AzureStorageTableProperties.TABLE_TIMESTAMP)) {
                 // nop : managed by server
             } else { // that's some properties !
                 if (fSchema.getType().equals(Type.BOOLEAN)) {
-                    entityProps.put(mName, new EntityProperty((Boolean) indexedRecord.get(f.pos())));
+                    entityProps.put(sName, new EntityProperty((Boolean) indexedRecord.get(f.pos())));
                 } else if (fSchema.getType().equals(Type.DOUBLE)) {
-                    entityProps.put(mName, new EntityProperty((Double) indexedRecord.get(f.pos())));
+                    entityProps.put(sName, new EntityProperty((Double) indexedRecord.get(f.pos())));
                 } else if (fSchema.getType().equals(Type.INT)) {
-                    entityProps.put(mName, new EntityProperty((Integer) indexedRecord.get(f.pos())));
+                    entityProps.put(sName, new EntityProperty((Integer) indexedRecord.get(f.pos())));
                 } else if (fSchema.getType().equals(Type.BYTES)) {
-                    entityProps.put(mName, new EntityProperty((byte[]) indexedRecord.get(f.pos())));
+                    entityProps.put(sName, new EntityProperty((byte[]) indexedRecord.get(f.pos())));
                 }
                 //
                 else if (fSchema.getType().equals(Type.LONG)) {
@@ -305,16 +301,17 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
                             dt = (Date) indexedRecord.get(f.pos());
                         }
 
-                        entityProps.put(mName, new EntityProperty(dt));
+                        entityProps.put(sName, new EntityProperty(dt));
                     } else {
-                        entityProps.put(mName, new EntityProperty((Long) indexedRecord.get(f.pos())));
+                        entityProps.put(sName, new EntityProperty((Long) indexedRecord.get(f.pos())));
                     }
                 }
                 //
                 else if (fSchema.getType().equals(Type.STRING)) {
-                    entityProps.put(mName, new EntityProperty((String) indexedRecord.get(f.pos())));
+                    entityProps.put(sName, new EntityProperty((String) indexedRecord.get(f.pos())));
                 } else { // use string as default type...
-                    entityProps.put(mName, new EntityProperty((String) indexedRecord.get(f.pos())));
+                    entityProps.put(sName, new EntityProperty((String) indexedRecord.get(f.pos())));
+
                 }
             }
         }
@@ -322,19 +319,6 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         entity.setEtag("*");
         entity.setProperties(entityProps);
         return entity;
-    }
-
-    /**
-     * this method return the mapped name is useNameMappings is true else it return the original name
-     */
-    private String getMappedNameIfNecessary(String sName) {
-        if (useNameMappings) {
-            if (nameMappings.containsKey(sName)) {
-                return nameMappings.get(sName);
-            }
-        }
-
-        return sName;
     }
 
     @Override

@@ -330,13 +330,7 @@ public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
     public void testNameMappings() throws Throwable {
         currentTable = tbl_test + "InsertWithNameMappings";
 
-        properties.nameMapping.schemaColumnName.setValue(schemaMappings);
-        properties.nameMapping.entityPropertyName.setValue(propertyMappings);
-
         insertTestValues(currentTable);
-
-        properties.nameMapping.schemaColumnName.setValue(new ArrayList<String>());
-        properties.nameMapping.entityPropertyName.setValue(new ArrayList<String>());
 
         // check results...
         BoundedReader reader = createReader(currentTable, filter, true);

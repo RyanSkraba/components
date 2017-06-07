@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
+import org.apache.avro.Schema.Type;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
@@ -26,6 +28,7 @@ import org.talend.components.azurestorage.table.AzureStorageTableProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
@@ -57,7 +60,11 @@ public class TAzureStorageOutputTableProperties extends AzureStorageTablePropert
     public Property<Boolean> processOperationInBatch = PropertyFactory.newBoolean("processOperationInBatch");
     
     public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
-
+    
+    public Property<List<String>> partitionKey = PropertyFactory.newStringList("partitionKey");
+    
+    public Property<List<String>> rowKey = PropertyFactory.newStringList("rowKey");
+    
     public TAzureStorageOutputTableProperties(String name) {
         super(name);
     }
@@ -86,20 +93,25 @@ public class TAzureStorageOutputTableProperties extends AzureStorageTablePropert
         Schema s = SchemaBuilder.record("Main").fields()
                 //
                 .name("PartitionKey").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "true").type(AvroUtils._string()).noDefault()
+                .type(AvroUtils._string()).noDefault()
                 //
                 .name("RowKey").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "true").type(AvroUtils._string()).noDefault()
+                .type(AvroUtils._string()).noDefault()
                 //
                 .endRecord();
         schema.schema.setValue(s);
+        partitionKey.setPossibleValues("PartitionKey","RowKey");
+        rowKey.setPossibleValues("PartitionKey","RowKey");
         
+        // update the properties when schema change
         setSchemaListener(new ISchemaListener() {
 
             @Override
             public void afterSchema() {
                 updateOutputSchemas();
+                updatePartitionKeyAndRowKey();
+
             }
         });
     }
@@ -109,6 +121,8 @@ public class TAzureStorageOutputTableProperties extends AzureStorageTablePropert
         super.setupLayout();
 
         Form mainForm = getForm(Form.MAIN);
+        mainForm.addColumn(Widget.widget(partitionKey).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        mainForm.addColumn(Widget.widget(rowKey).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         mainForm.addRow(actionOnData);
         mainForm.addColumn(actionOnTable);
         mainForm.addRow(processOperationInBatch);
@@ -119,6 +133,27 @@ public class TAzureStorageOutputTableProperties extends AzureStorageTablePropert
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         updateOutputSchemas();
+    }
+    
+    public void updatePartitionKeyAndRowKey() {
+        Schema inputSchema = schema.schema.getValue();
+        List<String> possibleValues = new ArrayList<String>();
+        for (Field field : inputSchema.getFields()) {
+            Schema fSchema = field.schema();
+            if (fSchema.getType() == Type.UNION) {
+                for (Schema s : field.schema().getTypes()) {
+                    if (s.getType() != Type.NULL) {
+                        fSchema = s;
+                        break;
+                    }
+                }
+            }
+            if (fSchema.getType().equals(Type.STRING)) {
+                possibleValues.add(field.name());
+            }
+        }
+        partitionKey.setPossibleValues(possibleValues);
+        rowKey.setPossibleValues(possibleValues);
     }
 
     protected void updateOutputSchemas() {
