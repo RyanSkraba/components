@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.avro.generic.IndexedRecord;
@@ -36,6 +37,7 @@ public class SalesforceInputTestIT {
         Reader reader = null;
         try {
             SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
+            properties.getDatasetProperties().selectColumnIds.setValue(Arrays.asList("IsDeleted", "Id"));
 
             SalesforceDataprepSource source = new SalesforceDataprepSource();
             source.initialize(null, properties);
@@ -76,9 +78,10 @@ public class SalesforceInputTestIT {
         SalesforceDataprepSource source = new SalesforceDataprepSource();
         source.initialize(null, properties);
         source.validate(null);
-        Reader reader = source.createReader(null);
 
-        try {
+        properties.getDatasetProperties().selectColumnIds.setValue(Arrays.asList("IsDeleted", "Id"));
+
+        try (Reader reader = source.createReader(null)) {
             int count = 3;
             for (boolean available = reader.start(); available; available = reader.advance()) {
                 IndexedRecord record = (IndexedRecord) reader.getCurrent();
@@ -91,9 +94,44 @@ public class SalesforceInputTestIT {
                 }
             }
 
-            reader.close();
-        } finally {
-            reader.close();
+        }
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testTypeForModuleWithBadQuery() throws Exception {
+        SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
+
+        SalesforceDataprepSource source = new SalesforceDataprepSource();
+        source.initialize(null, properties);
+        source.validate(null);
+
+        properties.getDatasetProperties().selectColumnIds.setValue(Arrays.asList("Toto"));
+
+        try (Reader reader = source.createReader(null)) {
+            reader.start();
+        }
+    }
+
+    @Test
+    public void testTypeForModuleWithoutSpecifiedFields() throws Exception {
+        SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
+
+        SalesforceDataprepSource source = new SalesforceDataprepSource();
+        source.initialize(null, properties);
+        source.validate(null);
+        properties.getDatasetProperties().selectColumnIds.setValue(Arrays.asList("IsDeleted", "Id", "Name"));
+
+        try (Reader reader = source.createReader(null)) {
+            int count = 3;
+            for (boolean available = reader.start(); available; available = reader.advance()) {
+                IndexedRecord record = (IndexedRecord) reader.getCurrent();
+
+                assertEquals(3, record.getSchema().getFields().size());
+                if ((count--) < 1) {
+                    break;
+                }
+            }
+
         }
     }
 
@@ -143,9 +181,8 @@ public class SalesforceInputTestIT {
         SalesforceDataprepSource source = new SalesforceDataprepSource();
         source.initialize(null, properties);
         source.validate(null);
-        Reader reader = source.createReader(null);
 
-        try {
+        try (Reader reader = source.createReader(null);) {
             int count = 3;
             for (boolean available = reader.start(); available; available = reader.advance()) {
                 IndexedRecord record = (IndexedRecord) reader.getCurrent();
@@ -158,9 +195,6 @@ public class SalesforceInputTestIT {
                 }
             }
 
-            reader.close();
-        } finally {
-            reader.close();
         }
     }
 

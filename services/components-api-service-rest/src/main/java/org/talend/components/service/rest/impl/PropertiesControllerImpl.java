@@ -197,6 +197,7 @@ public class PropertiesControllerImpl implements PropertiesController {
             return "{}";
         }
         properties.refreshLayout(properties.getPreferredForm(formName));
+        properties.refreshProperties();
         return jsonSerializationHelper.toJson(formName, properties);
     }
 

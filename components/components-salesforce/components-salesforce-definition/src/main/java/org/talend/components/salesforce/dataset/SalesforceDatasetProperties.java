@@ -12,24 +12,30 @@
 // ============================================================================
 package org.talend.components.salesforce.dataset;
 
+import static org.talend.daikon.properties.property.PropertyFactory.newStringList;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.avro.Schema;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.component.runtime.DependenciesReader;
-import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.dataset.DatasetProperties;
+import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.common.SalesforceErrorCodes;
 import org.talend.components.salesforce.common.SalesforceRuntimeSourceOrSink;
 import org.talend.components.salesforce.dataprep.SalesforceInputProperties;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreDefinition;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.ReferenceProperties;
+import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -55,6 +61,8 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
 
     public StringProperty moduleName = PropertyFactory.newString("moduleName");
 
+    public Property<List<String>> selectColumnIds = newStringList("selectColumnIds");
+
     public Property<String> query = PropertyFactory.newString("query");
 
     public SchemaProperties main = new SchemaProperties("main");
@@ -66,27 +74,86 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
     private void retrieveModules() throws IOException {
         // refresh the module list
         if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
-            ClassLoader classLoader = this.getClass().getClassLoader();
-            RuntimeInfo runtimeInfo = new JarRuntimeInfo("mvn:org.talend.components/components-salesforce-runtime",
-                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-salesforce-runtime"),
-                    "org.talend.components.salesforce.runtime.dataprep.SalesforceDataprepSource");
-            try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, classLoader)) {
-                SalesforceRuntimeSourceOrSink runtime = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
+            Consumer consumer = new Consumer() {
 
-                SalesforceInputProperties properties = new SalesforceInputProperties("model");
-                properties.setDatasetProperties(this);
+                @Override
+                public void accept(SalesforceRuntimeSourceOrSink runtime) throws IOException {
+                    List<NamedThing> moduleNames = runtime.getSchemaNames(null);
+                    moduleName.setPossibleNamedThingValues(moduleNames);
+                }
+            };
+            runtimeTask(consumer);
+        }
+    }
 
-                runtime.initialize(null, properties);
-                runtime.validate(null);
-                List<NamedThing> moduleNames = runtime.getSchemaNames(null);
-                moduleName.setPossibleNamedThingValues(moduleNames);
-            }
+    private void retrieveModuleFields() throws IOException {
+        // refresh the module list
+        if (sourceType.getValue() == SourceType.MODULE_SELECTION && StringUtils.isNotEmpty(moduleName.getValue())) {
+            Consumer consumer = new Consumer() {
+
+                @Override
+                public void accept(SalesforceRuntimeSourceOrSink runtime) throws IOException {
+                    List<NamedThing> moduleNames = runtime.getSchemaNames(null);
+                    moduleName.setPossibleNamedThingValues(moduleNames);
+
+                    Schema schema = runtime.getEndpointSchema(null, moduleName.getValue());
+                    List<NamedThing> columns = new ArrayList<>();
+                    for (Schema.Field field : schema.getFields()) {
+                        columns.add(new SimpleNamedThing(field.name(), field.name()));
+                    }
+                    selectColumnIds.setPossibleValues(columns);
+                }
+            };
+            runtimeTask(consumer);
+        }
+    }
+
+    private interface Consumer {
+
+        void accept(SalesforceRuntimeSourceOrSink runtime) throws IOException;
+    }
+
+    private void runtimeTask(Consumer task) throws IOException {
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        RuntimeInfo runtimeInfo = SalesforceDefinition
+                .getCommonRuntimeInfo("org.talend.components.salesforce.runtime.dataprep.SalesforceDataprepSource");
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, classLoader)) {
+            SalesforceRuntimeSourceOrSink runtime = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
+
+            SalesforceInputProperties properties = new SalesforceInputProperties("model");
+            properties.setDatasetProperties(this);
+
+            throwExceptionIfValidationResultIsError(runtime.initialize(null, properties));
+            throwExceptionIfValidationResultIsError(runtime.validate(null));
+
+            task.accept(runtime);
+        }
+    }
+
+    private void throwExceptionIfValidationResultIsError(ValidationResult validationResult) {
+        if (validationResult == null) {
+            return;
+        }
+
+        if (validationResult.getStatus() == ValidationResult.Result.ERROR) {
+            throw TalendRuntimeException.createUnexpectedException(validationResult.getMessage());
         }
     }
 
     public void afterSourceType() throws IOException {
         // refresh the module list
         retrieveModules();
+        moduleName.setValue(null);
+        selectColumnIds.setValue(null);
+        query.setValue(null);
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterModuleName() throws IOException {
+        // refresh the module list
+        retrieveModuleFields();
+        selectColumnIds.setValue(null);
+        query.setValue(null);
         refreshLayout(getForm(Form.MAIN));
     }
 
@@ -102,6 +169,9 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
         mainForm.addRow(Widget.widget(sourceType).setWidgetType(Widget.RADIO_WIDGET_TYPE));
         mainForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
         mainForm.addRow(Widget.widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
+        mainForm.addRow(Widget.widget(selectColumnIds).setWidgetType(Widget.MULTIPLE_VALUE_SELECTOR_WIDGET_TYPE));
+        mainForm.getWidget(selectColumnIds).setVisible(false);
+        selectColumnIds.setRequired(false);
     }
 
     /**
@@ -113,18 +183,37 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
         if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
             form.getWidget(moduleName).setVisible(true);
             moduleName.setRequired(true);
-            //We can not have a hidden field which is required
+            // We can not have a hidden field which is required
             form.getWidget(query).setVisible(false);
             query.setRequired(false);
-        }
-        else if (sourceType.getValue() == SourceType.SOQL_QUERY) {
+            if (StringUtils.isNotEmpty(moduleName.getValue())) {
+                form.getWidget(selectColumnIds).setVisible();
+                selectColumnIds.setRequired(true);
+            } else {
+                form.getWidget(selectColumnIds).setVisible(false);
+                selectColumnIds.setRequired(false);
+            }
+
+        } else if (sourceType.getValue() == SourceType.SOQL_QUERY) {
             form.getWidget(query).setVisible(true);
             query.setRequired();
-            //We can not have a hidden field which is required
+            // We can not have a hidden field which is required
             form.getWidget(moduleName).setVisible(false);
             moduleName.setRequired(false);
+            form.getWidget(selectColumnIds).setVisible(false);
+            selectColumnIds.setRequired(false);
         }
         super.refreshLayout(form);
+    }
+
+    @Override
+    public void refreshProperties() {
+        try {
+            retrieveModules();
+            retrieveModuleFields();
+        } catch (IOException e) {
+            LOGGER.error("Cannot retrieve modules or field of a module", e);
+        }
     }
 
     @Override
@@ -137,8 +226,7 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
         datastore.setReference(datastoreProperties);
         try {
             retrieveModules();
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
             LOGGER.error("error getting salesforce modules", e);
             throw new TalendRuntimeException(SalesforceErrorCodes.UNABLE_TO_RETRIEVE_MODULES, e);
         }

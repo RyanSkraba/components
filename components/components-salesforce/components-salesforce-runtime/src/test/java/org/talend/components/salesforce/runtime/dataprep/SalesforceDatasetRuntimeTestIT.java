@@ -1,5 +1,7 @@
 package org.talend.components.salesforce.runtime.dataprep;
 
+import java.util.Arrays;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Assert;
@@ -14,6 +16,7 @@ public class SalesforceDatasetRuntimeTestIT {
     @Test
     public void testGetSchemaForModule() {
         SalesforceDatasetProperties dataset = createDatasetPropertiesForModule();
+        dataset.selectColumnIds.setValue(Arrays.asList("IsDeleted", "Id"));
 
         SalesforceDatasetRuntime runtime = new SalesforceDatasetRuntime();
         runtime.initialize(null, dataset);
@@ -38,6 +41,7 @@ public class SalesforceDatasetRuntimeTestIT {
     @Test
     public void testGetSampleForModule() {
         SalesforceDatasetProperties dataset = createDatasetPropertiesForModule();
+        dataset.selectColumnIds.setValue(Arrays.asList("IsDeleted", "Id"));
         getSampleAction(dataset);
     }
 

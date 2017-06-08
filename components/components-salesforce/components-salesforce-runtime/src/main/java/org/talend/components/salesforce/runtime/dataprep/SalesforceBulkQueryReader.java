@@ -30,7 +30,6 @@ import org.talend.components.salesforce.runtime.BulkResultSet;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime;
 import org.talend.components.salesforce.runtime.common.ConnectionHolder;
 import org.talend.components.salesforce.soql.SoqlQuery;
-import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 import com.sforce.async.AsyncApiException;
@@ -54,7 +53,7 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
 
     protected transient Schema querySchema;
 
-    private int dataCount;;
+    private int dataCount;
 
     public SalesforceBulkQueryReader(RuntimeContainer container, SalesforceDataprepSource source,
             SalesforceInputProperties properties) {
@@ -148,10 +147,15 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
 
     private String getQueryString() throws IOException {
         if (dataset.sourceType.getValue() == SourceType.MODULE_SELECTION) {
+            final Schema schema = getSchema();
+            if (schema == null) {
+                throw new IllegalStateException("The schema must not be null");
+            }
+
             StringBuilder sb = new StringBuilder();
             sb.append("select ");
             int count = 0;
-            for (Schema.Field se : getSchema().getFields()) {
+            for (Schema.Field se : schema.getFields()) {
                 if (count++ > 0) {
                     sb.append(", ");
                 }
@@ -171,9 +175,9 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
         } else {
             String query = dataset.query.getValue();
             if (query != null && !query.isEmpty()) {
-                SoqlQuery soql_instance = SoqlQuery.getInstance();
-                soql_instance.init(query);
-                return soql_instance.getDrivingEntityName();
+                SoqlQuery soqlInstance = SoqlQuery.getInstance();
+                soqlInstance.init(query);
+                return soqlInstance.getDrivingEntityName();
             }
             return null;
         }
@@ -188,20 +192,11 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
     }
 
     private Schema getSchema() throws IOException {
-        if (querySchema != null) {
-            return querySchema;
+        if (querySchema == null) {
+            SalesforceDataprepSource sds = (SalesforceDataprepSource) getCurrentSource();
+            return SalesforceSchemaUtils.getSchema(dataset, sds, container);
         }
-
-        if (AvroUtils.isSchemaEmpty(querySchema)) {
-            if (dataset.sourceType.getValue() == SourceType.MODULE_SELECTION) {
-                querySchema = getCurrentSource().getEndpointSchema(container, dataset.moduleName.getValue());
-                return querySchema;
-            } else {
-                querySchema = ((SalesforceDataprepSource) getCurrentSource()).guessSchema(dataset.query.getValue());
-                return querySchema;
-            }
-        }
-
-        return null;
+        return querySchema;
     }
+
 }

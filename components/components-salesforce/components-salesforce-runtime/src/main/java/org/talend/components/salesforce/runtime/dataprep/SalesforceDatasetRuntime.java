@@ -13,6 +13,8 @@
 package org.talend.components.salesforce.runtime.dataprep;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -24,6 +26,7 @@ import org.talend.components.salesforce.dataprep.SalesforceInputProperties;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties.SourceType;
 import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -61,15 +64,14 @@ public class SalesforceDatasetRuntime implements DatasetRuntime<SalesforceDatase
 
         try {
             // TODO the UI will be a radio, need to adjust here
-            if (dataset.sourceType.getValue() == SourceType.MODULE_SELECTION) {
-                return sds.getEndpointSchema(container, dataset.moduleName.getValue());
-            } else {
-                return sds.guessSchema(dataset.query.getValue());
-            }
+            return SalesforceSchemaUtils.getSchema(dataset, sds, container);
+
         } catch (IOException e) {
             throw new ComponentException(e);
         }
     }
+
+
 
     @Override
     public void getSample(int limit, Consumer<IndexedRecord> consumer) {

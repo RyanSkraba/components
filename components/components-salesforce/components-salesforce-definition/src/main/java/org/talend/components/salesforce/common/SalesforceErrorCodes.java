@@ -27,6 +27,7 @@ import org.talend.daikon.exception.error.ErrorCode;
 public enum SalesforceErrorCodes implements ErrorCode {
 
     UNABLE_TO_RETRIEVE_MODULES(SC_INTERNAL_SERVER_ERROR),
+    UNABLE_TO_RETRIEVE_MODULE_FIELDS(SC_INTERNAL_SERVER_ERROR),
 
     ERROR_IN_BULK_QUERY_PROCESSING(SC_BAD_REQUEST, ExceptionContext.KEY_MESSAGE),
 

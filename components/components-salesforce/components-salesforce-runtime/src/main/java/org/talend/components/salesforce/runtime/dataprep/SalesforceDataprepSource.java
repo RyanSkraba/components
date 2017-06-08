@@ -142,6 +142,10 @@ public final class SalesforceDataprepSource
 
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
+        if (connectionHolder == null) {
+            LOG.error("Cannot retrieve the schema due to null connection holder");
+            throw new IllegalStateException("The Salesforce connection holder is null whereas it must not be");
+        }
         return SalesforceRuntimeCommon.getSchemaNames(connectionHolder.connection);
     }
 
