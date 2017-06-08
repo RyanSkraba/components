@@ -47,7 +47,7 @@ public class AzureStorageUtilsTest {
     @Before
     public void setUp() throws Exception {
         azureStorageUtils = new AzureStorageUtils();
-        folder = getClass().getResource("/").getPath() + TEST_FOLDER_PUT;
+        folder = getClass().getResource("/").getPath();
     }
 
     /**

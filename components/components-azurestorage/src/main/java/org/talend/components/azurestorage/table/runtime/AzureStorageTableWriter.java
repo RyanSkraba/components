@@ -256,7 +256,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
 
             String sName = f.name(); // schema name
             Schema fSchema = f.schema();
-            if (fSchema.getType() == Type.STRING.UNION) {
+            if (fSchema.getType() == Type.UNION) {
                 for (Schema s : f.schema().getTypes()) {
                     if (s.getType() != Type.NULL) {
                         fSchema = s;
@@ -266,9 +266,9 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             }
 
 
-            if (sName.equals(AzureStorageTableProperties.TABLE_PARTITION_KEY)) {
+            if (sName.equals(partitionKey)) {
                 entity.setPartitionKey((String) indexedRecord.get(f.pos()));
-            } else if (sName.equals(AzureStorageTableProperties.TABLE_ROW_KEY)) {
+            } else if (sName.equals(rowKey)) {
                 entity.setRowKey((String) indexedRecord.get(f.pos()));
             } else if (sName.equals(AzureStorageTableProperties.TABLE_TIMESTAMP)) {
                 // nop : managed by server
