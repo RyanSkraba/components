@@ -13,6 +13,7 @@
 package org.talend.components.salesforce.runtime;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.java8.SerializableFunction;
+
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
 
@@ -331,6 +333,10 @@ public class SalesforceAvroRegistry extends AvroRegistry {
         @Override
         public String convertToDatum(Long value) {
             return value == null ? null : format.format(new Date(value));
+        }
+        
+        public DateFormat getFormat() {
+            return format;
         }
 
     }

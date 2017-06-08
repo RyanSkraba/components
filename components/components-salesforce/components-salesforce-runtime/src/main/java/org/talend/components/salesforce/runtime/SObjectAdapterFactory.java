@@ -12,18 +12,25 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
+import org.talend.components.salesforce.runtime.SalesforceAvroRegistry.StringToDateConverter;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 import com.sforce.soap.partner.sobject.SObject;
+import com.sforce.ws.bind.CalendarCodec;
 import com.sforce.ws.bind.XmlObject;
+import com.sforce.ws.util.Base64;
 
 /**
  * Creates an {@link IndexedRecordConverter} that knows how to interpret Salesforce {@link SObject} objects.
@@ -33,6 +40,8 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
     private Schema schema;
 
     private String names[];
+
+    private Map<String, AvroConverter> name2converter;
 
     /**
      * The cached AvroConverter objects for the fields of this record.
@@ -71,8 +80,13 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
 
         private String rootType;
 
+        private boolean isAggregateResult;
+
         public SObjectIndexedRecord(SObject value) {
             rootType = value.getType();
+            isAggregateResult = "AggregateResult".equals(rootType);
+            init();
+
             Iterator<XmlObject> fields = value.getChildren();
             while (fields.hasNext()) {
                 XmlObject field = fields.next();
@@ -98,21 +112,27 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
         @SuppressWarnings("unchecked")
         @Override
         public Object get(int i) {
-            // Lazy initialization of the cached converter objects.
-            if (names == null) {
-                names = new String[getSchema().getFields().size()];
-                fieldConverter = new AvroConverter[names.length];
-                for (int j = 0; j < names.length; j++) {
-                    Field f = getSchema().getFields().get(j);
-                    names[j] = f.name();
-                    fieldConverter[j] = SalesforceAvroRegistry.get().getConverterFromString(f);
-                }
-            }
             Object value = valueMap.get(names[i]);
             if (value == null) {
                 value = valueMap.get(rootType + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER) + names[i]);
             }
             return fieldConverter[i].convertToAvro(value);
+        }
+
+        private void init() {
+            if (names == null) {
+                List<Schema.Field> fields = getSchema().getFields();
+                names = new String[fields.size()];
+                fieldConverter = new AvroConverter[names.length];
+                name2converter = new HashMap<String, AvroConverter>();
+                for (int j = 0; j < names.length; j++) {
+                    Field f = getSchema().getFields().get(j);
+                    names[j] = f.name();
+                    fieldConverter[j] = SalesforceAvroRegistry.get().getConverterFromString(f);
+                    name2converter.put(f.name(), fieldConverter[j]);
+                    name2converter.put(rootType + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER) + f.name(), fieldConverter[j]);
+                }
+            }
         }
 
         /**
@@ -155,12 +175,13 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
                                     + xo.getName().getLocalPart();
                             String tempPrefixTypeName = null;
                             if (null != prefixTypeName) {
-                                tempPrefixTypeName = prefixTypeName + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER)
+                                tempPrefixTypeName = prefixTypeName
+                                        + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER)
                                         + xo.getName().getLocalPart();
                             } else if (typeCount != 0 && null != typeName) {
                                 // Initialize type prefix name only for child relation object.
-                                tempPrefixTypeName = tempPrefixName + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER)
-                                        + typeName;
+                                tempPrefixTypeName = tempPrefixName
+                                        + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER) + typeName;
                             }
                             processXmlObject(xmlObject, tempPrefixName, tempPrefixTypeName);
                         } else {
@@ -177,6 +198,8 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
             }
         }
 
+        final private CalendarCodec calendarCodec = new CalendarCodec();
+
         /**
          * Puts parsed values into value map by column names or complex column names.<br/>
          * For <b>Parent-to-Child</b> relation stores duplicates to grant a possibility<br/>
@@ -191,21 +214,67 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
             if (value == null || "".equals(value)) {
                 return;
             }
+
             String columnName = null;
             if (prefixName != null && prefixName.length() > 0) {
                 columnName = prefixName + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER)
-                + xo.getName().getLocalPart();
+                        + xo.getName().getLocalPart();
             } else {
                 columnName = xo.getName().getLocalPart();
             }
+
             if (valueMap.get(columnName) == null) {
-                valueMap.put(columnName, value);
+                valueMap.put(columnName, formatIfNecessary(value, columnName));
             } else {
                 if (!columnName.equals(xo.getName().getLocalPart())) {
-                    valueMap.put(columnName,
-                            valueMap.get(columnName) + schema.getProp(SalesforceSchemaConstants.VALUE_DELIMITER) + value);
+                    valueMap.put(columnName, valueMap.get(columnName) + schema.getProp(SalesforceSchemaConstants.VALUE_DELIMITER)
+                            + formatIfNecessary(value, columnName));
                 }
             }
+        }
+
+        private String formatIfNecessary(Object value, String columnName) {
+            final String text;
+            if (isAggregateResult) {
+                if (value instanceof String) {
+                    text = value.toString();
+                } else if (value instanceof Integer) {
+                    text = "" + value;
+                } else if (value instanceof BigDecimal) {
+                    text = ((BigDecimal) value).toPlainString();
+                } else if (value instanceof Long) {
+                    text = "" + value;
+                } else if (value instanceof Date) {
+                    AvroConverter converter = name2converter.get(columnName);
+                    if ((converter == null) || !(converter instanceof StringToDateConverter)) {
+                        text = calendarCodec.getValueAsString(value);
+                    } else {
+                        StringToDateConverter stdc = (StringToDateConverter) converter;
+                        text = stdc.getFormat().format((Date) value);
+                    }
+                } else if (value instanceof Calendar) {
+                    AvroConverter converter = name2converter.get(columnName);
+                    if ((converter == null) || !(converter instanceof StringToDateConverter)) {
+                        text = calendarCodec.getValueAsString(value);
+                    } else {
+                        StringToDateConverter stdc = (StringToDateConverter) converter;
+                        text = stdc.getFormat().format(((Calendar) value).getTime());
+                    }
+                } else if (value instanceof Boolean) {
+                    text = "" + value;
+                } else if (value instanceof Double) {
+                    text = ((Double) value).toString();
+                } else if (value instanceof Float) {
+                    text = "" + value;
+                } else if (value instanceof byte[]) {
+                    text = new String(Base64.encode((byte[]) value));
+                } else {
+                    text = value.toString();
+                }
+            } else {
+                text = value.toString();
+            }
+            return text;
         }
     }
 

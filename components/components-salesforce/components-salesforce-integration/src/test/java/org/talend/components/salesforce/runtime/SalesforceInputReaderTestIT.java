@@ -54,7 +54,6 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         deleteAllAccountTestRows();
     }
 
-
     public static Schema SCHEMA_QUERY_ACCOUNT = SchemaBuilder.builder().record("Schema").fields() //
             .name("Id").type().stringType().noDefault() //
             .name("Name").type().stringType().noDefault() //
@@ -141,13 +140,14 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         try {
             TSalesforceInputProperties properties = createTSalesforceInputProperties(false, true);
             properties.manualQuery.setValue(false);
-            SalesforceBulkQueryInputReader reader = (SalesforceBulkQueryInputReader) this.<IndexedRecord>createBoundedReader(properties);
+            SalesforceBulkQueryInputReader reader = (SalesforceBulkQueryInputReader) this
+                    .<IndexedRecord> createBoundedReader(properties);
             reader.start();
             reader.close();
             // Job could be closed on Salesforce side and previously we tried to close it again, we shouldn't do that.
             // We can emulate this like calling close the job second time.
             reader.close();
-        } catch(Throwable t) {
+        } catch (Throwable t) {
             Assert.fail("This test shouldn't throw any errors, since we're closing already closed job");
         }
 
@@ -293,6 +293,103 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
     @Test
     public void testBulkManualQueryDynamic() throws Throwable {
         testManualQueryDynamic(true);
+    }
+
+    private final static Schema SCHEMA_INT = SchemaBuilder.builder().record("Schema").fields().name("VALUE").type().intType()
+            .noDefault().endRecord();
+
+    private final Schema SCHEMA_DOUBLE = SchemaBuilder.builder().record("Schema").fields().name("VALUE").type().doubleType()
+            .noDefault().endRecord();
+    
+    private final Schema SCHEMA_STRING = SchemaBuilder.builder().record("Schema").fields().name("VALUE").type().stringType()
+            .noDefault().endRecord();
+
+    private final Schema SCHEMA_DATE;
+    {
+        List<Schema.Field> fields = new ArrayList<>();
+        Schema.Field avroField = new Schema.Field("VALUE", AvroUtils.wrapAsNullable(AvroUtils._date()), null, (String)null);
+        avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd HH");
+        fields.add(avroField);
+        SCHEMA_DATE = Schema.createRecord("Schema", null, null, false, fields);
+    }
+
+    @Test
+    public void testAggregrateQueryWithDoubleTypeAndBasicQuery() throws Throwable {
+        TSalesforceInputProperties props = createTSalesforceInputProperties(true, false);
+        props.manualQuery.setValue(true);
+        props.query.setValue("SELECT AVG(Amount) VALUE FROM Opportunity");// alias is necessary and should be the same with schema
+        props.module.main.schema.setValue(SCHEMA_DOUBLE);
+        List<IndexedRecord> outputRows = readRows(props);
+        assertEquals(1, outputRows.size());
+        IndexedRecord record = outputRows.get(0);
+        assertNotNull(record.getSchema());
+        Object value = record.get(0);
+        Assert.assertTrue(value != null && value instanceof Double);
+    }
+
+    @Test
+    public void testAggregrateQueryWithIntTypeAndBasicQuery() throws Throwable {
+        TSalesforceInputProperties props = createTSalesforceInputProperties(true, false);
+        props.manualQuery.setValue(true);
+        props.query.setValue("SELECT COUNT(ID) VALUE FROM Account WHERE Name LIKE 'a%'");// alias is necessary and should be the
+                                                                                         // same with schema
+        props.module.main.schema.setValue(SCHEMA_INT);
+        List<IndexedRecord> outputRows = readRows(props);
+        assertEquals(1, outputRows.size());
+        IndexedRecord record = outputRows.get(0);
+        assertNotNull(record.getSchema());
+        Object value = record.get(0);
+        Assert.assertTrue(value != null && value instanceof Integer);
+    }
+
+    @Test
+    public void testAggregrateQueryWithDateTypeAndBasicQuery() throws Throwable {
+        TSalesforceInputProperties props = createTSalesforceInputProperties(true, false);
+        props.manualQuery.setValue(true);
+        props.query.setValue("SELECT MIN(CreatedDate) VALUE FROM Contact GROUP BY FirstName, LastName");// alias is
+                                                                                                        // necessary
+                                                                                                        // and
+                                                                                                        // should
+                                                                                                        // be the
+                                                                                                        // same
+                                                                                                        // with
+                                                                                                        // schema
+        props.module.main.schema.setValue(SCHEMA_DATE);
+        List<IndexedRecord> outputRows = readRows(props);
+
+        if (outputRows.isEmpty()) {
+            return;
+        }
+
+        IndexedRecord record = outputRows.get(0);
+        assertNotNull(record.getSchema());
+        Object value = record.get(0);
+        Assert.assertTrue(value != null && value instanceof Long);
+    }
+    
+    @Test
+    public void testAggregrateQueryWithDateTypeAndStringOutputAndBasicQuery() throws Throwable {
+        TSalesforceInputProperties props = createTSalesforceInputProperties(true, false);
+        props.manualQuery.setValue(true);
+        props.query.setValue("SELECT MIN(CreatedDate) VALUE FROM Contact GROUP BY FirstName, LastName");// alias is
+                                                                                                        // necessary
+                                                                                                        // and
+                                                                                                        // should
+                                                                                                        // be the
+                                                                                                        // same
+                                                                                                        // with
+                                                                                                        // schema
+        props.module.main.schema.setValue(SCHEMA_STRING);
+        List<IndexedRecord> outputRows = readRows(props);
+
+        if (outputRows.isEmpty()) {
+            return;
+        }
+
+        IndexedRecord record = outputRows.get(0);
+        assertNotNull(record.getSchema());
+        Object value = record.get(0);
+        Assert.assertTrue(value != null && value instanceof String);
     }
 
     public void testManualQueryDynamic(boolean isBulkQuery) throws Throwable {
