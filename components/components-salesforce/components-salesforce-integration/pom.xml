@@ -176,6 +176,9 @@
 						<salesforce.user>${salesforce.user}</salesforce.user>
 						<salesforce.password>${salesforce.password}</salesforce.password>
 						<salesforce.key>${salesforce.key}</salesforce.key>
+						<salesforce.user.expired>${salesforce.user.expired}</salesforce.user.expired>
+						<salesforce.password.expired>${salesforce.password.expired}</salesforce.password.expired>
+						<salesforce.key.expired>${salesforce.key.expired}</salesforce.key.expired>
 					</systemPropertyVariables>
 				</configuration>
 			</plugin>

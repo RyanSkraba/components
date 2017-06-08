@@ -50,6 +50,8 @@ import org.talend.components.salesforce.soql.SoqlQueryBuilder;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
@@ -61,6 +63,7 @@ import com.sforce.soap.partner.DescribeGlobalResult;
 import com.sforce.soap.partner.DescribeGlobalSObjectResult;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.GetUserInfoResult;
+import com.sforce.soap.partner.LoginResult;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
@@ -69,6 +72,9 @@ import com.sforce.ws.SessionRenewer;
 public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, SalesforceSchemaHelper<Schema> {
 
     private transient static final Logger LOG = LoggerFactory.getLogger(SalesforceSourceOrSink.class);
+
+    private static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(SalesforceSourceOrSink.class);
 
     protected SalesforceProvideConnectionProperties properties;
 
@@ -169,7 +175,16 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
                 config.setAuthEndpoint(endpoint);
             }
         }
+
+        config.setManualLogin(true);
+        // Creating connection and not login there.
         PartnerConnection connection = new PartnerConnection(config);
+        // Need to discard manual login parameter in configs to avoid execution errors.
+        config.setManualLogin(false);
+        if (null == config.getSessionId()) {
+            performLogin(config, connection);
+        }
+
         if (openNewSession && isReuseSession()) {
             this.sessionId = config.getSessionId();
             this.serviceEndPoint = config.getServiceEndpoint();
@@ -179,6 +194,26 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
             }
         }
         return connection;
+    }
+
+    /**
+     * Provides manual login as in {@link PartnerConnection} constructor, checks login result for valid connection/credentials.
+     *
+     * @param config connector configuration with endpoint/userId/password
+     * @param connection to be used for login in Salesforce.
+     * @throws ConnectionException if password has been expired or bad connection to Salesforce.
+     * @see com.sforce.soap.partner.PartnerConnection#PartnerConnection(ConnectorConfig config)
+     */
+    private void performLogin(ConnectorConfig config, PartnerConnection connection) throws ConnectionException {
+        config.setServiceEndpoint(config.getAuthEndpoint());
+        LoginResult loginResult = connection.login(config.getUsername(), config.getPassword());
+        if (loginResult.isPasswordExpired()) {
+            throw new ConnectionException(MESSAGES.getMessage("error.expiredPassword"));
+        }
+        config.setSessionId(loginResult.getSessionId());
+        config.setServiceEndpoint(loginResult.getServerUrl());
+
+        connection.setSessionHeader(loginResult.getSessionId());
     }
 
     protected ConnectionHolder connect(RuntimeContainer container) throws IOException {

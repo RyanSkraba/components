@@ -16,7 +16,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
@@ -29,7 +31,18 @@ import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.fault.LoginFault;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+
 public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
+
+    public static final String USER_ID_EXPIRED = System.getProperty("salesforce.user.expired");
+
+    public static final String PASSWORD_EXPIRED = System.getProperty("salesforce.password.expired");
+
+    public static final String SECURITY_KEY_EXPIRED = System.getProperty("salesforce.key.expired");
 
     @Test
     public void testInitialize() {
@@ -46,7 +59,7 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
         salesforceSourceOrSink.initialize(null, props);
         assertEquals(Result.OK, salesforceSourceOrSink.validate(null).getStatus());
-        // check validate is ERROR with wrong creadentials
+        // check validate is ERROR with wrong credentials
         props.userPassword.userId.setValue("");
         assertEquals(Result.ERROR, salesforceSourceOrSink.validate(null).getStatus());
     }
@@ -83,6 +96,34 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         };
         salesforceSourceOrSink.initialize(null, scmp);
         assertEquals(scmp.connection, salesforceSourceOrSink.getConnectionProperties());
+    }
+
+    @Ignore("Will be un ignored when DEVOPS - 2419 will be fixed correctly")
+    @Test(expected = ConnectionException.class)
+    public void testSalesForcePasswordExpired() throws ConnectionException {
+        SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
+        TSalesforceInputProperties properties = (TSalesforceInputProperties) new TSalesforceInputProperties(null).init();
+        salesforceSourceOrSink.initialize(null, properties);
+
+        ConnectorConfig config = new ConnectorConfig();
+        config.setUsername(StringUtils.strip(USER_ID_EXPIRED, "\""));
+        String password = StringUtils.strip(PASSWORD_EXPIRED, "\"");
+        String securityKey = StringUtils.strip(SECURITY_KEY_EXPIRED, "\"");
+        if (StringUtils.isNotEmpty(securityKey)) {
+            password = password + securityKey;
+        }
+        config.setPassword(password);
+
+        PartnerConnection connection = null;
+        try {
+            connection = salesforceSourceOrSink.doConnection(config, true);
+        } catch (LoginFault ex) {
+            Assert.fail("Must be an exception related to expired password, not the Login Fault.");
+        } finally {
+            if (null != connection) {
+                connection.logout();
+            }
+        }
     }
 
 }
