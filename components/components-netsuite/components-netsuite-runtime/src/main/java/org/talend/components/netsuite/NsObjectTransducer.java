@@ -266,11 +266,12 @@ public abstract class NsObjectTransducer {
                 beanInfo.getProperty("customFieldList") != null) {
             List<?> customFieldList = (List<?>) getProperty(nsObject, "customFieldList.customField");
             if (customFieldList != null && !customFieldList.isEmpty()) {
+                // Traverse all received custom fields and extract fields specified in schema
                 for (Object customField : customFieldList) {
                     String scriptId = (String) getSimpleProperty(customField, "scriptId");
                     CustomFieldDesc customFieldInfo = customFieldMap.get(scriptId);
-                    String fieldName = customFieldInfo.getName();
                     if (customFieldInfo != null) {
+                        String fieldName = customFieldInfo.getName();
                         valueMap.put(fieldName, customField);
                     }
                 }
