@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NsWriteResponse;
@@ -38,8 +39,8 @@ public class NetSuiteUpsertWriter<T, RefT> extends NetSuiteOutputWriter<T, RefT>
      */
     private boolean useNativeUpsert;
 
-    public NetSuiteUpsertWriter(NetSuiteWriteOperation writeOperation, MetaDataSource metaDataSource) {
-        super(writeOperation, metaDataSource);
+    public NetSuiteUpsertWriter(NetSuiteWriteOperation writeOperation, RuntimeContainer container, MetaDataSource metaDataSource) {
+        super(writeOperation, container, metaDataSource);
     }
 
     public boolean isUseNativeUpsert() {

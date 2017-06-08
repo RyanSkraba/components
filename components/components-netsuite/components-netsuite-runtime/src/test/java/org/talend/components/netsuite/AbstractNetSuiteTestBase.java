@@ -111,7 +111,12 @@ public abstract class AbstractNetSuiteTestBase {
 
         for (PropertyInfo propertyInfo : propertyInfoList) {
             if (propertyInfo.getWriteType() != null) {
-                Object value = composeValue(propertyInfo.getWriteType());
+                Object value;
+                if (propertyInfo.getName().equals("internalId")) {
+                    value = composeValue(Integer.class).toString();
+                } else {
+                    value = composeValue(propertyInfo.getWriteType());
+                }
                 setProperty(obj, propertyInfo.getName(), value);
             }
         }

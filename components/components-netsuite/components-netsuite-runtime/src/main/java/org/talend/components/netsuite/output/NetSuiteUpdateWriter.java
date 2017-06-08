@@ -15,6 +15,7 @@ package org.talend.components.netsuite.output;
 
 import java.util.List;
 
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NsWriteResponse;
@@ -27,8 +28,8 @@ import org.talend.components.netsuite.client.NsWriteResponse;
  */
 public class NetSuiteUpdateWriter<T, RefT> extends NetSuiteOutputWriter<T, RefT> {
 
-    public NetSuiteUpdateWriter(NetSuiteWriteOperation writeOperation, MetaDataSource metaDataSource) {
-        super(writeOperation, metaDataSource);
+    public NetSuiteUpdateWriter(NetSuiteWriteOperation writeOperation, RuntimeContainer container, MetaDataSource metaDataSource) {
+        super(writeOperation, container, metaDataSource);
     }
 
     @Override

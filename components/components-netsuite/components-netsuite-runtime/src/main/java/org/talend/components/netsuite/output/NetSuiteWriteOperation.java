@@ -69,20 +69,20 @@ public class NetSuiteWriteOperation implements WriteOperation<Result> {
         NetSuiteOutputWriter<?, ?> writer;
         switch (action) {
         case ADD:
-            writer = new NetSuiteAddWriter<>(this, metaDataSource);
+            writer = new NetSuiteAddWriter<>(this, adaptor, metaDataSource);
             break;
         case UPDATE:
-            writer = new NetSuiteUpsertWriter<>(this, metaDataSource);
+            writer = new NetSuiteUpsertWriter<>(this, adaptor, metaDataSource);
             break;
         case UPSERT:
-            writer = new NetSuiteUpsertWriter<>(this, metaDataSource);
+            writer = new NetSuiteUpsertWriter<>(this, adaptor, metaDataSource);
             Boolean useNativeUpsert = properties.module.useNativeUpsert.getValue();
             if (useNativeUpsert != null) {
                 ((NetSuiteUpsertWriter) writer).setUseNativeUpsert(useNativeUpsert);
             }
             break;
         case DELETE:
-            writer = new NetSuiteDeleteWriter<>(this, metaDataSource);
+            writer = new NetSuiteDeleteWriter<>(this, adaptor, metaDataSource);
             break;
         default:
             throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.INTERNAL_ERROR),

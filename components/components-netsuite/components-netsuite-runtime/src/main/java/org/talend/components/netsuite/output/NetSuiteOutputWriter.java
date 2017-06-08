@@ -20,9 +20,12 @@ import java.util.List;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.netsuite.NetSuiteDatasetRuntimeImpl;
 import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
@@ -49,8 +52,13 @@ import org.talend.components.netsuite.client.model.TypeDesc;
  */
 public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+
     /** Write operation which created this writer. */
     private final NetSuiteWriteOperation writeOperation;
+
+    /** Runtime container for this writer. */
+    private final RuntimeContainer container;
 
     // Holds accumulated write responses for a current batch
     private final List<NsWriteResponse<RefT>> writeResponses = new ArrayList<>();
@@ -91,8 +99,9 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
     /** Translates {@code IndexedRecord} to NetSuite data object. */
     protected NsObjectOutputTransducer transducer;
 
-    public NetSuiteOutputWriter(NetSuiteWriteOperation writeOperation, MetaDataSource metaDataSource) {
+    public NetSuiteOutputWriter(NetSuiteWriteOperation writeOperation, RuntimeContainer container, MetaDataSource metaDataSource) {
         this.writeOperation = writeOperation;
+        this.container = container;
         this.metaDataSource = metaDataSource;
     }
 
@@ -230,6 +239,9 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
      */
     private void processWriteResponse(NsWriteResponse<RefT> response, IndexedRecord indexedRecord) {
         writeResponses.add(response);
+        processReturnVariables(response);
+        result.totalCount++;
+
         if (response.getStatus().isSuccess()) {
             IndexedRecord targetRecord = createSuccessRecord(response, indexedRecord);
             successfulWrites.add(targetRecord);
@@ -242,7 +254,30 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
             rejectedWrites.add(targetRecord);
             result.rejectCount++;
         }
-        result.totalCount++;
+    }
+
+    /**
+     * Update return variables from given {@code IndexedRecord} after write.
+     *
+     * @param response write response
+     */
+    private void processReturnVariables(final NsWriteResponse<RefT> response) {
+        if (container != null) {
+            String internalId = null;
+            if (response.getRef() != null) {
+                NsRef ref = NsRef.fromNativeRef(response.getRef());
+                internalId = ref.getInternalId();
+            }
+            try {
+                // For compatibility with old component, current internal ID is stored as Integer.
+                container.setComponentData(container.getCurrentComponentId(),
+                        NetSuiteOutputDefinition.RETURN_LEGACY_CURRENT_INTERNAL_ID,
+                        (internalId != null ? Integer.parseInt(internalId) : null));
+            } catch (NumberFormatException e) {
+                // Normally this should not happen but we need to avoid failure of writer.
+                logger.error("Couldn't parse internalId as Integer: {}", internalId);
+            }
+        }
     }
 
     /**
