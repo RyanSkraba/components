@@ -16,7 +16,7 @@
         <dependency>
             <groupId>net.snowflake</groupId>
             <artifactId>snowflake-jdbc</artifactId>
-            <version>2.8.2</version>
+            <version>3.0.19</version>
         </dependency>
 
         <!-- APIs for all Components -->
@@ -196,7 +196,7 @@
                                 <Import-Package>
                                     !*internal,org.talend*,org.slf4j*,javax*,org.apache.commons*,org.xml.sax*,org.apache.avro.*,org.codehaus.jackson*
                                 </Import-Package>
-                                <Export-Package>org.talend.components.snowflake*,com.snowflake*</Export-Package>
+                                <Export-Package>org.talend.components.snowflake*,com.snowflake*,net.snowflake*</Export-Package>
                                 <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|auto-service</Embed-Dependency>
                                 <Include-Resource>
                                     {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt

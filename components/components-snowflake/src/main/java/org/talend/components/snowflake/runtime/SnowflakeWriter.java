@@ -42,12 +42,12 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
-import com.snowflake.client.loader.LoadResultListener;
-import com.snowflake.client.loader.LoaderFactory;
-import com.snowflake.client.loader.LoaderProperty;
-import com.snowflake.client.loader.LoadingError;
-import com.snowflake.client.loader.Operation;
-import com.snowflake.client.loader.StreamLoader;
+import net.snowflake.client.loader.LoadResultListener;
+import net.snowflake.client.loader.LoaderFactory;
+import net.snowflake.client.loader.LoaderProperty;
+import net.snowflake.client.loader.LoadingError;
+import net.snowflake.client.loader.Operation;
+import net.snowflake.client.loader.StreamLoader;
 
 public final class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 

@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.snowflake.test;
 
-import com.snowflake.client.jdbc.SnowflakeConnectionV1;
-import com.snowflake.client.loader.*;
+import net.snowflake.client.jdbc.SnowflakeConnectionV1;
+import net.snowflake.client.loader.*;
 import org.junit.*;
 
 import java.sql.*;
@@ -163,7 +163,6 @@ public class LoaderIT {
         // Delete staging area
         underTest = (StreamLoader) LoaderFactory.createLoader(
                 prop, putConnection, testConnection);
-        underTest.setProperty(LoaderProperty.asyncData, true);
         underTest.setProperty(LoaderProperty.startTransaction, true);
         underTest.setProperty(LoaderProperty.truncateTable, true);
         underTest.setProperty(LoaderProperty.executeBefore,
