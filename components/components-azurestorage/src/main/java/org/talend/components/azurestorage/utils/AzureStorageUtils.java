@@ -72,12 +72,7 @@ public class AzureStorageUtils {
                 }
             }
         } else {
-            if("".equals(keyParent)||keyParent==null){
-                map.put(file.getAbsolutePath(), file.getName());
-            }else{
-                map.put(file.getAbsolutePath(), keyParent);
-            }
-
+            throw new IllegalArgumentException(i18nMessages.getMessage("error.invalidDirectory"));
         }
         return map;
     }

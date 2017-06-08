@@ -23,8 +23,12 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 public class AzureStorageUtilsTest {
+
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider().getI18nMessages(AzureStorageUtils.class);
 
     private AzureStorageUtils azureStorageUtils;
 
@@ -55,12 +59,18 @@ public class AzureStorageUtilsTest {
         file = new File(folder);
         Map<String, String> result = azureStorageUtils.genAzureObjectList(file, keyparent);
         assertNotNull("result cannot be null", result);
-        file = new File(folder + "/blob1.txt");
-        result = azureStorageUtils.genAzureObjectList(file, keyparent);
-        assertNotNull("result cannot be null", result);
-        result = azureStorageUtils.genAzureObjectList(file, null);
-        assertEquals("blob1.txt", result.get(file.getAbsolutePath()));
 
+
+    }
+    
+    @Test
+    public void testIlleagueArguementException(){
+        try {
+            file = new File(folder + "/blob1.txt");
+            azureStorageUtils.genAzureObjectList(file, keyparent);
+        } catch (IllegalArgumentException ilae) {
+            assertEquals(i18nMessages.getMessage("error.invalidDirectory"), ilae.getMessage());
+        }
     }
 
     /**
