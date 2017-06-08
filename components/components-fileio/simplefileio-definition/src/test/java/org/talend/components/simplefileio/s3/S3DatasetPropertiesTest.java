@@ -75,12 +75,18 @@ public class S3DatasetPropertiesTest {
 
         Form main = properties.getForm(Form.MAIN);
         assertThat(main, notNullValue());
-        assertThat(main.getWidgets(), hasSize(13));
+        assertThat(main.getWidgets(), hasSize(11));
 
         for (String field : ALL) {
             Widget w = main.getWidget(field);
             assertThat(w, notNullValue());
         }
+
+        assertThat(properties.region.isRequired(), is(true));
+        assertThat(properties.unknownRegion.isRequired(), is(true));
+        assertThat(properties.bucket.isRequired(), is(true));
+        assertThat(properties.object.isRequired(), is(true));
+        assertThat(main.getWidget("bucket").getWidgetType(), is(Widget.DATALIST_WIDGET_TYPE));
     }
 
     /**

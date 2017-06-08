@@ -25,6 +25,7 @@ import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -37,13 +38,13 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
             S3DatastoreDefinition.NAME);
 
     // S3 Connectivity
-    public Property<S3Region> region = PropertyFactory.newEnum("region", S3Region.class).setValue(S3Region.DEFAULT);
+    public Property<S3Region> region = PropertyFactory.newEnum("region", S3Region.class).setValue(S3Region.DEFAULT).setRequired();
 
-    public Property<String> unknownRegion = PropertyFactory.newString("unknownRegion", "us-east-1");
+    public Property<String> unknownRegion = PropertyFactory.newString("unknownRegion", "us-east-1").setRequired();
 
-    public Property<String> bucket = PropertyFactory.newString("bucket");
+    public Property<String> bucket = PropertyFactory.newString("bucket").setRequired();
 
-    public Property<String> object = PropertyFactory.newString("object");
+    public Property<String> object = PropertyFactory.newString("object").setRequired();
 
     public Property<Boolean> encryptDataInMotion = PropertyFactory.newBoolean("encryptDataInMotion", false);
 
@@ -65,6 +66,9 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
             .setValue(FieldDelimiterType.SEMICOLON);
 
     public Property<String> specificFieldDelimiter = PropertyFactory.newString("specificFieldDelimiter", ";");
+
+    // TODO: If data-in-motion can be activated in the future, remove this flag.
+    public static final boolean ACTIVATE_DATA_IN_MOTION = false;
 
     public S3DatasetProperties(String name) {
         super(name);
@@ -93,10 +97,12 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
         // S3
         mainForm.addRow(region);
         mainForm.addRow(unknownRegion);
-        mainForm.addRow(bucket);
+        mainForm.addRow(Widget.widget(bucket).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
         mainForm.addRow(object);
-        mainForm.addRow(encryptDataInMotion);
-        mainForm.addRow(kmsForDataInMotion);
+        if (ACTIVATE_DATA_IN_MOTION) {
+            mainForm.addRow(encryptDataInMotion);
+            mainForm.addRow(kmsForDataInMotion);
+        }
         mainForm.addRow(encryptDataAtRest);
         mainForm.addRow(kmsForDataAtRest);
 
@@ -119,12 +125,14 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
 
             form.getWidget(bucket.getName()).setVisible();
             form.getWidget(object.getName()).setVisible();
-            form.getWidget(encryptDataInMotion.getName()).setVisible();
-            boolean isVisibleEncryptDataInMotion = form.getWidget(encryptDataInMotion).isVisible()
-                    && encryptDataInMotion.getValue();
-            form.getWidget(kmsForDataInMotion.getName()).setVisible(isVisibleEncryptDataInMotion);
+            if (ACTIVATE_DATA_IN_MOTION) {
+                form.getWidget(encryptDataInMotion.getName()).setVisible();
+                boolean isVisibleEncryptDataInMotion = form.getWidget(encryptDataInMotion).isVisible()
+                        && encryptDataInMotion.getValue();
+                form.getWidget(kmsForDataInMotion.getName()).setVisible(isVisibleEncryptDataInMotion);
+            }
             form.getWidget(encryptDataAtRest.getName()).setVisible();
-            boolean isVisibleEncryptDataAtRest = form.getWidget(encryptDataAtRest).isVisible() && encryptDataInMotion.getValue();
+            boolean isVisibleEncryptDataAtRest = form.getWidget(encryptDataAtRest).isVisible() && encryptDataAtRest.getValue();
             form.getWidget(kmsForDataAtRest.getName()).setVisible(isVisibleEncryptDataAtRest);
 
             form.getWidget(format).setVisible();

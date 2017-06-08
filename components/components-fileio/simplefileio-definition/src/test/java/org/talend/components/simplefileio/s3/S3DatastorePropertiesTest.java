@@ -35,6 +35,7 @@ public class S3DatastorePropertiesTest {
      * Useful constant listing all of the fields in the properties.
      */
     public static final Iterable<String> ALL = Arrays.asList("specifyCredentials", "accessKey", "secretKey");
+
     /**
      * Instance to test. A new instance is created for each test.
      */
@@ -61,6 +62,10 @@ public class S3DatastorePropertiesTest {
             Widget w = main.getWidget(field);
             assertThat(w, notNullValue());
         }
+
+        assertThat(properties.accessKey.isRequired(), is(false));
+        assertThat(properties.secretKey.isRequired(), is(false));
+        assertThat(main.getWidget("secretKey").getWidgetType(), is(Widget.HIDDEN_TEXT_WIDGET_TYPE));
     }
 
     /**

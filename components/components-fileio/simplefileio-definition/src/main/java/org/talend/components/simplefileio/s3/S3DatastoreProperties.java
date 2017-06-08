@@ -13,22 +13,25 @@
 
 package org.talend.components.simplefileio.s3;
 
+import static org.talend.daikon.properties.presentation.Widget.widget;
+
 import java.util.EnumSet;
 
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
 public class S3DatastoreProperties extends PropertiesImpl implements DatastoreProperties {
 
-    public Property<Boolean> specifyCredentials = PropertyFactory.newBoolean("specifyCredentials", true);
+    public Property<Boolean> specifyCredentials = PropertyFactory.newBoolean("specifyCredentials", true).setRequired();
 
     public Property<String> accessKey = PropertyFactory.newString("accessKey");
 
-    public Property<String> secretKey = PropertyFactory.newString("secretKey")
-            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
+    public Property<String> secretKey = PropertyFactory.newString("secretKey").setFlags(
+            EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     public S3DatastoreProperties(String name) {
         super(name);
@@ -40,7 +43,7 @@ public class S3DatastoreProperties extends PropertiesImpl implements DatastorePr
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(specifyCredentials);
         mainForm.addRow(accessKey);
-        mainForm.addRow(secretKey);
+        mainForm.addRow(widget(secretKey).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
     }
 
     @Override
