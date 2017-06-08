@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import com.snowflake.client.jdbc.internal.apache.commons.lang3.StringUtils;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.slf4j.Logger;
@@ -93,18 +94,49 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
     }
 
     public static ValidationResult validateConnection(SnowflakeProvideConnectionProperties properties) {
-        SnowflakeSourceOrSink sss = new SnowflakeSourceOrSink();
-        sss.initialize(null, (ComponentProperties) properties);
-        try {
-            sss.connect(null);
-            // Make sure we can get the schema names, as that tests that all of the connection parameters are really OK
-            sss.getSchemaNames((RuntimeContainer) null);
-        } catch (Exception ex) {
-            return exceptionToValidationResult(ex);
+        //check if every required properties was specified
+        ValidationResultMutable vr = validateConnectionProperties(properties);
+        if (vr.getStatus() == Result.OK) {
+            SnowflakeSourceOrSink sss = new SnowflakeSourceOrSink();
+            sss.initialize(null, (ComponentProperties) properties);
+            try {
+                sss.connect(null);
+                // Make sure we can get the schema names, as that tests that all of the connection parameters are really OK
+                sss.getSchemaNames((RuntimeContainer) null);
+            } catch (Exception ex) {
+                return exceptionToValidationResult(ex);
+            }
+            vr.setStatus(Result.OK);
+            vr.setMessage(SnowflakeConstants.CONNECTION_SUCCESSFUL_MESSAGE);
         }
+        return vr;
+    }
+
+    protected static ValidationResultMutable validateConnectionProperties(SnowflakeProvideConnectionProperties properties) {
         ValidationResultMutable vr = new ValidationResultMutable();
         vr.setStatus(Result.OK);
-        vr.setMessage(SnowflakeConstants.CONNECTION_SUCCESSFUL_MESSAGE);
+        SnowflakeConnectionProperties connectionProperties = properties.getConnectionProperties();
+        StringBuilder missingProperties = new StringBuilder();
+        if (StringUtils.isEmpty(connectionProperties.account.getValue())) {
+            missingProperties.append("'Account', ");
+        }
+        if (StringUtils.isEmpty(connectionProperties.userPassword.password.getValue())) {
+            missingProperties.append("'Password', ");
+        }
+        if (StringUtils.isEmpty(connectionProperties.userPassword.userId.getValue())) {
+            missingProperties.append("'UserID', ");
+        }
+        if (StringUtils.isEmpty(connectionProperties.schemaName.getValue())) {
+            missingProperties.append("'Schema', ");
+        }
+        if (StringUtils.isEmpty(connectionProperties.db.getValue())) {
+            missingProperties.append("'Database', ");
+        }
+        if (!missingProperties.toString().isEmpty()) {
+            vr.setStatus(Result.ERROR);
+            vr.setMessage(i18nMessages.getMessage("error.requiredPropertyIsEmpty",
+                    missingProperties.toString().substring(0, missingProperties.length() - 2)));
+        }
         return vr;
     }
 
@@ -215,8 +247,8 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
                 returnList.add(new SimpleNamedThing(tableName, tableName));
             }
         } catch (SQLException se) {
-            throw new IOException(i18nMessages.getMessage("error.searchingTable", getCatalog(connProps), getDbSchema(connProps),
-                    se.getMessage()), se);
+            throw new IOException(i18nMessages
+                    .getMessage("error.searchingTable", getCatalog(connProps), getDbSchema(connProps), se.getMessage()), se);
         }
         return returnList;
     }

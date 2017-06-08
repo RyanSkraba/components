@@ -22,6 +22,7 @@ import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
+import org.talend.daikon.properties.ValidationResult;
 
 /**
  * Unit-tests for {@link SnowflakeSourceOrSink} class
@@ -137,16 +138,33 @@ public class SnowflakeSourceOrSinkTest {
     }
 
     @Test
+    public void testValidatePropertiesWhenSchemaAndDBIsMissed() {
+        SnowflakeConnectionProperties connectionProperties = new SnowflakeConnectionProperties("test");
+        connectionProperties.account.setValue("notEmptyValue");
+        connectionProperties.userPassword.userId.setValue("notEmpty");
+        connectionProperties.userPassword.password.setValue("notEmpty");
+        connectionProperties.warehouse.setValue("notEmptyWH");
+        //Leave schema and db empty
+
+        ValidationResult vr = SnowflakeSourceOrSink.validateConnectionProperties(connectionProperties);
+
+
+        Assert.assertTrue(vr.getStatus() == ValidationResult.Result.ERROR);
+    }
+
+    @Test
     public void testI18NMessages() {
         I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider().getI18nMessages(SnowflakeSourceOrSink.class);
         String refComponentNotConnectedMessage = i18nMessages.getMessage("error.refComponentNotConnected");
         String refComponentWithoutPropertiesMessage = i18nMessages.getMessage("error.refComponentWithoutProperties");
         String errorDuringSearchingTable = i18nMessages.getMessage("error.searchingTable");
         String tableNotFoundMessage = i18nMessages.getMessage("error.tableNotFound");
+        String requiredPropertyIsEmptyMessage = i18nMessages.getMessage("error.requiredPropertyIsEmpty");
 
         assertFalse(refComponentNotConnectedMessage.equals("error.refComponentNotConnected"));
         assertFalse(refComponentWithoutPropertiesMessage.equals("error.refComponentWithoutProperties"));
         assertFalse(errorDuringSearchingTable.equals("error.searchingTable"));
         assertFalse(tableNotFoundMessage.equals("error.tableNotFound"));
+        assertFalse(requiredPropertyIsEmptyMessage.equals("error.requiredPropertyIsEmpty"));
     }
 }
