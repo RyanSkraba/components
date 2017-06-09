@@ -13,6 +13,8 @@
 
 package org.talend.components.netsuite.avro.converter;
 
+import java.util.Date;
+
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -25,13 +27,13 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.AvroConverter;
 
 /**
- * Responsible for conversion of <code>XMLGregorianCalendar</code> from/to <code>milliseconds</code>.
+ * Responsible for conversion of <code>XMLGregorianCalendar</code> from/to <code>date-time</code>.
  */
-public class XMLGregorianCalendarToLongConverter implements AvroConverter<XMLGregorianCalendar, Long> {
+public class XMLGregorianCalendarToDateTimeConverter implements AvroConverter<XMLGregorianCalendar, Object> {
 
     private DatatypeFactory datatypeFactory;
 
-    public XMLGregorianCalendarToLongConverter(DatatypeFactory datatypeFactory) {
+    public XMLGregorianCalendarToDateTimeConverter(DatatypeFactory datatypeFactory) {
         this.datatypeFactory = datatypeFactory;
     }
 
@@ -46,13 +48,22 @@ public class XMLGregorianCalendarToLongConverter implements AvroConverter<XMLGre
     }
 
     @Override
-    public XMLGregorianCalendar convertToDatum(Long timestamp) {
+    public XMLGregorianCalendar convertToDatum(Object timestamp) {
         if (timestamp == null) {
             return null;
         }
 
+        long timestampMillis;
+        if (timestamp instanceof Long) {
+            timestampMillis = ((Long) timestamp).longValue();
+        } else if (timestamp instanceof Date) {
+            timestampMillis = ((Date) timestamp).getTime();
+        } else {
+            throw new IllegalArgumentException("Unsupported Avro timestamp value: " + timestamp);
+        }
+
         MutableDateTime dateTime = new MutableDateTime();
-        dateTime.setMillis(timestamp);
+        dateTime.setMillis(timestampMillis);
 
         XMLGregorianCalendar xts = datatypeFactory.newXMLGregorianCalendar();
         xts.setYear(dateTime.getYear());
@@ -68,7 +79,7 @@ public class XMLGregorianCalendarToLongConverter implements AvroConverter<XMLGre
     }
 
     @Override
-    public Long convertToAvro(XMLGregorianCalendar xts) {
+    public Object convertToAvro(XMLGregorianCalendar xts) {
         if (xts == null) {
             return null;
         }
@@ -88,7 +99,7 @@ public class XMLGregorianCalendarToLongConverter implements AvroConverter<XMLGre
                 dateTime.setZoneRetainFields(tz);
             }
 
-            return dateTime.getMillis();
+            return Long.valueOf(dateTime.getMillis());
         } catch (IllegalArgumentException e) {
             throw new ComponentException(e);
         }

@@ -35,7 +35,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.netsuite.avro.converter.EnumToStringConverter;
 import org.talend.components.netsuite.avro.converter.ObjectToJsonConverter;
 import org.talend.components.netsuite.avro.converter.NullConverter;
-import org.talend.components.netsuite.avro.converter.XMLGregorianCalendarToLongConverter;
+import org.talend.components.netsuite.avro.converter.XMLGregorianCalendarToDateTimeConverter;
 import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NsRef;
@@ -506,7 +506,7 @@ public abstract class NsObjectTransducer {
                 valueClass == String.class) {
             return new AvroRegistry.Unconverted<>(valueClass, null);
         } else if (valueClass == XMLGregorianCalendar.class) {
-            return new XMLGregorianCalendarToLongConverter(datatypeFactory);
+            return new XMLGregorianCalendarToDateTimeConverter(datatypeFactory);
         } else if (valueClass.isEnum()) {
             Class<Enum> enumClass = (Class<Enum>) valueClass;
             return new EnumToStringConverter<>(enumClass, getEnumAccessor(enumClass));

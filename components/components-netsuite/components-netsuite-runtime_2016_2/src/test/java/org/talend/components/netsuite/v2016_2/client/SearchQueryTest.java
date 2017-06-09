@@ -30,7 +30,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
-import org.talend.components.netsuite.avro.converter.XMLGregorianCalendarToLongConverter;
+import org.talend.components.netsuite.avro.converter.XMLGregorianCalendarToDateTimeConverter;
 import org.talend.components.netsuite.client.EmptyCustomMetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteException;
@@ -80,11 +80,11 @@ public class SearchQueryTest {
 
     private NetSuiteClientService<NetSuitePortType> clientService = new NetSuiteClientServiceImpl();
 
-    private XMLGregorianCalendarToLongConverter calendarValueConverter;
+    private XMLGregorianCalendarToDateTimeConverter calendarValueConverter;
 
     @Before
     public void setUp() throws Exception {
-        calendarValueConverter = new XMLGregorianCalendarToLongConverter(DatatypeFactory.newInstance());
+        calendarValueConverter = new XMLGregorianCalendarToDateTimeConverter(DatatypeFactory.newInstance());
     }
 
     @Test
@@ -221,7 +221,7 @@ public class SearchQueryTest {
         assertNotNull(field1.getSearchValue());
         assertNull(field1.getSearchValue2());
         assertEquals("2017-01-01 12:00:00",
-                dateTimeFormatter.print(calendarValueConverter.convertToAvro(field1.getSearchValue())));
+                dateTimeFormatter.print((Long) calendarValueConverter.convertToAvro(field1.getSearchValue())));
 
         SearchCustomFieldList customFieldList = searchBasic.getCustomFieldList();
         assertNotNull(customFieldList);
@@ -240,7 +240,7 @@ public class SearchQueryTest {
         assertNotNull(customField1.getSearchValue());
         assertNull(customField1.getSearchValue2());
         assertEquals(currentDateFormatted + " " + controlTimeFormatted,
-                dateTimeFormatter.print(calendarValueConverter.convertToAvro(customField1.getSearchValue())));
+                dateTimeFormatter.print((Long) calendarValueConverter.convertToAvro(customField1.getSearchValue())));
     }
 
     @Test
