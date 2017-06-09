@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.integration;
 
+import static org.junit.Assert.fail;
+
 import javax.inject.Inject;
 
 import org.junit.Test;
@@ -37,12 +39,18 @@ public class OAthDepsTestIT {
         return OsgiSalesforceComponentTestIT.getSalesforcePaxExamOption();
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void setupComponentService() {
-        // this the only checks that all import and export for OAuth ahtentication are correctly set for OSGI.
-        SalesforceOAuthConnection salesforceOAuthConnection = new SalesforceOAuthConnection(new OauthProperties("foo"),
-                "http://localhost", null);
-        salesforceOAuthConnection.login(null);// this should not throw ClassNotFoundException
+        try {
+            // this the only checks that all import and export for OAuth ahtentication are correctly set for OSGI.
+            SalesforceOAuthConnection salesforceOAuthConnection = new SalesforceOAuthConnection(new OauthProperties("foo"),
+                    "http://localhost", null);
+            salesforceOAuthConnection.login(null);// this should not throw ClassNotFoundException
+        } catch (Exception e) {
+            if (e instanceof ClassNotFoundException) {
+                fail("this should not throw ClassNotFoundException");
+            }
+        }
     }
 
 }

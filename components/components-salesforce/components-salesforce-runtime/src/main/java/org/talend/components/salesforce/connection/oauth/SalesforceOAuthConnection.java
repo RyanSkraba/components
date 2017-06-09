@@ -27,12 +27,16 @@ import java.util.Properties;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.common.oauth.OauthClient;
 import org.talend.components.common.oauth.OauthProperties;
 
 import com.sforce.ws.ConnectorConfig;
 
 public class SalesforceOAuthConnection {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceOAuthConnection.class.getName());
 
     private static final String REFRESHTOKEN_KEY = "refreshtoken"; //$NON-NLS-1$
 
@@ -49,93 +53,108 @@ public class SalesforceOAuthConnection {
     }
 
     public void login(ConnectorConfig connect) {
-        String session_id = null;
-        String refreshToken = null;
         SalesforceOAuthAccessTokenResponse token = null;
+
         // 1. if tokenFile exist, try refresh token
         String tokenFilePath = oauth.tokenFile.getStringValue();
         if (tokenFilePath != null) {
-            Properties prop = new Properties();
-            File tokenFile = new File(tokenFilePath);
-            if (tokenFile.exists()) {
-                FileInputStream inputStream;
-                try {
-                    inputStream = new FileInputStream(tokenFilePath);
-                    prop.load(inputStream);
-                    inputStream.close();
-                } catch (FileNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                String storedRefreshToken = (String) prop.get(REFRESHTOKEN_KEY);
-                if (storedRefreshToken != null) {
-                    OauthClient oauthClient;
-                    try {
-                        oauthClient = new OauthClient.RefreshTokenBuilder(new URL(url + "/token"),
-                                oauth.clientId.getStringValue(), oauth.clientSecret.getStringValue())
-                                        .setRefreshToken(storedRefreshToken).build();
-                        token = oauthClient.getToken(SalesforceOAuthAccessTokenResponse.class);
-                        session_id = token.getAccessToken();
-                        refreshToken = token.getRefreshToken();
-                    } catch (MalformedURLException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            }
+            token = tryTokenRefresh(tokenFilePath);
         }
         // 2. try to auth if session_id can't be retrieved
-        if (session_id == null) {
-            OauthClient oauthClient;
-            try {
-                oauthClient = new OauthClient.AuthorizationCodeBuilder(new URL(url + "/token"), //$NON-NLS-1$
-                        oauth.clientId.getStringValue(), oauth.clientSecret.getStringValue())
-                                .setAuthorizationLocation(new URL(url + "/authorize")) //$NON-NLS-1$
-                                .setCallbackURL(new URL(
-                                        "https://" + oauth.callbackHost.getStringValue() + ":" + oauth.callbackPort.getValue()))
-                                .setResponseType("code").build();
-                token = oauthClient.getToken(SalesforceOAuthAccessTokenResponse.class);
-                session_id = token.getAccessToken();
-                refreshToken = token.getRefreshToken();
-            } catch (MalformedURLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        if (token == null) {
+            token = doAuthenticate();
         }
         // 3.if refresh token & tokenFile exist, store
-        if (refreshToken != null && tokenFilePath != null) {
-            File tokenFile = new File(tokenFilePath);
-            if (!tokenFile.exists()) {
-                try {
-                    tokenFile.getParentFile().mkdirs();
-                    tokenFile.createNewFile();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+        if (token != null && token.getRefreshToken() != null && tokenFilePath != null) {
+            storeToken(token, tokenFilePath);
+        }
+
+        connect.setServiceEndpoint(getEndpoint(token, apiVersion));
+        connect.setSessionId(token.getAccessToken());
+    }
+
+    /**
+     * Try a token refresh from the file passed in the parameter.
+     * 
+     * @param tokenFilePath : path to the file that contain the REFRESH TOKEN
+     * @return a valid token if refresh is done correctly, <code>null<code> otherwise
+     */
+    private SalesforceOAuthAccessTokenResponse tryTokenRefresh(String tokenFilePath) {
+        File tokenFile = new File(tokenFilePath);
+        if (tokenFile.exists()) {
+            try (FileInputStream inputStream = new FileInputStream(tokenFilePath)) {
+                Properties prop = new Properties();
+                prop.load(inputStream);
+                String storedRefreshToken = (String) prop.get(REFRESHTOKEN_KEY);
+                if (storedRefreshToken != null) {
+                    OauthClient oauthClient = new OauthClient.RefreshTokenBuilder(new URL(url + "/token"),
+                            oauth.clientId.getStringValue(), oauth.clientSecret.getStringValue())
+                                    .setRefreshToken(storedRefreshToken).build();
+                    return oauthClient.getToken(SalesforceOAuthAccessTokenResponse.class);
                 }
-            }
-            Properties prop = new Properties();
-            prop.setProperty(REFRESHTOKEN_KEY, refreshToken);
-            FileOutputStream outputStream;
-            try {
-                outputStream = new FileOutputStream(tokenFilePath);
-                prop.store(outputStream, null);
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+
+            } catch (FileNotFoundException e) {// ignored exception
+                LOGGER.warn("We can't refresh the token, The token file doesn't exist.", e);
+            } catch (IOException e) {// ignored exception
+                LOGGER.warn("We can't refresh the token, an unexpected error occurred.", e);
             }
         }
-        connect.setServiceEndpoint(getEndpoint(token, apiVersion));
-        connect.setSessionId(session_id);
+
+        return null;
+    }
+
+    /**
+     * Get the authentication token from salesforce
+     * 
+     * @return a valid token
+     * @throws RuntimeException if authentication failed, or the returned token is <code>null</code>
+     */
+    private SalesforceOAuthAccessTokenResponse doAuthenticate() {
+        try {
+            OauthClient oauthClient = new OauthClient.AuthorizationCodeBuilder(new URL(url + "/token"), //$NON-NLS-1$
+                    oauth.clientId.getStringValue(), oauth.clientSecret.getStringValue())
+                            .setAuthorizationLocation(new URL(url + "/authorize")) //$NON-NLS-1$
+                            .setCallbackURL(new URL(
+                                    "https://" + oauth.callbackHost.getStringValue() + ":" + oauth.callbackPort.getValue()))
+                            .setResponseType("code").build();
+            SalesforceOAuthAccessTokenResponse token = oauthClient.getToken(SalesforceOAuthAccessTokenResponse.class);
+            if (token == null) {
+                throw new RuntimeException("The returned authentication Token is null, please check your login settings");
+            }
+
+            return token;
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Store the token to a file
+     * 
+     * @param token : valid token that contain the refresh token
+     * @param tokenFilePath : path to the file where the refresh token will be stored
+     * 
+     * @throws RuntimeException if the refresh token can't be stored
+     */
+    private void storeToken(SalesforceOAuthAccessTokenResponse token, String tokenFilePath) {
+        File tokenFile = new File(tokenFilePath);
+        if (!tokenFile.exists()) {
+            try {
+                tokenFile.getParentFile().mkdirs();
+                tokenFile.createNewFile();
+            } catch (IOException e) {
+                new RuntimeException("The token file creation failed, the refresh token can't be stored correctly.", e);
+            }
+        }
+
+        try (FileOutputStream outputStream = new FileOutputStream(tokenFile)) {
+            Properties prop = new Properties();
+            prop.setProperty(REFRESHTOKEN_KEY, token.getRefreshToken());
+            prop.store(outputStream, null);
+        } catch (IOException e) {
+            throw new RuntimeException("Unexpected error, the refresh token can't be stored correctly.", e);
+        }
+
     }
 
     private String getEndpoint(SalesforceOAuthAccessTokenResponse token, String version) {

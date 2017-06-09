@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
-import org.talend.daikon.properties.ValidationResultMutable;
 
 import com.sforce.soap.partner.DescribeGlobalResult;
 import com.sforce.soap.partner.DescribeGlobalSObjectResult;
@@ -22,13 +22,15 @@ import com.sforce.ws.SessionRenewer;
 public final class SalesforceRuntimeCommon {
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceRuntimeCommon.class);
-    
+
     public static ValidationResult exceptionToValidationResult(Exception ex) {
-        ValidationResultMutable vr = new ValidationResultMutable();
-        // FIXME - do a better job here
-        vr.setMessage(ex.getMessage());
-        vr.setStatus(ValidationResult.Result.ERROR);
-        return vr;
+        String errorMessage = ExceptionUtils.getMessage(ex);
+        if (errorMessage.isEmpty()) {
+            // If still no error message, we use the class name to report the error
+            // this should really never happen, but we keep this to prevent loosing error information
+            errorMessage = ex.getClass().getName();
+        }
+        return new ValidationResult(ValidationResult.Result.ERROR, errorMessage);
     }
 
     public static void enableTLSv11AndTLSv12ForJava7() {
@@ -62,5 +64,5 @@ public final class SalesforceRuntimeCommon {
         }
         return returnList;
     }
-    
+
 }

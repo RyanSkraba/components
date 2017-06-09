@@ -96,13 +96,12 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
 
     @Override
     public ValidationResult validate(RuntimeContainer container) {
-        ValidationResult vr = new ValidationResult();
         try {
             connect(container);
-        } catch (IOException ex) {
+        } catch (IOException | RuntimeException ex) {
             return SalesforceRuntimeCommon.exceptionToValidationResult(ex);
         }
-        return vr;
+        return ValidationResult.OK;
     }
 
     /**
