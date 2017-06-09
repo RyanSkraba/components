@@ -139,7 +139,17 @@
 			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
 		</pluginRepository>
 	</pluginRepositories>
-	
+	<distributionManagement>
+		<repository>
+			<id>talend_nexus_deployment</id>
+			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+		</repository>
+		<snapshotRepository>
+			<id>talend_nexus_deployment</id>
+			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<build>
 		<plugins>
 			<plugin>
