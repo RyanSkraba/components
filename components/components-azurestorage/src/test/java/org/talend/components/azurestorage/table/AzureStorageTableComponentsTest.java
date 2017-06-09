@@ -17,9 +17,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +37,7 @@ import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureS
 import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableProperties.ActionOnTable;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 
 public class AzureStorageTableComponentsTest {
 
@@ -107,6 +110,26 @@ public class AzureStorageTableComponentsTest {
         connectors.clear();
         connectors.add(p.MAIN_CONNECTOR);
         assertEquals(connectors, p.getAllSchemaPropertiesConnectors(false));
+    }
+    
+    /**
+     * 
+     * @see org.talend.components.azurestorage.table.AzureStorageTableProperties#validateNameMapping()
+     */
+    @Test
+    public void testValidateNameMapping() {
+        List<String> schemaMappings = new ArrayList<>();
+        List<String> propertyMappings = new ArrayList<>();
+
+        schemaMappings.add("daty");
+        propertyMappings.add("datyMapped");
+        schemaMappings.add("inty");
+        propertyMappings.add("intyMapped");
+        
+        properties.nameMapping.schemaColumnName.setValue(schemaMappings);
+        properties.nameMapping.entityPropertyName.setValue(propertyMappings);
+        ValidationResult result = properties.validateNameMapping();
+        assertEquals(Result.OK,result.getStatus());
     }
 
     @Test

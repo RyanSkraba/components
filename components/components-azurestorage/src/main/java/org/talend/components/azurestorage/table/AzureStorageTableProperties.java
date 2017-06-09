@@ -67,6 +67,8 @@ public class AzureStorageTableProperties extends FixedConnectorsComponentPropert
     public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow"); //$NON-NLS-1$
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
+    
+    public NameMappingTable nameMapping = new NameMappingTable("nameMapping");
 
     public ISchemaListener schemaListener;
 
@@ -101,6 +103,9 @@ public class AzureStorageTableProperties extends FixedConnectorsComponentPropert
         wizardForm.addRow(tableName);
         wizardForm.addRow(widget(preview).setLongRunning(true).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
         wizardForm.addRow(widget(previewTable).setWidgetType(Widget.JSON_TABLE_WIDGET_TYPE));
+        
+        Form advancedForm = new Form(this, Form.ADVANCED);      
+        advancedForm.addRow(widget(nameMapping).setWidgetType(Widget.TABLE_WIDGET_TYPE));
 
     }
 
@@ -128,7 +133,10 @@ public class AzureStorageTableProperties extends FixedConnectorsComponentPropert
     public void setSchemaListener(ISchemaListener schemaListener) {
         this.schemaListener = schemaListener;
     }
-
+    
+    public ValidationResult validateNameMapping() {        
+        return nameMapping.validateNameMappings();        
+    }
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {

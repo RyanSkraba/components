@@ -49,6 +49,7 @@ public class AzureStorageTableWriterTest {
         p.setupProperties();
         p.tableName.setValue("test");
         p.dieOnError.setValue(true);
+        p.nameMapping = new NameMappingTable("test");
         List<String> schemaMappings = new ArrayList<>();
         List<String> propertyMappings = new ArrayList<>();
 
@@ -56,6 +57,9 @@ public class AzureStorageTableWriterTest {
         propertyMappings.add("datyMapped");
         schemaMappings.add("inty");
         propertyMappings.add("intyMapped");
+        
+        p.nameMapping.schemaColumnName.setValue(schemaMappings);
+        p.nameMapping.entityPropertyName.setValue(propertyMappings);
 
         sink.initialize(null, p);
 

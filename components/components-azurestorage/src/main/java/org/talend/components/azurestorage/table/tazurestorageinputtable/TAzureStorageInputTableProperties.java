@@ -47,8 +47,6 @@ public class TAzureStorageInputTableProperties extends AzureStorageTableProperti
     
     public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
     
-    public NameMappingTable nameMapping = new NameMappingTable("nameMapping");
-
     public TAzureStorageInputTableProperties(String name) {
         super(name);
 
@@ -111,9 +109,6 @@ public class TAzureStorageInputTableProperties extends AzureStorageTableProperti
         mainForm.getWidget(producedFilter.getName()).setReadonly(true);
         //
         mainForm.addRow(dieOnError);
-        
-        Form advancedForm = new Form(this, Form.ADVANCED);
-        advancedForm.addRow(widget(nameMapping).setWidgetType(Widget.TABLE_WIDGET_TYPE));
 
     }
 
@@ -145,8 +140,4 @@ public class TAzureStorageInputTableProperties extends AzureStorageTableProperti
         refreshLayout(getForm(Form.ADVANCED));
     }
     
-    public ValidationResult validateNameMapping() {
-        return nameMapping.validateNameMappings();
-    }
-
 }
