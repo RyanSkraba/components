@@ -37,7 +37,6 @@ import org.talend.daikon.properties.ValidationResult;
 
 import com.talend.shaded.com.amazonaws.services.s3.AmazonS3;
 import com.talend.shaded.com.amazonaws.services.s3.model.Bucket;
-import com.talend.shaded.com.amazonaws.services.s3.model.Region;
 
 public class S3DatasetRuntime implements IS3DatasetRuntime {
 
@@ -55,13 +54,17 @@ public class S3DatasetRuntime implements IS3DatasetRuntime {
         if (S3Region.OTHER.getValue().equals(region)) {
             region = properties.unknownRegion.getValue();
         }
+        conn.setEndpoint(regionToEndpoint(region));
+        LOG.debug("Start to find buckets in region {}", region);
         List<Bucket> buckets = conn.listBuckets();
         Set<String> bucketsName = new HashSet<>();
         for (Bucket bucket : buckets) {
             String bucketName = bucket.getName();
             try {
                 String bucketLocation = conn.getBucketLocation(bucketName);
-                if (Region.fromValue(bucketLocation).toAWSRegion().getName().equals(region)) {
+                String bucketRegion = locationToRegion(bucketLocation);
+                LOG.debug("Bucket is {} and location is {}({})", bucketName, bucketLocation, bucketRegion);
+                if (region.equals(bucketRegion)) {
                     bucketsName.add(bucketName);
                 }
             } catch (Exception e) {
@@ -70,6 +73,35 @@ public class S3DatasetRuntime implements IS3DatasetRuntime {
             }
         }
         return bucketsName;
+    }
+
+    /**
+     * Some region has special endpoint
+     * 
+     * @param region
+     * @return
+     */
+    private String regionToEndpoint(String region) {
+        S3Region s3Region = S3Region.fromString(region);
+        if (s3Region != null) {
+            return s3Region.toEndpoint();
+        } else {
+            // TODO let the user provide endpoint,
+            // or we remove the custom region, and provide a configuration file can be loaded on fly, keep update
+            // also need to consider location to region mapping
+            return String.format("s3.dualstack.%s.amazonaws.com", region);
+        }
+    }
+
+    /**
+     * Some region has multiple locations
+     * 
+     * @param location
+     * @return
+     */
+    private String locationToRegion(String location) {
+        S3Region bucketRegion = S3Region.fromLocation(location);
+        return bucketRegion == null ? location : bucketRegion.getValue();
     }
 
     @Override
