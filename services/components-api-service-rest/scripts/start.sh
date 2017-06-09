@@ -34,11 +34,10 @@ fi
 cd `getScriptLocation`
 
 # Add on extra jar files to CLASSPATH
-APP_CLASSPATH="${classpath.linux}"
+APP_CLASSPATH="$PWD/config:$PWD/config/default:${project.artifactId}-${project.version}.jar"
 if [ ! -z "$CLASSPATH" ] ; then
-  APP_CLASSPATH="$CLASSPATH":
+  APP_CLASSPATH="$CLASSPATH:$APP_CLASSPATH"
 fi
-APP_CLASSPATH="$APP_CLASSPATH:./config:./config/default"
 
 APP_CLASS="org.talend.components.service.rest.Application"
 

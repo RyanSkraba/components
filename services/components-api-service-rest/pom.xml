@@ -24,6 +24,11 @@
 		<git_branch>local</git_branch>
 		<talend_docker_registry>registry.datapwn.com</talend_docker_registry>
 	</properties>
+	<url>https://github.com/Talend/components/tree/master/services/components-api-service-rest</url>
+	<organization>
+		<name>Talend</name>
+		<url>http://www.talend.com</url>
+	</organization>
 
 	<dependencies>
 
@@ -86,7 +91,8 @@
 			<artifactId>pax-url-aether</artifactId>
 			<version>2.4.7</version>
 		</dependency>
-		<!-- provides layouts for logging. It is not really compile dependency, but rather runtime -->
+		<!-- provides layouts for logging. It is not really compile dependency, 
+			but rather runtime -->
 		<dependency>
 			<groupId>org.talend.daikon</groupId>
 			<artifactId>logging-event-layout</artifactId>
@@ -181,34 +187,12 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<!-- create the jar only with rest service classes, excluding configuration files -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>default-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<classesDirectory>${project.build.outputDirectory}</classesDirectory>
-							<excludes>
-								<exclude>**/application*.properties</exclude>
-								<exclude>**/logback-spring.xml</exclude>
-								<exclude>**/settings.xml</exclude>
-							</excludes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<!-- generate the maven repo for the service app -->
 				<artifactId>maven-invoker-plugin</artifactId>
 				<version>2.0.1-TALEND</version>
 				<configuration>
-					<localRepositoryPath>target/mvn-repo</localRepositoryPath>
-		            <onlyResolveDependencies>true</onlyResolveDependencies>
+					<localRepositoryPath>target/.m2</localRepositoryPath>
+					<onlyResolveDependencies>true</onlyResolveDependencies>
 				</configuration>
 				<executions>
 					<execution>
@@ -229,6 +213,33 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<executions>
+					<!-- create an executable jar only with rest service classes, excluding 
+						configuration but using the maven repo classpath files -->
+					<execution>
+						<id>default-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<classesDirectory>${project.build.outputDirectory}</classesDirectory>
+							<excludes>
+								<exclude>**/application*.properties</exclude>
+								<exclude>**/logback-spring.xml</exclude>
+								<exclude>**/settings.xml</exclude>
+							</excludes>
+							<archive>
+								<manifest>
+									<addClasspath>true</addClasspath>
+									<classpathPrefix>.m2/</classpathPrefix>
+									<classpathLayoutType>repository</classpathLayoutType>
+									<useUniqueVersions>false</useUniqueVersions><!-- to avoid time stamped 
+										snapshots -->
+									<mainClass>org.talend.components.service.rest.Application</mainClass>
+								</manifest>
+							</archive>
+						</configuration>
+					</execution>
 					<execution>
 						<!-- this lib is exactly the same as the default jar but it keept here 
 							because all component tests depends on it. -->
@@ -264,45 +275,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<!-- create a class path with all the compile scope dependencies of this 
-					pom using the local maven repository -->
-				<groupId>com.github.veithen.alta</groupId>
-				<artifactId>alta-maven-plugin</artifactId>
-				<version>0.5.4-TALEND</version>
-				<executions>
-					<execution>
-						<id>generate-components-linux-classpath</id>
-						<goals>
-							<goal>generate-properties</goal>
-						</goals>
-						<configuration>
-							<name>classpath.linux</name>
-							<value>.m2/%mavenPath%</value>
-							<separator>:</separator>
-							<dependencySet>
-								<scope>compile</scope>
-								<useProjectArtifact>true</useProjectArtifact>
-							</dependencySet>
-						</configuration>
-					</execution>
-					<execution>
-						<id>generate-components-windows-classpath</id>
-						<goals>
-							<goal>generate-properties</goal>
-						</goals>
-						<configuration>
-							<name>classpath.windows</name>
-							<value>.m2\%mavenPathWindows%</value>
-							<separator>;</separator>
-							<dependencySet>
-								<scope>compile</scope>
-								<useProjectArtifact>true</useProjectArtifact>
-							</dependencySet>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>3.0.0</version>
 				<executions>
@@ -321,7 +293,8 @@
 						</configuration>
 					</execution>
 					<execution>
-						<!-- creates config zip package to be used by any other packaging modules such as as all components -->
+						<!-- creates config zip package to be used by any other packaging modules 
+							such as as all components -->
 						<id>config-package</id>
 						<phase>package</phase>
 						<goals>
@@ -357,7 +330,7 @@
 		</plugins>
 		<resources>
 			<resource>
-				<!-- This enable maven defined variables in banner.txt as ${project.version} and application.properties-->
+				<!-- This enable maven defined variables in banner.txt, application.properties -->
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>

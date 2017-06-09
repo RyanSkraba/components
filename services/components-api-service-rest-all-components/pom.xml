@@ -3,13 +3,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+
 	<parent>
-		<groupId>org.talend.components</groupId>
-		<artifactId>components-parent</artifactId>
-		<version>0.19.0-SNAPSHOT</version>
-		<relativePath>../../components-parent/pom.xml</relativePath>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.1.RELEASE</version>
 	</parent>
 
+	<groupId>org.talend.components</groupId>
+	<version>0.19.0-SNAPSHOT</version>
 
 	<artifactId>components-api-service-rest-all-components</artifactId>
 
@@ -21,7 +23,6 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.boot.version>1.5.1.RELEASE</spring.boot.version>
 		<hadoop.version>2.7.0</hadoop.version>
 		<beam.version>0.6.0-tlnd</beam.version>
 		<!-- Used for Docker images name -->
@@ -29,24 +30,20 @@
 		<docker_tag_suffix>${maven.build.timestamp}</docker_tag_suffix>
 		<talend_docker_registry>registry.datapwn.com</talend_docker_registry>
 	</properties>
-
 	<dependencies>
 		<!-- rest service -->
+		<!-- used by the assembly to place it at the root -->
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<classifier>lib</classifier>
+			<type>jar</type>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.ops4j.pax.url</groupId>
-			<artifactId>pax-url-aether</artifactId>
-			<version>2.4.7</version>
-		</dependency>
+
 		<dependency>
 			<!-- only there for running test app in the IDE for now -->
 			<groupId>org.talend.components</groupId>
@@ -73,15 +70,35 @@
 
 		<!-- test dependencies -->
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
 			<type>test-jar</type>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
 			<classifier>tests</classifier>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.daikon</groupId>
+			<artifactId>daikon</artifactId>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+			<version>0.17.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.daikon</groupId>
+			<artifactId>daikon-spring-utils</artifactId>
+			<version>0.17.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -99,22 +116,30 @@
 
 	<repositories>
 		<repository>
+			<id>releases</id>
+			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+		</repository>
+		<repository>
+			<id>talend_nexus</id>
+			<name>snapshots</name>
+			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
+		</repository>
+		<repository>
 			<id>talend-update</id>
 			<url>https://talend-update.talend.com/nexus/content/repositories/libraries/</url>
 		</repository>
-		<repository>
-			<id>apache.snapshots</id>
-			<name>Apache Development Snapshot Repository</name>
-			<url>https://repository.apache.org/content/repositories/snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
 	</repositories>
-
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-releases</id>
+			<url>https://repo.spring.io/libs-release</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>releases</id>
+			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+		</pluginRepository>
+	</pluginRepositories>
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -162,7 +187,7 @@
 			</plugin>
 
 			<plugin>
-				<!-- this will add the Rest service artifacts to the local maven repo  -->
+				<!-- this will add the Rest service artifacts to the local maven repo -->
 				<artifactId>maven-invoker-plugin</artifactId>
 				<version>2.0.1-TALEND</version>
 				<configuration>
@@ -170,7 +195,7 @@
 					<skipTestScopeForExtraArtifacts>true</skipTestScopeForExtraArtifacts>
 					<projectsDirectory>src/it</projectsDirectory>
 					<cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-		            <onlyResolveDependencies>true</onlyResolveDependencies>
+					<onlyResolveDependencies>true</onlyResolveDependencies>
 				</configuration>
 				<executions>
 					<execution>
@@ -216,43 +241,6 @@
 						</goals>
 						<configuration>
 							<argLine>-Dorg.ops4j.pax.url.mvn.localRepository=${project.basedir}/target/mvn-repo/.m2</argLine>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<!-- create a class path with all the compile scope dependencies of this 
-					pom using the local maven repository -->
-				<groupId>com.github.veithen.alta</groupId>
-				<artifactId>alta-maven-plugin</artifactId>
-				<version>0.5.4-TALEND</version>
-				<executions>
-					<execution>
-					    <id>generate-components-linux-classpath</id>
-						<goals>
-							<goal>generate-properties</goal>
-						</goals>
-						<configuration>
-							<name>classpath.linux</name>
-							<value>.m2/%mavenPath%</value>
-							<separator>:</separator>
-							<dependencySet>
-								<scope>compile</scope>
-							</dependencySet>
-						</configuration>
-					</execution>
-					<execution>
-					    <id>generate-components-windows-classpath</id>
-						<goals>
-							<goal>generate-properties</goal>
-						</goals>
-						<configuration>
-							<name>classpath.windows</name>
-							<value>.m2\%mavenPathWindows%</value>
-							<separator>;</separator>
-							<dependencySet>
-								<scope>compile</scope>
-							</dependencySet>
 						</configuration>
 					</execution>
 				</executions>
@@ -304,7 +292,7 @@
 													<run>apk add --no-cache libc6-compat</run>
 													<run>chmod +x /maven/start.sh</run>
 												</runCmds>
-												<assembly><!-- includes the artifact generated by the current
+												<assembly><!-- includes the artifact generated by the current 
 														pom -->
 													<descriptor>${project.basedir}/assembly/no-arch.xml</descriptor>
 												</assembly>
