@@ -63,9 +63,13 @@ public class S3Connection {
         }
     }
 
-    public static String getUriPath(S3DatasetProperties properties) {
+    public static String getUriPath(S3DatasetProperties properties, String path) {
         // Construct the path using the s3a schema.
-        return Constants.FS_S3A + "://" + properties.bucket.getValue() + "/" + properties.object.getValue();
+        return Constants.FS_S3A + "://" + properties.bucket.getValue() + "/" + path;
+    }
+
+    public static String getUriPath(S3DatasetProperties properties) {
+        return getUriPath(properties, properties.object.getValue());
     }
 
     public static void setS3Configuration(ExtraHadoopConfiguration conf, S3DatastoreProperties properties) {

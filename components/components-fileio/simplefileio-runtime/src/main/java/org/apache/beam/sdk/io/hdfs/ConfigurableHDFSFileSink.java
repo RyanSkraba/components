@@ -13,33 +13,39 @@
 package org.apache.beam.sdk.io.hdfs;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
+ * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
+
+import static org.apache.beam.sdk.repackaged.com.google.common.base.Preconditions.checkState;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.io.Sink;
 import org.apache.beam.sdk.options.PipelineOptions;
+import org.apache.beam.sdk.repackaged.com.google.common.collect.Lists;
+import org.apache.beam.sdk.repackaged.com.google.common.collect.Maps;
+import org.apache.beam.sdk.repackaged.com.google.common.collect.Sets;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.JobID;
@@ -52,53 +58,47 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.task.JobContextImpl;
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import static org.apache.beam.sdk.repackaged.com.google.common.base.Preconditions.checkState;
-
-import org.apache.beam.sdk.repackaged.com.google.common.collect.Lists;
-import org.apache.beam.sdk.repackaged.com.google.common.collect.Maps;
-import org.apache.beam.sdk.repackaged.com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.talend.components.simplefileio.runtime.utils.FileSystemUtil;
 
 /**
  * Copied from https://github.com/apache/beam/commit/89cf4613465647e2711983674879afd5f67c519d
- * 
+ *
  * This class was modified to add the {@link HDFSWriter#configure(Job)} method, and to use the path when getting the
  * filesystem, and to prevent the filesystem from being cached in the components service.
  *
- * A {@code Sink} for writing records to a Hadoop filesystem using a Hadoop file-based output
- * format.
+ * A {@code Sink} for writing records to a Hadoop filesystem using a Hadoop file-based output format.
  *
  * @param <K> The type of keys to be written to the sink.
  * @param <V> The type of values to be written to the sink.
  */
 public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
 
-    private static final JobID jobId = new JobID(
-            Long.toString(System.currentTimeMillis()),
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigurableHDFSFileSink.class);
+
+    private static final JobID jobId = new JobID(Long.toString(System.currentTimeMillis()),
             new Random().nextInt(Integer.MAX_VALUE));
 
     protected final String path;
+
+    protected final boolean mergeOutput;
+
     protected final Class<? extends FileOutputFormat<K, V>> formatClass;
 
     // workaround to make Configuration serializable
     private final Map<String, String> map;
 
-    public ConfigurableHDFSFileSink(String path, Class<? extends FileOutputFormat<K, V>> formatClass) {
+    public ConfigurableHDFSFileSink(String path, boolean mergeOutput, Class<? extends FileOutputFormat<K, V>> formatClass) {
         this.path = path;
+        this.mergeOutput = mergeOutput;
         this.formatClass = formatClass;
         this.map = Maps.newHashMap();
     }
 
-    public ConfigurableHDFSFileSink(String path, Class<? extends FileOutputFormat<K, V>> formatClass,
-                        Configuration conf) {
-        this(path, formatClass);
+    public ConfigurableHDFSFileSink(String path, boolean mergeOutput, Class<? extends FileOutputFormat<K, V>> formatClass,
+            Configuration conf) {
+        this(path, mergeOutput, formatClass);
         // serialize conf to map
         for (Map.Entry<String, String> entry : conf) {
             map.put(entry.getKey(), entry.getValue());
@@ -112,7 +112,7 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
 
     @Override
     public Sink.WriteOperation<KV<K, V>, ?> createWriteOperation(PipelineOptions options) {
-        return new HDFSWriteOperation<>(this, path, formatClass);
+        return new HDFSWriteOperation<>(this, path, mergeOutput, formatClass);
     }
 
     protected Job jobInstance() throws IOException {
@@ -134,15 +134,19 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
     /** {{@link WriteOperation}} for HDFS. */
     public static class HDFSWriteOperation<K, V> extends WriteOperation<KV<K, V>, String> {
 
-        private final Sink<KV<K, V>> sink;
         protected final String path;
+
+        protected final boolean mergeOutput;
+
         protected final Class<? extends FileOutputFormat<K, V>> formatClass;
 
-        public HDFSWriteOperation(Sink<KV<K, V>> sink,
-                                  String path,
-                                  Class<? extends FileOutputFormat<K, V>> formatClass) {
+        private final Sink<KV<K, V>> sink;
+
+        public HDFSWriteOperation(Sink<KV<K, V>> sink, String path, boolean mergeOutput,
+                Class<? extends FileOutputFormat<K, V>> formatClass) {
             this.sink = sink;
             this.path = path;
+            this.mergeOutput = mergeOutput;
             this.formatClass = formatClass;
         }
 
@@ -157,7 +161,7 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
             Job job = ((ConfigurableHDFSFileSink<K, V>) getSink()).jobInstance();
             FileSystem fs = FileSystem.get(new URI(path), job.getConfiguration());
 
-            // Get expected output shards.  Nulls indicate that the task was launched, but didn't 
+            // Get expected output shards. Nulls indicate that the task was launched, but didn't
             // process any records.
             Set<String> expected = Sets.newHashSet(writerResults);
             expected.remove(null);
@@ -175,16 +179,9 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
 
             // get actual output shards
             Set<String> actual = Sets.newHashSet();
-            FileStatus[] statuses = fs.listStatus(new Path(path), new PathFilter() {
-                @Override
-                public boolean accept(Path path) {
-                    String name = path.getName();
-                    return !name.startsWith("_") && !name.startsWith(".");
-                }
-            });
+            FileStatus[] statuses = FileSystemUtil.listSubFiles(fs, path);
 
-            checkState(
-                    expected.size() == Lists.newArrayList(writerResults).size(),
+            checkState(expected.size() == Lists.newArrayList(writerResults).size(),
                     "Data loss due to writer results hash collision");
             for (FileStatus s : statuses) {
                 String name = s.getPath().getName();
@@ -200,11 +197,37 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
                 String name = s.getPath().getName();
                 int pos = name.indexOf('.');
                 String ext = pos > 0 ? name.substring(pos) : "";
-                fs.rename(
-                        s.getPath(),
-                        new Path(s.getPath().getParent(), String.format("part-r-%05d%s", i, ext)));
+                rename(fs, s.getPath(), String.format("part-r-%05d%s", i, ext));
                 i++;
             }
+
+            FileStatus[] sourceStatuses = FileSystemUtil.listSubFiles(fs, path); // after rename, before generate merged file
+            if (sourceStatuses.length > 0 && mergeOutput) {
+                String sourceFileName = sourceStatuses[0].getPath().getName();
+                String finalPath = path + String.format("/part-r-merged%s",
+                        sourceFileName.indexOf('.') > 0 ? sourceFileName.substring(sourceFileName.indexOf('.')) : "");
+                fs.delete(new Path(finalPath), true); // finalize method may be called multiple times, be sure idempotent
+                LOG.info("Start to merge files in {} to {}", path, finalPath);
+                boolean success = mergeOutput(fs, path, finalPath);
+                if (success) {
+                    LOG.info("Merge files in {} to {} successful, start to delete the source files.", path, finalPath);
+                    for (FileStatus sourceStatus : sourceStatuses) {
+                        fs.delete(sourceStatus.getPath(), true);
+                    }
+                } else {
+                    throw new IOException("Failed to merge output files in " + path + " to " + finalPath);
+                }
+            }
+
+        }
+
+        private void rename(FileSystem fs, Path sourcePath, String newFileName) throws Exception {
+            fs.rename(sourcePath, new Path(sourcePath.getParent(), newFileName));
+        }
+
+        protected boolean mergeOutput(FileSystem fs, String sourceFolder, String targetFile) {
+            // need to be implement
+            return false;
         }
 
         @Override
@@ -232,19 +255,22 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
     public static class HDFSWriter<K, V> extends Writer<KV<K, V>, String> {
 
         private final HDFSWriteOperation<K, V> writeOperation;
+
         private final String path;
+
         private final Class<? extends FileOutputFormat<K, V>> formatClass;
 
         // unique hash for each task
         private int hash;
 
         private TaskAttemptContext context;
+
         private RecordWriter<K, V> recordWriter;
+
         private FileOutputCommitter outputCommitter;
 
-        public HDFSWriter(HDFSWriteOperation<K, V> writeOperation,
-                          String path,
-                          Class<? extends FileOutputFormat<K, V>> formatClass) {
+        public HDFSWriter(HDFSWriteOperation<K, V> writeOperation, String path,
+                Class<? extends FileOutputFormat<K, V>> formatClass) {
             this.writeOperation = writeOperation;
             this.path = path;
             this.formatClass = formatClass;

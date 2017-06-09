@@ -36,8 +36,8 @@ public class SimpleRecordFormatParquetIO extends SimpleRecordFormatBase {
         SimpleFileIOAvroRegistry.get();
     }
 
-    public SimpleRecordFormatParquetIO(UgiDoAs doAs, String path, boolean overwrite, int limit) {
-        super(doAs, path, overwrite, limit);
+    public SimpleRecordFormatParquetIO(UgiDoAs doAs, String path, boolean overwrite, int limit, boolean mergeOutput) {
+        super(doAs, path, overwrite, limit, mergeOutput);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class SimpleRecordFormatParquetIO extends SimpleRecordFormatBase {
 
     @Override
     public PDone write(PCollection<IndexedRecord> in) {
-        ParquetHdfsFileSink sink = new ParquetHdfsFileSink(doAs, path, overwrite);
+        ParquetHdfsFileSink sink = new ParquetHdfsFileSink(doAs, path, overwrite, mergeOutput);
         sink.getExtraHadoopConfiguration().addFrom(getExtraHadoopConfiguration());
 
         PCollection<KV<Void, IndexedRecord>> pc1 = in.apply(ParDo.of(new FormatParquet()));

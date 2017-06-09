@@ -13,6 +13,8 @@
 package org.talend.components.simplefileio.runtime;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.Pipeline;
@@ -20,10 +22,12 @@ import org.apache.beam.sdk.testing.RunnableOnService;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.TemporaryFolder;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.simplefileio.SimpleFileIOFormat;
 import org.talend.components.simplefileio.output.SimpleFileIOOutputProperties;
@@ -39,6 +43,9 @@ public class SparkSimpleFileIOOutputRuntimeTestIT {
     @Rule
     public SparkIntegrationTestResource spark = SparkIntegrationTestResource.ofLocal();
 
+    @Rule
+    public TemporaryFolder tmp = new TemporaryFolder();
+
     /**
      * Basic unit test using all default values (except for the path) on an in-memory DFS cluster.
      */
@@ -47,7 +54,7 @@ public class SparkSimpleFileIOOutputRuntimeTestIT {
     @Test
     public void testBasicDefaults() throws IOException {
         FileSystem fs = FileSystem.get(spark.createHadoopConfiguration());
-        String fileSpec = fs.getUri().resolve("/tmp/test/input.csv").toString();
+        String fileSpec = fs.getUri().resolve(tmp.getRoot() + "/basic").toString();
 
         // Configure the component.
         SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
@@ -71,4 +78,102 @@ public class SparkSimpleFileIOOutputRuntimeTestIT {
         // Check the expected values.
         MiniDfsResource.assertReadFile(fs, fileSpec, "1;one", "2;two");
     }
+
+    @Test
+    public void testCsv_merge() throws IOException {
+        FileSystem fs = FileSystem.get(spark.createHadoopConfiguration());
+        String fileSpec = fs.getUri().resolve(tmp.getRoot() + "/output.csv").toString();
+
+        // Configure the component.
+        SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
+        props.getDatasetProperties().path.setValue(fileSpec);
+        props.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
+        props.mergeOutput.setValue(true);
+
+        // Create the runtime.
+        SimpleFileIOOutputRuntime runtime = new SimpleFileIOOutputRuntime();
+        runtime.initialize(null, props);
+
+        // Use the runtime in a Spark pipeline to test.
+        final Pipeline p = spark.createPipeline();
+        PCollection<IndexedRecord> input = p.apply( //
+                Create.of(ConvertToIndexedRecord.convertToAvro(new String[] { "1", "one" }), //
+                        ConvertToIndexedRecord.convertToAvro(new String[] { "2", "two" }))); //
+        input.apply(runtime);
+
+        // And run the test.
+        p.run().waitUntilFinish();
+
+        // Check the expected values.
+        MiniDfsResource.assertReadFile(fs, fileSpec, "1;one", "2;two");
+        MiniDfsResource.assertFileNumber(fs, fileSpec, 1);
+    }
+
+    @Test
+    public void testAvro_merge() throws IOException {
+        FileSystem fs = FileSystem.get(spark.createHadoopConfiguration());
+        String fileSpec = fs.getUri().resolve(tmp.getRoot() + "/output.avro").toString();
+
+        // Configure the component.
+        SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
+        props.getDatasetProperties().path.setValue(fileSpec);
+        props.getDatasetProperties().format.setValue(SimpleFileIOFormat.AVRO);
+        props.mergeOutput.setValue(true);
+
+        // Create the runtime.
+        SimpleFileIOOutputRuntime runtime = new SimpleFileIOOutputRuntime();
+        runtime.initialize(null, props);
+
+        // Use the runtime in a Spark pipeline to test.
+        final Pipeline p = spark.createPipeline();
+        PCollection<IndexedRecord> input = p.apply( //
+                Create.of(ConvertToIndexedRecord.convertToAvro(new String[] { "1", "one" }), //
+                        ConvertToIndexedRecord.convertToAvro(new String[] { "2", "two" }))); //
+        input.apply(runtime);
+
+        // And run the test.
+        p.run().waitUntilFinish();
+
+        // Check the expected values.
+
+        MiniDfsResource.assertReadAvroFile(fs, fileSpec,
+                new HashSet<IndexedRecord>(Arrays.asList(ConvertToIndexedRecord.convertToAvro(new String[] { "1", "one" }), //
+                        ConvertToIndexedRecord.convertToAvro(new String[] { "2", "two" }))),
+                false);
+        MiniDfsResource.assertFileNumber(fs, fileSpec, 1);
+    }
+
+    @Test
+    public void testParquet_merge() throws IOException {
+        FileSystem fs = FileSystem.get(spark.createHadoopConfiguration());
+        String fileSpec = fs.getUri().resolve(tmp.getRoot() + "/output.parquet").toString();
+
+        // Configure the component.
+        SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
+        props.getDatasetProperties().path.setValue(fileSpec);
+        props.getDatasetProperties().format.setValue(SimpleFileIOFormat.PARQUET);
+        props.mergeOutput.setValue(true);
+
+        // Create the runtime.
+        SimpleFileIOOutputRuntime runtime = new SimpleFileIOOutputRuntime();
+        runtime.initialize(null, props);
+
+        // Use the runtime in a Spark pipeline to test.
+        final Pipeline p = spark.createPipeline();
+        PCollection<IndexedRecord> input = p.apply( //
+                Create.of(ConvertToIndexedRecord.convertToAvro(new String[] { "1", "one" }), //
+                        ConvertToIndexedRecord.convertToAvro(new String[] { "2", "two" }))); //
+        input.apply(runtime);
+
+        // And run the test.
+        p.run().waitUntilFinish();
+
+        // Check the expected values.
+        MiniDfsResource.assertReadParquetFile(fs, fileSpec,
+                new HashSet<IndexedRecord>(Arrays.asList(ConvertToIndexedRecord.convertToAvro(new String[] { "1", "one" }), //
+                        ConvertToIndexedRecord.convertToAvro(new String[] { "2", "two" }))),
+                false);
+        MiniDfsResource.assertFileNumber(fs, fileSpec, 1);
+    }
+
 }

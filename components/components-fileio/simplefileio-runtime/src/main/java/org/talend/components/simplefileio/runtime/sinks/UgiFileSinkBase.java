@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.simplefileio.runtime.sinks;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,13 +25,14 @@ import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.simplefileio.runtime.ExtraHadoopConfiguration;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
-
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Subclass of ConfigurableHDFSFileSink that saves {@link org.apache.hadoop.security.UserGroupInformation}.
@@ -39,6 +42,8 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(UgiFileSinkBase.class);
+
     private final UgiDoAs doAs;
 
     private final boolean overwrite;
@@ -46,13 +51,13 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
     /** Additional information to configure the OutputFormat */
     private final ExtraHadoopConfiguration extraConfig;
 
-    public UgiFileSinkBase(UgiDoAs doAs, String path, boolean overwrite, Class<? extends FileOutputFormat<K, V>> formatClass) {
-        this(doAs, path, overwrite, formatClass, new ExtraHadoopConfiguration());
+    public UgiFileSinkBase(UgiDoAs doAs, String path, boolean overwrite, boolean mergeOutput, Class<? extends FileOutputFormat<K, V>> formatClass) {
+        this(doAs, path, overwrite, mergeOutput, formatClass, new ExtraHadoopConfiguration());
     }
 
-    public UgiFileSinkBase(UgiDoAs doAs, String path, boolean overwrite, Class<? extends FileOutputFormat<K, V>> formatClass,
+    public UgiFileSinkBase(UgiDoAs doAs, String path, boolean overwrite, boolean mergeOutput, Class<? extends FileOutputFormat<K, V>> formatClass,
             ExtraHadoopConfiguration extraConfig) {
-        super(path, formatClass);
+        super(path, mergeOutput, formatClass);
         this.doAs = doAs;
         this.overwrite = overwrite;
         this.extraConfig = extraConfig;
@@ -112,19 +117,29 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
 
     @Override
     public WriteOperation<KV<K, V>, ?> createWriteOperation(PipelineOptions options) {
-        return new UgiWriteOperation<>(this, path);
+        return new UgiWriteOperation<>(this, path, mergeOutput);
     }
 
     protected Writer<KV<K, V>, String> createWriter(UgiWriteOperation<K, V> writeOperation, PipelineOptions options) {
         return new UgiWriteOperation.UgiWriter<>(writeOperation, path);
     }
 
+    protected boolean mergeOutput(FileSystem fs, String sourceFolder, String targetFile) {
+        // implement how to merge files, different between format
+        try {
+           return FileUtil.copyMerge(fs, new Path(sourceFolder), fs, new Path(targetFile), false, fs.getConf(), "");
+        } catch (Exception e) {
+            LOG.error("Error when merging files in {}.\n{}", sourceFolder, e.getMessage());
+            return false;
+        }
+    }
+
     public static class UgiWriteOperation<K, V> extends HDFSWriteOperation<K, V> {
 
         protected final UgiFileSinkBase<K, V> sink;
 
-        public UgiWriteOperation(UgiFileSinkBase<K, V> sink, String path) {
-            super(sink, path, sink.formatClass);
+        public UgiWriteOperation(UgiFileSinkBase<K, V> sink, String path, boolean mergeOutput) {
+            super(sink, path, mergeOutput, sink.formatClass);
             this.sink = sink;
         }
 
@@ -138,6 +153,11 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
                     return null;
                 }
             });
+        }
+
+        @Override
+        protected boolean mergeOutput(FileSystem fs, String sourceFolder, String targetFile) {
+            return this.sink.mergeOutput(fs, sourceFolder, targetFile);
         }
 
         protected void ugiDoAsFinalize(Iterable<String> writerResults, PipelineOptions options) throws Exception {

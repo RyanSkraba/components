@@ -40,6 +40,8 @@ public class S3OutputProperties extends FixedConnectorsComponentProperties imple
     public transient ReferenceProperties<S3DatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
             S3DatasetDefinition.NAME);
 
+    public Property<Boolean> mergeOutput = PropertyFactory.newBoolean("mergeOutput", false);
+
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "dataset.main");
 
     @Override
@@ -47,6 +49,7 @@ public class S3OutputProperties extends FixedConnectorsComponentProperties imple
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(overwrite);
+        mainForm.addRow(mergeOutput);
     }
 
     @Override

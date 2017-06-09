@@ -40,6 +40,8 @@ public class SimpleFileIOOutputProperties extends FixedConnectorsComponentProper
     public transient ReferenceProperties<SimpleFileIODatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
             SimpleFileIODatasetDefinition.NAME);
 
+    public Property<Boolean> mergeOutput = PropertyFactory.newBoolean("mergeOutput", false);
+
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "dataset.main");
 
     @Override
@@ -47,6 +49,7 @@ public class SimpleFileIOOutputProperties extends FixedConnectorsComponentProper
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(overwrite);
+        mainForm.addRow(mergeOutput);
     }
 
     @Override

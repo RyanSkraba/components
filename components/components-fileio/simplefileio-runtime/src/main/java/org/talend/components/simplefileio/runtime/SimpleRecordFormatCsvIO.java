@@ -64,8 +64,9 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
     private final String fieldDelimiter;
 
     public SimpleRecordFormatCsvIO(UgiDoAs doAs, String path, boolean overwrite, int limit, String recordDelimiter,
-            String fieldDelimiter) {
-        super(doAs, path, overwrite, limit);
+            String fieldDelimiter,
+            boolean mergeOutput) {
+        super(doAs, path, overwrite, limit, mergeOutput);
         this.recordDelimiter = recordDelimiter;
 
         String fd = fieldDelimiter;
@@ -113,7 +114,7 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
             ExtraHadoopConfiguration conf = new ExtraHadoopConfiguration();
             conf.set(CsvTextOutputFormat.RECORD_DELIMITER, recordDelimiter);
             conf.set(CsvTextOutputFormat.ENCODING, CsvTextOutputFormat.UTF_8);
-            UgiFileSinkBase<NullWritable, Text> sink = new UgiFileSinkBase<>(doAs, path, overwrite, CsvTextOutputFormat.class,
+            UgiFileSinkBase<NullWritable, Text> sink = new UgiFileSinkBase<>(doAs, path, overwrite, mergeOutput, CsvTextOutputFormat.class,
                     conf);
             sink.getExtraHadoopConfiguration().addFrom(getExtraHadoopConfiguration());
 
@@ -174,34 +175,6 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
 
         public static final String UTF_8 = "UTF-8";
 
-        protected static class CsvRecordWriter extends RecordWriter<NullWritable, Text> {
-
-            protected DataOutputStream out;
-
-            private final byte[] recordDelimiter;
-
-            public final String encoding;
-
-            public CsvRecordWriter(DataOutputStream out, String encoding, String recordDelimiter) {
-                this.out = out;
-                this.encoding = encoding;
-                try {
-                    this.recordDelimiter = recordDelimiter.getBytes(encoding);
-                } catch (UnsupportedEncodingException uee) {
-                    throw new IllegalArgumentException("Encoding " + encoding + " not found.");
-                }
-            }
-
-            public synchronized void write(NullWritable key, Text value) throws IOException {
-                out.write(value.toString().getBytes(encoding));
-                out.write(recordDelimiter);
-            }
-
-            public synchronized void close(TaskAttemptContext context) throws IOException {
-                out.close();
-            }
-        }
-
         public RecordWriter<NullWritable, Text> getRecordWriter(TaskAttemptContext job) throws IOException, InterruptedException {
             Configuration conf = job.getConfiguration();
             boolean isCompressed = getCompressOutput(job);
@@ -221,6 +194,32 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
             } else {
                 FSDataOutputStream fileOut = fs.create(file, false);
                 return new CsvRecordWriter(new DataOutputStream(codec.createOutputStream(fileOut)), UTF_8, recordDelimiter);
+            }
+        }
+
+        protected static class CsvRecordWriter extends RecordWriter<NullWritable, Text> {
+
+            public final String encoding;
+            private final byte[] recordDelimiter;
+            protected DataOutputStream out;
+
+            public CsvRecordWriter(DataOutputStream out, String encoding, String recordDelimiter) {
+                this.out = out;
+                this.encoding = encoding;
+                try {
+                    this.recordDelimiter = recordDelimiter.getBytes(encoding);
+                } catch (UnsupportedEncodingException uee) {
+                    throw new IllegalArgumentException("Encoding " + encoding + " not found.");
+                }
+            }
+
+            public synchronized void write(NullWritable key, Text value) throws IOException {
+                out.write(value.toString().getBytes(encoding));
+                out.write(recordDelimiter);
+            }
+
+            public synchronized void close(TaskAttemptContext context) throws IOException {
+                out.close();
             }
         }
     }

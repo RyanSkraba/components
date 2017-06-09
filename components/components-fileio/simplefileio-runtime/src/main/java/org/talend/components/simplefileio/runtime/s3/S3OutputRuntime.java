@@ -59,21 +59,22 @@ public class S3OutputRuntime extends PTransform<PCollection<IndexedRecord>, PDon
         String path = S3Connection.getUriPath(properties.getDatasetProperties());
         boolean overwrite = properties.overwrite.getValue();
         int limit = -1; // limit is ignored for sinks
+        boolean mergeOutput = properties.mergeOutput.getValue();
 
         SimpleRecordFormatBase rf = null;
         switch (properties.getDatasetProperties().format.getValue()) {
 
         case AVRO:
-            rf = new SimpleRecordFormatAvroIO(doAs, path, overwrite, limit);
+            rf = new SimpleRecordFormatAvroIO(doAs, path, overwrite, limit, mergeOutput);
             break;
 
         case CSV:
             rf = new SimpleRecordFormatCsvIO(doAs, path, overwrite, limit, properties.getDatasetProperties().getRecordDelimiter(),
-                    properties.getDatasetProperties().getFieldDelimiter());
+                    properties.getDatasetProperties().getFieldDelimiter(), mergeOutput);
             break;
 
         case PARQUET:
-            rf = new SimpleRecordFormatParquetIO(doAs, path, overwrite, limit);
+            rf = new SimpleRecordFormatParquetIO(doAs, path, overwrite, limit, mergeOutput);
             break;
         }
 

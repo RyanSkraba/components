@@ -158,6 +158,10 @@ public class S3TestResource extends ExternalResource {
         return path;
     }
 
+    public String getS3APath(S3DatasetProperties datasetProperties) {
+        return S3Connection.getUriPath(datasetProperties, getPath());
+    }
+
     @Override
     public Statement apply(Statement base, Description desc) {
         name = desc.getMethodName();
