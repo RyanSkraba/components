@@ -63,7 +63,7 @@ public class SimpleFileIOOutputErrorTest {
             out.write(0);
         }
 
-        // Requesting a wrong execution engine causes an exception.
+        // Trying to write to an existing destination throws an exception.
         thrown.expect(TalendRuntimeException.class);
         thrown.expect(hasProperty("code", is(SimpleFileIOErrorCode.OUTPUT_ALREADY_EXISTS)));
         thrown.expectMessage("The path " + fileSpec + " already exists. Please remove it manually.");
@@ -86,6 +86,57 @@ public class SimpleFileIOOutputErrorTest {
             input.apply(runtime);
 
             // And run the test.
+            p.run().waitUntilFinish();
+        } catch (Pipeline.PipelineExecutionException e) {
+            if (e.getCause() instanceof TalendRuntimeException)
+                throw (TalendRuntimeException) e.getCause();
+            throw e;
+        }
+    }
+
+    /**
+     * Basic unit test using all default values (except for the path) on an in-memory DFS cluster.
+     */
+    @Test
+    public void testUnauthorizedOverwrite() throws IOException, URISyntaxException {
+        Path parent = new Path(mini.newFolder().toString());
+        Path dst = new Path(parent, "output");
+        String fileSpec = mini.getLocalFs().getUri().resolve(dst.toUri()).toString();
+
+        // Write something to the file before trying to run.
+        try (OutputStream out = mini.getLocalFs().create(new Path(dst, "part-00000"))) {
+            out.write(0);
+        }
+
+        // Ensure that the destination is unwritable.
+        FileUtil.chmod(dst.toUri().toString(), "000", true);
+
+        // Trying to overwrite an unmodifiable destination throws an exception.
+        thrown.expect(TalendRuntimeException.class);
+        thrown.expect(hasProperty("code", is(SimpleFileIOErrorCode.OUTPUT_NOT_AUTHORIZED)));
+        thrown.expectMessage("Can not write to " + fileSpec
+                + ". Please check user permissions or existence of base directory.");
+
+        // Now try using the component.
+        try {
+            // Configure the component.
+            SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
+            props.getDatasetProperties().path.setValue(fileSpec);
+            props.overwrite.setValue(true);
+
+            // Create the runtime.
+            SimpleFileIOOutputRuntime runtime = new SimpleFileIOOutputRuntime();
+            runtime.initialize(null, props);
+
+            // Use the runtime in a direct pipeline to test.
+            final Pipeline p = beam.createPipeline();
+            PCollection<IndexedRecord> input = p.apply( //
+                    Create.of(ConvertToIndexedRecord.convertToAvro(new String[] { "1", "one" }), //
+                            ConvertToIndexedRecord.convertToAvro(new String[] { "2", "two" }))); //
+            input.apply(runtime);
+
+            // And run the test.
+            runtime.runAtDriver(null);
             p.run().waitUntilFinish();
         } catch (Pipeline.PipelineExecutionException e) {
             if (e.getCause() instanceof TalendRuntimeException)

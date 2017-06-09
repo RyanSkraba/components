@@ -13,6 +13,7 @@
 package org.talend.components.simplefileio.runtime;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -30,12 +31,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.simplefileio.SimpleFileIOErrorCode;
 import org.talend.components.simplefileio.SimpleFileIOFormat;
 import org.talend.components.simplefileio.output.SimpleFileIOOutputDefinition;
 import org.talend.components.simplefileio.output.SimpleFileIOOutputProperties;
 import org.talend.components.test.BeamDirectTestResource;
 import org.talend.components.test.MiniDfsResource;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.runtime.RuntimeUtil;
+
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Unit tests for {@link SimpleFileIOOutputRuntime}.
@@ -212,5 +218,51 @@ public class SimpleFileIOOutputRuntimeTest {
         // TODO(rskraba): Implement a comparison for the file on disk.
         // mini.assertReadFile(mini.getLocalFs(), fileSpec, "1;one", "2;two");
     }
+
+    /**
+     * Basic unit test using all default values (except for the path) on an in-memory DFS cluster.
+     */
+    @Test
+    public void testTryToOverwrite() throws IOException, URISyntaxException {
+        Path parent = new Path(mini.newFolder().toString());
+        Path dst = new Path(parent, "output");
+        String fileSpec = mini.getLocalFs().getUri().resolve(dst.toUri()).toString();
+
+        // Write something to the file before trying to run.
+        try (OutputStream out = mini.getLocalFs().create(new Path(dst, "part-00000"))) {
+            out.write(0);
+        }
+
+        // Now try using the component.
+        try {
+            // Configure the component.
+            SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
+            props.getDatasetProperties().path.setValue(fileSpec);
+            props.overwrite.setValue(true);
+
+            // Create the runtime.
+            SimpleFileIOOutputRuntime runtime = new SimpleFileIOOutputRuntime();
+            runtime.initialize(null, props);
+
+            // Use the runtime in a direct pipeline to test.
+            final Pipeline p = beam.createPipeline();
+            PCollection<IndexedRecord> input = p.apply( //
+                    Create.of(ConvertToIndexedRecord.convertToAvro(new String[] { "1", "one" }), //
+                            ConvertToIndexedRecord.convertToAvro(new String[] { "2", "two" }))); //
+            input.apply(runtime);
+
+            // And run the test.
+            runtime.runAtDriver(null);
+            p.run().waitUntilFinish();
+        } catch (Pipeline.PipelineExecutionException e) {
+            if (e.getCause() instanceof TalendRuntimeException)
+                throw (TalendRuntimeException) e.getCause();
+            throw e;
+        }
+
+        // Check the expected values, which should be overwritten.
+        mini.assertReadFile(mini.getLocalFs(), fileSpec, "1;one", "2;two");
+    }
+
 
 }

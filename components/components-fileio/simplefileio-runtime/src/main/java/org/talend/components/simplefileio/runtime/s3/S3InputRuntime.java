@@ -27,8 +27,8 @@ import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 import org.talend.components.simplefileio.s3.input.S3InputProperties;
 import org.talend.daikon.properties.ValidationResult;
 
-public class S3InputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>> implements
-        RuntimableRuntime<S3InputProperties> {
+public class S3InputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>>
+        implements RuntimableRuntime<S3InputProperties> {
 
     static {
         // Ensure that the singleton for the SimpleFileIOAvroRegistry is created.
@@ -51,22 +51,23 @@ public class S3InputRuntime extends PTransform<PBegin, PCollection<IndexedRecord
         // The UGI does not control security for S3.
         UgiDoAs doAs = UgiDoAs.ofNone();
         String path = S3Connection.getUriPath(properties.getDatasetProperties());
+        boolean overwrite = false; // overwrite is ignored for reads.
         int limit = properties.limit.getValue();
 
         SimpleRecordFormatBase rf = null;
         switch (properties.getDatasetProperties().format.getValue()) {
 
         case AVRO:
-            rf = new SimpleRecordFormatAvroIO(doAs, path, limit);
+            rf = new SimpleRecordFormatAvroIO(doAs, path, overwrite, limit);
             break;
 
         case CSV:
-            rf = new SimpleRecordFormatCsvIO(doAs, path, limit, properties.getDatasetProperties().getRecordDelimiter(),
+            rf = new SimpleRecordFormatCsvIO(doAs, path, overwrite, limit, properties.getDatasetProperties().getRecordDelimiter(),
                     properties.getDatasetProperties().getFieldDelimiter());
             break;
 
         case PARQUET:
-            rf = new SimpleRecordFormatParquetIO(doAs, path, limit);
+            rf = new SimpleRecordFormatParquetIO(doAs, path, overwrite, limit);
             break;
         }
 

@@ -28,8 +28,8 @@ import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
  */
 public class AvroHdfsFileSink extends UgiFileSinkBase<AvroKey<IndexedRecord>, NullWritable> {
 
-    public AvroHdfsFileSink(UgiDoAs doAs, String path) {
-        super(doAs, path, (Class) AvroKeyOutputFormat.class);
+    public AvroHdfsFileSink(UgiDoAs doAs, String path, boolean overwrite) {
+        super(doAs, path, overwrite, (Class) AvroKeyOutputFormat.class);
     }
 
     @Override

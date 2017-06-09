@@ -13,6 +13,8 @@
 package org.talend.components.simplefileio.runtime.sinks;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 
@@ -20,10 +22,14 @@ import org.apache.beam.sdk.io.hdfs.ConfigurableHDFSFileSink;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.talend.components.simplefileio.runtime.ExtraHadoopConfiguration;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Subclass of ConfigurableHDFSFileSink that saves {@link org.apache.hadoop.security.UserGroupInformation}.
@@ -35,17 +41,20 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
 
     private final UgiDoAs doAs;
 
+    private final boolean overwrite;
+
     /** Additional information to configure the OutputFormat */
     private final ExtraHadoopConfiguration extraConfig;
 
-    public UgiFileSinkBase(UgiDoAs doAs, String path, Class<? extends FileOutputFormat<K, V>> formatClass) {
-        this(doAs, path, formatClass, new ExtraHadoopConfiguration());
+    public UgiFileSinkBase(UgiDoAs doAs, String path, boolean overwrite, Class<? extends FileOutputFormat<K, V>> formatClass) {
+        this(doAs, path, overwrite, formatClass, new ExtraHadoopConfiguration());
     }
 
-    public UgiFileSinkBase(UgiDoAs doAs, String path, Class<? extends FileOutputFormat<K, V>> formatClass,
+    public UgiFileSinkBase(UgiDoAs doAs, String path, boolean overwrite, Class<? extends FileOutputFormat<K, V>> formatClass,
             ExtraHadoopConfiguration extraConfig) {
         super(path, formatClass);
         this.doAs = doAs;
+        this.overwrite = overwrite;
         this.extraConfig = extraConfig;
         // Ensure that the local filesystem is used if the path starts with the file:// schema.
         if (path.toLowerCase().startsWith("file:")) {
@@ -68,6 +77,15 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
 
     protected void ugiDoAsValidate(final PipelineOptions options) {
         super.validate(options);
+        try {
+            Job job = jobInstance();
+            FileSystem fs = FileSystem.get(new URI(path), job.getConfiguration());
+            checkState(!fs.exists(new Path(path)) || overwrite, "Output path " + path + " already exists");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public ExtraHadoopConfiguration getExtraHadoopConfiguration() {

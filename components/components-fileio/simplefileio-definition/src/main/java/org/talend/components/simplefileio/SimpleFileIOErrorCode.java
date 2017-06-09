@@ -80,8 +80,9 @@ public enum SimpleFileIOErrorCode implements ErrorCode {
      * @return An exception corresponding to the error code.
      */
     public static TalendRuntimeException createOutputAlreadyExistsException(Throwable cause, String path) {
-        return new TalendMsgRuntimeException(cause, OUTPUT_ALREADY_EXISTS, ExceptionContext.withBuilder().put("path", path)
-                .build(), "The path " + path + " already exists. Please remove it manually.");
+        return new TalendMsgRuntimeException(cause, OUTPUT_ALREADY_EXISTS,
+                ExceptionContext.withBuilder().put("path", path).build(),
+                "The path " + path + " already exists. Please remove it manually.");
         // TODO: when overwrite is enabled, add "or enable the overwrite property."
     }
 
@@ -94,14 +95,14 @@ public enum SimpleFileIOErrorCode implements ErrorCode {
      * @return An exception corresponding to the error code.
      */
     public static TalendRuntimeException createOutputNotAuthorized(Throwable cause, String username, String path) {
-        if (username == null)
-            return new TalendMsgRuntimeException(cause, OUTPUT_NOT_AUTHORIZED, ExceptionContext.withBuilder().put("path", path)
-                    .put("username", username).build(), "Can not write to " + path
-                    + ". Please check user permissions or existence of base directory.");
+        if (username == null || username.length() == 0)
+            return new TalendMsgRuntimeException(cause, OUTPUT_NOT_AUTHORIZED,
+                    ExceptionContext.withBuilder().put("path", path).put("username", username).build(),
+                    "Can not write to " + path + ". Please check user permissions or existence of base directory.");
         else
-            return new TalendMsgRuntimeException(cause, OUTPUT_NOT_AUTHORIZED, ExceptionContext.withBuilder().put("path", path)
-                    .put("username", username).build(), username + " can not write to " + path
-                    + ". Please check user permissions or existence of base directory.");
+            return new TalendMsgRuntimeException(cause, OUTPUT_NOT_AUTHORIZED,
+                    ExceptionContext.withBuilder().put("path", path).put("username", username).build(),
+                    username + " can not write to " + path + ". Please check user permissions or existence of base directory.");
     }
 
     /**
@@ -119,8 +120,8 @@ public enum SimpleFileIOErrorCode implements ErrorCode {
         else
             localizedMessage = username + " can not read from " + path
                     + ". Please check user permissions or existence of base directory.";
-        return new TalendMsgRuntimeException(cause, INPUT_NOT_AUTHORIZED, ExceptionContext.withBuilder().put("path", path)
-                .put("username", username).build(), localizedMessage);
+        return new TalendMsgRuntimeException(cause, INPUT_NOT_AUTHORIZED,
+                ExceptionContext.withBuilder().put("path", path).put("username", username).build(), localizedMessage);
     }
 
     /**

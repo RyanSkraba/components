@@ -26,8 +26,8 @@ import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
  */
 public class ParquetHdfsFileSink extends UgiFileSinkBase<Void, IndexedRecord> {
 
-    public ParquetHdfsFileSink(UgiDoAs doAs, String path) {
-        super(doAs, path, (Class) AvroParquetOutputFormat.class);
+    public ParquetHdfsFileSink(UgiDoAs doAs, String path, boolean overwrite) {
+        super(doAs, path, overwrite, (Class) AvroParquetOutputFormat.class);
     }
 
     @Override

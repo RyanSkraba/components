@@ -26,12 +26,16 @@ import org.talend.components.simplefileio.s3.S3DatasetDefinition;
 import org.talend.components.simplefileio.s3.S3DatasetProperties;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class S3OutputProperties extends FixedConnectorsComponentProperties implements IOProperties {
 
     public S3OutputProperties(String name) {
         super(name);
     }
+
+    public Property<Boolean> overwrite = PropertyFactory.newBoolean("overwrite", false);
 
     public transient ReferenceProperties<S3DatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
             S3DatasetDefinition.NAME);
@@ -42,6 +46,7 @@ public class S3OutputProperties extends FixedConnectorsComponentProperties imple
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
+        mainForm.addRow(overwrite);
     }
 
     @Override

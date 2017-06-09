@@ -23,8 +23,8 @@ import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 import org.talend.components.simplefileio.runtime.ugi.UgiExceptionHandler;
 import org.talend.daikon.properties.ValidationResult;
 
-public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>> implements
-        RuntimableRuntime<SimpleFileIOInputProperties> {
+public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>>
+        implements RuntimableRuntime<SimpleFileIOInputProperties> {
 
     static {
         // Ensure that the singleton for the SimpleFileIOAvroRegistry is created.
@@ -48,22 +48,23 @@ public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<Ind
         UgiDoAs doAs = SimpleFileIODatasetRuntime.getReadWriteUgiDoAs(properties.getDatasetProperties(),
                 UgiExceptionHandler.AccessType.Read);
         String path = properties.getDatasetProperties().path.getValue();
+        boolean overwrite = false; // overwrite is ignored for reads.
         int limit = properties.limit.getValue();
 
         SimpleRecordFormat rf = null;
         switch (properties.getDatasetProperties().format.getValue()) {
 
         case AVRO:
-            rf = new SimpleRecordFormatAvroIO(doAs, path, limit);
+            rf = new SimpleRecordFormatAvroIO(doAs, path, overwrite, limit);
             break;
 
         case CSV:
-            rf = new SimpleRecordFormatCsvIO(doAs, path, limit, properties.getDatasetProperties().getRecordDelimiter(),
+            rf = new SimpleRecordFormatCsvIO(doAs, path, overwrite, limit, properties.getDatasetProperties().getRecordDelimiter(),
                     properties.getDatasetProperties().getFieldDelimiter());
             break;
 
         case PARQUET:
-            rf = new SimpleRecordFormatParquetIO(doAs, path, limit);
+            rf = new SimpleRecordFormatParquetIO(doAs, path, overwrite, limit);
             break;
         }
 

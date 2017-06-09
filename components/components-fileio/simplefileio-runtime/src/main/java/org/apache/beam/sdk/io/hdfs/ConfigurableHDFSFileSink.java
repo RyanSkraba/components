@@ -107,15 +107,7 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
 
     @Override
     public void validate(PipelineOptions options) {
-        try {
-            Job job = jobInstance();
-            FileSystem fs = FileSystem.get(new URI(path), job.getConfiguration());
-            checkState(!fs.exists(new Path(path)), "Output path " + path + " already exists");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        // The original Beam validate logic was moved to UgiFileSink to permit overwrite.
     }
 
     @Override

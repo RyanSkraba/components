@@ -40,8 +40,8 @@ public class SimpleRecordFormatAvroIO extends SimpleRecordFormatBase {
         SimpleFileIOAvroRegistry.get();
     }
 
-    public SimpleRecordFormatAvroIO(UgiDoAs doAs, String path, int limit) {
-        super(doAs, path, limit);
+    public SimpleRecordFormatAvroIO(UgiDoAs doAs, String path, boolean overwrite, int limit) {
+        super(doAs, path, overwrite, limit);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class SimpleRecordFormatAvroIO extends SimpleRecordFormatBase {
     @Override
     public PDone write(PCollection<IndexedRecord> in) {
         LazyAvroKeyWrapper lakw = LazyAvroKeyWrapper.of();
-        AvroHdfsFileSink sink = new AvroHdfsFileSink(doAs, path);
+        AvroHdfsFileSink sink = new AvroHdfsFileSink(doAs, path, overwrite);
         sink.getExtraHadoopConfiguration().addFrom(getExtraHadoopConfiguration());
 
         PCollection<KV<AvroKey<IndexedRecord>, NullWritable>> pc1 = in.apply(ParDo.of(new FormatAvro()));

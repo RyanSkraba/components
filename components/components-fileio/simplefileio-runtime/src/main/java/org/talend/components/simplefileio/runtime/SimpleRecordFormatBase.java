@@ -25,13 +25,16 @@ public abstract class SimpleRecordFormatBase implements SimpleRecordFormat {
 
     protected final String path;
 
+    protected final boolean overwrite;
+
     protected final int limit;
 
     private final ExtraHadoopConfiguration extraConfig = new ExtraHadoopConfiguration();
 
-    public SimpleRecordFormatBase(UgiDoAs doAs, String path, int limit) {
+    public SimpleRecordFormatBase(UgiDoAs doAs, String path, boolean overwrite, int limit) {
         this.doAs = doAs;
         this.path = path;
+        this.overwrite = overwrite;
         this.limit = limit;
     }
 

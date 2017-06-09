@@ -63,8 +63,9 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
 
     private final String fieldDelimiter;
 
-    public SimpleRecordFormatCsvIO(UgiDoAs doAs, String path, int limit, String recordDelimiter, String fieldDelimiter) {
-        super(doAs, path, limit);
+    public SimpleRecordFormatCsvIO(UgiDoAs doAs, String path, boolean overwrite, int limit, String recordDelimiter,
+            String fieldDelimiter) {
+        super(doAs, path, overwrite, limit);
         this.recordDelimiter = recordDelimiter;
 
         String fd = fieldDelimiter;
@@ -72,8 +73,8 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
             fd = fd.trim();
         }
         if (fd.isEmpty())
-            TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_ARGUMENT)
-                    .setAndThrow("single character field delimiter", fd);
+            TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_ARGUMENT).setAndThrow("single character field delimiter",
+                    fd);
         this.fieldDelimiter = fd;
     }
 
@@ -112,11 +113,12 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
             ExtraHadoopConfiguration conf = new ExtraHadoopConfiguration();
             conf.set(CsvTextOutputFormat.RECORD_DELIMITER, recordDelimiter);
             conf.set(CsvTextOutputFormat.ENCODING, CsvTextOutputFormat.UTF_8);
-            UgiFileSinkBase<NullWritable, Text> sink = new UgiFileSinkBase<>(doAs, path, CsvTextOutputFormat.class, conf);
+            UgiFileSinkBase<NullWritable, Text> sink = new UgiFileSinkBase<>(doAs, path, overwrite, CsvTextOutputFormat.class,
+                    conf);
             sink.getExtraHadoopConfiguration().addFrom(getExtraHadoopConfiguration());
 
-            PCollection<KV<NullWritable, Text>> pc1 = in.apply(ParDo.of(new FormatCsvRecord(fieldDelimiter.charAt(0)))).setCoder(
-                    KvCoder.of(WritableCoder.of(NullWritable.class), WritableCoder.of(Text.class)));
+            PCollection<KV<NullWritable, Text>> pc1 = in.apply(ParDo.of(new FormatCsvRecord(fieldDelimiter.charAt(0))))
+                    .setCoder(KvCoder.of(WritableCoder.of(NullWritable.class), WritableCoder.of(Text.class)));
 
             return pc1.apply(Write.to(sink));
         }
