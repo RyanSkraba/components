@@ -26,6 +26,7 @@ import static org.talend.components.marketo.tmarketolistoperation.TMarketoListOp
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -71,6 +72,11 @@ public class MarketoListOperationWriter extends MarketoWriter {
         listOpeParms.setApiMode(api);
         operation = properties.listOperation.getValue();
         dieOnError = properties.dieOnError.getValue();
+        //
+        listOpeParms = new ListOperationParameters();
+        listOpeParms.setApiMode(api);
+        listOpeParms.setOperation(operation.name());
+        listOpeParms.setStrict(dieOnError);
     }
 
     @Override
@@ -79,9 +85,6 @@ public class MarketoListOperationWriter extends MarketoWriter {
             return;
         }
         //
-        successfulWrites.clear();
-        rejectedWrites.clear();
-        //
         inputRecord = (IndexedRecord) object;
         result.totalCount++;
         // This for dynamic which would get schema from the first record
@@ -89,56 +92,36 @@ public class MarketoListOperationWriter extends MarketoWriter {
             inputSchema = inputRecord.getSchema();
         }
         //
-        // isMemberOf don't have to manage many prospects. Just once at a time..
-        if (operation.equals(isMemberOf)) {
-            listOpeParms = buildListOperationParameters((IndexedRecord) object);
-            processResult(client.isMemberOfList(listOpeParms));
-            return;
-        }
+        addRecordToListOperationParameters(inputRecord);
         //
-        if (!multipleOperations) {
-            listOpeParms = buildListOperationParameters((IndexedRecord) object);
-            if (operation.equals(addTo)) {
-                processResult(client.addToList(listOpeParms));
-            } else {
-                processResult(client.removeFromList(listOpeParms));
-            }
-            //
-            return;
-        }
-        // multipleOperations is valid for AddTo and RemoveFrom List
-        // while the List doesn't change we accumulate the Lead keys...
-        if (isSameListForListOperation(inputRecord) || !listOpeParms.isValid()) {
-            // initial listOperation...
-            if (!listOpeParms.isValid()) {
-                listOpeParms = buildListOperationParameters(inputRecord);
-            } else {
-                addLeadKeyToListOperationParameters(inputRecord);
-            }
-            return;
-        } else {
-            // first process previous list
-            if (operation.equals(addTo)) {
-                processResult(client.addToList(listOpeParms));
-            } else {
-                processResult(client.removeFromList(listOpeParms));
-            }
-            // then create new list and add leadId
-            listOpeParms = buildListOperationParameters(inputRecord);
-        }
     }
 
     @Override
     public Result close() throws IOException {
         // check if we have processed every record...
-        if (multipleOperations && !operation.equals(isMemberOf) && listOpeParms.isValid()) {
-            if (operation.equals(addTo)) {
-                processResult(client.addToList(listOpeParms));
-            } else {
-                processResult(client.removeFromList(listOpeParms));
-            }
-        }
+        flush();
         return super.close();
+    }
+
+    @Override
+    protected void flush() {
+        if (!listOpeParms.isValid()) {
+            return;
+        }
+        // process the list operation
+        switch (operation) {
+        case addTo:
+            processResult(client.addToList(listOpeParms));
+            break;
+        case isMemberOf:
+            processResult(client.isMemberOfList(listOpeParms));
+            break;
+        case removeFrom:
+            processResult(client.removeFromList(listOpeParms));
+            break;
+        }
+        // clear the list
+        listOpeParms.reset();
     }
 
     public Boolean isSameListForListOperation(IndexedRecord record) {
@@ -151,11 +134,22 @@ public class MarketoListOperationWriter extends MarketoWriter {
         }
     }
 
+    public void addRecordToListOperationParameters(IndexedRecord record) {
+        if (!listOpeParms.isValid() || !multipleOperations || operation.equals(isMemberOf)) {
+            buildListOperationParameters(record);
+            return;
+        }
+        // while the List doesn't change we accumulate the Lead keys...
+        if (isSameListForListOperation(inputRecord)) {
+            addLeadKeyToListOperationParameters(inputRecord);
+        } else {
+            flush();
+            buildListOperationParameters(inputRecord);
+        }
+    }
+
     public ListOperationParameters buildListOperationParameters(IndexedRecord record) {
-        listOpeParms = new ListOperationParameters();
-        listOpeParms.setApiMode(api);
-        listOpeParms.setOperation(operation.name());
-        listOpeParms.setStrict(dieOnError);
+        listOpeParms.reset();
         if (use_soap_api) {
             listOpeParms.setListKeyType(String.valueOf(record.get(inputSchema.getField(FIELD_LIST_KEY_TYPE).pos())));
             listOpeParms.setListKeyValue(String.valueOf(record.get(inputSchema.getField(FIELD_LIST_KEY_VALUE).pos())));
@@ -213,13 +207,25 @@ public class MarketoListOperationWriter extends MarketoWriter {
         return record;
     }
 
-    public void processResult(MarketoSyncResult mktoResult) throws IOException {
+    private void processResult(MarketoSyncResult mktoResult) {
+        successfulWrites.clear();
+        rejectedWrites.clear();
         result.apiCalls++;
         if (!mktoResult.isSuccess()) {
             if (dieOnError) {
-                throw new IOException(mktoResult.getErrorsString());
+                throw new MarketoRuntimeException(mktoResult.getErrorsString());
             }
-            LOG.error(mktoResult.getErrorsString());
+            // build a SyncStatus for record which failed
+            SyncStatus status = new SyncStatus();
+            status.setStatus("failed");
+            status.setErrorMessage(mktoResult.getErrorsString());
+            if (mktoResult.getRecords().isEmpty()) {
+                mktoResult.setRecords(Arrays.asList(status));
+            } else {
+                List<SyncStatus> tmp = mktoResult.getRecords();
+                tmp.add(status);
+                mktoResult.setRecords(tmp);
+            }
         }
         for (SyncStatus status : mktoResult.getRecords()) {
             if (Arrays.asList("true", "added", "removed", "notmemberof", "memberof").contains(status.getStatus().toLowerCase())
@@ -227,7 +233,7 @@ public class MarketoListOperationWriter extends MarketoWriter {
                 handleSuccess(fillRecord(status, flowSchema));
             } else {
                 if (dieOnError) {
-                    throw new IOException(status.getAvailableReason());
+                    throw new MarketoRuntimeException(status.getAvailableReason());
                 }
                 handleReject(fillRecord(status, rejectSchema));
             }

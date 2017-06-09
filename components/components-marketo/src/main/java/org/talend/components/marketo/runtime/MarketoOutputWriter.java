@@ -53,6 +53,8 @@ public class MarketoOutputWriter extends MarketoWriter {
 
     private Schema dynamicSchema;
 
+    private Boolean isBatchMode = Boolean.FALSE;
+
     private static final Logger LOG = LoggerFactory.getLogger(MarketoOutputWriter.class);
 
     public MarketoOutputWriter(WriteOperation writeOperation, RuntimeContainer runtime) {
@@ -76,6 +78,8 @@ public class MarketoOutputWriter extends MarketoWriter {
         if (operation.equals(OutputOperation.deleteLeads) && !properties.deleteLeadsInBatch.getValue()) {
             batchSize = 1;
         }
+        isBatchMode = ((operation.equals(OutputOperation.syncMultipleLeads) || operation.equals(OutputOperation.deleteLeads))
+                && batchSize > 1);
     }
 
     @Override
@@ -83,9 +87,6 @@ public class MarketoOutputWriter extends MarketoWriter {
         if (object == null) {
             return;
         }
-        //
-        successfulWrites.clear();
-        rejectedWrites.clear();
         //
         inputRecord = (IndexedRecord) object;
         result.totalCount++;
@@ -95,53 +96,50 @@ public class MarketoOutputWriter extends MarketoWriter {
         }
         //
         recordsToProcess.add(inputRecord);
-        switch (operation) {
-        case syncLead:
-            processResult(client.syncLead(properties, recordsToProcess.get(0)));
-            recordsToProcess.clear();
-            break;
-        case syncMultipleLeads:
-            if (recordsToProcess.size() >= batchSize) {
-                processResult(client.syncMultipleLeads(properties, recordsToProcess));
-                recordsToProcess.clear();
-            }
-            break;
-        case deleteLeads:
-            if (recordsToProcess.size() >= batchSize) {
-                processResult(((MarketoRESTClient) client).deleteLeads(recordsToProcess));
-                recordsToProcess.clear();
-            }
-            break;
-        case syncCustomObjects:
-            processResult(((MarketoRESTClient) client).syncCustomObjects(properties, recordsToProcess));
-            recordsToProcess.clear();
-            break;
-        case deleteCustomObjects:
-            processResult(((MarketoRESTClient) client).deleteCustomObjects(properties, recordsToProcess));
-            recordsToProcess.clear();
-            break;
+
+        if (recordsToProcess.size() == batchSize) {
+            flush();
         }
     }
 
     @Override
     public Result close() throws IOException {
-        if (!recordsToProcess.isEmpty()) {
-            if (operation.equals(OutputOperation.syncMultipleLeads)) {
-                processResult(client.syncMultipleLeads(properties, recordsToProcess));
-            }
-            if (operation.equals(OutputOperation.deleteLeads)) {
-                processResult(((MarketoRESTClient) client).deleteLeads(recordsToProcess));
-            }
-            recordsToProcess.clear();
-        }
+        flush();
         return super.close();
     }
 
-    public void processResult(MarketoSyncResult mktoResult) throws IOException {
+    @Override
+    protected void flush() {
+        if (recordsToProcess.isEmpty()) {
+            return;
+        }
+        switch (operation) {
+        case syncLead:
+            processResult(client.syncLead(properties, recordsToProcess.get(0)));
+            break;
+        case syncMultipleLeads:
+            processResult(client.syncMultipleLeads(properties, recordsToProcess));
+            break;
+        case deleteLeads:
+            processResult(((MarketoRESTClient) client).deleteLeads(recordsToProcess));
+            break;
+        case syncCustomObjects:
+            processResult(((MarketoRESTClient) client).syncCustomObjects(properties, recordsToProcess));
+            break;
+        case deleteCustomObjects:
+            processResult(((MarketoRESTClient) client).deleteCustomObjects(properties, recordsToProcess));
+            break;
+        }
+        recordsToProcess.clear();
+    }
+
+    public void processResult(MarketoSyncResult mktoResult) {
+        successfulWrites.clear();
+        rejectedWrites.clear();
         result.apiCalls++;
         if (!mktoResult.isSuccess()) {
             if (dieOnError) {
-                throw new IOException(mktoResult.getErrorsString());
+                throw new MarketoRuntimeException(mktoResult.getErrorsString());
             }
             // build a SyncStatus for record which failed
             SyncStatus status = new SyncStatus();
@@ -159,14 +157,28 @@ public class MarketoOutputWriter extends MarketoWriter {
         for (SyncStatus status : mktoResult.getRecords()) {
             IndexedRecord statusRecord = recordsToProcess.get(idx);
             idx++;
-            if (Arrays.asList("created", "updated", "deleted", "scheduled", "triggered")
-                    .contains(status.getStatus().toLowerCase())) {
-                handleSuccess(fillRecord(status, flowSchema, statusRecord));
-            } else {
-                if (dieOnError) {
-                    throw new IOException(status.getAvailableReason());
+            boolean isSuccess = Arrays.asList("created", "updated", "deleted", "scheduled", "triggered")
+                    .contains(status.getStatus().toLowerCase());
+            if (isBatchMode) {
+                if (!isSuccess && dieOnError) {
+                    throw new MarketoRuntimeException(status.getAvailableReason());
                 }
-                handleReject(fillRecord(status, rejectSchema, statusRecord));
+                // in batchmode we have only 0 or 1 connector only
+                handleSuccess(fillRecord(status, flowSchema, statusRecord));
+                if (!isSuccess) {
+                    // readjust counts
+                    result.successCount--;
+                    result.rejectCount++;
+                }
+            } else {
+                if (isSuccess) {
+                    handleSuccess(fillRecord(status, flowSchema, statusRecord));
+                } else {
+                    if (dieOnError) {
+                        throw new MarketoRuntimeException(status.getAvailableReason());
+                    }
+                    handleReject(fillRecord(status, rejectSchema, statusRecord));
+                }
             }
         }
     }

@@ -49,6 +49,17 @@ public class ListOperationParameters {
         return false;
     }
 
+    public void reset() {
+        // SOAP
+        listKeyType = "";
+        listKeyValue = "";
+        leadKeyType = "";
+        leadKeyValue.clear();
+        // REST
+        listId = null;
+        leadIds.clear();
+    }
+
     public String getApiMode() {
         return apiMode;
     }

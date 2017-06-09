@@ -112,4 +112,9 @@ public class MarketoInputWriter extends MarketoWriter {
             }
         }
     }
+
+    @Override
+    protected void flush() {
+        // nop, no batch mode.
+    }
 }
