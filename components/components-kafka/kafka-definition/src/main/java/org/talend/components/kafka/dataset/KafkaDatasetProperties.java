@@ -39,7 +39,7 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
     public ReferenceProperties<KafkaDatastoreProperties> datastore = new ReferenceProperties<>("datastore",
             KafkaDatastoreDefinition.NAME);
 
-    public Property<String> topic = PropertyFactory.newString("topic");
+    public Property<String> topic = PropertyFactory.newString("topic").setRequired();
 
     public SchemaProperties main = new SchemaProperties("main");
 
