@@ -29,8 +29,8 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OperationType;
-import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.RESTLookupFields;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation;
 import org.talend.daikon.properties.presentation.Form;
 
 public class TMarketoOutputPropertiesTest {

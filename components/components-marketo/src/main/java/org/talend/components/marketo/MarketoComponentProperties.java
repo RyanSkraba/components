@@ -12,9 +12,6 @@
 // ============================================================================
 package org.talend.components.marketo;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +27,6 @@ import org.talend.components.common.SchemaProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.properties.property.Property;
 
 public abstract class MarketoComponentProperties extends FixedConnectorsComponentProperties
         implements MarketoProvideConnectionProperties {
@@ -59,10 +55,6 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject");
 
-    public Property<Integer> batchSize = newInteger("batchSize");
-
-    public Property<Boolean> dieOnError = newBoolean("dieOnError");
-
     private static final long serialVersionUID = 5587867978797981L;
 
     private transient static final Logger LOG = LoggerFactory.getLogger(MarketoComponentProperties.class);
@@ -75,8 +67,6 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
     public void setupProperties() {
         super.setupProperties();
 
-        batchSize.setValue(100);
-        dieOnError.setValue(true);
     }
 
     @Override

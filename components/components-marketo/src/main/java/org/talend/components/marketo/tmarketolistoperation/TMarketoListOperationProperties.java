@@ -16,6 +16,7 @@ import static org.talend.components.marketo.MarketoConstants.getListOperationFlo
 import static org.talend.components.marketo.MarketoConstants.getListOperationFlowSOAPSchema;
 import static org.talend.components.marketo.MarketoConstants.getListOperationRejectRESTSchema;
 import static org.talend.components.marketo.MarketoConstants.getListOperationRejectSOAPSchema;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -37,6 +38,8 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TMarketoListOperationProperties extends MarketoComponentProperties {
+
+    public Property<Boolean> dieOnError = newBoolean("dieOnError");
 
     public enum ListOperation {
         addTo, // adds one or more leads to a list in the Marketo DB.
@@ -70,6 +73,7 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
     public void setupProperties() {
         super.setupProperties();
 
+        dieOnError.setValue(true);
         listOperation.setPossibleValues(ListOperation.values());
         listOperation.setValue(ListOperation.addTo);
         multipleOperation.setValue(false);

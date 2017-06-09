@@ -20,10 +20,10 @@ import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties.BulkImportTo;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
-import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
-import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;

@@ -15,11 +15,12 @@ package org.talend.components.marketo.tmarketoinput;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PARAM;
 import static org.talend.components.marketo.MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.CustomObject;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLead;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadActivity;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadChanges;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getMultipleLeads;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction.describe;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.CustomObject;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLead;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadActivity;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadChanges;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getMultipleLeads;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,12 +41,12 @@ import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.helpers.CompoundKeyTable;
 import org.talend.components.marketo.helpers.IncludeExcludeTypesTable;
 import org.talend.components.marketo.helpers.MarketoColumnMappingsTable;
 import org.talend.components.marketo.runtime.MarketoSourceOrSink;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
@@ -57,20 +59,16 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.serialize.PostDeserializeSetup;
 import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class TMarketoInputProperties extends MarketoComponentProperties implements SerializeSetVersion {
+public class TMarketoInputProperties extends MarketoComponentWizardBaseProperties implements SerializeSetVersion {
+
+    public Property<Integer> batchSize = newInteger("batchSize");
+
+    public Property<Boolean> dieOnError = newBoolean("dieOnError");
 
     private static final Logger LOG = getLogger(TMarketoInputProperties.class);
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(TMarketoInputProperties.class);
-
-    public enum InputOperation {
-        getLead, // retrieves basic information of leads and lead activities in Marketo DB. getLead:
-        getMultipleLeads, // retrieves lead records in batch.
-        getLeadActivity, // retrieves the history of activity records for a single lead identified by the provided key.
-        getLeadChanges, // checks the changes on Lead data in Marketo DB.
-        CustomObject // CO Operation
-    }
 
     public enum LeadSelector {
         LeadKeySelector,
@@ -247,8 +245,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
 
     }
 
-    public Property<InputOperation> inputOperation = newEnum("inputOperation", InputOperation.class).setRequired();
-
     public MarketoColumnMappingsTable mappingInput = new MarketoColumnMappingsTable("mappingInput");
 
     public Property<LeadSelector> leadSelectorSOAP = newEnum("leadSelectorSOAP", LeadSelector.class).setRequired();
@@ -290,19 +286,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
     public Property<Boolean> setExcludeTypes = newBoolean("setExcludeTypes");
 
     public IncludeExcludeTypesTable excludeTypes = new IncludeExcludeTypesTable("excludeTypes");
-
-    /**
-     * Custom objects
-     */
-    public enum CustomObjectAction {
-        describe,
-        list,
-        get
-    }
-
-    public Property<String> customObjectName = newString("customObjectName");
-
-    public Property<CustomObjectAction> customObjectAction = newEnum("customObjectAction", CustomObjectAction.class);
 
     public Property<String> customObjectNames = newString("customObjectNames");
 
@@ -346,6 +329,10 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
     @Override
     public void setupProperties() {
         super.setupProperties();
+
+        //
+        batchSize.setValue(100);
+        dieOnError.setValue(true);
         //
         inputOperation.setPossibleValues((Object[]) InputOperation.values());
         inputOperation.setValue(getLead);
@@ -368,8 +355,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
         // Custom Objects
         //
         customObjectAction.setPossibleValues((Object[]) CustomObjectAction.values());
-        customObjectAction.setValue(CustomObjectAction.describe);
-        customObjectName.setValue("");
+        customObjectAction.setValue(describe);
         customObjectNames.setValue("");
         customObjectFilterType.setValue("");
         customObjectFilterValues.setValue("");
@@ -444,6 +430,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
+
         boolean useSOAP = isApiSOAP();
         //
         if (form.getName().equals(Form.MAIN)) {
@@ -776,9 +763,24 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
 
     @Override
     public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
-        boolean migrated = super.postDeserialize(version, setup, persistent);
+        boolean migrated;
+        try {
+            migrated = super.postDeserialize(version, setup, persistent);
+        } catch (ClassCastException cce) {
+            migrated = super.postDeserialize(version, setup, false); // don't initLayout
+            LinkedHashMap value = (LinkedHashMap) inputOperation.getStoredValue();
+            String io = String.valueOf(value.get("name"));
+            // re-affect correct values
+            inputOperation.setPossibleValues(InputOperation.values());
+            inputOperation.setValue(InputOperation.valueOf(io));
+            value = (LinkedHashMap) customObjectAction.getStoredValue();
+            io = String.valueOf(value.get("name"));
+            // re-affect correct values
+            customObjectAction.setPossibleValues(CustomObjectAction.values());
+            customObjectAction.setValue(CustomObjectAction.valueOf(io));
+        }
         if (version < this.getVersionNumber()) {
-            if (InputOperation.getMultipleLeads.equals(inputOperation.getValue())
+            if (getMultipleLeads.equals(inputOperation.getValue())
                     && ((LeadSelector.StaticListSelector.equals(leadSelectorREST.getValue()) && isApiREST())
                             || (LeadSelector.StaticListSelector.equals(leadSelectorSOAP.getValue()) && isApiSOAP()))
                     && ListParam.STATIC_LIST_ID.equals(listParam.getValue()) && listParamListId.getValue() == null) {
@@ -794,5 +796,4 @@ public class TMarketoInputProperties extends MarketoComponentProperties implemen
         }
         return migrated;
     }
-
 }

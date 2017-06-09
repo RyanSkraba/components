@@ -38,7 +38,7 @@ import org.talend.components.marketo.runtime.client.MarketoRESTClient;
 import org.talend.components.marketo.runtime.client.rest.type.SyncStatus;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
-import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation;
 import org.talend.daikon.avro.AvroUtils;
 
 public class MarketoOutputWriter extends MarketoWriter {

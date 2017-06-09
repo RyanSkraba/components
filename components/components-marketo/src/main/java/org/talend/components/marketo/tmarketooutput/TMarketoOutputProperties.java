@@ -12,19 +12,21 @@
 // ============================================================================
 package org.talend.components.marketo.tmarketooutput;
 
-import static org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation.deleteCustomObjects;
-import static org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation.deleteLeads;
-import static org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation.syncCustomObjects;
-import static org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation.syncLead;
-import static org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation.syncMultipleLeads;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.deleteCustomObjects;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.deleteLeads;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.syncCustomObjects;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.syncLead;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.syncMultipleLeads;
 import static org.talend.daikon.properties.ValidationResult.OK;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -35,9 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.helpers.MarketoColumnMappingsTable;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -47,16 +49,14 @@ import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class TMarketoOutputProperties extends MarketoComponentProperties {
+public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperties implements SerializeSetVersion {
 
-    public enum OutputOperation {
-        syncLead, // This operation requests an insert or update operation for a lead record.
-        syncMultipleLeads, // This operation requests an insert or update operation for lead records in batch.
-        deleteLeads, // REST only
-        syncCustomObjects, // REST only
-        deleteCustomObjects // REST only
-    }
+    public Property<Integer> batchSize = newInteger("batchSize");
+
+    public Property<Boolean> dieOnError = newBoolean("dieOnError");
 
     public enum OperationType {
         createOnly,
@@ -79,8 +79,6 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
         sfdcOpptyId
     }
 
-    public Property<OutputOperation> outputOperation = newEnum("outputOperation", OutputOperation.class);
-
     public Property<OperationType> operationType = newEnum("operationType", OperationType.class);
 
     public Property<RESTLookupFields> lookupField = newEnum("lookupField", RESTLookupFields.class);
@@ -98,21 +96,10 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
      * 
      */
 
-    public enum CustomObjectSyncAction {
-        createOnly,
-        updateOnly,
-        createOrUpdate
-    }
-
     public enum CustomObjectDeleteBy {
         idField,
         dedupeFields
     }
-
-    public Property<String> customObjectName = newString("customObjectName").setRequired();
-
-    public Property<CustomObjectSyncAction> customObjectSyncAction = newEnum("customObjectSyncAction",
-            CustomObjectSyncAction.class);
 
     public Property<String> customObjectDedupeBy = newString("customObjectDedupeBy");
 
@@ -145,6 +132,9 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
     public void setupProperties() {
         super.setupProperties();
 
+        batchSize.setValue(100);
+        dieOnError.setValue(true);
+
         outputOperation.setPossibleValues((Object[]) OutputOperation.values());
         outputOperation.setValue(syncLead);
         operationType.setPossibleValues((Object[]) OperationType.values());
@@ -154,7 +144,6 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
         deDupeEnabled.setValue(false);
         deleteLeadsInBatch.setValue(false);
         // Custom Objects
-        customObjectName.setValue("");
         customObjectDeleteBy.setValue(CustomObjectDeleteBy.idField);
         customObjectDedupeBy.setValue("");
         customObjectSyncAction.setPossibleValues((Object[]) CustomObjectSyncAction.values());
@@ -407,6 +396,32 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
         Schema rejectSchema = newSchema(inputSchema, "schemaReject", rejectFields);
         schemaFlow.schema.setValue(flowSchema);
         schemaReject.schema.setValue(rejectSchema);
+    }
+
+    @Override
+    public int getVersionNumber() {
+        return 1;
+    }
+
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated;
+        try {
+            migrated = super.postDeserialize(version, setup, persistent);
+        } catch (ClassCastException cce) {
+            migrated = super.postDeserialize(version, setup, false); // don't initLayout
+            LinkedHashMap value = (LinkedHashMap) outputOperation.getStoredValue();
+            String io = String.valueOf(value.get("name"));
+            // re-affect correct values
+            outputOperation.setPossibleValues(OutputOperation.values());
+            outputOperation.setValue(OutputOperation.valueOf(io));
+            value = (LinkedHashMap) customObjectSyncAction.getStoredValue();
+            io = String.valueOf(value.get("name"));
+            // re-affect correct values
+            customObjectSyncAction.setPossibleValues(CustomObjectSyncAction.values());
+            customObjectSyncAction.setValue(CustomObjectSyncAction.valueOf(io));
+        }
+        return migrated;
     }
 
 }

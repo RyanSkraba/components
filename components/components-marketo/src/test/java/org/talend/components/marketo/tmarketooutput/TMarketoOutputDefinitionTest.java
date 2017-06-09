@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo.tmarketooutput;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -23,6 +24,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties;
 
 public class TMarketoOutputDefinitionTest {
 
@@ -54,5 +58,14 @@ public class TMarketoOutputDefinitionTest {
     @Test
     public void testNotStartable() {
         assertFalse(def.isStartable());
+    }
+
+    @Test
+    public void testGetNestedCompatibleComponentPropertiesClass() {
+        Class<? extends ComponentProperties>[] nestedCompatibleComponentPropertiesClass;
+        nestedCompatibleComponentPropertiesClass = def.getNestedCompatibleComponentPropertiesClass();
+        assertEquals(2, nestedCompatibleComponentPropertiesClass.length);
+        assertArrayEquals(nestedCompatibleComponentPropertiesClass,
+                new Class[] { TMarketoConnectionProperties.class, MarketoComponentWizardBaseProperties.class });
     }
 }

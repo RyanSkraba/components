@@ -22,8 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.runtime.MarketoBaseTestIT;
-import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
-import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
 

@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo.wizard;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
@@ -20,14 +21,14 @@ import java.util.List;
 
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.marketo.MarketoProvideConnectionProperties;
 import org.talend.components.marketo.runtime.MarketoSourceOrSink;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
-import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
-import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
-import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectSyncAction;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
@@ -46,12 +47,10 @@ public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesIm
 
     private String repositoryLocation;
 
-    private List<NamedThing> customObjectsNames;
-
     public Property<List<NamedThing>> selectedCustomObjectsNames = newProperty(new TypeLiteral<List<NamedThing>>() {
     }, "selectedCustomObjectsNames"); //$NON-NLS-1$
 
-    private transient static final Logger LOG = LoggerFactory.getLogger(MarketoCustomObjectsSchemasProperties.class);
+    private static final Logger LOG = getLogger(MarketoCustomObjectsSchemasProperties.class);
 
     public MarketoCustomObjectsSchemasProperties(String name) {
         super(name);
@@ -77,11 +76,6 @@ public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesIm
     }
 
     @Override
-    public void setupProperties() {
-        super.setupProperties();
-    }
-
-    @Override
     public void setupLayout() {
         super.setupLayout();
         Form containerForm = Form.create(this, FORM_CUSTOMOBJECTS);
@@ -89,12 +83,8 @@ public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesIm
         refreshLayout(containerForm);
     }
 
-    @Override
-    public void refreshLayout(Form form) {
-        super.refreshLayout(form);
-    }
-
     public void beforeFormPresentCustomObjects() throws IOException {
+        List<NamedThing> customObjectsNames;
         try {
             customObjectsNames = MarketoSourceOrSink.getSchemaNames(null, connection);
         } catch (IOException e) {
@@ -114,11 +104,13 @@ public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesIm
             for (NamedThing nl : selectedCustomObjectsNames.getValue()) {
                 String customObjectId = nl.getName();
                 storeId = nl.getName().replaceAll("-", "_").replaceAll(" ", "_");
-                TMarketoInputProperties customObjectProps = new TMarketoInputProperties(customObjectId);
+                MarketoComponentWizardBaseProperties customObjectProps = new MarketoComponentWizardBaseProperties(customObjectId);
                 customObjectProps.init();
                 customObjectProps.connection = connection;
                 customObjectProps.inputOperation.setValue(InputOperation.CustomObject);
+                customObjectProps.outputOperation.setValue(OutputOperation.syncCustomObjects);
                 customObjectProps.customObjectAction.setValue(CustomObjectAction.get);
+                customObjectProps.customObjectSyncAction.setValue(CustomObjectSyncAction.createOrUpdate);
                 customObjectProps.schemaInput.schema
                         .setValue(MarketoSourceOrSink.getEndpointSchema(null, customObjectId, connection));
                 customObjectProps.customObjectName.setValue(nl.getName());

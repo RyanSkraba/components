@@ -41,10 +41,10 @@ import org.talend.components.marketo.runtime.client.type.MarketoError;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
-import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.CustomObjectDeleteBy;
-import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.CustomObjectSyncAction;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectSyncAction;
 
 public class MarketoClientCustomObjectsTestIT extends MarketoBaseTestIT {
 

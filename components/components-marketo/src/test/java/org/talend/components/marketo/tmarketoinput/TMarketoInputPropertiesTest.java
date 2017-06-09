@@ -15,11 +15,11 @@ package org.talend.components.marketo.tmarketoinput;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.CustomObject;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLead;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadActivity;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadChanges;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getMultipleLeads;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.CustomObject;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLead;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadActivity;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadChanges;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getMultipleLeads;
 
 import java.util.Collections;
 
@@ -28,14 +28,14 @@ import org.junit.Test;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.MarketoTestBase;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
-import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsREST;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsSOAP;
-import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeREST;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeSOAP;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -231,7 +231,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         //
         // SOAP API Mode - getLead
         props.connection.apiMode.setValue(APIMode.SOAP);
-        props.inputOperation.setValue(InputOperation.getLead);
+        props.inputOperation.setValue(getLead);
         props.refreshLayout(props.getForm(Form.MAIN));
         assertTrue(f.getWidget(tl_operation).isVisible());
         assertTrue(f.getWidget(tl_mappingInput).isVisible());
@@ -421,35 +421,35 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
 
     @Test
     public void testUpdateSchemaRelated() throws Exception {
-        props.inputOperation.setValue(InputOperation.getLead);
+        props.inputOperation.setValue(getLead);
         props.updateSchemaRelated();
         props.schemaListener.afterSchema();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getMultipleLeads);
+        props.inputOperation.setValue(getMultipleLeads);
         props.updateSchemaRelated();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getLeadActivity);
+        props.inputOperation.setValue(getLeadActivity);
         props.updateSchemaRelated();
         props.afterInputOperation();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadActivity(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getLeadChanges);
+        props.inputOperation.setValue(getLeadChanges);
         props.updateSchemaRelated();
         props.afterInputOperation();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadChanges(), props.schemaInput.schema.getValue());
 
         props.connection.apiMode.setValue(APIMode.SOAP);
-        props.inputOperation.setValue(InputOperation.getLead);
+        props.inputOperation.setValue(getLead);
         props.afterInputOperation();
         props.updateSchemaRelated();
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getMultipleLeads);
+        props.inputOperation.setValue(getMultipleLeads);
         props.updateSchemaRelated();
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getLeadActivity);
+        props.inputOperation.setValue(getLeadActivity);
         props.updateSchemaRelated();
         props.afterInputOperation();
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadActivity(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getLeadChanges);
+        props.inputOperation.setValue(getLeadChanges);
         props.updateSchemaRelated();
         props.afterInputOperation();
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadChanges(), props.schemaInput.schema.getValue());
@@ -460,27 +460,27 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         // REST
         props.afterInputOperation();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getMultipleLeads);
+        props.inputOperation.setValue(getMultipleLeads);
         props.afterInputOperation();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getLeadActivity);
+        props.inputOperation.setValue(getLeadActivity);
         props.afterInputOperation();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadActivity(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getLeadChanges);
+        props.inputOperation.setValue(getLeadChanges);
         props.afterInputOperation();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadChanges(), props.schemaInput.schema.getValue());
         // SOAP
         props.connection.apiMode.setValue(APIMode.SOAP);
-        props.inputOperation.setValue(InputOperation.getLead);
+        props.inputOperation.setValue(getLead);
         props.afterInputOperation();
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getMultipleLeads);
+        props.inputOperation.setValue(getMultipleLeads);
         props.afterInputOperation();
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadOrGetMultipleLeads(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getLeadActivity);
+        props.inputOperation.setValue(getLeadActivity);
         props.afterInputOperation();
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadActivity(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getLeadChanges);
+        props.inputOperation.setValue(getLeadChanges);
         props.afterInputOperation();
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadChanges(), props.schemaInput.schema.getValue());
         props.connection.apiMode.setValue(APIMode.SOAP);
@@ -505,7 +505,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
 
     @Test
     public void testAfterSetIncludeTypes() throws Exception {
-        props.inputOperation.setValue(InputOperation.getLeadActivity);
+        props.inputOperation.setValue(getLeadActivity);
         assertFalse(props.setIncludeTypes.getValue());
         assertFalse(props.getForm(Form.MAIN).getWidget(props.includeTypes.getName()).isVisible());
         props.setIncludeTypes.setValue(true);
@@ -516,7 +516,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
 
     @Test
     public void testAfterSetExcludeTypes() throws Exception {
-        props.inputOperation.setValue(InputOperation.getLeadActivity);
+        props.inputOperation.setValue(getLeadActivity);
         assertFalse(props.setExcludeTypes.getValue());
         assertFalse(props.getForm(Form.MAIN).getWidget(props.excludeTypes.getName()).isVisible());
         props.setExcludeTypes.setValue(true);
@@ -529,8 +529,8 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     public final void testEnums() {
         // inoputOperation
         assertEquals(getLead, InputOperation.valueOf("getLead"));
-        assertEquals(InputOperation.getLeadActivity, InputOperation.valueOf("getLeadActivity"));
-        assertEquals(InputOperation.getLeadChanges, InputOperation.valueOf("getLeadChanges"));
+        assertEquals(getLeadActivity, InputOperation.valueOf("getLeadActivity"));
+        assertEquals(getLeadChanges, InputOperation.valueOf("getLeadChanges"));
         assertEquals(getMultipleLeads, InputOperation.valueOf("getMultipleLeads"));
         // LeadSelector
         assertEquals(LeadSelector.LeadKeySelector, LeadSelector.valueOf("LeadKeySelector"));
@@ -794,15 +794,15 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
 
     @Test
     public void testChangeOperationSchema() throws Exception {
-        props.inputOperation.setValue(InputOperation.CustomObject);
+        props.inputOperation.setValue(CustomObject);
         props.customObjectAction.setValue(CustomObjectAction.get);
         props.refreshLayout(props.getForm(Form.MAIN));
         props.afterInputOperation();
         assertEquals(MarketoConstants.getCustomObjectRecordSchema(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.getLeadActivity);
+        props.inputOperation.setValue(getLeadActivity);
         props.afterCustomObjectAction();
         assertEquals(MarketoConstants.getRESTSchemaForGetLeadActivity(), props.schemaInput.schema.getValue());
-        props.inputOperation.setValue(InputOperation.CustomObject);
+        props.inputOperation.setValue(CustomObject);
         props.customObjectAction.setValue(CustomObjectAction.describe);
         props.afterCustomObjectAction();
         assertEquals(MarketoConstants.getCustomObjectDescribeSchema(), props.schemaInput.schema.getValue());
@@ -817,14 +817,14 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     @Test
     public void testValidateInputOperation() throws Exception {
         assertEquals(Result.OK, props.validateInputOperation().getStatus());
-        props.inputOperation.setValue(InputOperation.CustomObject);
+        props.inputOperation.setValue(CustomObject);
         props.connection.apiMode.setValue(APIMode.SOAP);
         assertEquals(Result.ERROR, props.validateInputOperation().getStatus());
     }
 
     @Test
     public void testValidateFetchCustomObjectSchema() throws Exception {
-        props.inputOperation.setValue(InputOperation.CustomObject);
+        props.inputOperation.setValue(CustomObject);
         props.customObjectAction.setValue(CustomObjectAction.get);
         props.refreshLayout(props.getForm(Form.MAIN));
         props.afterInputOperation();

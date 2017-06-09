@@ -13,6 +13,7 @@
 package org.talend.components.marketo.tmarketobulkexec;
 
 import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
@@ -35,6 +36,8 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
 public class TMarketoBulkExecProperties extends MarketoComponentProperties {
+
+    public Property<Boolean> dieOnError = newBoolean("dieOnError");
 
     public enum BulkImportTo {
         Leads,
@@ -84,6 +87,8 @@ public class TMarketoBulkExecProperties extends MarketoComponentProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
+
+        dieOnError.setValue(true);
 
         connection.apiMode.setPossibleValues(APIMode.REST);
         connection.apiMode.setValue(APIMode.REST);

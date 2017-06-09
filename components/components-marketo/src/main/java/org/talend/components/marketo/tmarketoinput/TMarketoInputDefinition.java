@@ -19,6 +19,7 @@ import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.marketo.MarketoComponentDefinition;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TMarketoInputDefinition extends MarketoComponentDefinition {
@@ -50,5 +51,11 @@ public class TMarketoInputDefinition extends MarketoComponentDefinition {
         } else {
             return getCommonRuntimeInfo(this.getClass().getClassLoader(), RUNTIME_SOURCE_CLASS);
         }
+    }
+
+    @Override
+    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
+        return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
+                new Class[] { MarketoComponentWizardBaseProperties.class });
     }
 }
