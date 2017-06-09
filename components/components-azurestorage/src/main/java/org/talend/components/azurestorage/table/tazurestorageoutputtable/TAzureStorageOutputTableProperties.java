@@ -58,13 +58,13 @@ public class TAzureStorageOutputTableProperties extends AzureStorageTablePropert
     public Property<ActionOnTable> actionOnTable = PropertyFactory.newEnum("actionOnTable", ActionOnTable.class);
 
     public Property<Boolean> processOperationInBatch = PropertyFactory.newBoolean("processOperationInBatch");
-    
+
     public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
-    
+
     public Property<List<String>> partitionKey = PropertyFactory.newStringList("partitionKey");
-    
+
     public Property<List<String>> rowKey = PropertyFactory.newStringList("rowKey");
-    
+
     public TAzureStorageOutputTableProperties(String name) {
         super(name);
     }
@@ -72,10 +72,7 @@ public class TAzureStorageOutputTableProperties extends AzureStorageTablePropert
     @Override
     public Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         HashSet<PropertyPathConnector> connectors = new HashSet<>();
-        if (isOutputConnection) {
-            connectors.add(FLOW_CONNECTOR);
-            connectors.add(REJECT_CONNECTOR);
-        } else {
+        if (!isOutputConnection) {
             connectors.add(MAIN_CONNECTOR);
         }
         return connectors;
@@ -89,7 +86,7 @@ public class TAzureStorageOutputTableProperties extends AzureStorageTablePropert
         actionOnData.setValue(ActionOnData.Insert);
         actionOnTable.setValue(ActionOnTable.Default);
         processOperationInBatch.setValue(false);
-        
+
         Schema s = SchemaBuilder.record("Main").fields()
                 //
                 .name("PartitionKey").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
@@ -101,9 +98,9 @@ public class TAzureStorageOutputTableProperties extends AzureStorageTablePropert
                 //
                 .endRecord();
         schema.schema.setValue(s);
-        partitionKey.setPossibleValues("PartitionKey","RowKey");
-        rowKey.setPossibleValues("PartitionKey","RowKey");
-        
+        partitionKey.setPossibleValues("PartitionKey", "RowKey");
+        rowKey.setPossibleValues("PartitionKey", "RowKey");
+
         // update the properties when schema change
         setSchemaListener(new ISchemaListener() {
 
@@ -134,7 +131,7 @@ public class TAzureStorageOutputTableProperties extends AzureStorageTablePropert
         super.refreshLayout(form);
         updateOutputSchemas();
     }
-    
+
     public void updatePartitionKeyAndRowKey() {
         Schema inputSchema = schema.schema.getValue();
         List<String> possibleValues = new ArrayList<String>();

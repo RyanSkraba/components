@@ -89,7 +89,6 @@ public class AzureStorageTableComponentsTest {
         assertNotNull(azureStorageTableDefinition.getRuntimeInfo(null, null, ConnectorTopology.INCOMING));
     }
 
-
     @Test
     public void testGetNestedCompatibleComponentPropertiesClass() {
         assertArrayEquals(new Class[] { TAzureStorageConnectionProperties.class, AzureStorageTableProperties.class },
@@ -100,18 +99,13 @@ public class AzureStorageTableComponentsTest {
     public void getAllSchemaPropertiesConnectors() {
         TAzureStorageOutputTableProperties p = new TAzureStorageOutputTableProperties("test");
 
+        assertTrue(p.getAllSchemaPropertiesConnectors(true).isEmpty());
+
         HashSet<PropertyPathConnector> connectors = new HashSet<>();
-
-        connectors.add(p.FLOW_CONNECTOR);
-        connectors.add(p.REJECT_CONNECTOR);
-
-        assertEquals(connectors, p.getAllSchemaPropertiesConnectors(true));
-
-        connectors.clear();
         connectors.add(p.MAIN_CONNECTOR);
         assertEquals(connectors, p.getAllSchemaPropertiesConnectors(false));
     }
-    
+
     /**
      * 
      * @see org.talend.components.azurestorage.table.AzureStorageTableProperties#validateNameMapping()
@@ -125,11 +119,11 @@ public class AzureStorageTableComponentsTest {
         propertyMappings.add("datyMapped");
         schemaMappings.add("inty");
         propertyMappings.add("intyMapped");
-        
+
         properties.nameMapping.schemaColumnName.setValue(schemaMappings);
         properties.nameMapping.entityPropertyName.setValue(propertyMappings);
         ValidationResult result = properties.validateNameMapping();
-        assertEquals(Result.OK,result.getStatus());
+        assertEquals(Result.OK, result.getStatus());
     }
 
     @Test
