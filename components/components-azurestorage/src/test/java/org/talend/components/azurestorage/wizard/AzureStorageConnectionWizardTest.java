@@ -83,6 +83,9 @@ public class AzureStorageConnectionWizardTest extends AzureStorageGenericBase {
 
         @Override
         public String storeProperties(Properties properties, String name, String repositoryLocation, String schemaPropertyName) {
+            if(name!=null&&Character.isDigit(name.charAt(0))){
+                throw new IllegalArgumentException("Schema name cannot start with numberic in wizard.");
+            }
             RepoProps rp = new RepoProps(properties, name, repositoryLocation, schemaPropertyName);
             repoProps.add(rp);
             return repositoryLocation + ++locationNum;

@@ -15,10 +15,11 @@ package org.talend.components.azurestorage.wizard;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -26,9 +27,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.azurestorage.queue.AzureStorageQueueProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
+import org.talend.daikon.NamedThing;
+import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.service.Repository;
 
 public class AzureStorageComponentListPropertiesTest extends AzureStorageConnectionWizardTest {
@@ -37,7 +42,7 @@ public class AzureStorageComponentListPropertiesTest extends AzureStorageConnect
 
     private final List<RepoProps> repoProps = new ArrayList<>();
 
-    private Repository repo = new TestRepository(repoProps);
+    private Repository<Properties> repo = new TestRepository(repoProps);
 
     Schema schemaQueue = SchemaBuilder.builder().record("Main").fields()//
             .name(AzureStorageQueueProperties.FIELD_MESSAGE_ID).prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")
@@ -84,7 +89,7 @@ public class AzureStorageComponentListPropertiesTest extends AzureStorageConnect
     public void testSetConnection() {
         TAzureStorageConnectionProperties connection = new TAzureStorageConnectionProperties(null);
         AzureStorageComponentListProperties result = properties.setConnection(connection);
-        assertNotNull("result cannot be null", result);
+        assertNotNull("result cannot be null", result.getConnectionProperties());
     }
 
     /**
@@ -124,30 +129,38 @@ public class AzureStorageComponentListPropertiesTest extends AzureStorageConnect
      *
      * @see org.talend.components.azurestorage.wizard.AzureStorageComponentListProperties#beforeFormPresentContainer()
      */
-    @Test(expected = Exception.class)
+    @Test
     public void testBeforeFormPresentContainer() throws Exception {
+        properties.setupLayout();
         properties.beforeFormPresentContainer();
-        fail("Should have failed...");
+        assertTrue("Shoud be ture",properties.getForm(AzureStorageComponentListProperties.FORM_CONTAINER).isAllowBack()&&
+        properties.getForm(AzureStorageComponentListProperties.FORM_CONTAINER).isAllowForward()&&
+        properties.getForm(AzureStorageComponentListProperties.FORM_CONTAINER).isAllowFinish());
     }
 
     /**
      *
      * @see org.talend.components.azurestorage.wizard.AzureStorageComponentListProperties#beforeFormPresentQueue()
      */
-    @Test(expected = Exception.class)
+    @Test
     public void testBeforeFormPresentQueue() throws Exception {
+        properties.setupLayout();
         properties.beforeFormPresentQueue();
-        fail("Should have failed...");
+        assertTrue("Shoud be ture",properties.getForm(AzureStorageComponentListProperties.FORM_QUEUE).isAllowBack()&&
+        properties.getForm(AzureStorageComponentListProperties.FORM_QUEUE).isAllowForward()&&
+        properties.getForm(AzureStorageComponentListProperties.FORM_QUEUE).isAllowFinish());
     }
 
     /**
      *
      * @see org.talend.components.azurestorage.wizard.AzureStorageComponentListProperties#beforeFormPresentTable()
      */
-    @Test(expected = Exception.class)
+    @Test
     public void testBeforeFormPresentTable() throws Exception {
+        properties.setupLayout();
         properties.beforeFormPresentTable();
-        fail("Should have failed...");
+        assertTrue("Shoud be ture",properties.getForm(AzureStorageComponentListProperties.FORM_TABLE).isAllowBack()&&
+        properties.getForm(AzureStorageComponentListProperties.FORM_TABLE).isAllowFinish());
     }
 
     /**
@@ -156,8 +169,28 @@ public class AzureStorageComponentListPropertiesTest extends AzureStorageConnect
      */
     @Test
     public void afterFormFinishTable() throws Exception {
+        List<NamedThing> nameWithNumeric = new ArrayList<NamedThing>();
+        nameWithNumeric.add(new SimpleNamedThing("2Name_with_numeric2", "2Name_with_numeric2"));
+        properties.selectedContainerNames.setStoredValue(nameWithNumeric);
+        properties.selectedQueueNames.setStoredValue(nameWithNumeric);
         ValidationResult result = properties.afterFormFinishTable(repo);
-        assertNotNull("result cannot be null", result);
+        assertEquals(Result.OK, result.getStatus());
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void afterFormFinishTable2() throws Exception {
+        TAzureStorageConnectionProperties connection = new TAzureStorageConnectionProperties("test");
+        connection.setupProperties();
+        connection.setupLayout();
+        connection.useSharedAccessSignature.setValue(true);
+        connection.sharedAccessSignature.setValue("https://talendrd.blob.core.windows.net/?sv=2016-05-31&ss=f&srt=sco&sp=rwdlacup&se=2017-06-07T23:50:05Z&st=2017-05-24T15:50:05Z&spr=https&sig=fakeSASfakeSASfakeSASfakeSASfakeSASfakeSASfakeSASfakeSAS");
+        properties.setConnection(connection);
+        
+        List<NamedThing> nameWithNumeric = new ArrayList<NamedThing>();
+        nameWithNumeric.add(new SimpleNamedThing("2Name_with_numeric2", "2Name_with_numeric2"));
+        properties.selectedTableNames.setStoredValue(nameWithNumeric);
+        @SuppressWarnings("unused")
+        ValidationResult result = properties.afterFormFinishTable(repo);
     }
 
 }
