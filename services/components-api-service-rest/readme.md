@@ -1,6 +1,6 @@
 Components API Service REST
 ===
-This module packages the Web Service together with required components. This module should be with other Talend Products (DataPrep etc).
+This module packages bare Components REST Service.
 
 
 ###Run locally:
