@@ -1,7 +1,7 @@
 [
 
 	{
-		"id" : "MYSQL",
+		"id" : "MySQL",
 		"class" : "org.mariadb.jdbc.Driver",
 		"url" : "jdbc:mysql://localhost:3306/db",
 		"paths" : 
@@ -12,7 +12,7 @@
 	},
 	
 	{
-		"id" : "DERBY",
+		"id" : "Derby",
 		"class" : "org.apache.derby.jdbc.ClientDriver",
 		"url" : "jdbc:derby://localhost:1527/db",
 		"paths" : 
@@ -23,7 +23,7 @@
 	},
 	
 	{
-		"id" : "POSTGRESQL",
+		"id" : "PostgreSQL",
 		"class" : "org.postgresql.Driver",
 		"url" : "jdbc:postgresql://localhost:5432/db",
 		"paths" : 
@@ -34,7 +34,7 @@
 	},
 	
 	{
-		"id" : "SQL_SERVER",
+		"id" : "SQL Server",
 		"class" : "net.sourceforge.jtds.jdbc.Driver",
 		"url" : "jdbc:jtds:sqlserver://localhost:1433/db",
 		"paths" : 
@@ -45,7 +45,7 @@
 	},
 	
 	{
-		"id" : "AZURE_SQL",
+		"id" : "Azure SQL",
 		"class" : "net.sourceforge.jtds.jdbc.Driver",
 		"url" : "jdbc:jtds:sqlserver://localhost:1433/db",
 		"paths" : 
@@ -56,7 +56,7 @@
 	},
 	
 	{
-		"id" : "HIVE",
+		"id" : "Hive",
 		"class" : "org.apache.hive.jdbc.HiveDriver",
 		"url" : "jdbc:hive2://localhost:10000/default",
 		"paths" : 
