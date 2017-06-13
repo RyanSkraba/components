@@ -18,7 +18,7 @@
         <module>components-adapter-beam</module>
         <module>components-api</module>
         <module>components-api-proptester</module>
-        <module>components-osgi-test</module>
+        <module>components-osgitest</module>
         <module>components-common</module>
         <module>components-common-oauth</module>
   </modules>
