@@ -33,7 +33,7 @@ import com.google.cloud.pubsub.PubSub;
 import com.google.cloud.pubsub.SubscriptionInfo;
 import com.google.cloud.pubsub.TopicInfo;
 
-public class PubSubDatasetRuntimeTest {
+public class PubSubDatasetRuntimeTestIT {
 
     final static String uuid = UUID.randomUUID().toString();
 

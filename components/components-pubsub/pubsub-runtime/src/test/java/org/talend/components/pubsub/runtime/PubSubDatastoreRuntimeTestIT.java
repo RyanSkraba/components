@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.daikon.properties.ValidationResult;
 
-public class PubSubDatastoreRuntimeTest {
+public class PubSubDatastoreRuntimeTestIT {
 
     PubSubDatastoreRuntime runtime;
 

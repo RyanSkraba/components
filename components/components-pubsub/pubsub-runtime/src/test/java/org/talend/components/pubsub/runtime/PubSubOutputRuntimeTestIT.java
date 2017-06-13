@@ -46,7 +46,7 @@ import com.google.cloud.pubsub.ReceivedMessage;
 import com.google.cloud.pubsub.SubscriptionInfo;
 import com.google.cloud.pubsub.TopicInfo;
 
-public class PubSubOutputRuntimeTest implements Serializable {
+public class PubSubOutputRuntimeTestIT implements Serializable {
 
     final static String uuid = UUID.randomUUID().toString();
 
