@@ -131,7 +131,7 @@ public class SalesforceBulkRuntime {
         this.chunkSize = properties.chunkSize.getValue() > TSalesforceInputProperties.MAX_CHUNK_SIZE
                 ? TSalesforceInputProperties.MAX_CHUNK_SIZE
                 : properties.chunkSize.getValue() <= 0 ? TSalesforceInputProperties.DEFAULT_CHUNK_SIZE
-                        : properties.chunkSize.getValue();
+                : properties.chunkSize.getValue();
         this.chunkSleepTime = properties.chunkSleepTime.getValue() > 0 ? properties.chunkSleepTime.getValue() * 1000
                 : TSalesforceInputProperties.DEFAULT_CHUNK_SLEEP_TIME * 1000;
     }
@@ -502,7 +502,7 @@ public class SalesforceBulkRuntime {
             }
             tryCount++;
             if (tryCount % 3 == 0) {// after 3 attempt to get the result we multiply the time to wait by 2
-                secToWait = secToWait * 3;
+                secToWait = secToWait * 2;
             }
             // There is also a 2-minute limit on the time to process the query.
             // If the query takes more than 2 minutes to process, a QUERY_TIMEOUT error is returned.

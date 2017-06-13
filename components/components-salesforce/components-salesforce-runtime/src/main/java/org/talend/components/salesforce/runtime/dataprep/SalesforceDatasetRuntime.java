@@ -13,8 +13,6 @@
 package org.talend.components.salesforce.runtime.dataprep;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -24,9 +22,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.dataset.runtime.DatasetRuntime;
 import org.talend.components.salesforce.dataprep.SalesforceInputProperties;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties;
-import org.talend.components.salesforce.dataset.SalesforceDatasetProperties.SourceType;
 import org.talend.daikon.exception.TalendRuntimeException;
-import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -84,6 +80,7 @@ public class SalesforceDatasetRuntime implements DatasetRuntime<SalesforceDatase
         throwExceptionIfValidationResultIsError(sds.validate(container));
 
         SalesforceBulkQueryReader reader = (SalesforceBulkQueryReader) sds.createReader(container);
+        reader.setLimit(limit);
         ReaderDataProvider<IndexedRecord> readerDataProvider = new ReaderDataProvider<>(reader, limit, consumer);
         readerDataProvider.retrieveData();
     }

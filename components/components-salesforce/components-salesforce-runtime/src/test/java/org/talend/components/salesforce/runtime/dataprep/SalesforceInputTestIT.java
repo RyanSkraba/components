@@ -14,6 +14,7 @@ package org.talend.components.salesforce.runtime.dataprep;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -195,6 +196,33 @@ public class SalesforceInputTestIT {
                 }
             }
 
+        }
+    }
+
+    public void testLimitOfSalesforceBulQueryReader() throws Exception {
+        SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
+
+        SalesforceDataprepSource source = new SalesforceDataprepSource();
+        source.initialize(null, properties);
+        source.validate(null);
+        properties.getDatasetProperties().selectColumnIds.setValue(Arrays.asList("IsDeleted", "Id", "Name"));
+
+        try (Reader reader = source.createReader(null);) {
+            ((SalesforceBulkQueryReader) reader).setLimit(1);
+
+            reader.start();
+            reader.advance();
+
+            IndexedRecord record = (IndexedRecord) reader.getCurrent();
+
+            assertEquals(3, record.getSchema().getFields().size());
+            try{
+            reader.advance();
+                fail();
+            }
+            catch (IOException e) {
+                // Excepted to happen
+            }
         }
     }
 

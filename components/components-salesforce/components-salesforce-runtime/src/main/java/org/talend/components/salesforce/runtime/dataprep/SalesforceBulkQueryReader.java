@@ -53,6 +53,11 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
 
     protected transient Schema querySchema;
 
+    /**
+     * This limit is to make sure that the limit is done at least in the salesforce side
+     */
+    private int limit;
+
     private int dataCount;
 
     public SalesforceBulkQueryReader(RuntimeContainer container, SalesforceDataprepSource source,
@@ -163,6 +168,9 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
             }
             sb.append(" from ");
             sb.append(dataset.moduleName.getValue());
+            if (limit > 0) {
+                sb.append(" limit " + limit);
+            }
             return sb.toString();
         } else {
             return dataset.query.getValue();
@@ -199,4 +207,11 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
         return querySchema;
     }
 
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
 }
