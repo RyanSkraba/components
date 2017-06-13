@@ -179,4 +179,41 @@ public class MarketoInputWriterTestIT extends MarketoBaseTestIT {
         Schema sout = record.getSchema();
     }
 
+    @Test
+    public void testGetMultipleLeadsLeadKeyWithEmailSOAPTDI39008() throws Exception {
+        sink.initialize(null, propsSOAP);
+        Writer tmpWriter = sink.createWriteOperation().createWriter(null);
+        assertTrue(tmpWriter instanceof MarketoInputWriter);
+        MarketoInputWriter writer = (MarketoInputWriter) tmpWriter;
+        // create an input IndexedRecord
+        Schema s = SchemaBuilder.builder().record("input").fields().name("email").type().stringType().noDefault().endRecord();
+        IndexedRecord input = new GenericData.Record(s);
+        writer.open("SOAPTests");
+        input.put(0, "compdev@bj_talend.com");
+        writer.write(input);
+        input.put(0, "compqa@bj_talend.com");
+        writer.write(input);
+        writer.close();
+        assertEquals(2, writer.result.successCount);
+    }
+
+    @Test
+    public void testGetMultipleLeadsLeadKeyWithIdRESTTDI39008() throws Exception {
+        propsREST.leadKeyTypeREST.setValue(LeadKeyTypeREST.id);
+        propsREST.leadKeyValues.setValue("id");
+        sink.initialize(null, propsREST);
+        Writer tmpWriter = sink.createWriteOperation().createWriter(null);
+        assertTrue(tmpWriter instanceof MarketoInputWriter);
+        MarketoInputWriter writer = (MarketoInputWriter) tmpWriter;
+        Schema s = SchemaBuilder.builder().record("input").fields().name("id").type().intType().noDefault().endRecord();
+        IndexedRecord input = new GenericData.Record(s);
+        writer.open("RESTTests");
+        input.put(0, 4221930);
+        writer.write(input);
+        input.put(0, 4221931);
+        writer.write(input);
+        writer.close();
+        assertEquals(2, writer.result.successCount);
+    }
+
 }

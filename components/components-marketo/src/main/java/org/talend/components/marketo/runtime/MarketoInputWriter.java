@@ -33,6 +33,8 @@ public class MarketoInputWriter extends MarketoWriter {
 
     Boolean isDynamic = Boolean.FALSE;
 
+    String leadKeyColumn;
+
     private transient static final Logger LOG = LoggerFactory.getLogger(MarketoInputWriter.class);
 
     public MarketoInputWriter(MarketoWriteOperation writeOperation, RuntimeContainer container) {
@@ -75,6 +77,7 @@ public class MarketoInputWriter extends MarketoWriter {
         flowSchema = properties.schemaFlow.schema.getValue();
         dieOnError = properties.dieOnError.getValue();
         isDynamic = AvroUtils.isIncludeAllFields(this.properties.schemaInput.schema.getValue());
+        leadKeyColumn = properties.leadKeyValues.getValue();
     }
 
     @Override
@@ -94,10 +97,8 @@ public class MarketoInputWriter extends MarketoWriter {
                 adaptSchemaToDynamic();
             }
         }
-        //
-        Object lkv = inputRecord.get(inputSchema.getField(properties.leadKeyValues.getValue()).pos());
         // switch between column name in design and column value for runtime
-        properties.leadKeyValues.setValue(lkv.toString());
+        properties.leadKeyValues.setValue(String.valueOf(inputRecord.get(inputSchema.getField(leadKeyColumn).pos())));
         MarketoRecordResult result = client.getMultipleLeads(properties, null);
         if (!result.isSuccess()) {
             if (dieOnError) {
