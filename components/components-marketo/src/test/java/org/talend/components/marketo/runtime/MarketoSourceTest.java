@@ -76,7 +76,6 @@ public class MarketoSourceTest {
         source.initialize(null, props);
         ValidationResult vr = source.validate(null);
         assertEquals(ValidationResult.Result.ERROR, vr.getStatus());
-        assertTrue(vr.getMessage().contains("refused"));
     }
 
     @Test
