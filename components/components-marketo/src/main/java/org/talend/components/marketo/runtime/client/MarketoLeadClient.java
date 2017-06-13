@@ -662,6 +662,10 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
     public MarketoSyncResult syncMultipleLeads(TMarketoOutputProperties parameters, List<IndexedRecord> leads) {
         String action = parameters.operationType.getValue().name();
         String lookupField = parameters.lookupField.getValue().name();
+        if (parameters.deDupeEnabled.getValue()) {
+            action = null;
+            lookupField = null;
+        }
         int batchSize = parameters.batchSize.getValue();
 
         current_uri = new StringBuilder(basicPath)//
