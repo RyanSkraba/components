@@ -300,7 +300,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     private final Schema SCHEMA_DOUBLE = SchemaBuilder.builder().record("Schema").fields().name("VALUE").type().doubleType()
             .noDefault().endRecord();
-    
+
     private final Schema SCHEMA_STRING = SchemaBuilder.builder().record("Schema").fields().name("VALUE").type().stringType()
             .noDefault().endRecord();
 
@@ -366,7 +366,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         Object value = record.get(0);
         Assert.assertTrue(value != null && value instanceof Long);
     }
-    
+
     @Test
     public void testAggregrateQueryWithDateTypeAndStringOutputAndBasicQuery() throws Throwable {
         TSalesforceInputProperties props = createTSalesforceInputProperties(true, false);
@@ -416,7 +416,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         props.manualQuery.setValue(true);
         // Manual query with foreign key
         // Need to specify where clause to be sure that this record exists and has parent-to-child relation.
-        props.query.setValue("Select Id, Name,(Select Contact.Id,Contact.Name from Account.Contacts) from Account Limit 1");
+        props.query.setValue("Select Id, Name,(Select Contact.Id,Contact.Name from Account.Contacts) from Account WHERE Name = 'United Oil & Gas, UK' Limit 1");
         props.validateGuessSchema();
         List<IndexedRecord> rows = readRows(props);
 
