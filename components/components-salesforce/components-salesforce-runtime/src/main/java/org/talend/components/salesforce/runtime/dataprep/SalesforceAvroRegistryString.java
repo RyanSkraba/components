@@ -56,10 +56,8 @@ public class SalesforceAvroRegistryString extends AvroRegistry {
     private Schema inferSchemaDescribeSObjectResult(DescribeSObjectResult in) {
         List<Schema.Field> fields = new ArrayList<>();
         for (Field field : in.getFields()) {
-            // filter the invalud columns for salesforce bulk query api
-            // not sure the picklist is a good filter for it
-            if (field.getType() == FieldType.address || field.getType() == FieldType.location
-                    || field.getType() == FieldType.picklist) {
+            // filter the invalud compound columns for salesforce bulk query api
+            if (field.getType() == FieldType.address || field.getType() == FieldType.location) {
                 continue;
             }
 

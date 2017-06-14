@@ -42,6 +42,7 @@ import org.talend.components.salesforce.schema.SalesforceSchemaHelper;
 import org.talend.components.salesforce.soql.FieldDescription;
 import org.talend.components.salesforce.soql.SoqlQuery;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.sforce.async.AsyncApiException;
@@ -263,14 +264,18 @@ public final class SalesforceDataprepSource
         for (FieldDescription fieldDescription : fieldDescriptions) {
             Schema.Field runtimeField = runtimeSchema.getField(fieldDescription.getSimpleName());
 
-            Schema.Field newField = new Schema.Field(runtimeField.name(), runtimeField.schema(), runtimeField.doc(),
-                    runtimeField.defaultVal(), runtimeField.order());
-            newField.getObjectProps().putAll(runtimeField.getObjectProps());
-            for (Map.Entry<String, Object> entry : runtimeField.getObjectProps().entrySet()) {
-                newField.addProp(entry.getKey(), entry.getValue());
+            if (runtimeField != null) {
+                Schema.Field newField = new Schema.Field(runtimeField.name(), runtimeField.schema(), runtimeField.doc(),
+                        runtimeField.defaultVal(), runtimeField.order());
+                newField.getObjectProps().putAll(runtimeField.getObjectProps());
+                for (Map.Entry<String, Object> entry : runtimeField.getObjectProps().entrySet()) {
+                    newField.addProp(entry.getKey(), entry.getValue());
+                }
+                newFieldList.add(newField);
+            } else {
+                Schema.Field newField = new Schema.Field(fieldDescription.getSimpleName(), AvroUtils._string(), null, (String)null);
+                newFieldList.add(newField);
             }
-
-            newFieldList.add(newField);
         }
 
         newSchema.setFields(newFieldList);
