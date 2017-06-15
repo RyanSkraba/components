@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.salesforce.runtime.SalesforceSchemaConstants;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
@@ -56,8 +57,12 @@ public class SalesforceAvroRegistryString extends AvroRegistry {
     private Schema inferSchemaDescribeSObjectResult(DescribeSObjectResult in) {
         List<Schema.Field> fields = new ArrayList<>();
         for (Field field : in.getFields()) {
-            // filter the invalud compound columns for salesforce bulk query api
-            if (field.getType() == FieldType.address || field.getType() == FieldType.location) {
+
+            // filter the invalid compound columns for salesforce bulk query api
+            if (field.getType() == FieldType.address || // no address
+                    field.getType() == FieldType.location || // no location
+                    // no picklist that has a parent
+                    (field.getType() == FieldType.picklist && StringUtils.isNotBlank(field.getCompoundFieldName()))) {
                 continue;
             }
 

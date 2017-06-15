@@ -2,6 +2,7 @@ package org.talend.components.salesforce.runtime.dataprep;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.avro.Schema;
 import org.junit.Test;
@@ -23,6 +24,20 @@ public class SalesforceAvroRegistryStringTest {
         Schema schema = SalesforceAvroRegistryString.get().inferSchema(describeSObjectResult);
 
         assertThat(1, is(schema.getFields().size()));
+    }
+
+    @Test
+    public void testPickListWithParent() throws Exception {
+        DescribeSObjectResult describeSObjectResult = new DescribeSObjectResult();
+        Field pickList = new Field();
+        pickList.setName("pickList");
+        pickList.setType(FieldType.picklist);
+        pickList.setCompoundFieldName("parent");
+        describeSObjectResult.setFields(new Field[] { pickList });
+
+        Schema schema = SalesforceAvroRegistryString.get().inferSchema(describeSObjectResult);
+
+        assertTrue(schema.getFields().isEmpty());
     }
 
     @Test
