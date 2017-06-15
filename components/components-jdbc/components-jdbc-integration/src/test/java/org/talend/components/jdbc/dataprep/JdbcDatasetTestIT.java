@@ -27,7 +27,7 @@ import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
-public class JDBCDatasetTestIT {
+public class JdbcDatasetTestIT {
 
     public static AllSetting allSetting;
 

@@ -23,9 +23,27 @@
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-definition</artifactId>
             <version>${project.version}</version>
+			<scope>test</scope>
         </dependency>
 
-        <!-- Tests -->
+		<!-- In some integration tests, we need some function class in components-jdbc-runtime -->
+		<dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-jdbc-runtime</artifactId>
+            <version>${project.version}</version>
+			<scope>test</scope>
+        </dependency>
+		
+		<!-- In some integration tests, we need some test class in components-jdbc-runtime -->
+		<dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-jdbc-runtime</artifactId>
+            <version>${project.version}</version>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+        </dependency>
+
+		<!-- Tests -->
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>

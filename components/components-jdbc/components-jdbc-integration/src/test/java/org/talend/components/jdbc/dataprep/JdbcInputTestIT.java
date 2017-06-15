@@ -34,7 +34,7 @@ import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
-public class JDBCInputTestIT {
+public class JdbcInputTestIT {
 
     public static AllSetting allSetting;
 

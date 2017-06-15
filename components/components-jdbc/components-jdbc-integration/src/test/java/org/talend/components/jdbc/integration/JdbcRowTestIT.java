@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.jdbc;
+package org.talend.components.jdbc.integration;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -52,7 +52,7 @@ import org.talend.daikon.properties.test.PropertiesTestUtils;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
-public class JDBCRowTestIT {
+public class JdbcRowTestIT {
 
     public static AllSetting allSetting;
 
