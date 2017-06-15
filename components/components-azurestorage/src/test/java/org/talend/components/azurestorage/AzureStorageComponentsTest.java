@@ -13,6 +13,7 @@
 package org.talend.components.azurestorage;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
@@ -90,7 +91,7 @@ public class AzureStorageComponentsTest {// extends AzureStorageGenericBase {
     public void testAzureStorageDefinition() {
         AzureStorageDefinition def = new TAzureStorageConnectionDefinition();
         assertEquals(EnumSet.of(ConnectorTopology.NONE), def.getSupportedConnectorTopologies());
-        assertTrue(def.isStartable());
+        assertFalse(def.isStartable());
     }
 
     @Test

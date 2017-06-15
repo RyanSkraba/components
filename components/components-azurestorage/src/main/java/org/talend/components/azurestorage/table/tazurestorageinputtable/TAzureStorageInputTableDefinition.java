@@ -43,4 +43,9 @@ public class TAzureStorageInputTableDefinition extends AzureStorageTableDefiniti
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TAzureStorageInputTableProperties.class;
     }
+    
+    @Override
+    public boolean isStartable() {
+        return true;
+    }
 }

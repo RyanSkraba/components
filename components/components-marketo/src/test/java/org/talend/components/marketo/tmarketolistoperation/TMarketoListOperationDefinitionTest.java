@@ -13,6 +13,7 @@
 package org.talend.components.marketo.tmarketolistoperation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +47,11 @@ public class TMarketoListOperationDefinitionTest {
     @Test
     public void testGetRuntimeInfo() throws Exception {
         assertNotNull(def.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.INCOMING_AND_OUTGOING));
+    }
+    
+    @Test
+    public void testNotStartable() {
+        assertFalse(def.isStartable());
     }
 
 }

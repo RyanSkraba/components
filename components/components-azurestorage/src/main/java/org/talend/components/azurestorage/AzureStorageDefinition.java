@@ -78,6 +78,6 @@ public abstract class AzureStorageDefinition extends AbstractComponentDefinition
 
     @Override
     public boolean isStartable() {
-        return true;
+        return false;
     }
 }

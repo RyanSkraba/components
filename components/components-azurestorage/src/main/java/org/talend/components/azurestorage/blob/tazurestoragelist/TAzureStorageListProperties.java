@@ -71,7 +71,13 @@ public class TAzureStorageListProperties extends AzureStorageBlobProperties {
     
     @Override
     public Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
-        return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema")); //$NON-NLS-1$
+        if (isOutputConnection) {
+            return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema")); //$NON-NLS-1$
+        } else {
+            return Collections.emptySet();
+        }
     }
+    
+    
 
 }

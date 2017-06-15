@@ -39,5 +39,10 @@ public class TAzureStorageQueueInputLoopDefinition extends AzureStorageQueueDefi
     public Property[] getReturnProperties() {
         return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_QUEUE_NAME_PROP, RETURN_TOTAL_RECORD_COUNT_PROP };
     }
+    
+    @Override
+    public boolean isStartable() {
+        return true;
+    }
 
 }

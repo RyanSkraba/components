@@ -13,6 +13,7 @@
 package org.talend.components.marketo.tmarketobulkexec;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.EnumSet;
@@ -57,5 +58,9 @@ public class TMarketoBulkExecDefinitionTest {
     public void testGetPropertyClass() throws Exception {
         assertEquals(TMarketoBulkExecProperties.class, def.getPropertyClass());
     }
-
+    
+    @Test
+    public void testNotStartable() {
+        assertFalse(def.isStartable());
+    }
 }

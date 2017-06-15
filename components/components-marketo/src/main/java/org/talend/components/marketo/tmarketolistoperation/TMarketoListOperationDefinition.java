@@ -61,4 +61,9 @@ public class TMarketoListOperationDefinition extends MarketoComponentDefinition 
         return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_NB_CALL_PROP, RETURN_TOTAL_RECORD_COUNT_PROP,
                 RETURN_SUCCESS_RECORD_COUNT_PROP, RETURN_REJECT_RECORD_COUNT_PROP };
     }
+    
+    @Override
+    public boolean isStartable() {
+        return false;
+    }
 }
