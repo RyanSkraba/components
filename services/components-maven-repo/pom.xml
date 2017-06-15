@@ -29,7 +29,6 @@
 		<postgresql.driver.version>42.1.1</postgresql.driver.version>
 		<jtds.driver.version>1.3.1</jtds.driver.version>
 		<derby.driver.version>10.12.1.1</derby.driver.version>
-		<hive.driver.version>2.0.0</hive.driver.version>
 		<!-- Used for Docker images name -->
 		<git_branch>local</git_branch>
 		<talend_docker_registry>registry.datapwn.com</talend_docker_registry>
@@ -219,7 +218,6 @@
 								<extraArtifact>org.mariadb.jdbc:mariadb-java-client:${mariadb.driver.version}:jar</extraArtifact>
 								<extraArtifact>org.postgresql:postgresql:${postgresql.driver.version}:jar</extraArtifact>
 								<extraArtifact>net.sourceforge.jtds:jtds:${jtds.driver.version}:jar</extraArtifact>
-								<extraArtifact>org.apache.hive:hive-jdbc:${hive.driver.version}:jar</extraArtifact>
 								<!-- Other -->
 								<extraArtifact>org.apache.beam:beam-sdks-java-io-hdfs:${beam.version}:jar</extraArtifact>
 								<extraArtifact>org.apache.hadoop:hadoop-client:${hadoop.version}:jar</extraArtifact>
