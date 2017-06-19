@@ -68,13 +68,13 @@ public class RuntimeControllerImpl implements RuntimesController {
 
     @Autowired
     private ObjectMapper mapper;
-    
+
     @Override
     public ResponseEntity<ValidationResultsDto> validateDataStoreConnection(String dataStoreDefinitionName,
             PropertiesDto propertiesContainer) {
         final DatastoreDefinition<DatastoreProperties> definition = propertiesHelpers
                 .getDataStoreDefinition(dataStoreDefinitionName);
-        notNull(definition, "Could not find data store definition of name %s", dataStoreDefinitionName);
+        notNull(definition, "Could not find connection definition of name %s", dataStoreDefinitionName);
         DatastoreProperties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
 
         try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(definition.getRuntimeInfo(properties),
@@ -154,13 +154,14 @@ public class RuntimeControllerImpl implements RuntimesController {
                 throw new TalendRuntimeException(CommonErrorCodes.UNREGISTERED_DEFINITION);
             }
         } else if (properties instanceof DatasetProperties) {
-            throw new UnsupportedOperationException("HTTP API is only able to write using component implementations. Not " + properties.getClass());
+            throw new UnsupportedOperationException(
+                    "HTTP API is only able to write using component implementations. Not " + properties.getClass());
         }
     }
 
     private <T> T useDatasetRuntime(String datasetDefinitionName, //
-                                    PropertiesDto formData, //
-                                    Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, T> consumer) {
+            PropertiesDto formData, //
+            Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, T> consumer) {
 
         // 1) get dataset properties from supplied data
         DatasetProperties datasetProperties = propertiesHelpers.propertiesFromDto(formData);

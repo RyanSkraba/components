@@ -69,10 +69,10 @@ public class PropertiesControllerImpl implements PropertiesController {
 
     @Override
     public String getProperties(String definitionName, String formName) {
-        notNull(definitionName, "Data store name cannot be null.");
+        notNull(definitionName, "Connection name cannot be null.");
         final Definition<?> definition = propertiesHelpers.getDefinition(definitionName);
-        notNull(definition, "Could not find data store definition of name %s", definitionName);
-        log.debug("Found data store definition {} for {}", definition, definitionName);
+        notNull(definition, "Could not find connection definition of name %s", definitionName);
+        log.debug("Found connection definition {} for {}", definition, definitionName);
         return jsonSerializationHelper.toJson(
                 definitionServiceDelegate.createProperties(definition, definitionName + " properties"), formName, definitionName);
     }
@@ -204,7 +204,7 @@ public class PropertiesControllerImpl implements PropertiesController {
     @Override
     public String getDatasetProperties(String definitionName, String formName, PropertiesDto propertiesContainer) {
         DatastoreDefinition<DatastoreProperties> datastoreDefinition = propertiesHelpers.getDataStoreDefinition(definitionName);
-        notNull(datastoreDefinition, "Could not find data store definition of name %s", definitionName);
+        notNull(datastoreDefinition, "Could not find connection definition of name %s", definitionName);
         DatastoreProperties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
         DatasetProperties datasetProperties = datastoreDefinition.createDatasetProperties(properties);
         return datasetProperties == null ? "{}" : jsonSerializationHelper.toJson(formName, datasetProperties);
