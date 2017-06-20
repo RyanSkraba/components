@@ -117,6 +117,54 @@ public class SimpleFileIODatasetRuntimeTest {
     }
 
     @Test
+    public void testGetSampleCsv_multipleSources() throws Exception {
+        RecordSet rs1 = getSimpleTestData(0);
+        writeRandomCsvFile(mini.getFs(), "/user/test/input/part-00000", rs1);
+        RecordSet rs2 = getSimpleTestData(100);
+        writeRandomCsvFile(mini.getFs(), "/user/test/input/part-00001", rs2);
+        RecordSet rs3 = getSimpleTestData(100);
+        writeRandomCsvFile(mini.getFs(), "/user/test/input/part-00002", rs3);
+        String fileSpec = mini.getFs().getUri().resolve("/user/test/input/").toString();
+
+        // Configure the component.
+        SimpleFileIODatasetProperties props = createDatasetProperties();
+        props.format.setValue(SimpleFileIOFormat.CSV);
+        props.path.setValue(fileSpec);
+
+        // Create the runtime.
+        SimpleFileIODatasetRuntime runtime = new SimpleFileIODatasetRuntime();
+        runtime.initialize(null, props);
+
+        // Attempt to get a sample using the runtime methods.
+        {
+            final List<IndexedRecord> actual = new ArrayList<>();
+            runtime.getSample(15, new Consumer<IndexedRecord>() {
+
+                @Override
+                public void accept(IndexedRecord ir) {
+                    actual.add(ir);
+                }
+            });
+
+            // Check that the result was limited (15 out of 30 records)
+            assertThat(actual, hasSize(15));
+        }
+
+        // Run it again to verify that the static state is not retained.
+        {
+            final List<IndexedRecord> actual = new ArrayList<>();
+            runtime.getSample(15, new Consumer<IndexedRecord>() {
+
+                @Override
+                public void accept(IndexedRecord ir) {
+                    actual.add(ir);
+                }
+            });
+            assertThat(actual, hasSize(15));
+        }
+    }
+
+    @Test
     public void testGetSampleAvro() throws Exception {
         RecordSet rs = getSimpleTestData(0);
         writeRandomAvroFile(mini.getFs(), "/user/test/input.avro", rs);

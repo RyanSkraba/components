@@ -37,27 +37,32 @@ public class BoundedReaderWithLimit<T, SourceT extends BoundedSource<T>> extends
     }
 
     public static <T, SourceT extends BoundedSource<T>> BoundedReaderWithLimit<T, SourceT> of(
-            BoundedSource.BoundedReader<T> delegate, int limit) {
-        return new BoundedReaderWithLimit<>(delegate, limit, new AtomicInteger(0));
-    }
-
-    public static <T, SourceT extends BoundedSource<T>> BoundedReaderWithLimit<T, SourceT> of(
             BoundedSource.BoundedReader<T> delegate, int limit, AtomicInteger count) {
         return new BoundedReaderWithLimit<>(delegate, limit, count);
     }
 
     @Override
     public boolean start() throws IOException {
+        // If we've exceeded the limit, then records are never available.
         if (count.incrementAndGet() > limit)
             return false;
-        return delegate.start();
+        if (delegate.start())
+            return true;
+        // If we haven't exceeded the limit, but there isn't a record available. It shouldn't be counted.
+        count.decrementAndGet();
+        return false;
     }
 
     @Override
     public boolean advance() throws IOException {
+        // If we've exceeded the limit, then records are never available.
         if (count.incrementAndGet() > limit)
             return false;
-        return delegate.advance();
+        if (delegate.advance())
+            return true;
+        // If we haven't exceeded the limit, but there isn't a record available. It shouldn't be counted.
+        count.decrementAndGet();
+        return false;
     }
 
     @Override
@@ -67,6 +72,7 @@ public class BoundedReaderWithLimit<T, SourceT extends BoundedSource<T>> extends
 
     @Override
     public void close() throws IOException {
+        // We haven't observed any problems closing readers that were never started.
         delegate.close();
     }
 

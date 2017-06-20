@@ -14,6 +14,7 @@ package org.talend.components.simplefileio.runtime.sources;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
@@ -34,7 +35,7 @@ import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
  * Extend the Beam {@link org.apache.beam.sdk.io.hdfs.HDFSFileSource} for extra functionality.
  *
  * <ul>
- * <li>To limit the number createSourceForSplit lines fetched for sampling.</li>
+ * <li>To limit the number of lines fetched for sampling.</li>
  * <li>To override the defaultOutputCoder if necessary..</li>
  * </ul>
  * 
@@ -42,12 +43,29 @@ import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
  * @param <V> The value type provided by this source.
  * @param <SourceT> The concrete implementation class for the source.
  */
-public abstract class FileSourceBase<K, V, SourceT extends FileSourceBase<K, V, SourceT>> extends
-        UgiFileSourceBase<K, V, SourceT> {
+public abstract class FileSourceBase<K, V, SourceT extends FileSourceBase<K, V, SourceT>>
+        extends UgiFileSourceBase<K, V, SourceT> {
 
     private Coder<KV<K, V>> defaultCoder;
 
     private int limit = -1;
+
+    /**
+     * This static field is used to ensure limits are respected when running the FileSource in the DirectRunner and is
+     * only accessed when limit is non-negative.
+     * 
+     * This is a workaround to the fact that collections are completely materialized when using the DirectRunner, by
+     * causing the readers to abort when enough records have been read. In a normal distributed pipeline, the
+     * {@link org.apache.beam.sdk.transforms.Sample#any(long)} method should be used instead.
+     * 
+     * There are two important points to take into account:
+     * 
+     * 1) There can only be one running FileSourceBase running at a time, since it is static.
+     * 
+     * 2) However, since the component service uses a different classloader for each getSample() request, each request
+     * will have its own static scope for this variable and multple getSample requests can be simultaneously processed.
+     */
+    private static AtomicInteger sharedCount = new AtomicInteger(0);
 
     protected FileSourceBase(UgiDoAs doAs, String filepattern, Class<? extends FileInputFormat<?, ?>> formatClass,
             Class<K> keyClass, Class<V> valueClass, SerializableSplit serializableSplit) {
@@ -76,15 +94,6 @@ public abstract class FileSourceBase<K, V, SourceT extends FileSourceBase<K, V, 
     protected abstract BoundedSource.BoundedReader<KV<K, V>> createReaderForSplit(SerializableSplit serializableSplit)
             throws IOException;
 
-    /**
-     * @param serializableSplit the split that the source is processing.
-     * @return a reader created for this source, with a proposed limited number of records.
-     * @throws IOException If the reader can't be created.
-     */
-    protected BoundedReaderWithLimit<KV<K, V>, ?> createReaderWithLimit(SerializableSplit serializableSplit) throws IOException {
-        return BoundedReaderWithLimit.of(createReaderForSplit(serializableSplit), getLimit());
-    }
-
     protected void setDefaultCoder(Coder<K> keyCoder, Coder<V> valueCoder) {
         this.defaultCoder = KvCoder.of(keyCoder, valueCoder);
     }
@@ -98,6 +107,9 @@ public abstract class FileSourceBase<K, V, SourceT extends FileSourceBase<K, V, 
 
     public void setLimit(int limit) {
         this.limit = limit;
+        // Reset the shared state whenever the limit is set to non-negative.
+        if (limit >= 0)
+            sharedCount.set(0);
     }
 
     protected int getLimit() {
@@ -127,6 +139,9 @@ public abstract class FileSourceBase<K, V, SourceT extends FileSourceBase<K, V, 
     public BoundedReader<KV<K, V>> createReader(PipelineOptions options) throws IOException {
         // Re-implementation of the base class method to use the factory methods.
         this.validate();
-        return limit < 0 ? createReaderForSplit(serializableSplit) : createReaderWithLimit(serializableSplit);
+        if (limit < 0)
+            return createReaderForSplit(serializableSplit);
+        else
+            return BoundedReaderWithLimit.of(createReaderForSplit(serializableSplit), getLimit(), sharedCount);
     }
 }
