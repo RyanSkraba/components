@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.api.testcomponent;
 
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.util.Set;
 
@@ -40,8 +40,6 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
         super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
-    protected TestComponentProperties properties;
-
     @Override
     public String[] getFamilies() {
         return new String[] { "level1/level2", "newlevel1/newlevel2" };
@@ -62,7 +60,8 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
+            ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
         return null;
     }

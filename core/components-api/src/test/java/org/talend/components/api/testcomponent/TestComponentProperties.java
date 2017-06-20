@@ -12,34 +12,21 @@
 // ============================================================================
 package org.talend.components.api.testcomponent;
 
-import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
-import static org.talend.daikon.properties.property.PropertyFactory.newDate;
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 import static org.talend.daikon.properties.property.PropertyFactory.newSchema;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
-import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
-import org.talend.components.api.properties.ComponentReferenceProperties;
-import org.talend.components.api.testcomponent.nestedprop.NestedComponentProperties;
-import org.talend.components.api.testcomponent.nestedprop.inherited.InheritedComponentProperties;
-import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 
@@ -51,44 +38,9 @@ public class TestComponentProperties extends ComponentPropertiesImpl {
 
     public Form mainForm;
 
-    public Form restoreForm;
-
     public Property<Schema> mainOutput = newSchema("mainOutput");
 
-    public PresentationItem testPI = new PresentationItem("testPI", "testPI display name");
-
-    public Property<String> userId = newProperty(USER_ID_PROP_NAME).setRequired();
-
-    public Property<String> password = newProperty("password").setRequired()
-            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
-
-    public Property<String> nameList = newProperty("nameList");
-
-    public Property<String> nameListRef = newProperty("nameListRef");
-
-    public Property<Integer> integer = newInteger("integer");
-
-    public Property<Integer> decimal = newInteger("decimal");
-
-    public Property<Date> date = newDate("date");
-
-    public Property<Date> dateTime = newDate("dateTime");
-
-    // Used in testing refreshLayout
-    public Property<Boolean> suppressDate = newBoolean("suppressDate");
-
     public Property<String> initLater = null;
-
-    public NestedComponentProperties nestedInitLater = null;
-
-    public NestedComponentProperties nestedProps = new NestedComponentProperties("nestedProps");
-
-    public ComponentPropertiesWithDefinedI18N nestedProp2 = new ComponentPropertiesWithDefinedI18N("nestedProp2");
-
-    public InheritedComponentProperties nestedProp3 = new InheritedComponentProperties("nestedProp3");
-
-    public ComponentReferenceProperties<TestComponentProperties> referencedComponent = new ComponentReferenceProperties<>("referencedComponent",
-            TestComponentDefinition.COMPONENT_NAME);
 
     public static final String TESTCOMPONENT = "TestComponent";
 
@@ -96,69 +48,23 @@ public class TestComponentProperties extends ComponentPropertiesImpl {
         super(name);
     }
 
-    public ValidationResult beforeNameList() {
-        List<String> values = new ArrayList<>();
-        Collections.addAll(values, new String[] { "name1", "name2", "name3" });
-        nameList.setPossibleValues(values);
-        return ValidationResult.OK;
-    }
-
-    public void beforeNameListRef() {
-        List<String> values = new ArrayList<>();
-        Collections.addAll(values, new String[] { "namer1", "namer2", "namer3" });
-        nameListRef.setPossibleValues(values);
-    }
-
     public ValidationResult afterFormFinishMain(Repository<Properties> repo) {
         return new ValidationResult(Result.ERROR);
-    }
-
-    public ValidationResult afterInteger() {
-        return new ValidationResult(Result.WARNING);
     }
 
     @Override
     public void setupProperties() {
         super.setupProperties();
         initLater = newProperty("initLater");
-        nestedInitLater = new NestedComponentProperties("nestedInitLater");
     }
 
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form form = Form.create(this, Form.MAIN);
-        mainForm = form;
-        form.addRow(userId);
-        form.addRow(widget(password).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
-        form.addRow(testPI);
-        form.addRow(widget(nameList).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
-        form.addRow(widget(nameListRef).setWidgetType(Widget.NAME_SELECTION_REFERENCE_WIDGET_TYPE));
-
-        form = Form.create(this, "restoreTest");
-        restoreForm = form;
-        form.addRow(userId);
-        form.addRow(nameList);
-        form.addRow(integer);
-        form.addRow(decimal);
-        form.addRow(date);
-        form.addRow(dateTime);
-        form.addRow(nestedProps.getForm(Form.MAIN));
+        mainForm = Form.create(this, Form.MAIN);
 
         Form refForm = new Form(this, Form.REFERENCE);
-        Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
-        refForm.addRow(compListWidget);
         refForm.addRow(mainForm);
-    }
-
-    @Override
-    public void refreshLayout(Form form) {
-        super.refreshLayout(form);
-        if (form.getName().equals("restoreTest")) {
-            if (suppressDate.getValue()) {
-                form.getWidget("date").setHidden(true);
-            }
-        }
     }
 
     @Override

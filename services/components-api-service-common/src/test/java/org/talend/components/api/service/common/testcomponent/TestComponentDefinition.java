@@ -25,8 +25,6 @@ import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.common.testcomponent.nestedprop.NestedComponentProperties;
-import org.talend.components.api.service.common.testcomponent.nestedprop.inherited.InheritedComponentProperties;
-import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.StringProperty;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -67,8 +65,7 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
-        return new Class[] { NestedComponentProperties.class, ComponentPropertiesWithDefinedI18N.class,
-                InheritedComponentProperties.class };
+        return new Class[] { NestedComponentProperties.class, ComponentPropertiesWithDefinedI18N.class };
     }
 
     @Override

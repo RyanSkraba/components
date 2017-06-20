@@ -12,16 +12,9 @@
 // ============================================================================
 package org.talend.components.api.testcomponent.nestedprop.inherited;
 
-import static org.talend.daikon.properties.property.PropertyFactory.*;
-
 import org.talend.components.api.testcomponent.nestedprop.NestedComponentProperties;
-import org.talend.daikon.properties.property.Property;
 
 public class InheritedComponentProperties extends NestedComponentProperties {
-
-    public static final String A_GREAT_PROP_NAME3 = "aGreatProp3"; //$NON-NLS-1$
-
-    public Property aGreatProp3 = newProperty(A_GREAT_PROP_NAME3);
 
     public InheritedComponentProperties(String name) {
         super(name);
