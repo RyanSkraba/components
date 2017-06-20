@@ -53,7 +53,7 @@ import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 import com.sforce.ws.SessionRenewer;
 
-public final class SalesforceDataprepSource
+public class SalesforceDataprepSource
         implements BoundedSource, SalesforceRuntimeSourceOrSink, SalesforceSchemaHelper<Schema> {
 
     private static final long serialVersionUID = 1930140572051028338L;

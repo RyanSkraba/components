@@ -18,10 +18,10 @@ import static org.talend.components.netsuite.client.NetSuiteClientService.MESSAG
 import java.util.Arrays;
 import java.util.Properties;
 
+import org.talend.components.common.test.TestFixture;
 import org.talend.components.netsuite.client.NetSuiteClientFactory;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteCredentials;
-import org.talend.components.netsuite.test.TestFixture;
 import org.talend.components.netsuite.test.TestUtils;
 
 /**

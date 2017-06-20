@@ -18,7 +18,7 @@ import static org.mockito.Mockito.spy;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
-import org.talend.components.netsuite.test.TestFixture;
+import org.talend.components.common.test.TestFixture;
 
 /**
  *

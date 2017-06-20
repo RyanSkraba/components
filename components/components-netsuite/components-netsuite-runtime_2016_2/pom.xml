@@ -92,6 +92,12 @@
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
+            <artifactId>components-common</artifactId>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
             <artifactId>components-netsuite-runtime</artifactId>
             <version>${project.version}</version>
             <classifier>tests</classifier>

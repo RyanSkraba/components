@@ -9,8 +9,6 @@ public class BulkResultSet {
 
     List<String> header;
 
-    boolean hashNext = true;
-
     public BulkResultSet(com.csvreader.CsvReader reader, List<String> header) {
         this.reader = reader;
         this.header = header;
@@ -48,10 +46,6 @@ public class BulkResultSet {
         }
         return null;
 
-    }
-
-    public boolean hasNext() {
-        return hashNext;
     }
 
 }

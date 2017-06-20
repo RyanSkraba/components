@@ -464,6 +464,9 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<append>true</append>
+				</configuration>
 			</plugin>
 			<!-- this was supposed to deploy only when all the modules are succesfully 
 				build -->

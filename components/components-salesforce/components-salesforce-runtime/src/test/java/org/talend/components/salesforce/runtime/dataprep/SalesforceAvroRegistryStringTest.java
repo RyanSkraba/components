@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.avro.Schema;
 import org.junit.Test;
+import org.talend.components.salesforce.runtime.SalesforceSchemaConstants;
 
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
@@ -65,4 +66,26 @@ public class SalesforceAvroRegistryStringTest {
 
         assertThat(0, is(schema.getFields().size()));
     }
+
+    @Test
+    public void testInferSchemaWithReferenceField() {
+        Field referenceField = new Field();
+        referenceField.setName("reference");
+        referenceField.setType(FieldType.string);
+        referenceField.setReferenceTo(new String[]{"SomeRecord"});
+        referenceField.setRelationshipName("relationship");
+
+        DescribeSObjectResult dsor = new DescribeSObjectResult();
+        dsor.setName("MySObjectRecord");
+        dsor.setFields(new Field[] { referenceField });
+
+        Schema schema = SalesforceAvroRegistryString.get().inferSchema(dsor);
+
+        Schema.Field field = schema.getField("reference");
+
+        assertThat(field.schema().getType(), is(Schema.Type.STRING));
+        assertThat(field.getProp(SalesforceSchemaConstants.REF_MODULE_NAME), is("SomeRecord"));
+        assertThat(field.getProp(SalesforceSchemaConstants.REF_FIELD_NAME), is("relationship"));
+    }
+
 }

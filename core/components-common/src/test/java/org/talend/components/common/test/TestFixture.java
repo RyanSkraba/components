@@ -11,14 +11,24 @@
 //
 // ============================================================================
 
-package org.talend.components.netsuite.test;
+package org.talend.components.common.test;
 
 /**
- *
+ * Reusable code which performs setup for a test.
  */
 public interface TestFixture {
 
+    /**
+     * Perform steps required to prepare testing environment.
+     *
+     * @throws Exception if an error occurs during setting up
+     */
     void setUp() throws Exception;
 
+    /**
+     * Perform steps required to return environment to original state after testing.
+     *
+     * @throws Exception if an error occurs during tearing down
+     */
     void tearDown() throws Exception;
 }

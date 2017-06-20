@@ -30,6 +30,7 @@ import org.apache.avro.Schema;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.common.test.TestFixture;
 import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.model.CustomFieldDesc;
 import org.talend.components.netsuite.client.model.FieldDesc;
@@ -37,7 +38,6 @@ import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.client.model.beans.BeanInfo;
 import org.talend.components.netsuite.client.model.beans.Beans;
 import org.talend.components.netsuite.client.model.beans.PropertyInfo;
-import org.talend.components.netsuite.test.TestFixture;
 import org.talend.daikon.avro.AvroUtils;
 
 /**

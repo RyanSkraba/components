@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
+import static org.talend.components.salesforce.SalesforceDefinition.SOURCE_OR_SINK_CLASS;
+import static org.talend.components.salesforce.SalesforceDefinition.USE_CURRENT_JVM_PROPS;
+import static org.talend.components.salesforce.SalesforceDefinition.getSandboxedInstance;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
@@ -29,8 +32,6 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.StringProperty;
-import org.talend.daikon.runtime.RuntimeInfo;
-import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class SalesforceModuleProperties extends ComponentPropertiesImpl implements SalesforceProvideConnectionProperties {
@@ -83,11 +84,7 @@ public class SalesforceModuleProperties extends ComponentPropertiesImpl implemen
     // consider beforeActivate and beforeRender (change after to afterActivate)l
 
     public ValidationResult beforeModuleName() throws Exception {
-        ClassLoader classLoader = SalesforceDefinition.class.getClassLoader();
-        RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(
-                "org.talend.components.salesforce.runtime.SalesforceSourceOrSink");
-        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
-                classLoader)) {
+        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             SalesforceRuntimeSourceOrSink ss = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
             ss.initialize(null, connection);
             ValidationResult vr = ss.validate(null);
@@ -107,11 +104,8 @@ public class SalesforceModuleProperties extends ComponentPropertiesImpl implemen
     }
 
     public ValidationResult afterModuleName() throws Exception {
-        ClassLoader classLoader = SalesforceDefinition.class.getClassLoader();
-        RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(
-                "org.talend.components.salesforce.runtime.SalesforceSourceOrSink");
-        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
-                classLoader)) {
+        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS, USE_CURRENT_JVM_PROPS)) {
+
             SalesforceRuntimeSourceOrSink ss = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
             ss.initialize(null, connection);
             ValidationResult vr = ss.validate(null);

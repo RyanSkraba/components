@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
+import static org.talend.components.salesforce.SalesforceDefinition.SOURCE_OR_SINK_CLASS;
+import static org.talend.components.salesforce.SalesforceDefinition.USE_CURRENT_JVM_PROPS;
+import static org.talend.components.salesforce.SalesforceDefinition.getSandboxedInstance;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
@@ -31,8 +34,6 @@ import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
-import org.talend.daikon.runtime.RuntimeInfo;
-import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 import org.talend.daikon.serialize.PostDeserializeSetup;
 import org.talend.daikon.serialize.migration.SerializeSetVersion;
@@ -179,13 +180,9 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
     }
 
     public ValidationResult validateTestConnection() throws Exception {
-        ClassLoader classLoader = SalesforceDefinition.class.getClassLoader();
-        RuntimeInfo runtimeInfo = SalesforceDefinition
-                .getCommonRuntimeInfo("org.talend.components.salesforce.runtime.SalesforceSourceOrSink");
-        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
-                classLoader)) {
+        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             SalesforceRuntimeSourceOrSink ss = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
-            ss.initialize(null, this);
+            ss.initialize(null, SalesforceConnectionProperties.this);
             ValidationResultMutable vr = new ValidationResultMutable(ss.validate(null));
             if (vr.getStatus() == ValidationResult.Result.OK) {
                 vr.setMessage("Connection successful");

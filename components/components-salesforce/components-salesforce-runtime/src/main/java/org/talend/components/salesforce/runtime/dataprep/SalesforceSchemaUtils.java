@@ -7,7 +7,7 @@ import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties;
 
-public class SalesforceSchemaUtils {
+public abstract class SalesforceSchemaUtils {
 
     public static Schema getSchema(SalesforceDatasetProperties dataset, SalesforceDataprepSource sds, RuntimeContainer container)
             throws IOException {

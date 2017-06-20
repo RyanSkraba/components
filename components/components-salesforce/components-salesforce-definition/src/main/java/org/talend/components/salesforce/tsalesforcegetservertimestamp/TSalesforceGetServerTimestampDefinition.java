@@ -43,7 +43,7 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
         assertEngineCompatibility(engine);
         if (componentType == ConnectorTopology.OUTGOING) {
-            return getCommonRuntimeInfo("org.talend.components.salesforce.runtime.SalesforceSource");
+            return getCommonRuntimeInfo(SOURCE_CLASS);
         } else {
             return null;
         }

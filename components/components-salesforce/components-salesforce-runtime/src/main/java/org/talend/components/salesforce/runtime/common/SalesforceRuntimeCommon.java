@@ -19,7 +19,7 @@ import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 import com.sforce.ws.SessionRenewer;
 
-public final class SalesforceRuntimeCommon {
+public abstract class SalesforceRuntimeCommon {
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceRuntimeCommon.class);
 

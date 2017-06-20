@@ -13,11 +13,29 @@
 
 package org.talend.components.salesforce.tsalesforceinput;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.salesforce.SalesforceTestBase;
+import org.talend.components.salesforce.schema.SalesforceSchemaHelper;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties.QueryMode;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 
 /**
@@ -26,13 +44,13 @@ import org.talend.daikon.properties.presentation.Form;
  * @author maksym.basiuk
  */
 
-public class TSalesforceInputPropertiesTest {
+public class TSalesforceInputPropertiesTest extends SalesforceTestBase {
 
     private TSalesforceInputProperties properties;
 
     @Before
-    public void setupInstance() {
-        properties = new TSalesforceInputProperties("tSalesforceInputProperties");
+    public void setUp() {
+        properties = spy(new TSalesforceInputProperties("tSalesforceInputProperties"));
     }
 
     @Test
@@ -123,6 +141,191 @@ public class TSalesforceInputPropertiesTest {
     @Test
     public void testGetAllSchemaPropertiesConnectorsInputConnection() {
         Assert.assertEquals(0, properties.getAllSchemaPropertiesConnectors(false).size());
+    }
+
+    @Test
+    public void testAfterGuessSchema() {
+        properties.init();
+
+        reset(properties);
+
+        Form mainForm = properties.getForm(Form.MAIN);
+        properties.afterGuessSchema();
+        verify(properties, times(1)).refreshLayout(eq(mainForm));
+    }
+
+    @Test
+    public void testAfterGuessQuery() {
+        properties.init();
+
+        reset(properties);
+
+        Form mainForm = properties.getForm(Form.MAIN);
+        properties.afterGuessQuery();
+
+        verify(properties, times(1)).refreshLayout(eq(mainForm));
+    }
+
+    @Test
+    public void testAfterManualQuery() {
+        properties.init();
+
+        reset(properties);
+
+        Form mainForm = properties.getForm(Form.MAIN);
+        properties.afterManualQuery();
+
+        verify(properties, times(1)).refreshLayout(eq(mainForm));
+    }
+
+    @Test
+    public void testAfterQueryMode() {
+        properties.init();
+
+        reset(properties);
+
+        Form mainForm = properties.getForm(Form.MAIN);
+        Form advForm = properties.getForm(Form.ADVANCED);
+        properties.afterQueryMode();
+
+        verify(properties, times(1)).refreshLayout(eq(mainForm));
+        verify(properties, times(1)).refreshLayout(eq(advForm));
+    }
+
+    @Test
+    public void testAfterPkChunking() {
+        properties.init();
+
+        reset(properties);
+
+        Form advForm = properties.getForm(Form.ADVANCED);
+        properties.afterPkChunking();
+        verify(properties, times(1)).refreshLayout(eq(advForm));
+    }
+
+    @Test
+    public void testAfterPkChunkingSleepTime() {
+        properties.init();
+
+        reset(properties);
+
+        Form advForm = properties.getForm(Form.ADVANCED);
+        properties.afterPkChunkingSleepTime();
+        verify(properties, times(1)).refreshLayout(eq(advForm));
+    }
+
+    @Test
+    public void testValidateGuessQuery() throws Exception {
+        properties.init();
+
+        String query = "\"SELECT Id, Name, BillingCity FROM Account\"";
+
+        Schema schema = SchemaBuilder.record("Result").fields()
+                .name("Id").type().stringType().noDefault()
+                .name("Name").type().stringType().noDefault()
+                .name("BillingCity").type().stringType().noDefault()
+                .endRecord();
+
+        Schema emptySchema = AvroUtils.createEmptySchema();
+
+        properties.module.moduleName.setValue("Account");
+        properties.module.main.schema.setValue(schema);
+
+        try (MockRuntimeSourceOrSinkTestFixture testFixture = new MockRuntimeSourceOrSinkTestFixture(
+                equalTo(properties), createDefaultTestDataset())) {
+            testFixture.setUp();
+
+            // Valid
+
+            when(((SalesforceSchemaHelper) testFixture.runtimeSourceOrSink)
+                    .guessQuery(eq(schema), eq("Account"))).thenReturn(query);
+
+            ValidationResult vr1 = properties.validateGuessQuery();
+            assertEquals(ValidationResult.Result.OK, vr1.getStatus());
+            assertEquals(query, properties.query.getValue());
+
+            // Not valid
+
+            properties.module.main.schema.setValue(emptySchema);
+
+            ValidationResult vr2 = properties.validateGuessQuery();
+            assertEquals(ValidationResult.Result.ERROR, vr2.getStatus());
+            assertEquals("", properties.query.getValue());
+
+            // Error
+
+            when(((SalesforceSchemaHelper) testFixture.runtimeSourceOrSink)
+                    .guessQuery(eq(schema), eq("Account")))
+                    .thenThrow(TalendRuntimeException.createUnexpectedException("ERROR"));
+
+            properties.module.main.schema.setValue(schema);
+            properties.query.setValue(query);
+
+            ValidationResult vr3 = properties.validateGuessQuery();
+            assertEquals(ValidationResult.Result.ERROR, vr3.getStatus());
+            assertEquals(query, properties.query.getValue());
+        }
+    }
+
+    @Test
+    public void testValidateGuessSchema() throws Exception {
+        properties.init();
+
+        String query = "\"SELECT Id, Name, BillingCity FROM Account\"";
+
+        String invalidQuery = "qwerty";
+
+        Schema schema = SchemaBuilder.record("Result").fields()
+                .name("Id").type().stringType().noDefault()
+                .name("Name").type().stringType().noDefault()
+                .name("BillingCity").type().stringType().noDefault()
+                .endRecord();
+
+        Schema emptySchema = AvroUtils.createEmptySchema();
+
+        properties.module.moduleName.setValue("Account");
+        properties.module.main.schema.setValue(emptySchema);
+        properties.query.setValue(query);
+
+        try (MockRuntimeSourceOrSinkTestFixture testFixture = new MockRuntimeSourceOrSinkTestFixture(
+                equalTo(properties), createDefaultTestDataset())) {
+            testFixture.setUp();
+
+            // Valid
+
+            when(((SalesforceSchemaHelper) testFixture.runtimeSourceOrSink).guessSchema(eq(query)))
+                    .thenReturn(schema);
+
+            ValidationResult vr1 = properties.validateGuessSchema();
+            assertEquals(ValidationResult.Result.OK, vr1.getStatus());
+            assertEquals(schema, properties.module.main.schema.getValue());
+
+            // Not valid / Error
+
+            properties.query.setValue(invalidQuery);
+            properties.module.main.schema.setValue(schema);
+
+            when(((SalesforceSchemaHelper) testFixture.runtimeSourceOrSink).guessSchema(eq(invalidQuery)))
+                    .thenThrow(TalendRuntimeException.createUnexpectedException("ERROR"));
+
+            ValidationResult vr2 = properties.validateGuessSchema();
+            assertEquals(ValidationResult.Result.ERROR, vr2.getStatus());
+            assertEquals(schema, properties.module.main.schema.getValue());
+
+            when(((SalesforceSchemaHelper) testFixture.runtimeSourceOrSink).guessSchema(eq(invalidQuery)))
+                    .thenThrow(new RuntimeException("ERROR"));
+
+            vr2 = properties.validateGuessSchema();
+            assertEquals(ValidationResult.Result.ERROR, vr2.getStatus());
+            assertEquals(schema, properties.module.main.schema.getValue());
+
+            when(((SalesforceSchemaHelper) testFixture.runtimeSourceOrSink).guessSchema(eq(invalidQuery)))
+                    .thenThrow(new IOException("I/O ERROR"));
+
+            vr2 = properties.validateGuessSchema();
+            assertEquals(ValidationResult.Result.ERROR, vr2.getStatus());
+            assertEquals(schema, properties.module.main.schema.getValue());
+        }
     }
 
     private void setupProperties() {

@@ -70,7 +70,7 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition {
     @Override
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
         if (componentType == ConnectorTopology.INCOMING || componentType == ConnectorTopology.INCOMING_AND_OUTGOING) {
-            return getCommonRuntimeInfo("org.talend.components.salesforce.runtime.SalesforceSink");
+            return getCommonRuntimeInfo(SINK_CLASS);
         } else {
             return null;
         }

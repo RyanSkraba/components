@@ -36,6 +36,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.cxf.headers.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.common.test.TestFixture;
 import org.talend.components.netsuite.client.NetSuiteClientFactory;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteCredentials;
@@ -44,7 +45,6 @@ import org.talend.components.netsuite.client.model.FieldDesc;
 import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.client.model.beans.Beans;
 import org.talend.components.netsuite.test.FreePortFinder;
-import org.talend.components.netsuite.test.TestFixture;
 import org.talend.components.netsuite.util.Mapper;
 
 /**

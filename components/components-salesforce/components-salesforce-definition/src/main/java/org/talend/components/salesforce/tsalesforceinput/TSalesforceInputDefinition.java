@@ -53,7 +53,7 @@ public class TSalesforceInputDefinition extends SalesforceDefinition {
     @Override
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
         if (componentType == ConnectorTopology.OUTGOING) {
-            return getCommonRuntimeInfo("org.talend.components.salesforce.runtime.SalesforceSource");
+            return getCommonRuntimeInfo(SOURCE_CLASS);
         } else {
             return null;
         }

@@ -136,6 +136,14 @@ public class SalesforceBulkRuntime {
                 : TSalesforceInputProperties.DEFAULT_CHUNK_SLEEP_TIME * 1000;
     }
 
+    public int getChunkSize() {
+        return chunkSize;
+    }
+
+    public int getChunkSleepTime() {
+        return chunkSleepTime;
+    }
+
     private void setBulkOperation(String sObjectType, OutputAction userOperation, String externalIdFieldName,
             String contentTypeStr, String bulkFileName, int maxBytes, int maxRows) {
         this.sObjectType = sObjectType;
@@ -202,6 +210,10 @@ public class SalesforceBulkRuntime {
         default:
             break;
         }
+    }
+
+    public ConcurrencyMode getConcurrencyMode() {
+        return concurrencyMode;
     }
 
     /**

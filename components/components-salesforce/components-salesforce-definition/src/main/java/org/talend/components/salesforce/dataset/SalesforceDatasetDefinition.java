@@ -32,7 +32,7 @@ public class SalesforceDatasetDefinition extends I18nDefinition implements Datas
 
     @Override
     public RuntimeInfo getRuntimeInfo(SalesforceDatasetProperties properties) {
-        return SalesforceDefinition.getCommonRuntimeInfo("org.talend.components.salesforce.runtime.dataprep.SalesforceDatasetRuntime");
+        return SalesforceDefinition.getCommonRuntimeInfo(SalesforceDefinition.DATASET_RUNTIME_CLASS);
     }
 
     @Deprecated

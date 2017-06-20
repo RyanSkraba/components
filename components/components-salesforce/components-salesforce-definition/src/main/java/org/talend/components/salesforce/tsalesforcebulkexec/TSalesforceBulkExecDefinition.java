@@ -63,7 +63,7 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
         assertEngineCompatibility(engine);
         if (componentType == ConnectorTopology.OUTGOING || componentType == ConnectorTopology.NONE) {
-            return getCommonRuntimeInfo("org.talend.components.salesforce.runtime.SalesforceSource");
+            return getCommonRuntimeInfo(SOURCE_CLASS);
         } else {
             return null;
         }

@@ -385,7 +385,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         // Add module wizard - we refer to the existing connection properties as we don't present the UI
         // for them.
         assertTrue(connProps == ((SalesforceModuleListProperties) subWizards[2].getForms().get(0).getProperties())
-                .getConnectionProps());
+                .getConnectionProperties());
         assertFalse(subWizards[1].getDefinition().isTopLevel());
         assertEquals("Edit Salesforce Connection", subWizards[1].getDefinition().getMenuItemName());
         assertTrue(subWizards[0].getDefinition().isTopLevel());

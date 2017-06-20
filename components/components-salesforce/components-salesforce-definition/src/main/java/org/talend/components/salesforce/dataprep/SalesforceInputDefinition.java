@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.dataprep;
 
+import static org.talend.components.salesforce.SalesforceDefinition.DATAPREP_SOURCE_CLASS;
+
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -52,8 +54,7 @@ public class SalesforceInputDefinition extends AbstractComponentDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        return SalesforceDefinition
-                .getCommonRuntimeInfo("org.talend.components.salesforce.runtime.dataprep.SalesforceDataprepSource");
+        return SalesforceDefinition.getCommonRuntimeInfo(DATAPREP_SOURCE_CLASS);
     }
 
     @SuppressWarnings("rawtypes")

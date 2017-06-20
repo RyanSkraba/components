@@ -36,7 +36,7 @@ public class SalesforceDatastoreDefinition extends I18nDefinition implements Dat
 
     @Override
     public RuntimeInfo getRuntimeInfo(SalesforceDatastoreProperties properties) {
-        return SalesforceDefinition.getCommonRuntimeInfo("org.talend.components.salesforce.runtime.dataprep.SalesforceDatastoreRuntime");
+        return SalesforceDefinition.getCommonRuntimeInfo(SalesforceDefinition.DATASTORE_RUNTIME_CLASS);
     }
 
     @SuppressWarnings("rawtypes")
