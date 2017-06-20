@@ -11,6 +11,9 @@
 //
 // ============================================================================
 package org.talend.components.service.rest.fullexample.dataset;
+
+import java.io.IOException;
+
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.service.rest.fullexample.datastore.FullExampleDatastoreDefinition;
@@ -22,8 +25,6 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.properties.property.StringProperty;
-
-import java.io.IOException;
 
 public class FullExampleDatasetProperties extends PropertiesImpl implements DatasetProperties<FullExampleDatastoreProperties> {
 
@@ -43,10 +44,11 @@ public class FullExampleDatasetProperties extends PropertiesImpl implements Data
 
     public SchemaProperties main = new SchemaProperties("main");
 
+    public Property<String> testAfterDatastoreTrigger = PropertyFactory.newString("testAfterDatastoreTrigger").setValue("foo");
+
     public FullExampleDatasetProperties(String name) {
         super(name);
     }
-
 
     public void afterSourceType() throws IOException {
         refreshLayout(getForm(Form.MAIN));
@@ -71,14 +73,13 @@ public class FullExampleDatasetProperties extends PropertiesImpl implements Data
         if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
             form.getWidget(moduleName).setVisible(true);
             moduleName.setRequired(true);
-            //We can not have a hidden field which is required
+            // We can not have a hidden field which is required
             form.getWidget(query).setVisible(false);
             query.setRequired(false);
-        }
-        else if (sourceType.getValue() == SourceType.SOQL_QUERY) {
+        } else if (sourceType.getValue() == SourceType.SOQL_QUERY) {
             form.getWidget(query).setVisible(true);
             query.setRequired();
-            //We can not have a hidden field which is required
+            // We can not have a hidden field which is required
             form.getWidget(moduleName).setVisible(false);
             moduleName.setRequired(false);
         }
@@ -98,5 +99,9 @@ public class FullExampleDatasetProperties extends PropertiesImpl implements Data
     public enum SourceType {
         MODULE_SELECTION,
         SOQL_QUERY
+    }
+
+    public void afterDatastore() {
+        testAfterDatastoreTrigger.setValue("bar");
     }
 }

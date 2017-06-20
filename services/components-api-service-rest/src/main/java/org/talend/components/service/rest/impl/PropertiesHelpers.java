@@ -1,4 +1,4 @@
-//==============================================================================
+// ==============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
@@ -9,7 +9,7 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ==============================================================================
 
 package org.talend.components.service.rest.impl;
 
@@ -36,6 +36,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Component
 public class PropertiesHelpers {
 
+    private static final boolean CALL_TRIGGERS = true;
+
     @Autowired
     private JsonSerializationHelper jsonSerializationHelper;
 
@@ -46,15 +48,15 @@ public class PropertiesHelpers {
     private ComponentService componentService;
 
     public <T extends Properties> T propertiesFromDto(PropertiesDto propertiesContainer) {
-        T properties = (T) jsonSerializationHelper.toProperties(
-                toInputStream(propertiesContainer.getProperties().toString(), UTF_8));
+        T properties = (T) jsonSerializationHelper
+                .toProperties(toInputStream(propertiesContainer.getProperties().toString(), UTF_8));
         List<ObjectNode> dependencies = propertiesContainer.getDependencies();
         if (dependencies != null && !dependencies.isEmpty()) {
             List<Properties> props = dependencies.stream() //
                     .map(on -> jsonSerializationHelper.toProperties(toInputStream(on.toString(), UTF_8))) //
                     .collect(toList());
             props.add(properties);
-            ReferenceProperties.resolveReferenceProperties(props, definitionServiceDelegate);
+            ReferenceProperties.resolveReferenceProperties(props, definitionServiceDelegate, CALL_TRIGGERS);
         }
         return properties;
     }

@@ -82,9 +82,11 @@ public class PropertiesControllerImpl implements PropertiesController {
     public ResponseEntity<ValidationResultsDto> validateProperties(PropertiesDto propertiesContainer) {
         Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
         ValidationResult validationResult = properties.getValidationResult();
-        // TODO: I really would prefer return 200 status code any time it process correctly and that the payload determine the
+        // TODO: I really would prefer return 200 status code any time it process correctly and that the payload
+        // determine the
         // result of the analysis.
-        // Here we use 400 return code for perfectly acceptable validation request but results with unaccepted properties.
+        // Here we use 400 return code for perfectly acceptable validation request but results with unaccepted
+        // properties.
         ResponseEntity<ValidationResultsDto> response;
         if (validationResult == null) {
             response = new ResponseEntity<>(new ValidationResultsDto(emptyList()), OK);
@@ -197,7 +199,6 @@ public class PropertiesControllerImpl implements PropertiesController {
             return "{}";
         }
         properties.refreshLayout(properties.getPreferredForm(formName));
-        properties.refreshProperties();
         return jsonSerializationHelper.toJson(formName, properties);
     }
 
