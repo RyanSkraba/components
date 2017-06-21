@@ -12,12 +12,12 @@
 // ============================================================================
 package org.talend.components.simplefileio.runtime.sinks;
 
-import org.apache.beam.sdk.io.hdfs.ConfigurableHDFSFileSink;
+import org.talend.components.simplefileio.runtime.beamcopy.ConfigurableHDFSFileSink;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 /**
- * An {@link org.apache.beam.sdk.io.hdfs.ConfigurableHDFSFileSink.HDFSWriter} subclass that delays opening the
+ * An {@link ConfigurableHDFSFileSink.HDFSWriter} subclass that delays opening the
  * underlying write operation until after the first attempt to write a value.
  */
 public class ConfigureWithSampleHDFSWriter<K, V> extends ConfigurableHDFSFileSink.HDFSWriter<K, V> {

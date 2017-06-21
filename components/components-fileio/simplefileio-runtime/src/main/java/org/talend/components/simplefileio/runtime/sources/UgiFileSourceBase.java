@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.BoundedSource;
-import org.apache.beam.sdk.io.hdfs.RelaxedHDFSFileSource;
+import org.talend.components.simplefileio.runtime.beamcopy.RelaxedHDFSFileSource;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.mapreduce.Job;

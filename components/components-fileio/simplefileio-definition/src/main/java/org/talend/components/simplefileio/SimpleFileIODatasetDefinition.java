@@ -30,6 +30,8 @@ public class SimpleFileIODatasetDefinition extends I18nDefinition implements Dat
 
     public static final String NAME = SimpleFileIOComponentFamilyDefinition.NAME + "Dataset";
 
+    public static final boolean IS_CLASSLOADER_REUSABLE = false;
+
     public SimpleFileIODatasetDefinition() {
         super(NAME);
     }
@@ -60,7 +62,8 @@ public class SimpleFileIODatasetDefinition extends I18nDefinition implements Dat
         try {
             return new JarRuntimeInfo(new URL(SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
                     DependenciesReader.computeDependenciesFilePath(SimpleFileIOComponentFamilyDefinition.MAVEN_GROUP_ID,
-                            SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID), RUNTIME);
+                            SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID),
+                    RUNTIME, IS_CLASSLOADER_REUSABLE);
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }

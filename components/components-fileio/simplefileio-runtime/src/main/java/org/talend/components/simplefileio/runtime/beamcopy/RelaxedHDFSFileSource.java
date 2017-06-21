@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.apache.beam.sdk.io.hdfs;
+package org.talend.components.simplefileio.runtime.beamcopy;
 
 import java.io.IOException;
 

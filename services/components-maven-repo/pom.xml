@@ -117,26 +117,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.beam</groupId>
-			<artifactId>beam-sdks-java-io-hdfs</artifactId>
-			<version>${beam.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-client</artifactId>
-			<version>${hadoop.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
 			<version>10.12.1.1</version>
@@ -171,8 +151,6 @@
 			</snapshots>
 		</repository>
 	</repositories>
-
-
 
 	<build>
 		<plugins>
@@ -218,9 +196,6 @@
 								<extraArtifact>org.mariadb.jdbc:mariadb-java-client:${mariadb.driver.version}:jar</extraArtifact>
 								<extraArtifact>org.postgresql:postgresql:${postgresql.driver.version}:jar</extraArtifact>
 								<extraArtifact>net.sourceforge.jtds:jtds:${jtds.driver.version}:jar</extraArtifact>
-								<!-- Other -->
-								<extraArtifact>org.apache.beam:beam-sdks-java-io-hdfs:${beam.version}:jar</extraArtifact>
-								<extraArtifact>org.apache.hadoop:hadoop-client:${hadoop.version}:jar</extraArtifact>
 							</extraArtifacts>
 							<pomIncludes>
 								<pomInclude>*/pom.xml</pomInclude>

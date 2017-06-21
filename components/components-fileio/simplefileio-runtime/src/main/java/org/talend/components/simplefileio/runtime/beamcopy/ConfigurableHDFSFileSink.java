@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.apache.beam.sdk.io.hdfs;
+package org.talend.components.simplefileio.runtime.beamcopy;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
@@ -29,7 +29,6 @@ import static org.apache.beam.sdk.repackaged.com.google.common.base.Precondition
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;

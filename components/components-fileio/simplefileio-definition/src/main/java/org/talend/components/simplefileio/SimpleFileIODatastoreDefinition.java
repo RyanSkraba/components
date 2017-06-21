@@ -27,12 +27,14 @@ import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
-public class SimpleFileIODatastoreDefinition extends I18nDefinition implements
-        DatastoreDefinition<SimpleFileIODatastoreProperties> {
+public class SimpleFileIODatastoreDefinition extends I18nDefinition
+        implements DatastoreDefinition<SimpleFileIODatastoreProperties> {
 
     public static final String RUNTIME = "org.talend.components.simplefileio.runtime.SimpleFileIODatastoreRuntime";
 
     public static final String NAME = SimpleFileIOComponentFamilyDefinition.NAME + "Datastore";
+
+    public static final boolean IS_CLASSLOADER_REUSABLE = false;
 
     public SimpleFileIODatastoreDefinition() {
         super(NAME);
@@ -82,7 +84,8 @@ public class SimpleFileIODatastoreDefinition extends I18nDefinition implements
         try {
             return new JarRuntimeInfo(new URL(SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
                     DependenciesReader.computeDependenciesFilePath(SimpleFileIOComponentFamilyDefinition.MAVEN_GROUP_ID,
-                            SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID), RUNTIME);
+                            SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID),
+                    RUNTIME, IS_CLASSLOADER_REUSABLE);
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }

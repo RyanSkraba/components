@@ -19,18 +19,21 @@ import java.util.List;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
+import org.talend.daikon.sandbox.SandboxControl;
 
 /**
  * create a {@link RuntimeInfo} that will look for a given jar and will look for a dependency.txt file inside this jar given the
  * maven groupId and artifactID to find the right path to the file.
  */
-public class JarRuntimeInfo implements RuntimeInfo {
+public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
 
-    private String runtimeClassName;
+    private final String runtimeClassName;
 
-    private URL jarUrl;
+    private final URL jarUrl;
 
-    private String depTxtPath;
+    private final String depTxtPath;
+
+    private final boolean reusable;
 
     static {
         RuntimeUtil.registerMavenUrlHandler();
@@ -40,30 +43,46 @@ public class JarRuntimeInfo implements RuntimeInfo {
      * uses the <code>mavenGroupId</code> <code>mavenArtifactId</code> to locate the *dependency.txt* file using the rule defined
      * in {@link DependenciesReader#computeDependenciesFilePath}
      * 
-     * @param jarUrl url of the jar to read the depenency.txt from
+     * @param jarUrl url of the jar to read the dependency.txt from
      * @param depTxtPath, path used to locate the dependency.txt file
      * @param runtimeClassName class to be instanciated
      */
     public JarRuntimeInfo(URL jarUrl, String depTxtPath, String runtimeClassName) {
+        this(jarUrl, depTxtPath, runtimeClassName, true);
+    }
+
+    /**
+     * uses the <code>mavenGroupId</code> <code>mavenArtifactId</code> to locate the *dependency.txt* file using the
+     * rule defined in {@link DependenciesReader#computeDependenciesFilePath}
+     *
+     * @param jarUrl url of the jar to read the dependency.txt from
+     * @param depTxtPath, path used to locate the dependency.txt file
+     * @param runtimeClassName class to be instanciated
+     * @param reusable whether the ClassLoader for the runtime instance is cacheable and reusable across calls.
+     */
+    public JarRuntimeInfo(URL jarUrl, String depTxtPath, String runtimeClassName, boolean reusable) {
         this.jarUrl = jarUrl;
         this.depTxtPath = depTxtPath;
         this.runtimeClassName = runtimeClassName;
+        this.reusable = reusable;
     }
 
     /**
      * uses the <code>mavenGroupId</code> <code>mavenArtifactId</code> to locate the *dependency.txt* file using the rule defined
      * in {@link DependenciesReader#computeDependenciesFilePath}
      * 
-     * @param jarUrlString url of the jar to read the depenency.txt from
+     * @param jarUrlString url of the jar to read the dependency.txt from
      * @param depTxtPath, path used to locate the dependency.txt file
      * @param runtimeClassName class to be instanciated
      * @throws {@link TalendRuntimeException} if the jarUrlString is malformed
      */
     public JarRuntimeInfo(String jarUrlString, String depTxtPath, String runtimeClassName) {
+        this(createJarUrl(jarUrlString), depTxtPath, runtimeClassName, true);
+    }
+
+    private static URL createJarUrl(String jarUrlString) {
         try {
-            this.jarUrl = new URL(jarUrlString);
-            this.depTxtPath = depTxtPath;
-            this.runtimeClassName = runtimeClassName;
+            return new URL(jarUrlString);
         } catch (MalformedURLException e) {
             throw TalendRuntimeException.createUnexpectedException(e);
         }
@@ -85,6 +104,11 @@ public class JarRuntimeInfo implements RuntimeInfo {
     @Override
     public String getRuntimeClassName() {
         return runtimeClassName;
+    }
+
+    @Override
+    public boolean isClassLoaderReusable() {
+        return reusable;
     }
 
     @Override

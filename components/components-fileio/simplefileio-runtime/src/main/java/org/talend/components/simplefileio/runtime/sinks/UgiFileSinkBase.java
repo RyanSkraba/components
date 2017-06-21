@@ -20,7 +20,7 @@ import java.net.URISyntaxException;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 
-import org.apache.beam.sdk.io.hdfs.ConfigurableHDFSFileSink;
+import org.talend.components.simplefileio.runtime.beamcopy.ConfigurableHDFSFileSink;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
