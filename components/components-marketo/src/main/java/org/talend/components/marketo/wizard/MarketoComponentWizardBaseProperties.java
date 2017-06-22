@@ -12,13 +12,30 @@
 // ============================================================================
 package org.talend.components.marketo.wizard;
 
+import static org.talend.components.marketo.MarketoConstants.getEmptySchema;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
+import org.apache.commons.lang3.reflect.TypeLiteral;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoComponentProperties;
+import org.talend.components.marketo.runtime.MarketoSourceOrSink;
+import org.talend.components.marketo.runtime.client.MarketoRESTClient;
+import org.talend.daikon.NamedThing;
+import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.property.Property;
 
 public class MarketoComponentWizardBaseProperties extends MarketoComponentProperties {
@@ -34,6 +51,15 @@ public class MarketoComponentWizardBaseProperties extends MarketoComponentProper
     public Property<CustomObjectSyncAction> customObjectSyncAction = newEnum("customObjectSyncAction",
             CustomObjectSyncAction.class);
 
+    public transient PresentationItem fetchLeadSchema = new PresentationItem("fetchLeadSchema", "Select Lead schema");
+
+    public Property<List<NamedThing>> selectedLeadColumns = newProperty(new TypeLiteral<List<NamedThing>>() {
+    }, "selectedLeadColumns");
+
+    public Map<String, Field> allAvailableleadFields = new LinkedHashMap<>();
+
+    private static final Logger LOG = LoggerFactory.getLogger(MarketoComponentWizardBaseProperties.class);
+
     public MarketoComponentWizardBaseProperties(String name) {
         super(name);
     }
@@ -41,6 +67,51 @@ public class MarketoComponentWizardBaseProperties extends MarketoComponentProper
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         return null;
+    }
+
+    public void beforeFormPresentFetchLeadSchema() throws IOException {
+        List<NamedThing> cols = new ArrayList<>();
+        try {
+            if (allAvailableleadFields.isEmpty()) {
+                MarketoSourceOrSink sos = new MarketoSourceOrSink();
+                sos.initialize(null, this);
+                MarketoRESTClient client = (MarketoRESTClient) sos.getClientService(null);
+                for (Field f : client.getAllLeadFields()) {
+                    allAvailableleadFields.put(f.name(), f);
+                }
+            }
+            SimpleNamedThing snt;
+            // add current fields in schema
+            List<NamedThing> currentSchema = new ArrayList<>();
+            for (Field f : schemaInput.schema.getValue().getFields()) {
+                snt = new SimpleNamedThing(f.name(), f.name());
+                cols.add(snt);
+                currentSchema.add(snt);
+            }
+            for (String f : allAvailableleadFields.keySet()) {
+                snt = new SimpleNamedThing(f, f);
+                if (!cols.contains(snt)) {
+                    cols.add(snt);
+                }
+            }
+            selectedLeadColumns.setPossibleValues(cols);
+            selectedLeadColumns.setValue(currentSchema);
+        } catch (RuntimeException | IOException e) {
+            LOG.error(e.getMessage());
+        }
+    }
+
+    public void afterFetchLeadSchema() {
+        List<Field> newFields = new ArrayList<>();
+        try {
+            for (NamedThing nl : selectedLeadColumns.getValue()) {
+                newFields.add(MarketoSourceOrSink.generateNewField(allAvailableleadFields.get(nl.getName())));
+            }
+            Schema s = newSchema(getEmptySchema(), "selectedLeadFields", newFields);
+            schemaInput.schema.setValue(s);
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+        }
     }
 
     public enum InputOperation {

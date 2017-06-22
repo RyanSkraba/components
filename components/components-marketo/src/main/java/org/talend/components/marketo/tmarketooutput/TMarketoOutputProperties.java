@@ -168,6 +168,7 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
         super.setupLayout();
 
         Form mainForm = getForm(Form.MAIN);
+        mainForm.addColumn(Widget.widget(fetchLeadSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE).setLongRunning(true));
         mainForm.addRow(outputOperation);
         mainForm.addColumn(operationType);
         //
@@ -182,6 +183,10 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
         mainForm.addRow(deleteLeadsInBatch);
         mainForm.addRow(batchSize);
         mainForm.addRow(dieOnError);
+        //
+        Form selectLeadSchemaForm = new Form(this, "fetchLeadSchema");
+        selectLeadSchemaForm.addRow(widget(selectedLeadColumns).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
+        fetchLeadSchema.setFormtoShow(selectLeadSchemaForm);
     }
 
     @Override
@@ -202,6 +207,7 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
             form.getWidget(customObjectDedupeBy.getName()).setVisible(false);
             form.getWidget(customObjectDeleteBy.getName()).setVisible(false);
             //
+            form.getWidget(fetchLeadSchema.getName()).setVisible(false);
             // batchSize
             if (outputOperation.getValue().equals(syncMultipleLeads)) {
                 form.getWidget(deDupeEnabled.getName()).setVisible(true);
@@ -217,6 +223,7 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
                     form.getWidget(deDupeEnabled.getName()).setVisible(true);
                     form.getWidget(operationType.getName()).setHidden(deDupeEnabled.getValue());
                     form.getWidget(lookupField.getName()).setHidden(deDupeEnabled.getValue());
+                    form.getWidget(fetchLeadSchema.getName()).setVisible(true);
                     break;
                 case deleteLeads:
                     form.getWidget(deleteLeadsInBatch.getName()).setVisible(true);
@@ -299,6 +306,12 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
     public void afterBatchSize() {
         updateOutputSchemas();
         refreshLayout(getForm(Form.MAIN));
+    }
+
+    @Override
+    public void afterFetchLeadSchema() {
+        super.afterFetchLeadSchema();
+        updateOutputSchemas();
     }
 
     public void updateSchemaRelated() {

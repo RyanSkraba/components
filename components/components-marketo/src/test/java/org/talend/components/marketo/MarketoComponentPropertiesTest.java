@@ -56,7 +56,7 @@ public class MarketoComponentPropertiesTest {
         props.setupProperties();
         props.setupLayout();
         List<Form> forms = props.getForms();
-        assertEquals(2, forms.size());
+        assertEquals(3, forms.size());
         assertTrue(props.getForm(Form.MAIN).getWidget(props.connection.getName()).isVisible());
         props.refreshLayout(props.getForm(Form.MAIN));
         assertTrue(props.getForm(Form.MAIN).getWidget(props.connection.getName()).isVisible());

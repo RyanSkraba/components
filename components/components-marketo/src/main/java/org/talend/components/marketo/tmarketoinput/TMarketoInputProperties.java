@@ -383,6 +383,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
         super.setupLayout();
 
         Form mainForm = getForm(Form.MAIN);
+        mainForm.addColumn(Widget.widget(fetchLeadSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE).setLongRunning(true));
         mainForm.addRow(inputOperation);
         // Custom Objects & Opportunities
         mainForm.addColumn(customObjectAction);
@@ -425,6 +426,11 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
         //
         mainForm.addRow(batchSize);
         mainForm.addRow(dieOnError);
+
+        //
+        Form selectLeadSchemaForm = new Form(this, "fetchLeadSchema");
+        selectLeadSchemaForm.addRow(widget(selectedLeadColumns).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
+        fetchLeadSchema.setFormtoShow(selectLeadSchemaForm);
     }
 
     @Override
@@ -455,6 +461,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
             form.getWidget(oldestCreateDate.getName()).setVisible(false);
             form.getWidget(latestCreateDate.getName()).setVisible(false);
             form.getWidget(batchSize.getName()).setVisible(false);
+            form.getWidget(fetchLeadSchema.getName()).setVisible(false);
             // custom objects
             form.getWidget(customObjectAction.getName()).setVisible(false);
             form.getWidget(customObjectName.getName()).setVisible(false);
@@ -478,6 +485,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                 if (useSOAP) {
                     form.getWidget(leadKeyTypeSOAP.getName()).setVisible(true);
                 } else {
+                    form.getWidget(fetchLeadSchema.getName()).setVisible(true);
                     form.getWidget(leadKeyTypeREST.getName()).setVisible(true);
                 }
             }
@@ -506,6 +514,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                         break;
                     }
                 } else {
+                    form.getWidget(fetchLeadSchema.getName()).setVisible(true);
                     form.getWidget(leadSelectorREST.getName()).setVisible(true);
                     switch (leadSelectorREST.getValue()) {
                     case LeadKeySelector:
@@ -709,6 +718,12 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
 
     public void afterListParam() {
         refreshLayout(getForm(Form.MAIN));
+    }
+
+    @Override
+    public void afterFetchLeadSchema() {
+        super.afterFetchLeadSchema();
+        beforeMappingInput();
     }
 
     public void updateSchemaRelated() {
