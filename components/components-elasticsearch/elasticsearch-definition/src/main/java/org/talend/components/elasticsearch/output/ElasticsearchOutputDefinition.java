@@ -13,6 +13,15 @@
 
 package org.talend.components.elasticsearch.output;
 
+import static org.talend.components.elasticsearch.ElasticsearchComponentFamilyDefinition.MAVEN_GROUP_ID;
+import static org.talend.components.elasticsearch.ElasticsearchComponentFamilyDefinition.MAVEN_RUNTIME_ARTIFACT_ID;
+import static org.talend.components.elasticsearch.ElasticsearchComponentFamilyDefinition.MAVEN_RUNTIME_URI;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
@@ -23,11 +32,6 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.elasticsearch.ElasticsearchComponentFamilyDefinition;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.EnumSet;
-import java.util.Set;
 
 public class ElasticsearchOutputDefinition extends AbstractComponentDefinition {
 
@@ -53,8 +57,8 @@ public class ElasticsearchOutputDefinition extends AbstractComponentDefinition {
                     .getValue()) {
             case V_2_4:
             default:
-                return new JarRuntimeInfo(new URL("mvn:org.talend.components/elasticsearch-runtime"),
-                        DependenciesReader.computeDependenciesFilePath("org.talend.components", "elasticsearch-runtime"),
+                return new JarRuntimeInfo(new URL(MAVEN_RUNTIME_URI),
+                        DependenciesReader.computeDependenciesFilePath(MAVEN_GROUP_ID, MAVEN_RUNTIME_ARTIFACT_ID),
                         RUNTIME_2_4);
             }
         } catch (MalformedURLException e) {

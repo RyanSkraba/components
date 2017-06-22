@@ -13,6 +13,10 @@
 
 package org.talend.components.elasticsearch;
 
+import static org.talend.components.elasticsearch.ElasticsearchComponentFamilyDefinition.MAVEN_GROUP_ID;
+import static org.talend.components.elasticsearch.ElasticsearchComponentFamilyDefinition.MAVEN_RUNTIME_ARTIFACT_ID;
+import static org.talend.components.elasticsearch.ElasticsearchComponentFamilyDefinition.MAVEN_RUNTIME_URI;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -49,9 +53,8 @@ public class ElasticsearchDatastoreDefinition extends I18nDefinition
             switch (properties.version.getValue()) {
             case V_2_4:
             default:
-                return new JarRuntimeInfo(new URL("mvn:org.talend.components/elasticsearch-runtime"),
-                        DependenciesReader.computeDependenciesFilePath("org.talend.components", "elasticsearch-runtime"),
-                        RUNTIME_2_4);
+                return new JarRuntimeInfo(new URL(MAVEN_RUNTIME_URI),
+                        DependenciesReader.computeDependenciesFilePath(MAVEN_GROUP_ID, MAVEN_RUNTIME_ARTIFACT_ID), RUNTIME_2_4);
             }
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
@@ -67,8 +70,8 @@ public class ElasticsearchDatastoreDefinition extends I18nDefinition
     @Override
     public String getImagePath(DefinitionImageType type) {
         switch (type) {
-            case PALETTE_ICON_32X32:
-                return NAME + "_icon32.png";
+        case PALETTE_ICON_32X32:
+            return NAME + "_icon32.png";
         }
         return null;
     }

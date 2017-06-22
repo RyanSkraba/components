@@ -16,5 +16,6 @@
     <modules>
         <module>elasticsearch-definition</module>
         <module>elasticsearch-runtime_2_4</module>
+        <module>elasticsearch-integration</module>
     </modules>
 </project>

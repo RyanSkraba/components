@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>components-parent</artifactId>
+        <groupId>org.talend.components</groupId>
+        <version>0.20.0-SNAPSHOT</version>
+        <relativePath>../../../components-parent/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>elasticsearch-integration</artifactId>
+
+    <name>Components - Elasticsearch Integration Tests</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <!-- skip the deployment for integration tests, not necessary -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
+    <dependencies>
+        <!-- Depend only on definitions. -->
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>elasticsearch-definition</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>
+            <version>2.4.7</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <es.hosts>${docker.host.address}:${es.port}</es.hosts>
+                        <es.transport.port>${es.transport.port}</es.transport.port>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.15.1</version>
+
+                <executions>
+                    <execution>
+                        <id>start</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${really.skip.tests}</skip>
+                            <images>
+                                <image>
+                                    <name>elasticsearch:2.4</name>
+                                    <alias>elasticsearch</alias>
+                                    <run>
+                                        <ports>
+                                            <port>es.port:9200</port>
+                                            <port>es.transport.port:9300</port>
+                                        </ports>
+                                        <wait>
+                                            <time>10000</time>
+                                        </wait>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>stop</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${really.skip.tests}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

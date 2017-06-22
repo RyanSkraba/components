@@ -13,12 +13,13 @@
 
 package org.talend.components.elasticsearch;
 
-import com.google.auto.service.AutoService;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.elasticsearch.input.ElasticsearchInputDefinition;
 import org.talend.components.elasticsearch.output.ElasticsearchOutputDefinition;
+
+import com.google.auto.service.AutoService;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -26,10 +27,17 @@ import aQute.bnd.annotation.component.Component;
  * Install all of the definitions provided for the Elasticsearch family of components.
  */
 @AutoService(ComponentInstaller.class)
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + ElasticsearchComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX
+        + ElasticsearchComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class ElasticsearchComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "Elasticsearch";
+
+    public static final String MAVEN_GROUP_ID = "org.talend.components";
+
+    public static final String MAVEN_RUNTIME_ARTIFACT_ID = "elasticsearch-runtime_2_4";
+
+    public static final String MAVEN_RUNTIME_URI = "mvn:" + MAVEN_GROUP_ID + "/" + MAVEN_RUNTIME_ARTIFACT_ID;
 
     public ElasticsearchComponentFamilyDefinition() {
         super(NAME, new ElasticsearchDatastoreDefinition(), new ElasticsearchDatasetDefinition(),
