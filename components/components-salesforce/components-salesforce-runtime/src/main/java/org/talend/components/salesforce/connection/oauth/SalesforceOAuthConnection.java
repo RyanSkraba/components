@@ -24,14 +24,14 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Properties;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.common.oauth.OauthClient;
 import org.talend.components.common.oauth.OauthProperties;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sforce.ws.ConnectorConfig;
 
 public class SalesforceOAuthConnection {
@@ -178,14 +178,12 @@ public class SalesforceOAuthConnection {
             URLConnection idConn = new URL(token.getID()).openConnection();
             idConn.setRequestProperty("Authorization", token.getTokenType() + " " + token.getAccessToken());
             reader = new BufferedReader(new InputStreamReader(idConn.getInputStream()));
-            JSONParser jsonParser = new JSONParser();
-            JSONObject json = (JSONObject) jsonParser.parse(reader);
-            JSONObject urls = (JSONObject) json.get("urls");
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(reader);
+            JsonNode urls = jsonNode.get("urls");
             endpointURL = urls.get("partner").toString().replace("{version}", version);
+            endpointURL = StringUtils.strip(endpointURL, "\"");
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
