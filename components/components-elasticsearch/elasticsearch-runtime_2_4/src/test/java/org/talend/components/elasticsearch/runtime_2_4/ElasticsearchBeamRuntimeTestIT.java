@@ -13,6 +13,8 @@
 
 package org.talend.components.elasticsearch.runtime_2_4;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -43,6 +45,7 @@ import org.talend.components.elasticsearch.ElasticsearchDatasetProperties;
 import org.talend.components.elasticsearch.ElasticsearchDatastoreProperties;
 import org.talend.components.elasticsearch.input.ElasticsearchInputProperties;
 import org.talend.components.elasticsearch.output.ElasticsearchOutputProperties;
+import org.talend.daikon.java8.Consumer;
 
 import com.google.gson.JsonParser;
 
@@ -50,12 +53,12 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
 
     public static final String INDEX_NAME = "beam";
 
+    @Rule
+    public final TestPipeline pipeline = TestPipeline.create();
+
     ElasticsearchDatastoreProperties datastoreProperties;
 
     Client client;
-
-    @Rule
-    public final TestPipeline pipeline = TestPipeline.create();
 
     @Before
     public void init() throws IOException, ExecutionException, InterruptedException {
@@ -78,6 +81,54 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
             // create index for test, name is 'beam'
             restClient.performRequest("PUT", "/" + INDEX_NAME, emptyHeader);
         }
+    }
+
+    @Test
+    public void getSampleTest() {
+        final String TYPE_NAME = "getsampletest";
+
+        List<String> records = Arrays.asList("r1", "r2", "r3");
+
+        List<IndexedRecord> avroRecords = new ArrayList<>();
+        for (String record : records) {
+            avroRecords.add(ConvertToIndexedRecord.convertToAvro(record));
+        }
+
+        ElasticsearchDatasetProperties datasetProperties = new ElasticsearchDatasetProperties("datasetProperties");
+        datasetProperties.init();
+        datasetProperties.setDatastoreProperties(datastoreProperties);
+        datasetProperties.index.setValue(INDEX_NAME);
+        datasetProperties.type.setValue(TYPE_NAME);
+
+        ElasticsearchOutputProperties outputProperties = new ElasticsearchOutputProperties("outputProperties");
+        outputProperties.init();
+        outputProperties.setDatasetProperties(datasetProperties);
+
+        ElasticsearchOutputRuntime outputRuntime = new ElasticsearchOutputRuntime();
+        outputRuntime.initialize(null, outputProperties);
+
+        PCollection<IndexedRecord> inputRecords = (PCollection<IndexedRecord>) pipeline
+                .apply(Create.of(avroRecords).withCoder(LazyAvroCoder.of()));
+        inputRecords.apply(outputRuntime);
+
+        pipeline.run();
+
+        ElasticsearchTestUtils.upgradeIndexAndGetCurrentNumDocs(INDEX_NAME, TYPE_NAME, client);
+
+        ElasticsearchDatasetRuntime datasetRuntime = new ElasticsearchDatasetRuntime();
+        datasetRuntime.initialize(null, datasetProperties);
+        final List<String> samples = new ArrayList<>();
+        datasetRuntime.getSample(3, new Consumer<IndexedRecord>() {
+
+            ExtractJson parse = new ExtractJson();
+
+            @Override
+            public void accept(IndexedRecord indexedRecord) {
+                samples.add(parse.apply(indexedRecord));
+            }
+        });
+        assertEquals(records, samples);
+
     }
 
     @Test
@@ -104,8 +155,8 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
         ElasticsearchOutputRuntime outputRuntime = new ElasticsearchOutputRuntime();
         outputRuntime.initialize(null, outputProperties);
 
-        PCollection<IndexedRecord> inputRecords = (PCollection<IndexedRecord>) pipeline.apply(Create.of(avroRecords).withCoder(
-                LazyAvroCoder.of()));
+        PCollection<IndexedRecord> inputRecords = (PCollection<IndexedRecord>) pipeline
+                .apply(Create.of(avroRecords).withCoder(LazyAvroCoder.of()));
         inputRecords.apply(outputRuntime);
 
         pipeline.run();
@@ -153,8 +204,8 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
         ElasticsearchOutputRuntime outputRuntime = new ElasticsearchOutputRuntime();
         outputRuntime.initialize(null, outputProperties);
 
-        PCollection<IndexedRecord> inputRecords = (PCollection<IndexedRecord>) pipeline.apply(Create.of(avroRecords).withCoder(
-                LazyAvroCoder.of()));
+        PCollection<IndexedRecord> inputRecords = (PCollection<IndexedRecord>) pipeline
+                .apply(Create.of(avroRecords).withCoder(LazyAvroCoder.of()));
         inputRecords.apply(outputRuntime);
 
         pipeline.run();
