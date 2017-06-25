@@ -121,6 +121,11 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
         for (Map.Entry<String, String> entry : map.entrySet()) {
             conf.set(entry.getKey(), entry.getValue());
         }
+        // TODO: We've explicitly listed all the schemas supported here, but the filesystem schema could be dynamically
+        // generated from the path (resolved against the default name node).
+        conf.set("fs.gs.impl.disable.cache", "true");
+        conf.set("fs.s3t.impl.disable.cache", "true");
+        conf.set("fs.file.impl.disable.cache", "true");
         conf.set("fs.hdfs.impl.disable.cache", "true");
         job.setJobID(jobId);
         return job;

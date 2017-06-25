@@ -62,7 +62,6 @@ public class SimpleFileIOAvroRegistry extends AvroRegistry {
 
         // Ensure that we know how to get IndexedRecords for String arrays.
         registerIndexedRecordConverter(String[].class, StringArrayToIndexedRecordConverter.class);
-        registerIndexedRecordConverter(CSVRecord.class, CsvRecordToIndexedRecordConverter.class);
     }
 
     public static SimpleFileIOAvroRegistry get() {

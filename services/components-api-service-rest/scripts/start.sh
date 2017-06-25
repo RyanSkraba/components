@@ -41,7 +41,7 @@ fi
 
 APP_CLASS="org.talend.components.service.rest.Application"
 
-JAVA_OPTS="-Xmx2048m -Dfile.encoding=UTF-8 -Dorg.ops4j.pax.url.mvn.localRepository=\"$PWD/.m2\" -Dorg.ops4j.pax.url.mvn.settings=\"$PWD/config/settings.xml\" -Dcomponent.default.config.folder=\"$PWD/config/default\""
+JAVA_OPTS="-XX:MaxMetaspaceSize=250m -Xmx2048m -Dfile.encoding=UTF-8 -Dorg.ops4j.pax.url.mvn.localRepository=\"$PWD/.m2\" -Dorg.ops4j.pax.url.mvn.settings=\"$PWD/config/settings.xml\" -Dcomponent.default.config.folder=\"$PWD/config/default\""
 
 # If HADOOP_CONF_DIR is not set, try to get it from in the application properties, then add it to the classpath.
 if [ -z "$HADOOP_CONF_DIR" ] ; then

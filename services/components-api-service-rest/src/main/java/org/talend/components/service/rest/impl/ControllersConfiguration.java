@@ -1,4 +1,4 @@
-//==============================================================================
+// ==============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
@@ -9,20 +9,15 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ==============================================================================
 
 package org.talend.components.service.rest.impl;
+
+import static org.talend.daikon.exception.error.CommonErrorCodes.UNEXPECTED_ARGUMENT;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.google.common.base.CaseFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.jackson.JsonComponent;
@@ -42,8 +37,13 @@ import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.ErrorCode;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
 
-import static org.talend.daikon.exception.error.CommonErrorCodes.UNEXPECTED_ARGUMENT;
-import static org.talend.daikon.exception.error.CommonErrorCodes.UNEXPECTED_EXCEPTION;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.google.common.base.CaseFormat;
 
 @ControllerAdvice
 public class ControllersConfiguration {
@@ -63,12 +63,6 @@ public class ControllersConfiguration {
         return buildUnexpectedErrorResponse(UNEXPECTED_ARGUMENT, e.getMessage(), e.getCause());
     }
 
-    @ExceptionHandler
-    public ResponseEntity<ApiError> handleExceptions(Exception e) {
-        log.info("An exception reached the API", e);
-        return buildUnexpectedErrorResponse(UNEXPECTED_EXCEPTION, e.getMessage(), e.getCause());
-    }
-
     private static ResponseEntity<ApiError> buildUnexpectedErrorResponse(ErrorCode code, String message, Throwable cause) {
         ApiError dto = new ApiError();
         dto.setCode(code.getProduct() + "_" + code.getGroup() + "_" + code.getCode());
@@ -85,6 +79,7 @@ public class ControllersConfiguration {
     protected void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(PropertyTrigger.class, new PropertyEditorSupport() {
 
+            @Override
             public void setAsText(String text) throws IllegalArgumentException {
                 String upperUnderscoreCased = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.UPPER_UNDERSCORE).convert(text);
                 PropertyTrigger propertyTrigger = PropertyTrigger.valueOf(upperUnderscoreCased);
@@ -119,8 +114,8 @@ public class ControllersConfiguration {
 
             @Override
             public PropertyTrigger deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-                return PropertyTrigger.valueOf(
-                        CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.UPPER_UNDERSCORE).convert(jp.getValueAsString()));
+                return PropertyTrigger
+                        .valueOf(CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.UPPER_UNDERSCORE).convert(jp.getValueAsString()));
             }
         }
     }

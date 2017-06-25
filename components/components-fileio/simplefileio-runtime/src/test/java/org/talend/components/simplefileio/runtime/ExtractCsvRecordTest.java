@@ -7,8 +7,8 @@ import static org.junit.Assert.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.transforms.DoFnTester;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.hadoop.io.Text;
 import org.junit.Test;
 
@@ -18,24 +18,24 @@ import org.junit.Test;
 public class ExtractCsvRecordTest {
 
     /** The DoFn under test. */
-    private final DoFnTester<Text, CSVRecord> fnBasic = DoFnTester.of(new SimpleRecordFormatCsvIO.ExtractCsvRecord(';'));
+    private final DoFnTester<Text, IndexedRecord> fnBasic = DoFnTester.of(new SimpleRecordFormatCsvIO.ExtractCsvRecord(';'));
 
-    public static String[] toArray(CSVRecord record) {
-        String[] fields = new String[record.size()];
+    public static String[] toArray(IndexedRecord record) {
+        String[] fields = new String[record.getSchema().getFields().size()];
         for (int i = 0; i < fields.length; i++)
-            fields[i] = record.get(i);
+            fields[i] = record.get(i).toString();
         return fields;
     }
 
-    public static List<String[]> toArrays(List<CSVRecord> records) {
+    public static List<String[]> toArrays(List<IndexedRecord> records) {
         List<String[]> out = new ArrayList<>(records.size());
-        for (CSVRecord r : records) {
+        for (IndexedRecord r : records) {
             out.add(toArray(r));
         }
         return out;
     }
 
-    public static void assertLine(String msg, DoFnTester<Text, CSVRecord> fn, String inputLine, String... expected)
+    public static void assertLine(String msg, DoFnTester<Text, IndexedRecord> fn, String inputLine, String... expected)
             throws Exception {
         assertThat(msg + ":" + inputLine, toArray(fn.processBundle(new Text(inputLine)).get(0)), arrayContaining(expected));
     }
