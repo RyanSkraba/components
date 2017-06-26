@@ -20,23 +20,12 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.common.SchemaProperties;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 
 public class CommonUtils {
-
-    /**
-     * get AVRO schema object inside SchemaProperties object
-     * 
-     * @param schema
-     * @return
-     */
-    public static Schema getSchema(SchemaProperties schema) {
-        return schema.schema.getValue();
-    }
 
     /**
      * install the form for the properties

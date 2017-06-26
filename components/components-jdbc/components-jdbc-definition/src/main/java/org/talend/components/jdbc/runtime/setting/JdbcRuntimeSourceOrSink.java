@@ -20,7 +20,7 @@ import org.talend.components.api.container.RuntimeContainer;
  * common JDBC runtime execution object
  *
  */
-public interface JdbcSourceOrSinkWithQuery extends SourceOrSink {
+public interface JdbcRuntimeSourceOrSink extends SourceOrSink {
 
     public Schema getSchemaFromQuery(RuntimeContainer runtime, String query);
 }

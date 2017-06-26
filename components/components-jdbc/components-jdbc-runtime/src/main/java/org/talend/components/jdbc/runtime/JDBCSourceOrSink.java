@@ -35,6 +35,7 @@ import org.talend.components.jdbc.JdbcComponentErrorsCode;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.avro.JDBCAvroRegistryString;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
+import org.talend.components.jdbc.runtime.setting.JdbcRuntimeSourceOrSinkDefault;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
@@ -45,7 +46,7 @@ import org.talend.daikon.properties.ValidationResultMutable;
  * common JDBC runtime execution object
  *
  */
-public class JDBCSourceOrSink implements SourceOrSink {
+public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
     private static final long serialVersionUID = -1730391293657968628L;
 

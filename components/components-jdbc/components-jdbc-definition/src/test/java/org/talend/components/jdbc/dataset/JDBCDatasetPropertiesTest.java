@@ -17,11 +17,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.talend.components.jdbc.dataset.JDBCDatasetProperties.SourceType.TABLE_NAME;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.components.jdbc.dataset.JDBCDatasetProperties.SourceType;
+import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.properties.PropertiesDynamicMethodHelper;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -75,6 +79,14 @@ public class JDBCDatasetPropertiesTest {
         dataset.sourceType.setValue(TABLE_NAME);
         dataset.tableName.setValue("abc");
         assertEquals("select * from abc", dataset.getSql());
+    }
+
+    @Test
+    public void testGetRuntimeSetting() {
+        dataset.setDatastoreProperties(new JDBCDatastoreProperties("datastore"));
+        dataset.sourceType.setValue(SourceType.TABLE_NAME);
+        AllSetting setting = dataset.getRuntimeSetting();
+        Assert.assertNotNull(setting);
     }
 
 }

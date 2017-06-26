@@ -173,13 +173,21 @@ public class JDBCDatastoreProperties extends PropertiesImpl implements Datastore
         List<String> mavenPaths = new ArrayList<String>();
 
         DBType currentDBType = dyTypesInfo.get(dbTypes.getValue());
-        mavenPaths.addAll(currentDBType.paths);
+
+        if (currentDBType != null) {
+            mavenPaths.addAll(currentDBType.paths);
+        }
 
         return mavenPaths;
     }
 
     public String getCurrentDriverClass() {
         DBType currentDBType = dyTypesInfo.get(dbTypes.getValue());
+
+        if (currentDBType == null) {
+            return null;
+        }
+
         return currentDBType.clazz;
     }
 

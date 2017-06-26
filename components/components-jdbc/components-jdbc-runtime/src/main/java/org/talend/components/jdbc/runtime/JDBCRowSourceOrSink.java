@@ -20,7 +20,6 @@ import java.sql.Statement;
 import java.util.List;
 
 import org.apache.avro.Schema;
-import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
@@ -28,6 +27,7 @@ import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.JDBCTemplate;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
+import org.talend.components.jdbc.runtime.setting.JdbcRuntimeSourceOrSinkDefault;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
@@ -37,7 +37,7 @@ import org.talend.daikon.properties.ValidationResultMutable;
  * JDBC row runtime execution object
  *
  */
-public class JDBCRowSourceOrSink implements SourceOrSink {
+public class JDBCRowSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
     private static final long serialVersionUID = -1730391293657968628L;
 

@@ -17,11 +17,11 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.avro.Schema;
-import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.RuntimeSettingProvider;
+import org.talend.components.jdbc.runtime.setting.JdbcRuntimeSourceOrSinkDefault;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
@@ -31,7 +31,7 @@ import org.talend.daikon.properties.ValidationResultMutable;
  * JDBC close runtime execution object
  *
  */
-public class JDBCCloseSourceOrSink implements SourceOrSink {
+public class JDBCCloseSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
     private static final long serialVersionUID = -7224090141384147842L;
 

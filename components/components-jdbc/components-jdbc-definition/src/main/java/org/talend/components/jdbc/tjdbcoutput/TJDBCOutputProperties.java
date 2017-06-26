@@ -31,7 +31,7 @@ import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.module.JDBCTableSelectionModule;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
-import org.talend.components.jdbc.runtime.setting.JdbcSourceOrSinkWithQuery;
+import org.talend.components.jdbc.runtime.setting.JdbcRuntimeSourceOrSink;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
 import org.talend.daikon.avro.SchemaConstants;
@@ -233,7 +233,7 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
         JdbcRuntimeInfo jdbcRuntimeInfo = new JdbcRuntimeInfo(this, "org.talend.components.jdbc.runtime.JDBCSourceOrSink");
         try (SandboxedInstance sandboxI = RuntimeUtil.createRuntimeClass(jdbcRuntimeInfo,
                 connection.getClass().getClassLoader())) {
-            JdbcSourceOrSinkWithQuery ss = (JdbcSourceOrSinkWithQuery) sandboxI.getInstance();
+            JdbcRuntimeSourceOrSink ss = (JdbcRuntimeSourceOrSink) sandboxI.getInstance();
             ss.initialize(null, this);
             Schema schema = null;
             try {

@@ -20,7 +20,7 @@ import org.talend.components.jdbc.JdbcRuntimeInfo;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
-import org.talend.components.jdbc.runtime.setting.JdbcSourceOrSinkWithQuery;
+import org.talend.components.jdbc.runtime.setting.JdbcRuntimeSourceOrSink;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
@@ -61,7 +61,7 @@ public class JDBCConnectionWizardProperties extends ComponentPropertiesImpl impl
         JdbcRuntimeInfo jdbcRuntimeInfo = new JdbcRuntimeInfo(this, "org.talend.components.jdbc.runtime.JDBCSourceOrSink");
         try (SandboxedInstance sandboxI = RuntimeUtil.createRuntimeClass(jdbcRuntimeInfo,
                 connection.getClass().getClassLoader())) {
-            JdbcSourceOrSinkWithQuery sourceOrSink = (JdbcSourceOrSinkWithQuery) sandboxI.getInstance();
+            JdbcRuntimeSourceOrSink sourceOrSink = (JdbcRuntimeSourceOrSink) sandboxI.getInstance();
             sourceOrSink.initialize(null, this);
             ValidationResult vr = sourceOrSink.validate(null);
             if (vr.getStatus() == ValidationResult.Result.OK) {
