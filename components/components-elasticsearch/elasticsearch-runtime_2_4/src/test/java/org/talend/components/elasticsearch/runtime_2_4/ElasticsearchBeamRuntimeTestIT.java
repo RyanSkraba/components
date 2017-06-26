@@ -13,7 +13,8 @@
 
 package org.talend.components.elasticsearch.runtime_2_4;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -127,7 +128,7 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
                 samples.add(parse.apply(indexedRecord));
             }
         });
-        assertEquals(records, samples);
+        assertThat(samples, containsInAnyOrder(records.toArray()));
 
     }
 
