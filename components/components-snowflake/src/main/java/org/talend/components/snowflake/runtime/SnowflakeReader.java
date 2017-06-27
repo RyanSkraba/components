@@ -34,7 +34,7 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
-public class SnowflakeReader<T> extends AbstractBoundedReader<IndexedRecord> {
+public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
 
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider().getI18nMessages(SnowflakeReader.class);
 
@@ -56,12 +56,11 @@ public class SnowflakeReader<T> extends AbstractBoundedReader<IndexedRecord> {
 
     private Result result;
 
-    public SnowflakeReader(RuntimeContainer container, BoundedSource source, TSnowflakeInputProperties props) throws IOException {
+    public SnowflakeReader(RuntimeContainer container, BoundedSource source, TSnowflakeInputProperties props) {
         super(source);
         this.container = container;
         this.properties = props;
         factory = new SnowflakeResultSetIndexedRecordConverter();
-        factory.setSchema(getSchema());
     }
 
     protected Connection getConnection() throws IOException {
@@ -112,6 +111,9 @@ public class SnowflakeReader<T> extends AbstractBoundedReader<IndexedRecord> {
 
     @Override
     public boolean start() throws IOException {
+        if (null == factory.getSchema()) {
+            factory.setSchema(getSchema());
+        }
         result = new Result();
         try {
             statement = getConnection().createStatement();

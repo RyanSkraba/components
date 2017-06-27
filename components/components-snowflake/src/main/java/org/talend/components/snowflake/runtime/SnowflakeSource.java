@@ -12,10 +12,10 @@
 // ============================================================================
 package org.talend.components.snowflake.runtime;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
@@ -28,8 +28,7 @@ public class SnowflakeSource extends SnowflakeSourceOrSink implements BoundedSou
     }
 
     @Override
-    public List<? extends BoundedSource> splitIntoBundles(long desiredBundleSizeBytes, RuntimeContainer adaptor)
-            throws Exception {
+    public List<? extends BoundedSource> splitIntoBundles(long desiredBundleSizeBytes, RuntimeContainer adaptor) {
         List<BoundedSource> list = new ArrayList<>();
         list.add(this);
         return list;
@@ -46,17 +45,11 @@ public class SnowflakeSource extends SnowflakeSourceOrSink implements BoundedSou
     }
 
     @Override
-    public BoundedReader createReader(RuntimeContainer container) {
+    public BoundedReader<? extends IndexedRecord> createReader(RuntimeContainer container) {
         if (properties instanceof TSnowflakeInputProperties) {
-            TSnowflakeInputProperties sfInProps = (TSnowflakeInputProperties) properties;
-            try {
-                return new SnowflakeReader(container, this, sfInProps);
-            } catch (IOException e) {
-                TalendRuntimeException.unexpectedException(e);
-            }
+            return new SnowflakeReader(container, this, (TSnowflakeInputProperties) properties);
         }
-        TalendRuntimeException.unexpectedException("Unknown properties: " + properties);
-        return null;
+        throw TalendRuntimeException.createUnexpectedException("Unknown properties: " + properties);
     }
 
 }

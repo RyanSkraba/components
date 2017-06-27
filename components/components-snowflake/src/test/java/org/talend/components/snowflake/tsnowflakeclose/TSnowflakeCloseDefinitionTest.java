@@ -19,12 +19,14 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.snowflake.SnowflakeDefinition;
 import org.talend.components.snowflake.runtime.SnowflakeCloseSourceOrSink;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
@@ -35,14 +37,31 @@ import org.talend.daikon.sandbox.SandboxedInstance;
  */
 public class TSnowflakeCloseDefinitionTest {
 
+    private TSnowflakeCloseDefinition snowflakeCloseDefinition;
+
+    @Before
+    public void setup() {
+        snowflakeCloseDefinition = new TSnowflakeCloseDefinition();
+    }
+
     /**
      * Check {@link TSnowflakeCloseDefinition#getFamilies()} returns string array, which contains "Cloud/Snowflake"
      */
     @Test
     public void testGetFamilies() {
-        SnowflakeDefinition definition = new TSnowflakeCloseDefinition();
-        String[] families = definition.getFamilies();
+        String[] families = snowflakeCloseDefinition.getFamilies();
         assertThat(families, arrayContaining("Cloud/Snowflake"));
+    }
+
+    @Test
+    public void testIsStartable() {
+        // Since this value may be used by Studio we should provide such check.
+        Assert.assertTrue(snowflakeCloseDefinition.isStartable());
+    }
+
+    @Test
+    public void testGetReturnProperties(){
+        Assert.assertEquals(snowflakeCloseDefinition.getReturnProperties()[0], ComponentDefinition.RETURN_ERROR_MESSAGE_PROP);
     }
 
     /**
@@ -50,8 +69,7 @@ public class TSnowflakeCloseDefinitionTest {
      */
     @Test
     public void testGetName() {
-        SnowflakeDefinition definition = new TSnowflakeCloseDefinition();
-        String componentName = definition.getName();
+        String componentName = snowflakeCloseDefinition.getName();
         assertEquals(componentName, "tSnowflakeClose");
     }
 
@@ -61,8 +79,7 @@ public class TSnowflakeCloseDefinitionTest {
      */
     @Test
     public void testGetPropertyClass() {
-        TSnowflakeCloseDefinition definition = new TSnowflakeCloseDefinition();
-        Class<?> propertyClass = definition.getPropertyClass();
+        Class<?> propertyClass = snowflakeCloseDefinition.getPropertyClass();
         String canonicalName = propertyClass.getCanonicalName();
         assertThat(canonicalName, equalTo("org.talend.components.snowflake.tsnowflakeclose.TSnowflakeCloseProperties"));
     }
@@ -72,9 +89,8 @@ public class TSnowflakeCloseDefinitionTest {
      */
     @Test
     public void testGetRuntime() {
-        TSnowflakeCloseDefinition definition = new TSnowflakeCloseDefinition();
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.NONE);
-        SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, definition.getClass().getClassLoader());
+        RuntimeInfo runtimeInfo = snowflakeCloseDefinition.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.NONE);
+        SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, snowflakeCloseDefinition.getClass().getClassLoader());
         SourceOrSink source = (SourceOrSink) sandboxedInstance.getInstance();
         assertThat(source, is(instanceOf(SnowflakeCloseSourceOrSink.class)));
     }

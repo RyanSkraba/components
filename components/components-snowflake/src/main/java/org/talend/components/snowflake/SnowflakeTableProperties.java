@@ -90,7 +90,7 @@ public class SnowflakeTableProperties extends ComponentPropertiesImpl implements
     public ValidationResult afterTableName() throws Exception {
         ValidationResultMutable vr = new ValidationResultMutable();
         try {
-            main.schema.setValue(SnowflakeSourceOrSink.getSchema(null, connection, tableName.getStringValue()));
+            main.schema.setValue(SnowflakeSourceOrSink.getSchema(null, connection, tableName.getValue()));
         } catch (Exception ex) {
             vr.setMessage(ex.getMessage());
             vr.setStatus(ValidationResult.Result.ERROR);
@@ -100,6 +100,6 @@ public class SnowflakeTableProperties extends ComponentPropertiesImpl implements
 
     @Override
     public SnowflakeConnectionProperties getConnectionProperties() {
-        return connection.getConnectionProperties();
+        return connection;
     }
 }

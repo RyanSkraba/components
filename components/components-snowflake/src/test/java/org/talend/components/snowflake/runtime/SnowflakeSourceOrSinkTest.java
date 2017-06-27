@@ -5,16 +5,22 @@ import static org.junit.Assert.assertFalse;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Driver;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
@@ -27,20 +33,71 @@ import org.talend.daikon.properties.ValidationResult;
 /**
  * Unit-tests for {@link SnowflakeSourceOrSink} class
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(SnowflakeRuntimeHelper.class)
 public class SnowflakeSourceOrSinkTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SnowflakeSourceOrSinkTest.class);
 
-    private final SnowflakeSourceOrSink snowflakeSourceOrSink = new SnowflakeSourceOrSink();
+    private SnowflakeSourceOrSink snowflakeSourceOrSink;
 
     @Mock
     private RuntimeContainer runtimeContainerMock = Mockito.mock(RuntimeContainer.class);
 
     @Before
     public void setUp() throws Exception {
+        snowflakeSourceOrSink = new SnowflakeSourceOrSink();
         SnowflakeConnectionProperties properties = new SnowflakeConnectionProperties("test");
         properties.referencedComponent.componentInstanceId.setValue("referencedComponentId");
         this.snowflakeSourceOrSink.initialize(runtimeContainerMock, properties);
+    }
+
+    @Test
+    public void testValidateReferencedConnection() throws Exception {
+        Connection connection = Mockito.mock(Connection.class);
+        Mockito.when(connection.isClosed()).thenReturn(false);
+        Mockito.when(runtimeContainerMock.getComponentData("referencedComponentId", SnowflakeSourceOrSink.KEY_CONNECTION))
+                .thenReturn(connection);
+        Assert.assertEquals(ValidationResult.Result.OK, snowflakeSourceOrSink.validate(runtimeContainerMock).getStatus());
+    }
+
+    @Test
+    public void testValidateNotReferencedConnection() throws Exception {
+        PowerMockito.mockStatic(SnowflakeRuntimeHelper.class);
+        Connection connection = Mockito.mock(Connection.class);
+        snowflakeSourceOrSink.properties.getConnectionProperties().referencedComponent.setValue("componentInstanceId", null);
+        Mockito.when(
+                SnowflakeRuntimeHelper.getConnection(Mockito.any(SnowflakeConnectionProperties.class), Mockito.any(Driver.class)))
+                .thenReturn(connection);
+        Assert.assertEquals(ValidationResult.Result.OK, snowflakeSourceOrSink.validate(null).getStatus());
+    }
+
+    @Test
+    public void testValidateIllegalArgument() throws Exception {
+        PowerMockito.mockStatic(SnowflakeRuntimeHelper.class);
+        snowflakeSourceOrSink.properties.getConnectionProperties().referencedComponent.setValue("componentInstanceId", null);
+        Mockito.when(
+                SnowflakeRuntimeHelper.getConnection(Mockito.any(SnowflakeConnectionProperties.class), Mockito.any(Driver.class)))
+                .thenThrow(new SQLException("HTTP status=403 Forbidden access."));
+        Assert.assertEquals(ValidationResult.Result.ERROR, snowflakeSourceOrSink.validate(null).getStatus());
+    }
+
+    @Test(expected = IOException.class)
+    public void testConnectCheckClosedConnection() throws Exception {
+        Connection connection = Mockito.mock(Connection.class);
+        Mockito.when(connection.isClosed()).thenThrow(new SQLException("Failed to retrieve connection state"));
+        Mockito.when(runtimeContainerMock.getComponentData("referencedComponentId", SnowflakeSourceOrSink.KEY_CONNECTION))
+                .thenReturn(connection);
+        snowflakeSourceOrSink.connect(runtimeContainerMock);
+    }
+
+    /**
+     * This issue was very common, when saving job, referenced connection wasn't set often.
+     * @throws Exception
+     */
+    @Test(expected = IOException.class)
+    public void testConnectNoReferencedConnection() throws Exception {
+        snowflakeSourceOrSink.connect(null);
     }
 
     /**
@@ -66,6 +123,98 @@ public class SnowflakeSourceOrSinkTest {
                 .thenReturn(connectionMock);
 
         this.snowflakeSourceOrSink.connect(runtimeContainerMock);
+    }
+
+    @Test
+    public void testValidateConnection() throws Exception {
+        SnowflakeConnectionProperties properties = new SnowflakeConnectionProperties("connection");
+        properties.account.setValue("talend");
+        properties.userPassword.password.setValue("teland_password");
+        properties.userPassword.userId.setValue("talend_dev");
+        properties.schemaName.setValue("LOAD");
+        properties.db.setValue("TestDB");
+        Connection connection = Mockito.mock(Connection.class);
+        Mockito.when(connection.isClosed()).thenReturn(false);
+        DatabaseMetaData metaData = Mockito.mock(DatabaseMetaData.class);
+        Mockito.when(metaData.getTables(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.eq(new String[] { "TABLE" }))).thenReturn(Mockito.mock(ResultSet.class));
+        Mockito.when(connection.getMetaData()).thenReturn(metaData);
+        PowerMockito.mockStatic(SnowflakeRuntimeHelper.class);
+        Mockito.when(
+                SnowflakeRuntimeHelper.getConnection(Mockito.any(SnowflakeConnectionProperties.class), Mockito.any(Driver.class)))
+                .thenReturn(connection);
+        Assert.assertEquals(ValidationResult.Result.OK, SnowflakeSourceOrSink.validateConnection(properties).getStatus());
+    }
+
+    @Test
+    public void testValidateConnectionInvalidValueInResultSet() throws Exception {
+        SnowflakeConnectionProperties properties = new SnowflakeConnectionProperties("connection");
+        properties.account.setValue("talend");
+        properties.userPassword.password.setValue("teland_password");
+        properties.userPassword.userId.setValue("talend_dev");
+        properties.schemaName.setValue("LOAD");
+        properties.db.setValue("TestDB");
+        Connection connection = Mockito.mock(Connection.class);
+        Mockito.when(connection.isClosed()).thenReturn(false);
+        DatabaseMetaData metaData = Mockito.mock(DatabaseMetaData.class);
+
+        ResultSet rs = Mockito.mock(ResultSet.class);
+        Mockito.when(rs.next()).thenReturn(true, true, false);
+        Mockito.when(rs.getString("TABLE_NAME")).thenReturn("table 1")
+                .thenThrow(new SQLException("Unexpected result in resultset"));
+        Mockito.when(metaData.getTables(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.eq(new String[] { "TABLE" }))).thenReturn(rs);
+        Mockito.when(connection.getMetaData()).thenReturn(metaData);
+        PowerMockito.mockStatic(SnowflakeRuntimeHelper.class);
+        Mockito.when(
+                SnowflakeRuntimeHelper.getConnection(Mockito.any(SnowflakeConnectionProperties.class), Mockito.any(Driver.class)))
+                .thenReturn(connection);
+        Assert.assertEquals(ValidationResult.Result.ERROR, SnowflakeSourceOrSink.validateConnection(properties).getStatus());
+    }
+
+    @Test
+    public void testCloseConnection() throws Exception {
+        Connection conn = Mockito.mock(Connection.class);
+        snowflakeSourceOrSink.closeConnection(null, conn);
+        Mockito.verify(conn).close();
+
+    }
+
+    @Test
+    public void testValidateConnectionStaticCallMissingAllProperties() {
+        SnowflakeConnectionProperties properties = new SnowflakeConnectionProperties("connection");
+        Assert.assertEquals(ValidationResult.Result.ERROR, SnowflakeSourceOrSink.validateConnection(properties).getStatus());
+    }
+
+    @Test
+    public void testGetSnowflakeAvroRegistry() {
+        Assert.assertTrue(snowflakeSourceOrSink.getSnowflakeAvroRegistry() instanceof SnowflakeAvroRegistry);
+    }
+
+    @Test(expected = IOException.class)
+    public void testGetSchemaNames() throws Exception {
+        snowflakeSourceOrSink.properties.getConnectionProperties().referencedComponent
+                .setReference(new SnowflakeConnectionProperties("connection"));
+        SnowflakeConnectionProperties properties = snowflakeSourceOrSink.getEffectiveConnectionProperties(null);
+        properties.account.setValue("talend");
+        properties.userPassword.password.setValue("teland_password");
+        properties.userPassword.userId.setValue("talend_dev");
+        properties.schemaName.setValue("LOAD");
+        properties.db.setValue("TestDB");
+        Connection connection = Mockito.mock(Connection.class);
+        Mockito.when(connection.isClosed()).thenReturn(false);
+        DatabaseMetaData metaData = Mockito.mock(DatabaseMetaData.class);
+
+        ResultSet rs = Mockito.mock(ResultSet.class);
+        Mockito.when(metaData.getColumns(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(rs);
+        Mockito.when(connection.getMetaData()).thenReturn(metaData);
+        PowerMockito.mockStatic(SnowflakeRuntimeHelper.class);
+        Mockito.when(
+                SnowflakeRuntimeHelper.getConnection(Mockito.any(SnowflakeConnectionProperties.class), Mockito.any(Driver.class)))
+                .thenReturn(connection);
+
+        snowflakeSourceOrSink.getEndpointSchema(null, "table1");
     }
 
     /**
@@ -99,6 +248,8 @@ public class SnowflakeSourceOrSinkTest {
         final SnowflakeAvroRegistry snowflakeAvroRegistryMock = Mockito.mock(SnowflakeAvroRegistry.class);
 
         class SnowflakeSourceOrSinkChild extends SnowflakeSourceOrSink {
+
+            private static final long serialVersionUID = 1L;
 
             @Override
             public SnowflakeAvroRegistry getSnowflakeAvroRegistry() {

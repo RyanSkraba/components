@@ -12,6 +12,11 @@
 // ============================================================================
 package org.talend.components.snowflake;
 
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
@@ -23,11 +28,6 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
-
-import java.util.List;
-
-import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 public class SnowflakeTableListProperties extends ComponentPropertiesImpl implements SnowflakeProvideConnectionProperties {
 
@@ -64,11 +64,6 @@ public class SnowflakeTableListProperties extends ComponentPropertiesImpl implem
         // Since this is a repeating property it has a list of values
         tableForm.addRow(widget(selectedTableNames).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
         refreshLayout(tableForm);
-    }
-
-    // For the tests
-    public SnowflakeConnectionProperties getConnectionProps() {
-        return connection;
     }
 
     public void beforeFormPresentMain() throws Exception {

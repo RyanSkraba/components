@@ -19,18 +19,14 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.DriverPropertyInfo;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.SourceOrSink;
@@ -192,9 +188,8 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
 
         try {
             Driver driver = (Driver) Class.forName(SnowflakeConstants.SNOWFLAKE_DRIVER).newInstance();
-            DriverManager.registerDriver(new DriverWrapper(driver));
 
-            conn = DriverManager.getConnection(connProps.getConnectionUrl(), connProps.getJdbcProperties());
+            conn = SnowflakeRuntimeHelper.getConnection(connProps, driver);
         } catch (Exception e) {
             if (e.getMessage().contains("HTTP status=403")) {
                 throw new IllegalArgumentException(e.getMessage());
@@ -257,7 +252,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             throws IOException {
         SnowflakeSourceOrSink ss = new SnowflakeSourceOrSink();
         ss.initialize(null, (ComponentProperties) properties);
-        return ss.getSchema(container, ss.connect(container), table);
+        return ss.getEndpointSchema(container, table);
     }
 
     @Override
@@ -304,47 +299,4 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
 
     }
 
-    public class DriverWrapper implements Driver {
-
-        private Driver driver;
-
-        public DriverWrapper(Driver d) {
-            this.driver = d;
-        }
-
-        @Override
-        public boolean acceptsURL(String u) throws SQLException {
-            return this.driver.acceptsURL(u);
-        }
-
-        @Override
-        public Connection connect(String u, Properties p) throws SQLException {
-            return this.driver.connect(u, p);
-        }
-
-        @Override
-        public int getMajorVersion() {
-            return this.driver.getMajorVersion();
-        }
-
-        @Override
-        public int getMinorVersion() {
-            return this.driver.getMinorVersion();
-        }
-
-        @Override
-        public DriverPropertyInfo[] getPropertyInfo(String u, Properties p) throws SQLException {
-            return this.driver.getPropertyInfo(u, p);
-        }
-
-        @Override
-        public boolean jdbcCompliant() {
-            return this.driver.jdbcCompliant();
-        }
-
-        @Override
-        public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
-            return this.driver.getParentLogger();
-        }
-    }
 }

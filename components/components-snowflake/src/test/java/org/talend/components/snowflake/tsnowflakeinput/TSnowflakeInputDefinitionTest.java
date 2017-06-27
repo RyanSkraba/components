@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
@@ -17,6 +18,10 @@ import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.SnowflakeTableProperties;
 import org.talend.daikon.runtime.RuntimeInfo;
 
+/**
+ * Unit tests for {@link TSnowflakeInputDefinition} class
+ *
+ */
 public class TSnowflakeInputDefinitionTest {
 
     TSnowflakeInputDefinition inputDefinition;
@@ -57,12 +62,17 @@ public class TSnowflakeInputDefinitionTest {
     }
 
     @Test
-    public void getRuntimeInfo() throws Exception {
+    public void testGetRuntimeInfo() throws Exception {
         RuntimeInfo runtimeInfo;
 
         runtimeInfo = inputDefinition.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.OUTGOING);
 
         assertNotNull(runtimeInfo);
+    }
+
+    @Test
+    public void testGetRuntimeInfoWithIncorrectConnector() {
+        Assert.assertNull(inputDefinition.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.INCOMING));
     }
 
     @Test

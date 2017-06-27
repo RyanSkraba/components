@@ -1,11 +1,76 @@
 package org.talend.components.snowflake.runtime;
 
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.SQLException;
+
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.snowflake.SnowflakeConnectionProperties;
+import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
+import org.talend.daikon.properties.ValidationResult;
 
+/**
+ * Unit tests for {@link SnowflakeSink} class
+ */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(SnowflakeRuntimeHelper.class)
 public class SnowflakeSinkTest {
+
+    private SnowflakeSink sink;
+
+    @Before
+    public void setup() {
+        sink = new SnowflakeSink();
+        sink.initialize(null, new TSnowflakeOutputProperties("outputProperties"));
+    }
+
+    @Test
+    public void testValidate() throws Exception {
+        PowerMockito.mockStatic(SnowflakeRuntimeHelper.class);
+        Mockito.when(SnowflakeRuntimeHelper.getConnection(Mockito.any(SnowflakeConnectionProperties.class),
+                Mockito.any(Driver.class))).thenReturn(Mockito.mock(Connection.class));
+        Assert.assertEquals(ValidationResult.Result.OK, sink.validate(null).getStatus());
+    }
+
+    @Test
+    public void testValidateFailed() throws Exception {
+        PowerMockito.mockStatic(SnowflakeRuntimeHelper.class);
+        Mockito.when(SnowflakeRuntimeHelper.getConnection(Mockito.any(SnowflakeConnectionProperties.class),
+                Mockito.any(Driver.class))).thenThrow(new SQLException("Can't connect to Snowflake"));
+        Assert.assertEquals(ValidationResult.Result.ERROR, sink.validate(null).getStatus());
+    }
+
+    @Test
+    public void testValidateWrongPropertiesType() throws Exception {
+        sink.properties = new SnowflakeConnectionProperties("connectionProperties");
+        PowerMockito.mockStatic(SnowflakeRuntimeHelper.class);
+        Mockito.when(SnowflakeRuntimeHelper.getConnection(Mockito.any(SnowflakeConnectionProperties.class),
+                Mockito.any(Driver.class))).thenReturn(Mockito.mock(Connection.class));
+        Assert.assertEquals(ValidationResult.Result.ERROR, sink.validate(null).getStatus());
+
+    }
+
+    @Test
+    public void testCreateWriteOperation() {
+        WriteOperation<?> writer = sink.createWriteOperation();
+        Assert.assertTrue(writer instanceof SnowflakeWriteOperation);
+        Assert.assertEquals(sink, writer.getSink());
+    }
+
+    @Test
+    public void testGetSnoflakeOuputProperties() {
+        Assert.assertNotNull(sink.getSnowflakeOutputProperties());
+    }
 
     @Test
     public void testI18NMessages() {

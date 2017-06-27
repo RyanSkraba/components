@@ -47,6 +47,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.SnowflakeTableProperties;
+import org.talend.components.snowflake.runtime.SnowflakeReader;
 import org.talend.components.snowflake.runtime.SnowflakeSink;
 import org.talend.components.snowflake.runtime.SnowflakeSource;
 import org.talend.components.snowflake.runtime.SnowflakeWriteOperation;
@@ -96,11 +97,11 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
         initTestData(LOGGER);
     }
 
-    public <T> BoundedReader<T> createBoundedReader(ComponentProperties tsip) {
+    public BoundedReader<? extends IndexedRecord> createBoundedReader(ComponentProperties tsip) {
         return createBoundedReader(tsip, null);
     }
 
-    public <T> BoundedReader<T> createBoundedReader(ComponentProperties tsip, RuntimeContainer container) {
+    public BoundedReader<? extends IndexedRecord> createBoundedReader(ComponentProperties tsip, RuntimeContainer container) {
         SnowflakeSource SnowflakeSource = new SnowflakeSource();
         SnowflakeSource.initialize(container, tsip);
         SnowflakeSource.validate(container);
@@ -243,7 +244,7 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
             inputProps = (TSnowflakeInputProperties) new TSnowflakeInputProperties("bar").init();
         inputProps.connection = props.connection;
         inputProps.table = props.table;
-        BoundedReader<IndexedRecord> reader = createBoundedReader(inputProps, container);
+        BoundedReader<IndexedRecord> reader = (SnowflakeReader) createBoundedReader(inputProps, container);
         boolean hasRecord = reader.start();
         List<IndexedRecord> rows = new ArrayList<>();
         while (hasRecord) {

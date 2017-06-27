@@ -99,57 +99,32 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
         return field;
     }
 
+    @Override
     public JDBCConverter getConverter(final Field f) {
-        Schema basicSchema = AvroUtils.unwrapIfNullable(f.schema());
+        final Schema basicSchema = AvroUtils.unwrapIfNullable(f.schema());
 
-        if (basicSchema.getLogicalType() == LogicalTypes.date()) {
-            return new JDBCConverter() {
+        return null == basicSchema.getLogicalType() ? super.getConverter(f) : new JDBCConverter() {
 
-                @Override
-                public Object convertToAvro(ResultSet value) {
-                    int index = f.pos() + 1;
-                    try {
+            @Override
+            public Object convertToAvro(ResultSet value) {
+                int index = f.pos() + 1;
+                try {
+                    if (basicSchema.getLogicalType() == LogicalTypes.date()) {
                         // Snowflake stores the value as the number of days. So it is possible to retrieve that as an
                         // int value instead of converting it to Date first and then to days from milliseconds. If we
                         // convert it to date, Snowflake jdbc shifts the time to 00:00 in current timezone.
                         return value.getInt(index);
-                    } catch (SQLException e) {
-                        throw new ComponentException(e);
-                    }
-                }
-            };
-        } else if (basicSchema.getLogicalType() == LogicalTypes.timeMillis()) {
-            return new JDBCConverter() {
-
-                @Override
-                public Object convertToAvro(ResultSet value) {
-                    int index = f.pos() + 1;
-                    try {
-                        // Snowflake - milliseconds since midnight
+                    } else if (basicSchema.getLogicalType() == LogicalTypes.timeMillis()) {
                         java.sql.Time time = value.getTime(index);
-                        return (time != null) ? (int) value.getTime(index).getTime() : null;
-                    } catch (SQLException e) {
-                        throw new ComponentException(e);
-                    }
-                }
-            };
-        } else if (basicSchema.getLogicalType() == LogicalTypes.timestampMillis()) {
-            return new JDBCConverter() {
-
-                @Override
-                public Object convertToAvro(ResultSet value) {
-                    int index = f.pos() + 1;
-                    try {
-                        // Milliseconds since epoc
+                        return (time != null) ? (int) time.getTime() : null;
+                    } else {
                         java.sql.Timestamp timestamp = value.getTimestamp(index);
                         return (timestamp != null) ? timestamp.getTime() : null;
-                    } catch (SQLException e) {
-                        throw new ComponentException(e);
                     }
+                } catch (SQLException e) {
+                    throw new ComponentException(e);
                 }
-            };
-        } else {
-            return super.getConverter(f);
-        }
+            }
+        };
     }
 }

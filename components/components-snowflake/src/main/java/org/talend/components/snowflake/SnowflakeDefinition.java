@@ -44,7 +44,7 @@ public abstract class SnowflakeDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public Property[] getReturnProperties() {
+    public Property<?>[] getReturnProperties() {
         return new Property[]{RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP};
     }
 

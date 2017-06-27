@@ -10,12 +10,10 @@ import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.di.DiSchemaConstants;
@@ -23,10 +21,12 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.SchemaProperty;
 
+/**
+ * Unit tests for {@link TSnowflakeOutputProperties} class
+ */
 public class TSnowflakeOutputPropertiesTest {
 
     TSnowflakeOutputProperties outputProperties;
-
 
     @Before
     public void reset() {
@@ -153,5 +153,39 @@ public class TSnowflakeOutputPropertiesTest {
         emptyPropertyFieldNames = outputProperties.getFieldNames(emptySchemaProperty);
 
         assertTrue(emptyPropertyFieldNames.isEmpty());
+    }
+
+    @Test
+    public void testAfterTableName() throws Exception {
+        Schema schema = SchemaBuilder.builder().record("Record").fields() //
+                .requiredInt("id")
+                .requiredString("name")
+                .requiredInt("age")
+                .endRecord();
+        outputProperties.setupProperties();
+        outputProperties.table.main.schema.setValue(schema);
+        Assert.assertTrue(outputProperties.upsertKeyColumn.getPossibleValues().isEmpty());
+        outputProperties.table.afterTableName();
+        Assert.assertEquals(3, outputProperties.upsertKeyColumn.getPossibleValues().size());
+    }
+
+    @Test
+    public void testAfterTableWithNotSetSchema() throws Exception {
+        outputProperties.setupProperties();
+        Assert.assertTrue(outputProperties.upsertKeyColumn.getPossibleValues().isEmpty());
+        outputProperties.table.afterTableName();
+        Assert.assertTrue(outputProperties.upsertKeyColumn.getPossibleValues().isEmpty());
+    }
+
+    @Test
+    public void testAfterSchema() {
+        Schema schema = SchemaBuilder.builder().record("Record").fields() //
+                .requiredInt("id").endRecord();
+        outputProperties.setupProperties();
+        outputProperties.table.main.schema.setValue(schema);
+        Assert.assertTrue(outputProperties.schemaReject.schema.getValue().getFields().isEmpty());
+        outputProperties.table.schemaListener.afterSchema();
+        Assert.assertEquals(9, outputProperties.schemaReject.schema.getValue().getFields().size());
+
     }
 }

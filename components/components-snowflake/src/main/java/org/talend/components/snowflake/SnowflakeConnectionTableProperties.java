@@ -38,7 +38,7 @@ public abstract class SnowflakeConnectionTableProperties extends FixedConnectors
         super.setupProperties();
         // Allow for subclassing
         table = new SnowflakeTableProperties("table");
-        table.connection = connection;
+        table.connection = getConnectionProperties();
     }
 
     public Schema getSchema() {

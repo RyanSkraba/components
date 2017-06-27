@@ -137,7 +137,6 @@ public class SpringSnowflakeTestIT extends SnowflakeRuntimeIT {
         assertTrue(modForm.isAllowBack());
         assertFalse(modForm.isAllowForward());
         assertTrue(modForm.isAllowFinish());
-        @SuppressWarnings("unchecked")
         List<NamedThing> all = mlProps.selectedTableNames.getValue();
         assertNull(all);
         List<NamedThing> possibleValues = (List<NamedThing>) mlProps.selectedTableNames.getPossibleValues();
@@ -185,7 +184,7 @@ public class SpringSnowflakeTestIT extends SnowflakeRuntimeIT {
         // Add module wizard - we refer to the existing connection properties as we don't present the UI
         // for them.
         assertTrue(connProps == ((SnowflakeTableListProperties) subWizards[2].getForms().get(0).getProperties())
-                .getConnectionProps());
+                .getConnectionProperties());
         assertFalse(subWizards[1].getDefinition().isTopLevel());
         assertEquals("Edit Snowflake Connection", subWizards[1].getDefinition().getMenuItemName());
         assertTrue(subWizards[0].getDefinition().isTopLevel());

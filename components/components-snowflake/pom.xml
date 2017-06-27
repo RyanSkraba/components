@@ -54,12 +54,12 @@
             <artifactId>components-api-service-rest</artifactId>
             <classifier>lib</classifier>
             <scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-classic</artifactId>
-				</exclusion>
-			</exclusions>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -83,6 +83,18 @@
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
             <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>1.6.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>1.6.5</version>
             <scope>test</scope>
         </dependency>
 
@@ -207,9 +219,9 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- The following plugins are there to make sure they are launched after 
+            <!-- The following plugins are there to make sure they are launched after
                 the bundle are packaged when used in the package phase.-->
-            <!-- They may be used with the -PgenerateP2 maven profile to build a p2 
+            <!-- They may be used with the -PgenerateP2 maven profile to build a p2
                 update site for distribution to the Studio -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -220,7 +232,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>            
+            </plugin>
         </plugins>
     </build>
 

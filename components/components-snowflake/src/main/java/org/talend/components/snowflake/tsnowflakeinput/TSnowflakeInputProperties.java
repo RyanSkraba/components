@@ -15,18 +15,18 @@
  */
 package org.talend.components.snowflake.tsnowflakeinput;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.snowflake.SnowflakeConnectionProperties;
-import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
-import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.properties.property.Property;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.util.Collections;
 import java.util.Set;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TSnowflakeInputProperties extends SnowflakeConnectionTableProperties {
 
@@ -41,16 +41,11 @@ public class TSnowflakeInputProperties extends SnowflakeConnectionTablePropertie
     }
 
     @Override
-    public SnowflakeConnectionProperties getConnectionProperties() {
-        return this.connection;
-    }
-
-    @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         if (isOutputConnection) {
             return Collections.singleton(MAIN_CONNECTOR);
         } else {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
     }
 

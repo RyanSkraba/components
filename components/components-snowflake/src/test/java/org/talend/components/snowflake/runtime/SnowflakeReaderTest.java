@@ -1,7 +1,10 @@
 package org.talend.components.snowflake.runtime;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.avro.Schema;
@@ -11,8 +14,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
@@ -21,7 +27,9 @@ import org.talend.daikon.i18n.I18nMessages;
  */
 public class SnowflakeReaderTest {
 
-    private static final String TEST_QUERY = "select field from Table";
+    private static final String TEST_QUERY = "select field, column from Table";
+
+    private static final String WHERE_TEST_QUERY = "select field, column from Table where id = 1";
 
     @Mock
     private RuntimeContainer runtimeContainerMock = Mockito.mock(RuntimeContainer.class);
@@ -31,9 +39,13 @@ public class SnowflakeReaderTest {
 
     private SnowflakeReader snowflakeReader;
 
+    private Schema schema;
+
     @Before
     public void setUp() throws Exception {
-        Schema schema = SchemaBuilder.builder().record("Schema").fields().name("field").type().stringType().noDefault()
+        schema = SchemaBuilder.builder().record("Schema").fields()
+                .requiredString("field")
+                .requiredString("column")
                 .endRecord();
 
         TSnowflakeInputProperties tSnowflakeInputProperties = new TSnowflakeInputProperties("test");
@@ -64,6 +76,119 @@ public class SnowflakeReaderTest {
         snowflakeReader.start();
 
         Assert.assertEquals(expectedRecords, snowflakeReader.getReturnValues().get("totalRecordCount"));
+    }
+
+    @Test(expected = IOException.class)
+    public void testStartErrorInStatement() throws Exception {
+        Connection connectionMock = Mockito.mock(Connection.class);
+
+        Mockito.when((snowflakeSourceMock).connect(runtimeContainerMock)).thenReturn(connectionMock);
+        Mockito.when((snowflakeSourceMock).connect(runtimeContainerMock)).thenReturn(connectionMock);
+        Mockito.when(connectionMock.createStatement()).thenThrow(new SQLException("Failed to create statement"));
+
+        Assert.assertFalse(snowflakeReader.start());
+    }
+
+    @Test
+    public void testClose() throws Exception {
+        Connection connection = Mockito.mock(Connection.class);
+        Mockito.when(snowflakeSourceMock.connect(runtimeContainerMock)).thenReturn(connection);
+
+        snowflakeReader.getConnection();
+        snowflakeReader.close();
+
+        Mockito.verify(snowflakeSourceMock).closeConnection(runtimeContainerMock, connection);
+    }
+
+    @Test(expected = IOException.class)
+    public void testCloseFailed() throws Exception {
+        Connection connection = Mockito.mock(Connection.class);
+        Mockito.when(snowflakeSourceMock.connect(runtimeContainerMock)).thenReturn(connection);
+        Mockito.doThrow(new SQLException("Failed to close connection")).when(snowflakeSourceMock).closeConnection(runtimeContainerMock, connection);
+        snowflakeReader.getConnection();
+        snowflakeReader.close();
+    }
+
+    @Test
+    public void testEmulateRealUsageOfMethods() throws Exception {
+
+        snowflakeReader.properties.condition.setValue("id = 1");
+        Statement statementMock = Mockito.mock(Statement.class);
+        Connection connectionMock = Mockito.mock(Connection.class);
+        ResultSet resultSetMock = Mockito.mock(ResultSet.class);
+
+
+        Mockito.when(resultSetMock.next()).thenReturn(true, true, true, false);
+        Mockito.when(resultSetMock.getMetaData()).thenReturn(Mockito.mock(ResultSetMetaData.class));
+        Mockito.when(resultSetMock.getMetaData().getColumnCount()).thenReturn(2);
+        Mockito.when(resultSetMock.getString(0)).thenReturn("row1field", "row1column", "row2field", "row2column", "row3field", "row3column");
+        Mockito.when((snowflakeSourceMock).connect(runtimeContainerMock)).thenReturn(connectionMock);
+        Mockito.when(connectionMock.createStatement()).thenReturn(statementMock);
+        Mockito.when(statementMock.executeQuery(WHERE_TEST_QUERY)).thenReturn(resultSetMock);
+
+        // Emulate real usage of Reader:
+        try {
+            snowflakeReader.start();
+            do {
+                // Do smth with current record
+                snowflakeReader.getCurrent();
+            } while (snowflakeReader.advance());
+        } finally {
+            // close
+            snowflakeReader.close();
+        }
+
+        Assert.assertEquals(3, snowflakeReader.getReturnValues().get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+    }
+
+    @Test
+    public void testGetManualQuery() throws Exception {
+        String query = "SELECT id, name from Table";
+        snowflakeReader.properties.manualQuery.setValue(true);
+        snowflakeReader.properties.query.setValue(query);
+        Assert.assertEquals(query, snowflakeReader.getQueryString());
+    }
+
+    @Test(expected = IOException.class)
+    public void testExceptionInAdvance() throws Exception {
+        Statement statementMock = Mockito.mock(Statement.class);
+        Connection connectionMock = Mockito.mock(Connection.class);
+        ResultSet resultSetMock = Mockito.mock(ResultSet.class);
+        Mockito.when(resultSetMock.next()).thenReturn(true).thenThrow(new SQLException("Can't retrieve next result "));
+        Mockito.when(resultSetMock.getMetaData()).thenReturn(Mockito.mock(ResultSetMetaData.class));
+        Mockito.when(resultSetMock.getMetaData().getColumnCount()).thenReturn(2);
+        Mockito.when(resultSetMock.getString(0)).thenReturn("row1field", "row1column");
+        Mockito.when((snowflakeSourceMock).connect(runtimeContainerMock)).thenReturn(connectionMock);
+        Mockito.when(connectionMock.createStatement()).thenReturn(statementMock);
+        Mockito.when(statementMock.executeQuery(TEST_QUERY)).thenReturn(resultSetMock);
+        snowflakeReader.start();
+        snowflakeReader.getCurrent();
+        snowflakeReader.advance();
+    }
+
+    @Test(expected = ComponentException.class)
+    public void testFailedConvertCurrent() throws Exception {
+        Statement statementMock = Mockito.mock(Statement.class);
+        Connection connectionMock = Mockito.mock(Connection.class);
+        ResultSet resultSetMock = Mockito.mock(ResultSet.class);
+        Mockito.when(resultSetMock.next()).thenReturn(true);
+        Mockito.when(resultSetMock.getMetaData()).thenReturn(Mockito.mock(ResultSetMetaData.class));
+        Mockito.when(resultSetMock.getMetaData().getColumnCount()).thenReturn(3);
+        Mockito.when(resultSetMock.getString(0)).thenReturn("row1field", "row1column");
+        Mockito.when((snowflakeSourceMock).connect(runtimeContainerMock)).thenReturn(connectionMock);
+        Mockito.when(connectionMock.createStatement()).thenReturn(statementMock);
+        Mockito.when(statementMock.executeQuery(TEST_QUERY)).thenReturn(resultSetMock);
+        snowflakeReader.start();
+        snowflakeReader.getCurrent();
+    }
+
+    @Test
+    public void testGetSchemaFromSource() throws Exception {
+        AvroUtils.setIncludeAllFields(schema, true);
+        snowflakeReader.properties.table.main.schema.setValue(schema);
+        Schema mockSchema = Mockito.mock(Schema.class);
+        Mockito.when(snowflakeSourceMock.getEndpointSchema(runtimeContainerMock, "Table")).thenReturn(mockSchema);
+        Assert.assertEquals(mockSchema, snowflakeReader.getSchema());
     }
 
     @Test

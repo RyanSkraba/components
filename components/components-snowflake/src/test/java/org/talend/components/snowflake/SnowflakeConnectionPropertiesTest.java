@@ -1,18 +1,32 @@
 package org.talend.components.snowflake;
 
+import java.util.Properties;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.snowflake.runtime.SnowflakeSourceOrSink;
+import org.talend.components.snowflake.tsnowflakeconnection.TSnowflakeConnectionDefinition;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.presentation.Form;
 
 /**
  * Unit-tests for {@link SnowflakeConnectionProperties} class
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(SnowflakeSourceOrSink.class)
 public class SnowflakeConnectionPropertiesTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SnowflakeConnectionPropertiesTest.class);
@@ -193,6 +207,58 @@ public class SnowflakeConnectionPropertiesTest {
 
         Assert.assertFalse(connectionSuccessMessage.equals("messages.connectionSuccessful"));
 
+    }
+
+    @Test
+    public void testValidateTestConnection() throws Exception {
+        snowflakeConnectionProperties.userPassword.setupLayout();
+        snowflakeConnectionProperties.setupLayout();
+        PowerMockito.mockStatic(SnowflakeSourceOrSink.class);
+        Mockito.when(SnowflakeSourceOrSink.validateConnection(snowflakeConnectionProperties)).thenReturn(ValidationResult.OK);
+        ValidationResult vr = snowflakeConnectionProperties.validateTestConnection();
+        Assert.assertEquals(ValidationResult.Result.OK, vr.getStatus());
+        Assert.assertTrue(snowflakeConnectionProperties.getForm(SnowflakeConnectionProperties.FORM_WIZARD).isAllowForward());
+    }
+
+    @Test
+    public void testValidateTestConnectionFailed() throws Exception {
+        snowflakeConnectionProperties.userPassword.setupLayout();
+        snowflakeConnectionProperties.setupLayout();
+        PowerMockito.mockStatic(SnowflakeSourceOrSink.class);
+        Mockito.when(SnowflakeSourceOrSink.validateConnection(snowflakeConnectionProperties))
+                .thenReturn(new ValidationResult(Result.ERROR));
+        ValidationResult vr = snowflakeConnectionProperties.validateTestConnection();
+        Assert.assertEquals(ValidationResult.Result.ERROR, vr.getStatus());
+        Assert.assertFalse(snowflakeConnectionProperties.getForm(SnowflakeConnectionProperties.FORM_WIZARD).isAllowForward());
+    }
+
+    @Test
+    public void testGetReferencedConnectionProperties() {
+        snowflakeConnectionProperties.referencedComponent.setReference(new SnowflakeConnectionProperties("referenced"));
+        Assert.assertNotNull(snowflakeConnectionProperties.getReferencedConnectionProperties());
+    }
+
+    @Test
+    public void testGetJdbcProperties() {
+        snowflakeConnectionProperties.userPassword.userId.setValue("talendTest");
+        Properties properties = snowflakeConnectionProperties.getJdbcProperties();
+        Assert.assertEquals(snowflakeConnectionProperties.userPassword.userId.getValue(), properties.getProperty("user"));
+        Assert.assertEquals(snowflakeConnectionProperties.userPassword.password.getValue(), properties.getProperty("password"));
+        Assert.assertEquals(String.valueOf(snowflakeConnectionProperties.loginTimeout.getValue()),
+                properties.getProperty("loginTimeout"));
+    }
+
+    @Test
+    public void testAfterReferencedComponent() {
+        snowflakeConnectionProperties.userPassword.setupLayout();
+        snowflakeConnectionProperties.setupLayout();
+        snowflakeConnectionProperties.referencedComponent.componentInstanceId
+                .setValue(TSnowflakeConnectionDefinition.COMPONENT_NAME);
+        snowflakeConnectionProperties.afterReferencedComponent();
+        Assert.assertTrue(snowflakeConnectionProperties.getForm(Form.MAIN)
+                .getWidget(snowflakeConnectionProperties.userPassword.getName()).isHidden());
+        Assert.assertTrue(
+                snowflakeConnectionProperties.getForm(Form.ADVANCED).getWidget(snowflakeConnectionProperties.role).isHidden());
     }
 
 }
