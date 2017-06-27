@@ -99,17 +99,4 @@ public class SandboxedSimpleFileIODatasetRuntimeTest {
         assertThat(consumed.get(0).get(0), is((Object) "1"));
         assertThat(consumed.get(0).get(1), is((Object) "one"));
     }
-
-    @Test
-    public void testNonReusableClassLoader() throws Exception {
-        SimpleFileIODatasetProperties props = createDatasetProperties();
-
-        // Generate two sandboxed instances and ensure that they do not have the same classloader.
-        RuntimeInfo ri = def.getRuntimeInfo(props);
-        try (SandboxedInstance si = RuntimeUtil.createRuntimeClass(ri, getClass().getClassLoader())) {
-            try (SandboxedInstance si2 = RuntimeUtil.createRuntimeClass(ri, getClass().getClassLoader())) {
-                assertThat(si.getSandboxClassLoader(), not(sameInstance(si2.getSandboxClassLoader())));
-            }
-        }
-    }
 }

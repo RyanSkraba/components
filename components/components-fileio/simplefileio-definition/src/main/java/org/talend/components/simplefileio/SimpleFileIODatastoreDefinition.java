@@ -34,7 +34,8 @@ public class SimpleFileIODatastoreDefinition extends I18nDefinition
 
     public static final String NAME = SimpleFileIOComponentFamilyDefinition.NAME + "Datastore";
 
-    public static final boolean IS_CLASSLOADER_REUSABLE = false;
+    /** TODO: See {@link org.talend.components.simplefileio.SimpleFileIODatasetDefinition}. */
+    public static final boolean IS_CLASSLOADER_REUSABLE = SimpleFileIODatasetDefinition.IS_CLASSLOADER_REUSABLE;
 
     public SimpleFileIODatastoreDefinition() {
         super(NAME);

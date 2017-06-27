@@ -30,7 +30,13 @@ public class SimpleFileIODatasetDefinition extends I18nDefinition implements Dat
 
     public static final String NAME = SimpleFileIOComponentFamilyDefinition.NAME + "Dataset";
 
-    public static final boolean IS_CLASSLOADER_REUSABLE = false;
+    /**
+     * Setting this to false deactivates ClassLoader reuse, which can leak state between requests. Setting this to
+     * false will correct TCOMP-422 (service fails in a Kerberos/KMS environment after a certain time), but causes TCOMP-486
+     * (serious memory leaks in the sandboxed environment).
+     * TODO: Ensure that both TCOMP-422 and TCOMP-486 can be fixed.
+     */
+    public static final boolean IS_CLASSLOADER_REUSABLE = true;
 
     public SimpleFileIODatasetDefinition() {
         super(NAME);
