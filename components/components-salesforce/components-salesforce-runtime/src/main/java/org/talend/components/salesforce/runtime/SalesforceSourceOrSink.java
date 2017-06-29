@@ -232,6 +232,8 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
                         ch.connection = (PartnerConnection) sharedConn;
                     } else if (sharedConn instanceof BulkConnection) {
                         ch.bulkConnection = (BulkConnection) sharedConn;
+                    } else if (sharedConn instanceof ConnectionHolder){
+                        return (ConnectionHolder) sharedConn;
                     }
                     return ch;
                 }
@@ -279,9 +281,6 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
             config.setConnectionTimeout(connProps.timeout.getValue());
         }
         config.setCompression(connProps.needCompression.getValue());
-        if (false) {
-            config.setTraceMessage(true);
-        }
         config.setUseChunkedPost(connProps.httpChunked.getValue());
         config.setValidateSchema(false);
 
@@ -309,12 +308,10 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
             }
             if (connProps.bulkConnection.getValue()) {
                 ch.bulkConnection = connectBulk(ch.connection.getConfig());
-                sharedConn = ch.bulkConnection;
-            } else {
-                sharedConn = ch.connection;
             }
+
             if (container != null) {
-                container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, sharedConn);
+                container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, ch);
             }
             return ch;
         } catch (ConnectionException e) {

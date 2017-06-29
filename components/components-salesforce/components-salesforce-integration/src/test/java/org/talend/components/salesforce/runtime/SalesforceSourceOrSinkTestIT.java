@@ -20,10 +20,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.integration.SalesforceTestBase;
+import org.talend.components.salesforce.runtime.common.ConnectionHolder;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -95,6 +98,47 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         };
         salesforceSourceOrSink.initialize(null, scmp);
         assertEquals(scmp.connection, salesforceSourceOrSink.getConnectionProperties());
+    }
+
+    @Test
+    public void testGetSharedPartnerConnection() throws Exception {
+        prepareAndGetConnectionHolder(false);
+    }
+
+    @Test
+    public void testGetSharedBulkConnection() throws Exception {
+        prepareAndGetConnectionHolder(true);
+    }
+
+    private void prepareAndGetConnectionHolder(boolean isBulk) throws Exception {
+        final SalesforceConnectionProperties connectionProperties = setupProps(null, false);
+        connectionProperties.bulkConnection.setValue(isBulk);
+        RuntimeContainer container = new DefaultComponentRuntimeContainerImpl() {
+
+            @Override
+            public String getCurrentComponentId() {
+                return connectionProperties.getName();
+            }
+        };
+
+        SalesforceSourceOrSink sourceOrSink = new SalesforceSourceOrSink();
+        sourceOrSink.initialize(container, connectionProperties);
+        // Creating and saving PartnerConnection + BulkConnection(holder) inside container.
+        sourceOrSink.validate(container);
+        ConnectionHolder expectedHolder = (ConnectionHolder) container.getComponentData(connectionProperties.getName(),
+                SalesforceSourceOrSink.KEY_CONNECTION);
+        TSalesforceInputProperties inputProperties = new TSalesforceInputProperties("input");
+        inputProperties.connection.referencedComponent.componentInstanceId.setValue(connectionProperties.getName());
+        sourceOrSink.initialize(container, inputProperties);
+        ConnectionHolder actualHolder = sourceOrSink.connect(container);
+
+        Assert.assertEquals(expectedHolder, actualHolder);
+        if (isBulk) {
+            Assert.assertNotNull(actualHolder.bulkConnection);
+        } else {
+            //Check if bulk connection was not chosen but created.
+            Assert.assertNull(actualHolder.bulkConnection);
+        }
     }
 
     @Test(expected = ConnectionException.class)
