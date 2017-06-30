@@ -28,8 +28,9 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -41,7 +42,6 @@ import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.integration.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
-import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
@@ -49,9 +49,30 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceInputReaderTestIT.class);
 
-    @Before
-    public void setup() throws Throwable {
-        deleteAllAccountTestRows();
+    private static String randomizedValue;
+
+    @BeforeClass
+    public static void setup() throws Throwable {
+        randomizedValue = "Name_IT_" + createNewRandom();
+
+        List<IndexedRecord> outputRows = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            GenericData.Record row = new GenericData.Record(getSchema(false));
+            row.put("Name", randomizedValue);
+            row.put("ShippingStreet", "123 Main Street");
+            row.put("ShippingPostalCode", Integer.toString(i));
+            row.put("BillingStreet", "123 Main Street");
+            row.put("BillingState", "CA");
+            row.put("BillingPostalCode", createNewRandom());
+            outputRows.add(row);
+        }
+
+        writeRows(outputRows);
+    }
+
+    @AfterClass
+    public static void cleanup() throws Throwable {
+        deleteAllAccountTestRows(randomizedValue);
     }
 
     public static Schema SCHEMA_QUERY_ACCOUNT = SchemaBuilder.builder().record("Schema").fields() //
@@ -65,7 +86,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     @Test
     public void testStartAdvanceGetCurrent() throws IOException {
-        BoundedReader salesforceInputReader = createSalesforceInputReaderFromModule(EXISTING_MODULE_NAME);
+        BoundedReader<?> salesforceInputReader = createSalesforceInputReaderFromModule(EXISTING_MODULE_NAME, null);
         try {
             assertTrue(salesforceInputReader.start());
             assertTrue(salesforceInputReader.advance());
@@ -78,7 +99,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
     @Test(expected = IOException.class)
     public void testStartException() throws IOException {
         BoundedReader<IndexedRecord> salesforceInputReader = createSalesforceInputReaderFromModule(
-                SalesforceTestBase.NOT_EXISTING_MODULE_NAME);
+                SalesforceTestBase.NOT_EXISTING_MODULE_NAME, null);
         try {
             assertTrue(salesforceInputReader.start());
         } finally {
@@ -202,8 +223,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         }
     }
 
-    @Override
-    public Schema getMakeRowSchema(boolean isDynamic) {
+    public static Schema getSchema(boolean isDynamic) {
         SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.builder().record("MakeRowRecord").fields() //
                 .name("Id").type().nullable().stringType().noDefault() //
                 .name("Name").type().nullable().stringType().noDefault() //
@@ -219,63 +239,46 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         return fa.endRecord();
     }
 
+    @Override
+    public Schema getMakeRowSchema(boolean isDynamic) {
+        return getSchema(isDynamic);
+    }
+
     @Test
     public void testManualQuery() throws Throwable {
-        String random = createNewRandom();
         TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
-        // 1. Write test data
-        List<IndexedRecord> outputRows = new ArrayList<IndexedRecord>();
-        Schema schema = getMakeRowSchema(false);
-        IndexedRecord record1 = new GenericData.Record(schema);
-        record1.put(1, "TestName_" + random);
-        IndexedRecord record2 = new GenericData.Record(schema);
-        record2.put(1, "TestName_" + random);
-        outputRows.add(record1);
-        outputRows.add(record2);
-        TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
-        outputProps.copyValuesFrom(props);
-        outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
-        doWriteRows(outputProps, outputRows);
-        // 2. Make sure 2 rows write successfully
         props.manualQuery.setValue(true);
-        props.query.setValue("select Id from Account WHERE Name = 'TestName_" + random + "'");
+        props.query.setValue("select Id from Account WHERE Name = '" + randomizedValue + "'");
+        List<IndexedRecord> outputRows = readRows(props);
+        assertEquals(100, outputRows.size());
+        props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields()//
+                .name("Id").type().nullable().stringType().noDefault() //
+                .name("Name").type().nullable().stringType().noDefault() //
+                .name("Owner_Name").type().nullable().stringType().noDefault() //
+                .name("Owner_Id").type().nullable().stringType().noDefault().endRecord());
+        props.query
+                .setValue("SELECT Id, Name, Owner.Name ,Owner.Id FROM Account WHERE Name = '" + randomizedValue + "'");
+        List<IndexedRecord> rowsWithForeignKey = readRows(props);
+
+        props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields()//
+                .name("Id").type().nullable().stringType().noDefault() //
+                .name("Name").type().nullable().stringType().noDefault() //
+                .name("OwnerId").type().nullable().stringType().noDefault().endRecord());
+        props.query.setValue("SELECT Id, Name, OwnerId FROM Account WHERE Name = '" + randomizedValue + "'");
         outputRows = readRows(props);
-        assertEquals(2, outputRows.size());
-        try {
-            // 3. Test 2 ways of manual query with foreign key
-            props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields()//
-                    .name("Id").type().nullable().stringType().noDefault() //
-                    .name("Name").type().nullable().stringType().noDefault() //
-                    .name("Owner_Name").type().nullable().stringType().noDefault() //
-                    .name("Owner_Id").type().nullable().stringType().noDefault().endRecord());
-            props.query.setValue("SELECT Id, Name, Owner.Name ,Owner.Id FROM Account WHERE Name = 'TestName_" + random + "'");
-            List<IndexedRecord> rowsWithForeignKey = readRows(props);
 
-            props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields()//
-                    .name("Id").type().nullable().stringType().noDefault() //
-                    .name("Name").type().nullable().stringType().noDefault() //
-                    .name("OwnerId").type().nullable().stringType().noDefault().endRecord());
-            props.query.setValue("SELECT Id, Name, OwnerId FROM Account WHERE Name = 'TestName_" + random + "'");
-            outputRows = readRows(props);
+        assertEquals(rowsWithForeignKey.size(), outputRows.size());
+        assertEquals(100, rowsWithForeignKey.size());
+        IndexedRecord fkRecord = rowsWithForeignKey.get(0);
+        IndexedRecord commonRecord = outputRows.get(0);
+        assertNotNull(fkRecord);
+        assertNotNull(commonRecord);
+        Schema schemaFK = fkRecord.getSchema();
+        Schema schemaCommon = commonRecord.getSchema();
 
-            assertEquals(rowsWithForeignKey.size(), outputRows.size());
-            assertEquals(2, rowsWithForeignKey.size());
-            IndexedRecord fkRecord = rowsWithForeignKey.get(0);
-            IndexedRecord commonRecord = outputRows.get(0);
-            assertNotNull(fkRecord);
-            assertNotNull(commonRecord);
-            Schema schemaFK = fkRecord.getSchema();
-            Schema schemaCommon = commonRecord.getSchema();
-
-            assertNotNull(schemaFK);
-            assertNotNull(schemaCommon);
-            assertEquals(commonRecord.get(schemaCommon.getField("OwnerId").pos()),
-                    fkRecord.get(schemaFK.getField("Owner_Id").pos()));
-            System.out.println("Account records Owner id: " + fkRecord.get(schemaFK.getField("Owner_Id").pos()));
-        } finally {
-            // 4. Delete test data
-            deleteRows(outputRows, props);
-        }
+        assertNotNull(schemaFK);
+        assertNotNull(schemaCommon);
+        assertEquals(commonRecord.get(schemaCommon.getField("OwnerId").pos()), fkRecord.get(schemaFK.getField("Owner_Id").pos()));
 
     }
 
@@ -346,7 +349,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
     public void testAggregrateQueryWithDateTypeAndBasicQuery() throws Throwable {
         TSalesforceInputProperties props = createTSalesforceInputProperties(true, false);
         props.manualQuery.setValue(true);
-        props.query.setValue("SELECT MIN(CreatedDate) VALUE FROM Contact GROUP BY FirstName, LastName");// alias is
+        props.query.setValue("SELECT MIN(CreatedDate) VALUE FROM Contact GROUP BY FirstName, LastName LIMIT 1");// alias is
                                                                                                         // necessary
                                                                                                         // and
                                                                                                         // should
@@ -371,7 +374,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
     public void testAggregrateQueryWithDateTypeAndStringOutputAndBasicQuery() throws Throwable {
         TSalesforceInputProperties props = createTSalesforceInputProperties(true, false);
         props.manualQuery.setValue(true);
-        props.query.setValue("SELECT MIN(CreatedDate) VALUE FROM Contact GROUP BY FirstName, LastName");// alias is
+        props.query.setValue("SELECT MIN(CreatedDate) VALUE FROM Contact GROUP BY FirstName, LastName LIMIT 1");// alias is
                                                                                                         // necessary
                                                                                                         // and
                                                                                                         // should
@@ -432,12 +435,6 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
                 assertNotNull(row.get(schema.getField("Name").pos()));
                 assertNotNull(row.get(schema.getField("Account_Contacts_records_Contact_Id").pos()));
                 assertNotNull(row.get(schema.getField("Account_Contacts_records_Contact_Name").pos()));
-
-                LOGGER.debug("check: [Name && Account_Name]:" + row.get(schema.getField("Name").pos()) + " [Id && Account_Id]: "
-                        + row.get(schema.getField("Id").pos()) + " [Contacts_records_Id && Contacts_records_Id]: "
-                        + row.get(schema.getField("Account_Contacts_records_Contact_Id").pos())
-                        + " [Account_Contacts_records_Name && Contacts_records_Name]: "
-                        + row.get(schema.getField("Account_Contacts_records_Contact_Name").pos()));
             }
         } else {
             LOGGER.warn("Query result is empty!");
@@ -446,39 +443,15 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     @Test
     public void testInputNBLine() throws Throwable {
-        String random = createNewRandom();
         TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
-        List<IndexedRecord> outputRows = new ArrayList<IndexedRecord>();
-        for (int i = 0; i < 210; i++) {
-            IndexedRecord record = new GenericData.Record(SCHEMA_QUERY_ACCOUNT);
-            record.put(1, "TestName_" + random);
-            outputRows.add(record);
-        }
-        TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
-        outputProps.copyValuesFrom(props);
-        outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
-        doWriteRows(outputProps, outputRows);
         List<IndexedRecord> returnRecords = null;
-        String query = "SELECT Id, Name FROM Account WHERE Name = 'TestName_" + random + "'";
-        try {
-            // SOAP query test
-            returnRecords = checkRows(outputProps, query, 210, false);
-            assertThat(returnRecords.size(), is(210));
-            // Bulk query test
-            returnRecords = checkRows(outputProps, query, 210, true);
-            assertThat(returnRecords.size(), is(210));
-        } finally {
-            // Delete test records
-            if (returnRecords != null) {
-                deleteRows(returnRecords, outputProps);
-            } else {
-                props.manualQuery.setValue(true);
-                props.query.setValue(query);
-                returnRecords = readRows(props);
-                deleteRows(returnRecords, outputProps);
-            }
-        }
-
+        String query = "SELECT Id, Name FROM Account WHERE Name = '" + randomizedValue + "'";
+        // SOAP query test
+        returnRecords = checkRows(props, query, 100, false);
+        assertThat(returnRecords.size(), is(100));
+        // Bulk query test
+        returnRecords = checkRows(props, query, 100, true);
+        assertThat(returnRecords.size(), is(100));
     }
 
     /*

@@ -32,7 +32,7 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
 
     public SalesforceSource() {
     }
-    
+
     @Override
     public List<? extends BoundedSource> splitIntoBundles(long desiredBundleSizeBytes, RuntimeContainer adaptor)
             throws Exception {

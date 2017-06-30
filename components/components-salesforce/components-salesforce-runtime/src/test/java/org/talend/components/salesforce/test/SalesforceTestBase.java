@@ -24,7 +24,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
-import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang3.StringUtils;
@@ -71,7 +70,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     private ComponentService componentService;
 
-    protected RuntimeContainer adaptor;
+    protected static RuntimeContainer adaptor = new DefaultComponentRuntimeContainerImpl();
 
     public static final boolean ADD_QUOTES = true;
 
@@ -82,11 +81,10 @@ public class SalesforceTestBase extends AbstractComponentTest {
     static public final String securityKey = System.getProperty("salesforce.key");
 
     public SalesforceTestBase() {
-        adaptor = new DefaultComponentRuntimeContainerImpl();
     }
 
-    public String createNewRandom() {
-        return Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
+    public static String createNewRandom() {
+        return Integer.toString(ThreadLocalRandom.current().nextInt(1, 1000000));
     }
 
     @Before
@@ -153,8 +151,9 @@ public class SalesforceTestBase extends AbstractComponentTest {
         moduleProps.main.schema.setValue(emptySchema);
     }
 
-    public Schema getMakeRowSchema(boolean isDynamic) {
-        FieldAssembler<Schema> fa = SchemaBuilder.builder().record("MakeRowRecord").fields() //
+    public static Schema getSchema(boolean isDynamic) {
+        SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.builder().record("MakeRowRecord").fields() //
+                .name("Id").type().nullable().stringType().noDefault() //
                 .name("Name").type().nullable().stringType().noDefault() //
                 .name("ShippingStreet").type().nullable().stringType().noDefault() //
                 .name("ShippingPostalCode").type().nullable().intType().noDefault() //
@@ -166,6 +165,10 @@ public class SalesforceTestBase extends AbstractComponentTest {
         }
 
         return fa.endRecord();
+    }
+
+    public Schema getMakeRowSchema(boolean isDynamic) {
+        return getSchema(isDynamic);
     }
 
     public List<IndexedRecord> makeRows(String random, int count, boolean isDynamic) {
@@ -339,7 +342,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         readAndCheckRows(random, props, 0);
     }
 
-    public <T> T writeRows(Writer<T> writer, List<IndexedRecord> outputRows) throws IOException {
+    public static <T> T writeRows(Writer<T> writer, List<IndexedRecord> outputRows) throws IOException {
         T result;
         writer.open("foo");
         try {
@@ -352,8 +355,14 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return result;
     }
 
+    protected static void writeRows(List<IndexedRecord> outputRows) throws Exception {
+        TSalesforceOutputProperties outputProps = createSalesforceoutputProperties(EXISTING_MODULE_NAME);// $NON-NLS-1$
+        outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
+        doWriteRows(outputProps, outputRows);
+    }
+
     // Returns the rows written (having been re-read so they have their Ids)
-    protected void doWriteRows(SalesforceConnectionModuleProperties props, List<IndexedRecord> outputRows) throws Exception {
+    protected static void doWriteRows(SalesforceConnectionModuleProperties props, List<IndexedRecord> outputRows) throws Exception {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
         salesforceSink.validate(adaptor);
@@ -361,7 +370,6 @@ public class SalesforceTestBase extends AbstractComponentTest {
         Writer<Result> saleforceWriter = writeOperation.createWriter(adaptor);
         writeRows(saleforceWriter, outputRows);
     }
-
     // Returns the rows written (having been re-read so they have their Ids)
     protected List<IndexedRecord> writeRows(String random, SalesforceConnectionModuleProperties props,
             List<IndexedRecord> outputRows) throws Exception {
@@ -380,14 +388,16 @@ public class SalesforceTestBase extends AbstractComponentTest {
         doWriteRows(deleteProperties, rows);
     }
 
-    public <T> BoundedReader<T> createSalesforceInputReaderFromModule(String moduleName) {
-        TSalesforceInputProperties tsip = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
-        SalesforceConnectionProperties conProps = setupProps(tsip.connection, !ADD_QUOTES);
-        tsip.batchSize.setValue(200);
-        tsip.module.moduleName.setValue(moduleName);
-        tsip.module.main.schema.setValue(
+    public <T> BoundedReader<T> createSalesforceInputReaderFromModule(String moduleName, TSalesforceInputProperties properties) {
+        if (null == properties) {
+            properties = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
+        }
+        setupProps(properties.connection, !ADD_QUOTES);
+        properties.batchSize.setValue(200);
+        properties.module.moduleName.setValue(moduleName);
+        properties.module.main.schema.setValue(
                 SchemaBuilder.builder().record("test").prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true").fields().endRecord());
-        return createBoundedReader(tsip);
+        return createBoundedReader(properties);
     }
 
     public <T> BoundedReader<T> createBoundedReader(ComponentProperties tsip) {
@@ -397,18 +407,17 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return salesforceSource.createReader(null);
     }
 
-    public static void main(String[] args) throws Exception {
-        deleteAllAccountTestRows();
-
-    }
-
-    public static void deleteAllAccountTestRows() throws Exception {
-        BoundedReader salesforceInputReader = new SalesforceTestBase()
-                .createSalesforceInputReaderFromModule(EXISTING_MODULE_NAME);
+    public static void deleteAllAccountTestRows(String condition) throws Exception {
+        TSalesforceInputProperties properties = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init();
+        properties.condition.setValue("Name = '" + condition + "'");
+        BoundedReader<?> salesforceInputReader = new SalesforceTestBase()
+                .createSalesforceInputReaderFromModule(EXISTING_MODULE_NAME, properties);
         // getting all rows
+
         List<IndexedRecord> rows = new ArrayList<>();
         try {
             salesforceInputReader.start();
+            rows.add((IndexedRecord) salesforceInputReader.getCurrent());
             while (salesforceInputReader.advance()) {
                 rows.add((IndexedRecord) salesforceInputReader.getCurrent());
             }
@@ -416,13 +425,11 @@ public class SalesforceTestBase extends AbstractComponentTest {
             salesforceInputReader.close();
         }
         // filtering rows
-        List<IndexedRecord> rowToBeDeleted = getAllTestRows(rows);
-        // deleting rows
         TSalesforceOutputProperties salesforceoutputProperties = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
         setupProps(salesforceoutputProperties.connection, !ADD_QUOTES);
-        new SalesforceTestBase().deleteRows(rowToBeDeleted, salesforceoutputProperties);
+        new SalesforceTestBase().deleteRows(rows, salesforceoutputProperties);
     }
-    
+
     private static TSalesforceOutputProperties createSalesforceoutputProperties(String moduleName) throws Exception {
         TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
         setupProps(props.connection, !ADD_QUOTES);

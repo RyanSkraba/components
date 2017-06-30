@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.EnumSet;
 
@@ -24,7 +24,7 @@ import org.talend.daikon.properties.property.Property;
 
 public class SalesforceUserPasswordProperties extends UserPasswordProperties {
 
-    public Property securityKey = ((Property) newProperty("securityKey"))
+    public Property<String> securityKey = newString("securityKey")
             .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     public SalesforceUserPasswordProperties(String name) {

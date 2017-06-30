@@ -26,6 +26,8 @@ import java.util.List;
 
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,6 +51,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
+import com.sforce.async.AsyncApiException;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.fault.ExceptionCode;
 import com.sforce.soap.partner.fault.LoginFault;
@@ -63,8 +66,34 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
 
     private static final String WRONG_PWD = "WRONG_PWD";
 
+    private static String randomizedValue;
+
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @BeforeClass
+    public static void setup() throws Throwable {
+        randomizedValue = "Name_Unit_" + createNewRandom();
+
+        List<IndexedRecord> outputRows = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            GenericData.Record row = new GenericData.Record(getSchema(false));
+            row.put("Name", randomizedValue);
+            row.put("ShippingStreet", "123 Main Street");
+            row.put("ShippingPostalCode", Integer.toString(i));
+            row.put("BillingStreet", "123 Main Street");
+            row.put("BillingState", "CA");
+            row.put("BillingPostalCode", createNewRandom());
+            outputRows.add(row);
+        }
+
+        writeRows(outputRows);
+    }
+
+    @AfterClass
+    public static void cleanup() throws Throwable {
+        deleteAllAccountTestRows(randomizedValue);
+    }
 
     /*
     * If the logic changes for this test please specify appropriate timeout.
@@ -161,7 +190,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
             // Check whether the session disable by other test.
             ((PartnerConnection) connection).getUserInfo();
 
-            Property prop = (Property) f.getWidget("moduleName").getContent();
+            Property<?> prop = (Property<?>) f.getWidget("moduleName").getContent();
             assertTrue(prop.getPossibleValues().size() > 100);
             LOGGER.debug(moduleProps.getValidationResult().toString());
             assertEquals(ValidationResult.Result.OK, moduleProps.getValidationResult().getStatus());
@@ -263,7 +292,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
     }
 
     @Test
-    public void testBulkSessionRenew() throws Throwable {
+    public void testBulkSessionRenew() throws Exception {
 
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
@@ -273,22 +302,39 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
         // setup session function
         props.connection.bulkConnection.setValue(true);
         props.queryMode.setValue(TSalesforceInputProperties.QueryMode.Bulk);
-
+        props.condition.setValue("Name = '"+ randomizedValue + "'");
         // Init session
         assertEquals(ValidationResult.Result.OK, testConnection(props).getStatus());
 
-        BoundedReader reader = createBoundedReader(props);
+        BoundedReader<?> reader = createBoundedReader(props);
         assertThat(reader, instanceOf(SalesforceBulkQueryInputReader.class));
-        boolean hasRecord = reader.start();
+
+        reader.start();
         // Invalid the session by session id
         String sessionIdBeforeRenew = ((SalesforceBulkQueryInputReader) reader).bulkRuntime.getBulkConnection().getConfig()
                 .getSessionId();
+        reader.close();
+
+        Thread.sleep(1000);
+
         invalidSession(props.connection, sessionIdBeforeRenew);
         // Test renew session for bulk connections
-        ((SalesforceBulkQueryInputReader) reader).executeSalesforceBulkQuery();
+        try {
+            reader.start();
+        } catch (IOException io) {
+            if (io.getCause() instanceof AsyncApiException
+                    && io.getMessage().contains("Unable to find any data to create batch")) {
+                // This kind of error shows that connection is established well, but some issue with test data.
+                // It happens in SalesforceBulkRuntime inside of method createBatchFromStream, after job was created.
+                LOGGER.warn("Issue with getting prepared test data. Error msg - {}", io.getMessage());
+            } else {
+                throw io;
+            }
+        }
         // Check the renew session
         String sessionIdAfterRenew = ((SalesforceBulkQueryInputReader) reader).bulkRuntime.getBulkConnection().getConfig()
                 .getSessionId();
+        reader.close();
         assertNotEquals(sessionIdBeforeRenew, sessionIdAfterRenew);
 
     }
@@ -377,7 +423,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
         return result;
     }
 
-    protected void invalidSession(SalesforceConnectionProperties props, String sessionId) throws Throwable {
+    protected void invalidSession(SalesforceConnectionProperties props, String sessionId) throws Exception {
         SalesforceSourceOrSink sourceOrSink = new SalesforceSourceOrSink();
         sourceOrSink.initialize(null, props);
         ConnectionHolder connectionHolder = sourceOrSink.connect(null);

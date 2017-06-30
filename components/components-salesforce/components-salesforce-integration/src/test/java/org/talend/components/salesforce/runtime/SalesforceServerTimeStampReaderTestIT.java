@@ -40,7 +40,7 @@ public class SalesforceServerTimeStampReaderTestIT extends SalesforceTestBase {
         TSalesforceGetServerTimestampProperties props = (TSalesforceGetServerTimestampProperties) new TSalesforceGetServerTimestampProperties(
                 "foo").init();
         setupProps(props.connection, !ADD_QUOTES);
-        BoundedReader bounderReader = createBoundedReader(props);
+        BoundedReader<?> bounderReader = createBoundedReader(props);
         try {
             assertTrue(bounderReader.start());
             assertFalse(bounderReader.advance());
