@@ -19,6 +19,7 @@ import static org.junit.Assert.assertThat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -150,6 +151,16 @@ public class MarketoColumnMappingsTableTest {
         assertThat(schema, containsInAnyOrder(mappings.getNameMappingsForMarketo().keySet().toArray()));
         assertEquals(Arrays.asList("ID", "EMAIL", "Campaign", "LastScoring-Adoption"),
                 mappings.getMarketoColumns(getTestSchema()));
+    }
+
+    @Test
+    public void testGetInputedNameMappingsForMarketoNullAndEmptyValue() throws Exception {
+        mappings.columnName.setValue(new ArrayList<String>());
+        mappings.marketoColumnName.setValue(new ArrayList<String>());
+        assertEquals(new HashMap<String, String>(), mappings.getInputedNameMappingsForMarketo());
+        mappings.columnName.setValue(null);
+        mappings.marketoColumnName.setValue(null);
+        assertEquals(new HashMap<String, String>(), mappings.getInputedNameMappingsForMarketo());
     }
 
 }

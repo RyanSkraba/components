@@ -21,6 +21,7 @@ import org.junit.Test;
 public class MarketoResultTest {
 
     MarketoResult result;
+
     @Before
     public void setUp() throws Exception {
         result = new MarketoResult();
@@ -51,6 +52,18 @@ public class MarketoResultTest {
         assertEquals(s1, result.toString());
         result.setApiCalls(10);
         assertEquals(s2, result.toString());
+    }
+
+    @Test
+    public void testAdd() throws Exception {
+        MarketoResult result1 = new MarketoResult("test", 1, 2, 3, 4);
+        MarketoResult result2 = new MarketoResult("test", 1, 2, 3, 4);
+        result1.add(result2);
+        assertEquals(2, result1.totalCount);
+        assertEquals(4, result1.successCount);
+        assertEquals(6, result1.rejectCount);
+        assertEquals(8, result1.apiCalls);
+        assertEquals(8, result1.getApiCalls());
     }
 
 }

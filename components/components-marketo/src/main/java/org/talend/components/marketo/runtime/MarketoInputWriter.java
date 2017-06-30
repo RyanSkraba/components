@@ -73,7 +73,7 @@ public class MarketoInputWriter extends MarketoWriter {
     @Override
     public void open(String uId) throws IOException {
         super.open(uId);
-        properties = (TMarketoInputProperties) sink.properties;
+        properties = (TMarketoInputProperties) sink.getProperties();
         flowSchema = properties.schemaFlow.schema.getValue();
         dieOnError = properties.dieOnError.getValue();
         isDynamic = AvroUtils.isIncludeAllFields(this.properties.schemaInput.schema.getValue());

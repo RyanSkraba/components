@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class ListOperationParameters {
 
     String operation;
@@ -40,8 +42,8 @@ public class ListOperationParameters {
 
     public Boolean isValid() {
         if ("SOAP".equals(apiMode)) {
-            return (listKeyType != null && !listKeyType.isEmpty()) && (listKeyValue != null && !listKeyValue.isEmpty())
-                    && (leadKeyType != null && !leadKeyType.isEmpty()) && (leadKeyValue != null && !leadKeyValue.isEmpty());
+            return (!StringUtils.isEmpty(listKeyType)) && (!StringUtils.isEmpty(listKeyValue))
+                    && (!StringUtils.isEmpty(leadKeyType)) && (leadKeyValue != null && !leadKeyValue.isEmpty());
         }
         if ("REST".equals(apiMode)) {
             return (listId != null && leadIds != null && !leadIds.isEmpty());

@@ -64,8 +64,8 @@ public class MarketoConnectionWizardTest {
         assertNull(def.getIconKey());
         assertEquals("connectionWizardIcon.png", def.getImagePath(DefinitionImageType.TREE_ICON_16X16));
         assertEquals("marketoWizardBanner.png", def.getImagePath(DefinitionImageType.WIZARD_BANNER_75X66));
-        assertNull(def.getImagePath(DefinitionImageType.SVG_ICON));
         assertEquals("connectionWizardIcon.png", def.getPngImagePath(null));
+        assertNull(def.getImagePath(DefinitionImageType.SVG_ICON));
         assertNull(def.getImagePath(DefinitionImageType.PALETTE_ICON_32X32));
         assertTrue(def.supportsProperties(TMarketoConnectionProperties.class));
     }

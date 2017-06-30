@@ -15,12 +15,17 @@ package org.talend.components.marketo.tmarketoinput;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.CustomObject;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLead;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadActivity;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadChanges;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getMultipleLeads;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Before;
@@ -34,10 +39,13 @@ import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadK
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeSOAP;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam;
+import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.StandardAction;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.serialize.PostDeserializeSetup;
 
 public class TMarketoInputPropertiesTest extends MarketoTestBase {
 
@@ -139,6 +147,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         props.inputOperation.setValue(getMultipleLeads);
         props.leadSelectorREST.setValue(LeadSelector.StaticListSelector);
         props.listParam.setValue(ListParam.STATIC_LIST_NAME);
+        props.afterListParam();
         props.refreshLayout(props.getForm(Form.MAIN));
         assertTrue(f.getWidget(tl_operation).isVisible());
         assertTrue(f.getWidget(tl_mappingInput).isVisible());
@@ -790,6 +799,9 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertEquals(LeadKeyTypeSOAP.SFDCLEADID, LeadKeyTypeSOAP.valueOf("SFDCLEADID"));
         assertEquals(LeadKeyTypeSOAP.SFDCLEADOWNERID, LeadKeyTypeSOAP.valueOf("SFDCLEADOWNERID"));
         assertEquals(LeadKeyTypeSOAP.SFDCOPPTYID, LeadKeyTypeSOAP.valueOf("SFDCOPPTYID"));
+        //
+        assertEquals(StandardAction.describe, StandardAction.valueOf("describe"));
+        assertEquals(StandardAction.get, StandardAction.valueOf("get"));
     }
 
     @Test
@@ -817,19 +829,12 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     @Test
     public void testValidateInputOperation() throws Exception {
         assertEquals(Result.OK, props.validateInputOperation().getStatus());
+        props.connection.apiMode.setValue(APIMode.SOAP);
+        props.inputOperation.setValue(getLeadActivity);
+        assertEquals(Result.OK, props.validateInputOperation().getStatus());
         props.inputOperation.setValue(CustomObject);
         props.connection.apiMode.setValue(APIMode.SOAP);
         assertEquals(Result.ERROR, props.validateInputOperation().getStatus());
-    }
-
-    @Test
-    public void testValidateFetchCustomObjectSchema() throws Exception {
-        props.inputOperation.setValue(CustomObject);
-        props.customObjectAction.setValue(CustomObjectAction.get);
-        props.refreshLayout(props.getForm(Form.MAIN));
-        props.afterInputOperation();
-        assertEquals(Result.ERROR, props.validateFetchCustomObjectSchema().getStatus());
-        props.afterFetchCustomObjectSchema();
     }
 
     @Test
@@ -879,6 +884,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertFalse(f.getWidget(props.fetchCompoundKey).isVisible());
 
         props.useCompoundKey.setValue(true);
+        props.afterUseCompoundKey();
         props.refreshLayout(props.getForm(Form.MAIN));
         assertTrue(f.getWidget(props.customObjectAction).isVisible());
         assertTrue(f.getWidget(props.customObjectName).isVisible());
@@ -890,4 +896,69 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertTrue(f.getWidget(props.fetchCustomObjectSchema).isVisible());
         assertTrue(f.getWidget(props.fetchCompoundKey).isVisible());
     }
+
+    @Test
+    public void testBeforeInputOperation() throws Exception {
+        props.beforeInputOperation();
+        assertEquals(Arrays.asList(getLead, getMultipleLeads, getLeadActivity, getLeadChanges, CustomObject),
+                props.inputOperation.getPossibleValues());
+        props.connection.apiMode.setValue(APIMode.SOAP);
+        props.beforeInputOperation();
+        assertEquals(Arrays.asList(getLead, getMultipleLeads, getLeadActivity, getLeadChanges),
+                props.inputOperation.getPossibleValues());
+    }
+
+    @Test
+    public void testGetVersionNumber() throws Exception {
+        assertTrue(props.getVersionNumber() > 0);
+    }
+
+    @Test
+    public void testPostDeserialize() throws Exception {
+        MarketoComponentWizardBaseProperties mprops = mock(MarketoComponentWizardBaseProperties.class);
+        when(mprops.postDeserialize(eq(0), any(PostDeserializeSetup.class), eq(false))).thenReturn(true);
+        assertFalse(props.postDeserialize(0, null, false));
+    }
+
+    @Test
+    public void testValidateFetchCustomObjectSchema() throws Exception {
+        try (SandboxedInstanceTestFixture sandboxedInstanceTestFixture = new SandboxedInstanceTestFixture()) {
+            sandboxedInstanceTestFixture.setUp();
+            props.inputOperation.setValue(CustomObject);
+            props.customObjectAction.setValue(CustomObjectAction.get);
+            props.refreshLayout(props.getForm(Form.MAIN));
+            props.afterInputOperation();
+            props.customObjectName.setValue("car_c");
+            assertEquals(Result.OK, props.validateFetchCustomObjectSchema().getStatus());
+            props.afterFetchCustomObjectSchema();
+            assertEquals(CO_CARC_SCHEMA, props.schemaInput.schema.getValue());
+            props.customObjectName.setValue("car_null");
+            assertEquals(Result.ERROR, props.validateFetchCustomObjectSchema().getStatus());
+            props.customObjectName.setValue("car_except");
+            assertEquals(Result.ERROR, props.validateFetchCustomObjectSchema().getStatus());
+        }
+    }
+
+    @Test
+    public void testValidateFetchCompoundKey() throws Exception {
+        try (SandboxedInstanceTestFixture sandboxedInstanceTestFixture = new SandboxedInstanceTestFixture()) {
+            sandboxedInstanceTestFixture.setUp();
+            props.customObjectName.setValue("car_c");
+            assertEquals(Result.OK, props.validateFetchCompoundKey().getStatus());
+            props.afterFetchCompoundKey();
+            assertEquals(Arrays.asList("brand", "model"), props.compoundKey.keyName.getValue());
+            props.customObjectName.setValue("car_null");
+            assertEquals(Result.ERROR, props.validateFetchCompoundKey().getStatus());
+            props.customObjectName.setValue("car_except");
+            assertEquals(Result.ERROR, props.validateFetchCompoundKey().getStatus());
+        }
+    }
+
+    @Test
+    public void testAfterFetchLeadSchema() throws Exception {
+        props.afterFetchLeadSchema();
+        assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads().getName(),
+                props.schemaInput.schema.getValue().getName());
+    }
+
 }

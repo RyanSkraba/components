@@ -66,6 +66,10 @@ public class SyncStatusTest {
         reason1.put("message", "M1");
         s.setReasons(Arrays.asList(reason1));
         assertEquals("[R1] M1.", s.getAvailableReason());
+        s.setReasons(null);
+        assertNotNull(s.getAvailableReason());
+        s.setReasons(new ArrayList<Map<String, String>>());
+        assertNotNull(s.getAvailableReason());
     }
 
     @Test

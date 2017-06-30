@@ -53,7 +53,6 @@ public class MarketoConnectionWizardDefinition extends AbstractComponentWizardDe
             return "connectionWizardIcon.png";
         case WIZARD_BANNER_75X66:
             return "marketoWizardBanner.png";
-        default:
         }
         return null;
     }

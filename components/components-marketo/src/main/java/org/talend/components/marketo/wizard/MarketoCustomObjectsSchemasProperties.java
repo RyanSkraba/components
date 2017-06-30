@@ -13,6 +13,8 @@
 package org.talend.components.marketo.wizard;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.talend.components.marketo.MarketoComponentDefinition.RUNTIME_SOURCEORSINK_CLASS;
+import static org.talend.components.marketo.MarketoComponentDefinition.getSandboxedInstance;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
@@ -23,7 +25,7 @@ import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.slf4j.Logger;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.marketo.MarketoProvideConnectionProperties;
-import org.talend.components.marketo.runtime.MarketoSourceOrSink;
+import org.talend.components.marketo.runtime.MarketoSourceOrSinkRuntime;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectSyncAction;
@@ -38,6 +40,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
+import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesImpl implements MarketoProvideConnectionProperties {
 
@@ -86,7 +89,10 @@ public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesIm
     public void beforeFormPresentCustomObjects() throws IOException {
         List<NamedThing> customObjectsNames;
         try {
-            customObjectsNames = MarketoSourceOrSink.getSchemaNames(null, connection);
+            SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance();
+            MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
+            sos.initialize(null, this);
+            customObjectsNames = sos.getSchemaNames(null);
         } catch (IOException e) {
             LOG.error(e.getMessage());
             throw e;
@@ -98,9 +104,11 @@ public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesIm
 
     public ValidationResult afterFormFinishCustomObjects(Repository<Properties> repo) throws Exception {
         try {
+            SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance();
+            MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
+            sos.initialize(null, this);
             String repoLoc = repo.storeProperties(connection, connection.name.getValue(), repositoryLocation, null);
             String storeId;
-
             for (NamedThing nl : selectedCustomObjectsNames.getValue()) {
                 String customObjectId = nl.getName();
                 storeId = nl.getName().replaceAll("-", "_").replaceAll(" ", "_");
@@ -111,8 +119,7 @@ public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesIm
                 customObjectProps.outputOperation.setValue(OutputOperation.syncCustomObjects);
                 customObjectProps.customObjectAction.setValue(CustomObjectAction.get);
                 customObjectProps.customObjectSyncAction.setValue(CustomObjectSyncAction.createOrUpdate);
-                customObjectProps.schemaInput.schema
-                        .setValue(MarketoSourceOrSink.getEndpointSchema(null, customObjectId, connection));
+                customObjectProps.schemaInput.schema.setValue(sos.getEndpointSchema(null, customObjectId));
                 customObjectProps.customObjectName.setValue(nl.getName());
                 repo.storeProperties(customObjectProps, storeId, repoLoc, "schemaInput.schema");
             }
@@ -124,6 +131,10 @@ public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesIm
             return vr;
         }
         return ValidationResult.OK;
+    }
+
+    protected SandboxedInstance getRuntimeSandboxedInstance() {
+        return getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS);
     }
 
 }

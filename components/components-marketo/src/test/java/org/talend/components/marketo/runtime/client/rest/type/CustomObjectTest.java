@@ -100,6 +100,10 @@ public class CustomObjectTest {
                 + "updatedAt=null, idField='model', dedupeFields=[brand, model], searchableFields=[[one, two, three]], "
                 + "fields=[FieldDescription{id=123456, displayName='My phone number', dataType='phone', length=25, rest=null, soap=null}, FieldDescription{id=123456, displayName='My phone number', dataType='phone', length=25, rest=null, soap=null}, FieldDescription{id=123456, displayName='My phone number', dataType='phone', length=25, rest=null, soap=null}], relationships=[ObjectRelation{field='related', relatedTo=RelatedObject{name='Related', field='rel'}, type='string'}, ObjectRelation{field='related', relatedTo=RelatedObject{name='Related', field='rel'}, type='string'}]}";
         assertEquals(s, co.toString());
+        co.setCreatedAt(new Date());
+        assertNotNull(co.toString());
+        co.setUpdatedAt(co.getCreatedAt());
+        assertNotNull(co.toString());
     }
 
     @Test

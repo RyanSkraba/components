@@ -13,6 +13,7 @@
 package org.talend.components.marketo;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -60,5 +61,8 @@ public class MarketoComponentPropertiesTest {
         assertTrue(props.getForm(Form.MAIN).getWidget(props.connection.getName()).isVisible());
         props.refreshLayout(props.getForm(Form.MAIN));
         assertTrue(props.getForm(Form.MAIN).getWidget(props.connection.getName()).isVisible());
+        assertTrue(props.isApiREST());
+        assertFalse(props.isApiSOAP());
     }
+
 }

@@ -233,7 +233,7 @@ public class MarketoCustomObjectClient extends MarketoLeadClient {
                 mkto.setRecords(rs.getResult());
             } else {
                 mkto.setRecordCount(0);
-                mkto.setErrors(Arrays.asList(rs.getErrors().get(0)));
+                mkto.setErrors(rs.getErrors());
             }
             LOG.debug("rs = {}.", rs);
         } catch (MarketoException e) {

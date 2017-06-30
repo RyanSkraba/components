@@ -65,7 +65,7 @@ public class MarketoOutputWriter extends MarketoWriter {
     public void open(String uId) throws IOException {
         super.open(uId);
 
-        properties = (TMarketoOutputProperties) sink.properties;
+        properties = (TMarketoOutputProperties) sink.getProperties();
         inputSchema = properties.schemaInput.schema.getValue();
         flowSchema = properties.schemaFlow.schema.getValue();
         rejectSchema = properties.schemaReject.schema.getValue();

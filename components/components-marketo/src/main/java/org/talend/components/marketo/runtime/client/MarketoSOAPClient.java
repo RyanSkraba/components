@@ -154,46 +154,53 @@ public class MarketoSOAPClient extends MarketoClient {
     private ObjectFactory objectFactory;
 
     public MarketoSOAPClient(TMarketoConnectionProperties connection) throws MarketoException {
+        LOG.debug("Marketo SOAP Client initialization.");
+        objectFactory = new ObjectFactory();
+        endpoint = connection.endpoint.getValue();
+        userId = connection.clientAccessId.getValue();
+        secretKey = connection.secretKey.getValue();
+    }
+
+    public MarketoSOAPClient connect() throws MarketoException {
         try {
-            LOG.debug("Marketo SOAP Client initialization.");
-            objectFactory = new ObjectFactory();
-            endpoint = connection.endpoint.getValue();
-            userId = connection.clientAccessId.getValue();
-            secretKey = connection.secretKey.getValue();
-
-            URL marketoSoapEndPoint = null;
-            marketoSoapEndPoint = new URL(endpoint + "?WSDL");
-
-            QName serviceName = new QName("http://www.marketo.com/mktows/", "MktMktowsApiService");
-            MktMktowsApiService service = new MktMktowsApiService(marketoSoapEndPoint, serviceName);
-            port = service.getMktowsApiSoapPort();
-            // Create Signature
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-            String text = df.format(new Date());
-            String requestTimestamp = text.substring(0, 22) + ":" + text.substring(22);
-            String encryptString = requestTimestamp + userId;
-            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA1");
-            Mac mac = getInstance("HmacSHA1");
-            mac.init(secretKeySpec);
-            byte[] rawHmac = mac.doFinal(encryptString.getBytes());
-            char[] hexChars = encodeHex(rawHmac);
-            String signature = new String(hexChars);
-            // Set Authentication Header
-            header = new AuthenticationHeader();
-            header.setMktowsUserId(userId);
-            header.setRequestTimestamp(requestTimestamp);
-            header.setRequestSignature(signature);
+            port = getMktowsApiSoapPort();
+            LOG.debug("Marketo SOAP Client :: port.");
+            header = getAuthentificationHeader();
+            LOG.debug("Marketo SOAP Client initialization :: AuthHeader.");
             // bug/TDI-38439_MarketoWizardConnection : make a dummy call to check auth and not just URL.
-            port.listMObjects(new ParamsListMObjects(), header);
-        } catch (MalformedURLException | NoSuchAlgorithmException | InvalidKeyException e) {
-            // LOG.error("Client connection error : {}.", e.getMessage());
-            throw new MarketoException(SOAP, e.getMessage());
-        } catch (WebServiceException e) {
-            // TODO manage connection reset and socket closed error with timeout and retry properties.
-            // String socket_close = "Socket closed";
-            // String connection_reset = "Connection reset";
+            getPort().listMObjects(new ParamsListMObjects(), header);
+        } catch (MalformedURLException | NoSuchAlgorithmException | InvalidKeyException | WebServiceException e) {
             throw new MarketoException(SOAP, e.getMessage());
         }
+        return this;
+    }
+
+    public AuthenticationHeader getAuthentificationHeader() throws NoSuchAlgorithmException, InvalidKeyException {
+        // Create Signature
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        String text = df.format(new Date());
+        String requestTimestamp = text.substring(0, 22) + ":" + text.substring(22);
+        String encryptString = requestTimestamp + userId;
+        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA1");
+        Mac mac = getInstance("HmacSHA1");
+        mac.init(secretKeySpec);
+        byte[] rawHmac = mac.doFinal(encryptString.getBytes());
+        char[] hexChars = encodeHex(rawHmac);
+        String signature = new String(hexChars);
+        // Set Authentication Header
+        AuthenticationHeader hdr = new AuthenticationHeader();
+        hdr.setMktowsUserId(userId);
+        hdr.setRequestTimestamp(requestTimestamp);
+        hdr.setRequestSignature(signature);
+        return hdr;
+    }
+
+    public MktowsPort getMktowsApiSoapPort() throws MalformedURLException {
+        URL marketoSoapEndPoint = null;
+        marketoSoapEndPoint = new URL(endpoint + "?WSDL");
+        QName serviceName = new QName("http://www.marketo.com/mktows/", "MktMktowsApiService");
+        MktMktowsApiService service = new MktMktowsApiService(marketoSoapEndPoint, serviceName);
+        return service.getMktowsApiSoapPort();
     }
 
     @Override
@@ -342,13 +349,14 @@ public class MarketoSOAPClient extends MarketoClient {
         SuccessGetLead result = null;
         MarketoRecordResult mkto = new MarketoRecordResult();
         try {
-            result = port.getLead(request, header);
+            result = getPort().getLead(request, header);
         } catch (Exception e) {
             LOG.error("Lead not found : {}.", e.getMessage());
             mkto.setSuccess(false);
             mkto.setRecordCount(0);
             mkto.setRemainCount(0);
             mkto.setErrors(Arrays.asList(new MarketoError(SOAP, e.getMessage())));
+            return mkto;
         }
         if (result == null || !(result.getResult().getCount() > 0)) {
             LOG.debug("Request returned 0 matching lead.");
@@ -486,7 +494,7 @@ public class MarketoSOAPClient extends MarketoClient {
         MarketoRecordResult mkto = new MarketoRecordResult();
         LOG.debug("Sending request to server...");
         try {
-            result = port.getMultipleLeads(request, header);
+            result = getPort().getMultipleLeads(request, header);
         } catch (Exception e) {
             LOG.error("Lead not found : {}.", e.getMessage());
             mkto.setSuccess(false);
@@ -579,7 +587,7 @@ public class MarketoSOAPClient extends MarketoClient {
         LOG.debug("Sending request to server...");
         MarketoRecordResult mkto = new MarketoRecordResult();
         try {
-            result = port.getLeadActivity(request, header);
+            result = getPort().getLeadActivity(request, header);
             mkto.setSuccess(true);
         } catch (Exception e) {
             LOG.error("getLeadActivity error : {}.", e.getMessage());
@@ -698,7 +706,7 @@ public class MarketoSOAPClient extends MarketoClient {
         LOG.debug("Sending request to server...");
         MarketoRecordResult mkto = new MarketoRecordResult();
         try {
-            result = port.getLeadChanges(request, header);
+            result = getPort().getLeadChanges(request, header);
             mkto.setSuccess(true);
         } catch (Exception e) {
             LOG.error("getLeadChanges error: {}.", e.getMessage());
@@ -753,7 +761,7 @@ public class MarketoSOAPClient extends MarketoClient {
         MarketoSyncResult mkto = new MarketoSyncResult();
         mkto.setRequestId(SOAP + "::" + operationType.name());
         try {
-            SuccessListOperation result = port.listOperation(paramsListOperation, header);
+            SuccessListOperation result = getPort().listOperation(paramsListOperation, header);
             if (LOG.isDebugEnabled()) {
                 try {
                     JAXBContext context = JAXBContext.newInstance(SuccessListOperation.class);
@@ -906,7 +914,7 @@ public class MarketoSOAPClient extends MarketoClient {
             request.setLeadRecord(convertToLeadRecord(lead, parameters.mappingInput.getNameMappingsForMarketo()));
             MktowsContextHeader headerContext = new MktowsContextHeader();
             headerContext.setTargetWorkspace("default");
-            SuccessSyncLead result = port.syncLead(request, header, headerContext);
+            SuccessSyncLead result = getPort().syncLead(request, header, headerContext);
             //
             if (LOG.isDebugEnabled()) {
                 try {
@@ -949,7 +957,7 @@ public class MarketoSOAPClient extends MarketoClient {
                     .createParamsSyncMultipleLeadsDedupEnabled(parameters.deDupeEnabled.getValue());
             request.setDedupEnabled(dedup);
             request.setLeadRecordList(leadRecords);
-            SuccessSyncMultipleLeads result = port.syncMultipleLeads(request, header);
+            SuccessSyncMultipleLeads result = getPort().syncMultipleLeads(request, header);
             //
             if (LOG.isDebugEnabled()) {
                 try {
@@ -976,5 +984,9 @@ public class MarketoSOAPClient extends MarketoClient {
             mkto.setErrors(Arrays.asList(new MarketoError(SOAP, e.getMessage())));
         }
         return mkto;
+    }
+
+    public MktowsPort getPort() {
+        return port;
     }
 }

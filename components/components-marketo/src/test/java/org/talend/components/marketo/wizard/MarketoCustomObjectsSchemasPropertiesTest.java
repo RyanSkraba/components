@@ -14,76 +14,29 @@ package org.talend.components.marketo.wizard;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.avro.Schema;
 import org.junit.Before;
 import org.junit.Test;
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.marketo.MarketoTestBase;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
-import org.talend.daikon.properties.Properties;
-import org.talend.daikon.properties.service.Repository;
+import org.talend.daikon.properties.ValidationResult.Result;
 
-public class MarketoCustomObjectsSchemasPropertiesTest {
+public class MarketoCustomObjectsSchemasPropertiesTest extends MarketoTestBase {
 
     MarketoCustomObjectsSchemasProperties properties;
 
     TMarketoConnectionProperties connection;
-
-    static class RepoProps {
-
-        Properties props;
-
-        String name;
-
-        String repoLocation;
-
-        Schema schema;
-
-        String schemaPropertyName;
-
-        RepoProps(Properties props, String name, String repoLocation, String schemaPropertyName) {
-            this.props = props;
-            this.name = name;
-            this.repoLocation = repoLocation;
-            this.schemaPropertyName = schemaPropertyName;
-            if (schemaPropertyName != null) {
-                this.schema = (Schema) props.getValuedProperty(schemaPropertyName).getValue();
-            }
-        }
-    }
-
-    class TestRepository implements Repository {
-
-        private int locationNum;
-
-        public String componentIdToCheck;
-
-        public ComponentProperties properties;
-
-        public List<RepoProps> repoProps;
-
-        TestRepository(List<RepoProps> repoProps) {
-            this.repoProps = repoProps;
-        }
-
-        @Override
-        public String storeProperties(Properties properties, String name, String repositoryLocation, String schemaPropertyName) {
-            RepoProps rp = new RepoProps(properties, name, repositoryLocation, schemaPropertyName);
-            repoProps.add(rp);
-            return repositoryLocation + ++locationNum;
-        }
-    }
-
-    private final List<RepoProps> repoProps = new ArrayList<>();
-
-    private Repository repo = new TestRepository(repoProps);
 
     @Before
     public void setUp() throws Exception {
@@ -94,6 +47,7 @@ public class MarketoCustomObjectsSchemasPropertiesTest {
         connection.endpoint.setValue("http://fakeendpoint.com");
         connection.clientAccessId.setValue("user0000");
         connection.secretKey.setValue("secretk");
+        properties.setupLayout();
     }
 
     @Test
@@ -113,19 +67,39 @@ public class MarketoCustomObjectsSchemasPropertiesTest {
         assertEquals("___DRI", properties.getRepositoryLocation());
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void testBeforeFormPresentCustomObjects() throws Exception {
-        properties.beforeFormPresentCustomObjects();
-        fail("Shouldn't be here");
+        try (SandboxedInstanceTestFixture sandboxedInstanceTestFixture = new SandboxedInstanceTestFixture()) {
+            sandboxedInstanceTestFixture.setUp();
+            properties.beforeFormPresentCustomObjects();
+            assertEquals(CO_SCHEMA_NAMES, properties.selectedCustomObjectsNames.getPossibleValues());
+            assertTrue(properties.getForm(MarketoCustomObjectsSchemasProperties.FORM_CUSTOMOBJECTS).isAllowBack());
+            assertTrue(properties.getForm(MarketoCustomObjectsSchemasProperties.FORM_CUSTOMOBJECTS).isAllowFinish());
+            when(sandboxedInstanceTestFixture.runtimeSourceOrSink.getSchemaNames(any(RuntimeContainer.class)))
+                    .thenThrow(new IOException("ERROR"));
+            try {
+                properties.beforeFormPresentCustomObjects();
+                fail("Should not be here");
+            } catch (Exception e) {
+                assertNotNull(e.getMessage());
+            }
+        }
     }
 
-    @Test // (expected = IOException.class)
+    @Test
     public void testAfterFormFinishCustomObjects() throws Exception {
-        List<NamedThing> o = new ArrayList<>();
-        o.add(new SimpleNamedThing("name", "displayName."));
-        properties.selectedCustomObjectsNames.setValue(o);
-        properties.afterFormFinishCustomObjects(repo);
-        // TODO avoid NPE.
+        try (SandboxedInstanceTestFixture sandboxedInstanceTestFixture = new SandboxedInstanceTestFixture()) {
+            sandboxedInstanceTestFixture.setUp();
+            properties.beforeFormPresentCustomObjects();
+            List<NamedThing> o = new ArrayList<>();
+            o.add(new SimpleNamedThing("car_c", "car_c"));
+            properties.selectedCustomObjectsNames.setValue(o);
+            assertEquals(Result.OK, properties.afterFormFinishCustomObjects(repo).getStatus());
+            //
+            o.add(new SimpleNamedThing("car_except", "car_except"));
+            properties.selectedCustomObjectsNames.setValue(o);
+            assertEquals(Result.ERROR, properties.afterFormFinishCustomObjects(repo).getStatus());
+        }
     }
 
 }

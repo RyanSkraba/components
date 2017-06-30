@@ -15,17 +15,20 @@ package org.talend.components.marketo.tmarketolistoperation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class TMarketoListOperationDefinitionTest {
 
     TMarketoListOperationDefinition def;
+
     @Before
     public void setup() {
         def = new TMarketoListOperationDefinition();
@@ -52,6 +55,11 @@ public class TMarketoListOperationDefinitionTest {
     @Test
     public void testNotStartable() {
         assertFalse(def.isStartable());
+    }
+
+    @Test
+    public void testIsConditionalInputs() throws Exception {
+        assertTrue(def.isConditionalInputs());
     }
 
 }

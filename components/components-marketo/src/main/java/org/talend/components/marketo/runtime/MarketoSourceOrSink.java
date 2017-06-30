@@ -1,3 +1,15 @@
+// ============================================================================
+//
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+//
+// This source code is available under agreement available at
+// %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
+//
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
+//
+// ============================================================================
 package org.talend.components.marketo.runtime;
 
 import java.io.IOException;
@@ -41,7 +53,7 @@ import org.talend.daikon.properties.ValidationResultMutable;
 
 import com.google.gson.Gson;
 
-public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSchemaProvider {
+public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRuntime, MarketoSourceOrSinkSchemaProvider {
 
     public static final String RESOURCE_COMPANY = "resourceCompany";
 
@@ -58,6 +70,10 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
     private static final Logger LOG = LoggerFactory.getLogger(MarketoSourceOrSink.class);
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoSourceOrSink.class);
+
+    public MarketoProvideConnectionProperties getProperties() {
+        return properties;
+    }
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
@@ -91,13 +107,6 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
         return validateConnection(conn);
     }
 
-    public static List<NamedThing> getSchemaNames(RuntimeContainer container, TMarketoConnectionProperties connection)
-            throws IOException {
-        MarketoSourceOrSink sos = new MarketoSourceOrSink();
-        sos.initialize(container, connection);
-        return sos.getSchemaNames(container);
-    }
-
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
         List<NamedThing> customObjects = new ArrayList<>();
@@ -118,13 +127,6 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
         }
         //
         return customObjects;
-    }
-
-    public static Schema getEndpointSchema(RuntimeContainer container, String schemaName, TMarketoConnectionProperties connection)
-            throws IOException {
-        MarketoSourceOrSink sos = new MarketoSourceOrSink();
-        sos.initialize(container, connection);
-        return sos.getEndpointSchema(container, schemaName);
     }
 
     @Override
@@ -198,6 +200,11 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
         return Arrays.asList(keys);
     }
 
+    @Override
+    public List<Field> getAllLeadFields() throws IOException {
+        return ((MarketoRESTClient) getClientService(null)).getAllLeadFields();
+    }
+
     /**
      * Retrieve schema for Leads or CustomObjects.
      *
@@ -255,7 +262,7 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
         return result;
     }
 
-    public static ValidationResult validateConnection(MarketoProvideConnectionProperties properties) {
+    public ValidationResult validateConnection(MarketoProvideConnectionProperties properties) {
         ValidationResultMutable vr = new ValidationResultMutable().setStatus(Result.OK);
         try {
             MarketoSourceOrSink sos = new MarketoSourceOrSink();
@@ -300,9 +307,9 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
             try {
                 TMarketoConnectionProperties conn = getEffectiveConnection(container);
                 if (APIMode.SOAP.equals(conn.apiMode.getValue())) {
-                    client = new MarketoSOAPClient(conn);
+                    client = new MarketoSOAPClient(conn).connect();
                 } else {
-                    client = new MarketoRESTClient(conn);
+                    client = new MarketoRESTClient(conn).connect();
                 }
             } catch (MarketoException e) {
                 LOG.error(e.toString());

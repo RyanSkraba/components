@@ -27,6 +27,8 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties.BulkFileFormat;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties.BulkImportTo;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
+import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 
 public class TMarketoBulkExecPropertiesTest {
@@ -117,4 +119,12 @@ public class TMarketoBulkExecPropertiesTest {
         assertEquals(BulkImportTo.Leads, BulkImportTo.valueOf("Leads"));
         assertEquals(BulkImportTo.CustomObjects, BulkImportTo.valueOf("CustomObjects"));
     }
+
+    @Test
+    public void testValidateBulkImportTo() throws Exception {
+        assertEquals(Result.OK, props.validateBulkImportTo().getStatus());
+        props.connection.apiMode.setValue(APIMode.SOAP);
+        assertEquals(Result.ERROR, props.validateBulkImportTo().getStatus());
+    }
+
 }

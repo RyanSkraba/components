@@ -1,7 +1,9 @@
 package org.talend.components.marketo.runtime.client.rest.response;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.marketo.runtime.client.type.MarketoError;
 
 public abstract class RequestResult {
@@ -23,7 +25,24 @@ public abstract class RequestResult {
     }
 
     public List<MarketoError> getErrors() {
+        // ensure that errors is never null
+        if (errors == null) {
+            return new ArrayList<>();
+        }
         return errors;
+    }
+
+    public String getErrorsString() {
+        StringBuilder errs = new StringBuilder("");
+        for (MarketoError err : getErrors()) {
+            errs.append("{");
+            if (!StringUtils.isEmpty(err.getCode())) {
+                errs.append("[").append(err.getCode()).append("] ");
+            }
+            errs.append(err.getMessage());
+            errs.append("}");
+        }
+        return errs.toString();
     }
 
     public abstract List<?> getResult();

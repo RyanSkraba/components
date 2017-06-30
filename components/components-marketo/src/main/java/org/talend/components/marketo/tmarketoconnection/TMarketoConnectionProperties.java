@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.marketo.tmarketoconnection;
 
+import static org.talend.components.marketo.MarketoComponentDefinition.RUNTIME_SOURCEORSINK_CLASS;
+import static org.talend.components.marketo.MarketoComponentDefinition.getSandboxedInstance;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
@@ -24,8 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.marketo.MarketoProvideConnectionProperties;
-import org.talend.components.marketo.runtime.MarketoSource;
-import org.talend.components.marketo.runtime.MarketoSourceOrSink;
+import org.talend.components.marketo.runtime.MarketoSourceOrSinkRuntime;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
@@ -33,6 +34,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
+import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class TMarketoConnectionProperties extends ComponentPropertiesImpl implements MarketoProvideConnectionProperties {
 
@@ -174,7 +176,10 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
     }
 
     public ValidationResult validateTestConnection() {
-        ValidationResult vr = MarketoSource.validateConnection(this);
+        SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance();
+        MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
+        sos.initialize(null, this);
+        ValidationResult vr = sos.validateConnection(this);
         if (vr.getStatus() == ValidationResult.Result.OK) {
             getForm(FORM_WIZARD).setAllowForward(true);
             getForm(FORM_WIZARD).setAllowFinish(true);
@@ -185,8 +190,10 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
     }
 
     public ValidationResult afterFormFinishWizard(Repository<Properties> repo) {
-
-        ValidationResult vr = MarketoSourceOrSink.validateConnection(this);
+        SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance();
+        MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
+        sos.initialize(null, this);
+        ValidationResult vr = sos.validateConnection(this);
         if (vr.getStatus() != ValidationResult.Result.OK) {
             return vr;
         }
@@ -216,6 +223,10 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
     public TMarketoConnectionProperties setRepositoryLocation(String repositoryLocation) {
         this.repositoryLocation = repositoryLocation;
         return this;
+    }
+
+    protected SandboxedInstance getRuntimeSandboxedInstance() {
+        return getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS);
     }
 
 }

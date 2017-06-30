@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.marketo.wizard;
 
+import static org.talend.components.marketo.MarketoComponentDefinition.RUNTIME_SOURCEORSINK_CLASS;
+import static org.talend.components.marketo.MarketoComponentDefinition.getSandboxedInstance;
 import static org.talend.components.marketo.MarketoConstants.getEmptySchema;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
@@ -32,11 +34,12 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.runtime.MarketoSourceOrSink;
-import org.talend.components.marketo.runtime.client.MarketoRESTClient;
+import org.talend.components.marketo.runtime.MarketoSourceOrSinkSchemaProvider;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class MarketoComponentWizardBaseProperties extends MarketoComponentProperties {
 
@@ -73,10 +76,10 @@ public class MarketoComponentWizardBaseProperties extends MarketoComponentProper
         List<NamedThing> cols = new ArrayList<>();
         try {
             if (allAvailableleadFields.isEmpty()) {
-                MarketoSourceOrSink sos = new MarketoSourceOrSink();
+                SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance();
+                MarketoSourceOrSinkSchemaProvider sos = (MarketoSourceOrSinkSchemaProvider) sandboxedInstance.getInstance();
                 sos.initialize(null, this);
-                MarketoRESTClient client = (MarketoRESTClient) sos.getClientService(null);
-                for (Field f : client.getAllLeadFields()) {
+                for (Field f : sos.getAllLeadFields()) {
                     allAvailableleadFields.put(f.name(), f);
                 }
             }
@@ -144,4 +147,9 @@ public class MarketoComponentWizardBaseProperties extends MarketoComponentProper
         updateOnly,
         createOrUpdate
     }
+
+    protected SandboxedInstance getRuntimeSandboxedInstance() {
+        return getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS);
+    }
+
 }

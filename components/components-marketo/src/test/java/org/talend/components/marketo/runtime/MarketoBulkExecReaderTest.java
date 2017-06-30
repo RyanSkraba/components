@@ -18,35 +18,65 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.talend.components.api.component.ComponentDefinition.RETURN_ERROR_MESSAGE;
 import static org.talend.components.marketo.MarketoComponentDefinition.RETURN_NB_CALL;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.marketo.MarketoConstants;
+import org.talend.components.marketo.runtime.client.MarketoRESTClient;
+import org.talend.components.marketo.runtime.client.type.MarketoError;
+import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties;
 
 public class MarketoBulkExecReaderTest {
 
     MarketoBulkExecReader reader;
 
+    MarketoRESTClient client;
+
     @Before
     public void setUp() throws Exception {
-        MarketoSource source = new MarketoSource();
         TMarketoBulkExecProperties props = new TMarketoBulkExecProperties("test");
         props.connection.setupProperties();
         props.setupProperties();
+        client = mock(MarketoRESTClient.class);
+        when(client.bulkImport(any(TMarketoBulkExecProperties.class))).thenReturn(new MarketoRecordResult());
+        MarketoSource source = mock(MarketoSource.class);
         source.initialize(null, props);
+        when(source.getClientService(any(RuntimeContainer.class))).thenReturn(client);
+        when(source.createReader(null)).thenReturn(new MarketoBulkExecReader(null, source, props));
         reader = (MarketoBulkExecReader) source.createReader(null);
         assertTrue(reader instanceof MarketoBulkExecReader);
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void testStart() throws Exception {
+        try {
+            assertFalse(reader.start());
+            fail("Should not be here");
+        } catch (IOException e) {
+        }
+        reader.properties.dieOnError.setValue(false);
+        MarketoRecordResult mkto = new MarketoRecordResult();
+        mkto.setErrors(Arrays.asList(new MarketoError("REST", "error")));
+        when(client.bulkImport(any(TMarketoBulkExecProperties.class))).thenReturn(mkto);
         assertFalse(reader.start());
-        fail("Shouldn't be here");
+        IndexedRecord record = new GenericData.Record(MarketoConstants.getEmptySchema());
+        mkto.setSuccess(true);
+        mkto.setRecords(Arrays.asList(record));
+        when(client.bulkImport(any(TMarketoBulkExecProperties.class))).thenReturn(mkto);
+        assertTrue(reader.start());
     }
 
     @Test

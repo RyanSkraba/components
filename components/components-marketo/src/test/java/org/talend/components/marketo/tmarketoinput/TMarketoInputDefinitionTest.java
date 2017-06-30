@@ -52,6 +52,8 @@ public class TMarketoInputDefinitionTest {
     @Test
     public void testGetRuntimeInfo() throws Exception {
         assertNotNull(def.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.OUTGOING));
+        assertNotNull(def.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.INCOMING));
+        assertNotNull(def.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.INCOMING_AND_OUTGOING));
     }
 
     @Test

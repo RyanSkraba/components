@@ -227,4 +227,50 @@ public class MarketoConstantsTest {
         assertEquals("STRING", ref.getField("failuresLogFile").schema().getTypes().get(0).getType().toString());
         assertEquals("STRING", ref.getField("warningsLogFile").schema().getTypes().get(0).getType().toString());
     }
+
+    @Test
+    public void testGetCampaignSchema() throws Exception {
+        Schema ref = MarketoConstants.getCampaignSchema();
+        assertEquals("INT", ref.getField("id").schema().getTypes().get(0).getType().toString());
+        assertEquals("true", ref.getField("id").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+        assertEquals("STRING", ref.getField("name").schema().getTypes().get(0).getType().toString());
+        assertEquals("BOOLEAN", ref.getField("active").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("description").schema().getTypes().get(0).getType().toString());
+        assertEquals("INT", ref.getField("programId").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("programName").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("type").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("workspaceName").schema().getTypes().get(0).getType().toString());
+        assertEquals("LONG", ref.getField("createdAt").schema().getType().toString());
+        assertEquals("java.util.Date", ref.getField("createdAt").getProp(SchemaConstants.JAVA_CLASS_FLAG));
+        assertEquals(DATETIME_PATTERN_REST, ref.getField("createdAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals("LONG", ref.getField("updatedAt").schema().getType().toString());
+        assertEquals("java.util.Date", ref.getField("updatedAt").getProp(SchemaConstants.JAVA_CLASS_FLAG));
+        assertEquals(DATETIME_PATTERN_REST, ref.getField("updatedAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+    }
+
+    @Test
+    public void testScheduleCampaignSchema() throws Exception {
+        Schema ref = MarketoConstants.scheduleCampaignSchema();
+        assertEquals("INT", ref.getField("campaignId").schema().getTypes().get(0).getType().toString());
+        assertEquals("true", ref.getField("campaignId").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+        assertEquals("STRING", ref.getField("Status").schema().getTypes().get(0).getType().toString());
+    }
+
+    @Test
+    public void testTriggerCampaignSchema() throws Exception {
+        Schema ref = MarketoConstants.triggerCampaignSchema();
+        assertEquals("INT", ref.getField("leadId").schema().getTypes().get(0).getType().toString());
+        assertEquals("true", ref.getField("leadId").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+    }
+
+    @Test
+    public void testTriggerCampaignSchemaFlow() throws Exception {
+        Schema ref = MarketoConstants.triggerCampaignSchemaFlow();
+        assertEquals("INT", ref.getField("leadId").schema().getTypes().get(0).getType().toString());
+        assertEquals("true", ref.getField("leadId").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+        assertEquals("INT", ref.getField("campaignId").schema().getTypes().get(0).getType().toString());
+        assertEquals("true", ref.getField("campaignId").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+        assertEquals("STRING", ref.getField("Status").schema().getTypes().get(0).getType().toString());
+    }
+
 }

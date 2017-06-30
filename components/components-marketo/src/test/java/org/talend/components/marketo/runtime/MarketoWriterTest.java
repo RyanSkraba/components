@@ -15,9 +15,7 @@ package org.talend.components.marketo.runtime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.util.Collections;
 
 import org.junit.Before;
@@ -25,29 +23,22 @@ import org.junit.Test;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 
-public class MarketoWriterTest {
-
-    MarketoSink sink;
+public class MarketoWriterTest extends MarketoRuntimeTestBase {
 
     MarketoWriteOperation wop;
 
-    MarketoOutputWriter writer;
+    MarketoWriter writer;
 
     @Before
     public void setUp() throws Exception {
-        sink = new MarketoSink();
+        super.setUp();
         TMarketoOutputProperties pout = new TMarketoOutputProperties("test");
         pout.connection.setupProperties();
         pout.setupProperties();
+        MarketoSink sink = new MarketoSink();
         sink.initialize(null, pout);
         wop = (MarketoWriteOperation) sink.createWriteOperation();
-        writer = (MarketoOutputWriter) wop.createWriter(null);
-    }
-
-    @Test(expected = IOException.class)
-    public void testOpen() throws Exception {
-        writer.open("testUID");
-        fail("Shouldn't be here");
+        writer = (MarketoWriter) wop.createWriter(null);
     }
 
     @Test

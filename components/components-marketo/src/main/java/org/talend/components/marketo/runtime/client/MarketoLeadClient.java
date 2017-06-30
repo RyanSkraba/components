@@ -320,7 +320,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                             parameters.mappingInput.getNameMappingsForMarketo()));
                 }
             } else {
-                mkto.setErrors(Arrays.asList(result.getErrors().get(0)));
+                mkto.setErrors(result.getErrors());
             }
         } catch (MarketoException e) {
             LOG.error("Lead error {}.", e.toString());
@@ -395,7 +395,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                             parameters.mappingInput.getNameMappingsForMarketo()));
                 }
             } else {
-                mkto.setErrors(Arrays.asList(result.getErrors().get(0)));
+                mkto.setErrors(result.getErrors());
             }
         } catch (MarketoException e) {
             LOG.error("MultipleLeads error {}.", e.toString());
@@ -469,7 +469,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                             parameters.mappingInput.getNameMappingsForMarketo()));
                 }
             } else {
-                mkto.setErrors(Arrays.asList(result.getErrors().get(0)));
+                mkto.setErrors(result.getErrors());
             }
         } catch (MarketoException e) {
             LOG.error("LeadActivities error {}.", e.toString());
@@ -516,7 +516,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                     mkto.setStreamPosition(result.getNextPageToken());
                 }
             } else {
-                mkto.setErrors(Arrays.asList(result.getErrors().get(0)));
+                mkto.setErrors(result.getErrors());
             }
         } catch (MarketoException e) {
             LOG.error("LeadChanges error {}.", e.toString());

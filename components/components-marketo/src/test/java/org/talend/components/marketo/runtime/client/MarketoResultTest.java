@@ -70,11 +70,12 @@ public class MarketoResultTest {
         assertEquals("REST::666", result.getRequestId());
         assertTrue(result.isSuccess());
         assertNotNull(result.getErrors());
-
         result = new MarketoRecordResult("200", 200, 200, null);
         assertNull(result.getRecords());
         assertEquals(200, result.getRecordCount());
         assertEquals(200, result.getRemainCount());
         assertEquals("200", result.getStreamPosition());
+        result.setErrors(Arrays.asList(new MarketoError("REST", "101", "error"), new MarketoError("error2")));
+        assertNotNull(result.getErrorsString());
     }
 }

@@ -63,7 +63,7 @@ public class MarketoListOperationWriter extends MarketoWriter {
     public void open(String uId) throws IOException {
         super.open(uId);
 
-        properties = (TMarketoListOperationProperties) sink.properties;
+        properties = (TMarketoListOperationProperties) sink.getProperties();
         inputSchema = properties.schemaInput.schema.getValue();
         flowSchema = properties.schemaFlow.schema.getValue();
         rejectSchema = properties.schemaReject.schema.getValue();

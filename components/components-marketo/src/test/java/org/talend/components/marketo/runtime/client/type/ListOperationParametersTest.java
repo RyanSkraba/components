@@ -14,6 +14,7 @@ package org.talend.components.marketo.runtime.client.type;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -25,9 +26,9 @@ public class ListOperationParametersTest {
 
     ListOperationParameters listOpSOAP;
 
-    final String[] stringKeys = {"KEY1", "KEY2"};
+    final String[] stringKeys = { "KEY1", "KEY2" };
 
-    final Integer[] integerKeys = {1, 2};
+    final Integer[] integerKeys = { 1, 2 };
 
     Integer listId = 1000;
 
@@ -97,14 +98,14 @@ public class ListOperationParametersTest {
         listOpSOAP.setLeadKeyType("FRRT");
         listOpSOAP.setLeadKeyValue(null);
         assertFalse(listOpSOAP.isValid());
-        listOpSOAP.setLeadKeyValue(new String[]{});
+        listOpSOAP.setLeadKeyValue(new String[] {});
         assertFalse(listOpSOAP.isValid());
         //
         assertTrue(listOpREST.isValid());
         listOpREST.setListId(null);
         listOpREST.setLeadIds(null);
         assertFalse(listOpREST.isValid());
-        listOpREST.setLeadIds(new Integer[]{});
+        listOpREST.setLeadIds(new Integer[] {});
         assertFalse(listOpREST.isValid());
         listOpREST.setLeadIds(integerKeys);
         assertFalse(listOpREST.isValid());
@@ -112,7 +113,7 @@ public class ListOperationParametersTest {
         listOpREST.setLeadIds(null);
         assertFalse(listOpREST.isValid());
         listOpREST.setListId(listId);
-        listOpREST.setLeadIds(new Integer[]{});
+        listOpREST.setLeadIds(new Integer[] {});
         assertFalse(listOpREST.isValid());
         //
         ListOperationParameters p = new ListOperationParameters();
@@ -124,6 +125,15 @@ public class ListOperationParametersTest {
         assertFalse(p.isValid());
         p.setApiMode("REST");
         assertTrue(p.isValid());
+        //
+        listOpSOAP.setListKeyType(null);
+        listOpSOAP.setListKeyValue(null);
+        listOpSOAP.setLeadKeyType(null);
+        listOpSOAP.setLeadKeyValue(null);
+        assertFalse(listOpSOAP.isValid());
+        listOpSOAP.setLeadKeyType("");
+        listOpSOAP.setLeadKeyValue(new String[] { "erer" });
+        assertFalse(listOpSOAP.isValid());
     }
 
     @Test
@@ -144,4 +154,15 @@ public class ListOperationParametersTest {
         assertEquals(nulls, listOpSOAP.toString());
     }
 
+    @Test
+    public void testReset() throws Exception {
+        listOpREST.reset();
+        assertNull("", listOpREST.listId);
+        assertTrue(listOpREST.leadIds.isEmpty());
+        listOpSOAP.reset();
+        assertEquals("", listOpSOAP.listKeyType);
+        assertEquals("", listOpSOAP.listKeyValue);
+        assertEquals("", listOpSOAP.leadKeyType);
+        assertTrue(listOpSOAP.leadKeyValue.isEmpty());
+    }
 }

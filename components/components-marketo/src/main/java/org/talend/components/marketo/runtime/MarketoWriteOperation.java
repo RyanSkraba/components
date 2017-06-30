@@ -43,13 +43,13 @@ public class MarketoWriteOperation implements WriteOperation<Result> {
 
     @Override
     public Writer<Result> createWriter(RuntimeContainer adaptor) {
-        if (sink.properties instanceof TMarketoListOperationProperties) {
+        if (sink.getProperties() instanceof TMarketoListOperationProperties) {
             return new MarketoListOperationWriter(this, adaptor);
         }
-        if (sink.properties instanceof TMarketoOutputProperties) {
+        if (sink.getProperties() instanceof TMarketoOutputProperties) {
             return new MarketoOutputWriter(this, adaptor);
         }
-        if (sink.properties instanceof TMarketoInputProperties) {
+        if (sink.getProperties() instanceof TMarketoInputProperties) {
             return new MarketoInputWriter(this, adaptor);
         }
         return null;

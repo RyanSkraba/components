@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -150,27 +149,6 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
         timeout = connection.timeout.getValue();
         retryCount = connection.maxReconnAttemps.getValue();
         retryInterval = connection.attemptsIntervalTime.getValue();
-        try {
-            if (endpoint == null) {
-                throw new MarketoException(REST, messages.getMessage("error.rest.endpoint.null"));
-            }
-            URL url = new URL(endpoint);
-            if (url.getPath() != null) {
-                basicPath = url.toString();
-                // check if endpoint is valid
-                if (!basicPath.equals(String.format("%s://%s/rest", url.getProtocol(), url.getHost()))) {
-                    throw new MarketoException(REST, messages.getMessage("error.rest.endpoint.invalid"));
-                }
-                bulkPath = basicPath.replaceAll("rest$", "bulk");
-            }
-            // check credentials
-            getToken();
-            // dummy call to finally check the connection
-            getPageToken("2017-01-01 00:00:00");
-        } catch (MalformedURLException e) {
-            LOG.error(e.toString());
-            throw new MarketoException(REST, e.getMessage());
-        }
     }
 
     @Override

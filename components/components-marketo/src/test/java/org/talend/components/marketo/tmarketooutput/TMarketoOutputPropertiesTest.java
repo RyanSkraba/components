@@ -16,6 +16,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.syncLead;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.syncMultipleLeads;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,10 +34,14 @@ import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
+import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.CustomObjectDeleteBy;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OperationType;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.RESTLookupFields;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation;
+import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.serialize.PostDeserializeSetup;
 
 public class TMarketoOutputPropertiesTest {
 
@@ -46,6 +56,9 @@ public class TMarketoOutputPropertiesTest {
         props.schemaInput.setupLayout();
         props.setupProperties();
         props.setupLayout();
+        props.mappingInput.setupProperties();
+        props.mappingInput.setupLayout();
+        props.afterOutputOperation();
     }
 
     @Test
@@ -57,8 +70,8 @@ public class TMarketoOutputPropertiesTest {
 
     @Test
     public void testEnums() {
-        assertEquals(OutputOperation.syncLead, OutputOperation.valueOf("syncLead"));
-        assertEquals(OutputOperation.syncMultipleLeads, OutputOperation.valueOf("syncMultipleLeads"));
+        assertEquals(syncLead, OutputOperation.valueOf("syncLead"));
+        assertEquals(syncMultipleLeads, OutputOperation.valueOf("syncMultipleLeads"));
 
         assertEquals(OperationType.createOnly, OperationType.valueOf("createOnly"));
         assertEquals(OperationType.updateOnly, OperationType.valueOf("updateOnly"));
@@ -76,19 +89,23 @@ public class TMarketoOutputPropertiesTest {
         assertEquals(RESTLookupFields.sfdcLeadId, RESTLookupFields.valueOf("sfdcLeadId"));
         assertEquals(RESTLookupFields.sfdcLeadOwnerId, RESTLookupFields.valueOf("sfdcLeadOwnerId"));
         assertEquals(RESTLookupFields.sfdcOpptyId, RESTLookupFields.valueOf("sfdcOpptyId"));
+
+        assertEquals(CustomObjectDeleteBy.idField, CustomObjectDeleteBy.valueOf("idField"));
+        assertEquals(CustomObjectDeleteBy.dedupeFields, CustomObjectDeleteBy.valueOf("dedupeFields"));
     }
 
     @Test
     public void testUpdateSchemaRelated() throws Exception {
-        props.outputOperation.setValue(OutputOperation.syncLead);
+        props.outputOperation.setValue(syncLead);
         props.setupProperties();
         props.mappingInput.setupProperties();
         props.afterOutputOperation();
         assertEquals(MarketoConstants.getRESTOutputSchemaForSyncLead(), props.schemaInput.schema.getValue());
         assertEquals(MarketoConstants.getRESTOutputSchemaForSyncLead().getFields(),
                 props.schemaFlow.schema.getValue().getFields());
-        props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
+        props.outputOperation.setValue(syncMultipleLeads);
         props.batchSize.setValue(1);
+        props.afterBatchSize();
         props.afterOutputOperation();
         assertEquals(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads(), props.schemaInput.schema.getValue());
         assertEquals(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads().getFields(),
@@ -98,14 +115,14 @@ public class TMarketoOutputPropertiesTest {
 
         props.connection.apiMode.setValue(APIMode.SOAP);
         props.updateSchemaRelated();
-        props.outputOperation.setValue(OutputOperation.syncLead);
+        props.outputOperation.setValue(syncLead);
         props.afterOutputOperation();
         assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncLead(), props.schemaInput.schema.getValue());
         assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncLead().getFields(),
                 props.schemaFlow.schema.getValue().getFields());
         assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncLead().getFields().size() + 1,
                 props.schemaReject.schema.getValue().getFields().size());
-        props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
+        props.outputOperation.setValue(syncMultipleLeads);
         props.afterOutputOperation();
         assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncMultipleLeads(), props.schemaInput.schema.getValue());
         assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncMultipleLeads().getFields(),
@@ -121,7 +138,7 @@ public class TMarketoOutputPropertiesTest {
 
     @Test
     public void testTDI38543() throws Exception {
-        props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
+        props.outputOperation.setValue(syncMultipleLeads);
         props.afterOutputOperation();
         assertFalse(props.deDupeEnabled.getValue());
         assertTrue(props.getForm(Form.MAIN).getWidget(props.operationType.getName()).isVisible());
@@ -180,4 +197,73 @@ public class TMarketoOutputPropertiesTest {
         // props.schemaFlow.schema.getValue().getFields());
     }
 
+    @Test
+    public void testCustomObjectActions() throws Exception {
+        Form f = props.getForm(Form.MAIN);
+        props.updateSchemaRelated();
+        props.schemaListener.afterSchema();
+        props.refreshLayout(f);
+        assertFalse(f.getWidget(props.customObjectName.getName()).isVisible());
+        assertFalse(f.getWidget(props.customObjectSyncAction.getName()).isVisible());
+        assertFalse(f.getWidget(props.customObjectDeleteBy.getName()).isVisible());
+        assertFalse(f.getWidget(props.customObjectDedupeBy.getName()).isVisible());
+        props.outputOperation.setValue(OutputOperation.syncCustomObjects);
+        props.updateSchemaRelated();
+        props.schemaListener.afterSchema();
+        props.refreshLayout(f);
+        assertTrue(f.getWidget(props.customObjectName.getName()).isVisible());
+        assertTrue(f.getWidget(props.customObjectSyncAction.getName()).isVisible());
+        assertTrue(f.getWidget(props.customObjectDedupeBy.getName()).isVisible());
+        assertFalse(f.getWidget(props.customObjectDeleteBy.getName()).isVisible());
+        props.outputOperation.setValue(OutputOperation.deleteCustomObjects);
+        props.updateSchemaRelated();
+        props.schemaListener.afterSchema();
+        props.refreshLayout(f);
+        assertTrue(f.getWidget(props.customObjectName.getName()).isVisible());
+        assertFalse(f.getWidget(props.customObjectSyncAction.getName()).isVisible());
+        assertTrue(f.getWidget(props.customObjectDeleteBy.getName()).isVisible());
+        assertFalse(f.getWidget(props.customObjectDedupeBy.getName()).isVisible());
+    }
+
+    @Test
+    public void testValidateOutputOperation() throws Exception {
+        assertEquals(Result.OK, props.validateOutputOperation().getStatus());
+        props.connection.apiMode.setValue(APIMode.SOAP);
+        assertEquals(Result.OK, props.validateOutputOperation().getStatus());
+        props.outputOperation.setValue(OutputOperation.deleteCustomObjects);
+        assertEquals(Result.ERROR, props.validateOutputOperation().getStatus());
+    }
+
+    @Test
+    public void testBeforeOutputOperation() throws Exception {
+        props.beforeOutputOperation();
+        assertEquals(OutputOperation.values().length, props.outputOperation.getPossibleValues().size());
+        props.connection.apiMode.setValue(APIMode.SOAP);
+        props.beforeOutputOperation();
+        assertEquals(Arrays.asList(syncLead, syncMultipleLeads), props.outputOperation.getPossibleValues());
+        props.outputOperation.setValue(OutputOperation.syncCustomObjects);
+        props.beforeOutputOperation();
+        assertEquals(syncLead, props.outputOperation.getValue());
+    }
+
+    @Test
+    public void testGetVersionNumber() throws Exception {
+        assertTrue(props.getVersionNumber() > 0);
+    }
+
+    @Test
+    public void testPostDeserialize() throws Exception {
+        MarketoComponentWizardBaseProperties mprops = mock(MarketoComponentWizardBaseProperties.class);
+        when(mprops.postDeserialize(eq(0), any(PostDeserializeSetup.class), eq(false))).thenReturn(true);
+        assertFalse(props.postDeserialize(0, null, false));
+        when(mprops.postDeserialize(eq(0), any(PostDeserializeSetup.class), eq(false))).thenThrow(new ClassCastException());
+        assertFalse(props.postDeserialize(0, null, false));
+    }
+
+    @Test
+    public void testAfterFetchLeadSchema() throws Exception {
+        props.afterFetchLeadSchema();
+        assertEquals(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads().getName(),
+                props.schemaInput.schema.getValue().getName());
+    }
 }

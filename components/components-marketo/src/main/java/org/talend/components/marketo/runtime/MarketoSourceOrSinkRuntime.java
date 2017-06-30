@@ -12,24 +12,12 @@
 // ============================================================================
 package org.talend.components.marketo.runtime;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
 import org.talend.components.api.component.runtime.SourceOrSink;
+import org.talend.components.marketo.MarketoProvideConnectionProperties;
+import org.talend.daikon.properties.ValidationResult;
 
-public interface MarketoSourceOrSinkSchemaProvider extends SourceOrSink {
+public interface MarketoSourceOrSinkRuntime extends SourceOrSink {
 
-    Schema getSchemaForCustomObject(String customObjectName) throws IOException;
+    ValidationResult validateConnection(MarketoProvideConnectionProperties properties);
 
-    Schema getSchemaForCompany() throws IOException;
-
-    Schema getSchemaForOpportunity() throws IOException;
-
-    Schema getSchemaForOpportunityRole() throws IOException;
-
-    List<String> getCompoundKeyFields(String resource) throws IOException;
-
-    List<Field> getAllLeadFields() throws IOException;
 }
