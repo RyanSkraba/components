@@ -38,8 +38,6 @@ public class AzureStorageUtilsTest {
 
     String keyparent = "parent";
 
-    File file = new File(".");
-
     String folder;
 
     String TEST_FOLDER_PUT = "azurestorage-put";
@@ -47,7 +45,7 @@ public class AzureStorageUtilsTest {
     @Before
     public void setUp() throws Exception {
         azureStorageUtils = new AzureStorageUtils();
-        folder = getClass().getResource("/").getPath();
+        folder = getClass().getClassLoader().getResource("azurestorage-put").getPath();
     }
 
     /**
@@ -56,17 +54,16 @@ public class AzureStorageUtilsTest {
      */
     @Test
     public void testGenAzureObjectList() {
-        file = new File(folder);
+        File file = new File(folder);
         Map<String, String> result = azureStorageUtils.genAzureObjectList(file, keyparent);
         assertNotNull("result cannot be null", result);
 
-
     }
-    
+
     @Test
-    public void testIlleagueArguementException(){
+    public void testIlleagueArguementException() {
         try {
-            file = new File(folder + "/blob1.txt");
+            File file = new File(folder + "/blob1.txt");
             azureStorageUtils.genAzureObjectList(file, keyparent);
         } catch (IllegalArgumentException ilae) {
             assertEquals(i18nMessages.getMessage("error.invalidDirectory"), ilae.getMessage());

@@ -30,51 +30,67 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.blob.runtime.AzureStorageReader;
 import org.talend.components.azurestorage.queue.AzureStorageQueueDefinition;
+import org.talend.components.azurestorage.queue.AzureStorageQueueService;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinput.TAzureStorageQueueInputProperties;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
 import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.queue.CloudQueue;
 import com.microsoft.azure.storage.queue.CloudQueueMessage;
 
 public class AzureStorageQueueInputReader extends AzureStorageReader<IndexedRecord> {
 
-    private TAzureStorageQueueInputProperties properties;
+    protected String queueName;
+
+    protected int nbMsg;
+
+    protected int visibilityTimeout;
+
+    protected Boolean peek;
+
+    protected boolean dieOnError;
+
+    protected Schema schema;
 
     protected Iterator<CloudQueueMessage> messages;
 
     protected CloudQueueMessage current;
 
-    protected Boolean delete = Boolean.FALSE;
+    protected boolean delete = false;
 
-    protected CloudQueue queue;
+    protected boolean startable;
+
+    protected Boolean advanceable;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageQueueInputReader.class);
-    
+
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageQueueInputReader.class);
 
+    public AzureStorageQueueService queueService;
+
     public AzureStorageQueueInputReader(RuntimeContainer container, BoundedSource source,
             TAzureStorageQueueInputProperties properties) {
+
         super(container, source);
-        this.properties = properties;
+        queueName = properties.queueName.getValue();
+        nbMsg = properties.numberOfMessages.getValue();
+        visibilityTimeout = properties.visibilityTimeoutInSeconds.getValue();
+        peek = properties.peekMessages.getValue();
+        delete = properties.deleteMessages.getValue();
+        dieOnError = properties.dieOnError.getValue();
+        schema = properties.schema.schema.getValue();
+        this.queueService = new AzureStorageQueueService(((AzureStorageQueueSource) source).getAzureConnection(container));
     }
 
     @Override
     public boolean start() throws IOException {
-        Boolean startable = false;
-        String queueName = properties.queueName.getValue();
-        int nbMsg = properties.numberOfMessages.getValue();
-        int visibilityTimeout = properties.visibilityTimeoutInSeconds.getValue();
-        Boolean peek = properties.peekMessages.getValue();
-        delete = properties.deleteMessages.getValue();
+
         try {
-            queue = ((AzureStorageQueueSource) getCurrentSource()).getCloudQueue(runtime, queueName);
             if (peek) {
-                messages = queue.peekMessages(nbMsg).iterator();
+                messages = queueService.peekMessages(queueName, nbMsg).iterator();
             } else {
-                messages = queue.retrieveMessages(nbMsg, visibilityTimeout, null, null).iterator();
+                messages = queueService.retrieveMessages(queueName, nbMsg, visibilityTimeout).iterator();
             }
             startable = messages.hasNext();
             if (startable) {
@@ -82,15 +98,15 @@ public class AzureStorageQueueInputReader extends AzureStorageReader<IndexedReco
                 current = messages.next();
                 if (delete) {
                     try {
-                        queue.deleteMessage(current);
+                        queueService.deleteMessage(queueName, current);
                     } catch (StorageException e) {
-                        LOGGER.error(i18nMessages.getMessage("error.Cannotdelete",current.getId(),e.getLocalizedMessage()));
+                        LOGGER.error(i18nMessages.getMessage("error.Cannotdelete", current.getId(), e.getLocalizedMessage()));
                     }
                 }
             }
         } catch (InvalidKeyException | URISyntaxException | StorageException e) {
             LOGGER.error(e.getLocalizedMessage());
-            if (properties.dieOnError.getValue())
+            if (dieOnError)
                 throw new ComponentException(e);
         }
         return startable;
@@ -98,16 +114,16 @@ public class AzureStorageQueueInputReader extends AzureStorageReader<IndexedReco
 
     @Override
     public boolean advance() throws IOException {
-        Boolean advanceable = messages.hasNext();
+        advanceable = messages.hasNext();
         if (advanceable) {
             dataCount++;
             current = messages.next();
-            //
+
             if (delete) {
                 try {
-                    queue.deleteMessage(current);
-                } catch (StorageException e) {
-                    LOGGER.error(i18nMessages.getMessage("error.Cannotdelete",current.getId(),e.getLocalizedMessage()));
+                    queueService.deleteMessage(queueName, current);
+                } catch (StorageException | InvalidKeyException | URISyntaxException e) {
+                    LOGGER.error(i18nMessages.getMessage("error.Cannotdelete", current.getId(), e.getLocalizedMessage()));
                 }
             }
         }
@@ -116,32 +132,34 @@ public class AzureStorageQueueInputReader extends AzureStorageReader<IndexedReco
 
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
-        CloudQueueMessage msg = current;
-        Schema schema = properties.schema.schema.getValue();
+        if (!startable || (advanceable != null && !advanceable)) {
+            throw new NoSuchElementException();
+        }
+
         IndexedRecord record = new GenericData.Record(schema);
         try {
             for (Field f : schema.getFields()) {
                 switch (f.name()) {
                 case TAzureStorageQueueInputProperties.FIELD_MESSAGE_ID:
-                    record.put(f.pos(), msg.getMessageId());
+                    record.put(f.pos(), current.getMessageId());
                     break;
                 case TAzureStorageQueueInputProperties.FIELD_MESSAGE_CONTENT:
-                    record.put(f.pos(), msg.getMessageContentAsString());
+                    record.put(f.pos(), current.getMessageContentAsString());
                     break;
                 case TAzureStorageQueueInputProperties.FIELD_INSERTION_TIME:
-                    record.put(f.pos(), msg.getInsertionTime());
+                    record.put(f.pos(), current.getInsertionTime());
                     break;
                 case TAzureStorageQueueInputProperties.FIELD_EXPIRATION_TIME:
-                    record.put(f.pos(), msg.getExpirationTime());
+                    record.put(f.pos(), current.getExpirationTime());
                     break;
                 case TAzureStorageQueueInputProperties.FIELD_DEQUEUE_COUNT:
-                    record.put(f.pos(), msg.getDequeueCount());
+                    record.put(f.pos(), current.getDequeueCount());
                     break;
                 case TAzureStorageQueueInputProperties.FIELD_POP_RECEIPT:
-                    record.put(f.pos(), msg.getPopReceipt());
+                    record.put(f.pos(), current.getPopReceipt());
                     break;
                 case TAzureStorageQueueInputProperties.FIELD_NEXT_VISIBLE_TIME:
-                    record.put(f.pos(), msg.getNextVisibleTime());
+                    record.put(f.pos(), current.getNextVisibleTime());
                     break;
                 default:
                     LOGGER.warn(i18nMessages.getMessage("warn.UnknowField", f));
@@ -149,7 +167,7 @@ public class AzureStorageQueueInputReader extends AzureStorageReader<IndexedReco
             }
         } catch (StorageException e) {
             LOGGER.error(e.getLocalizedMessage());
-            if (properties.dieOnError.getValue())
+            if (dieOnError)
                 throw new ComponentException(e);
         }
 
@@ -159,7 +177,7 @@ public class AzureStorageQueueInputReader extends AzureStorageReader<IndexedReco
     @Override
     public Map<String, Object> getReturnValues() {
         Map<String, Object> r = super.getReturnValues();
-        r.put(AzureStorageQueueDefinition.RETURN_QUEUE_NAME, properties.queueName.getValue());
+        r.put(AzureStorageQueueDefinition.RETURN_QUEUE_NAME, queueName);
         return r;
     }
 

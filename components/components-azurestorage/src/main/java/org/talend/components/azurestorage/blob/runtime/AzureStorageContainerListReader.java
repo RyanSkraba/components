@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.azurestorage.blob.AzureStorageBlobService;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzureStorageContainerListDefinition;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzureStorageContainerListProperties;
 
-import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 
 public class AzureStorageContainerListReader extends AzureStorageReader<IndexedRecord> {
@@ -46,18 +46,22 @@ public class AzureStorageContainerListReader extends AzureStorageReader<IndexedR
 
     Boolean advanceable = null; // this is initialized in the advance method
 
+    /** let this attribute public for test purpose */
+    public AzureStorageBlobService blobService;
+
     public AzureStorageContainerListReader(RuntimeContainer container, BoundedSource source,
             TAzureStorageContainerListProperties properties) {
         super(container, source);
         this.properties = properties;
+        AzureStorageSource currentSource = (AzureStorageSource) source;
+        this.blobService = new AzureStorageBlobService(currentSource.getAzureConnection(container));
     }
 
     @Override
     public boolean start() throws IOException {
         startable = false;
         try {
-            CloudBlobClient clientService = ((AzureStorageSource) getCurrentSource()).getServiceClient(runtime);
-            containers = clientService.listContainers().iterator();
+            containers = blobService.listContainers().iterator();
             startable = containers.hasNext();
         } catch (InvalidKeyException | URISyntaxException e) {
             LOGGER.error(e.getLocalizedMessage());

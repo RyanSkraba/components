@@ -28,7 +28,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 import org.talend.components.azurestorage.table.avro.AzureStorageDTEConverters.DTEConverter;
-import org.talend.components.azurestorage.table.runtime.AzureStorageTableBaseTestIT;
+import org.talend.components.azurestorage.table.runtime.it.AzureStorageTableBaseTestIT;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 

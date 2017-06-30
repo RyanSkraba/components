@@ -27,6 +27,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.blob.AzureStorageBlobDefinition;
+import org.talend.components.azurestorage.blob.AzureStorageBlobService;
 import org.talend.components.azurestorage.blob.AzureStorageContainerDefinition;
 import org.talend.components.azurestorage.blob.helpers.RemoteBlobGet;
 import org.talend.components.azurestorage.blob.helpers.RemoteBlobsGetTable;
@@ -38,7 +39,6 @@ import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlob;
-import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.ListBlobItem;
 
 public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
@@ -55,6 +55,9 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
 
     private RemoteBlobsGetTable remoteBlobsGet;
 
+    /** keep this attribute public for test purpose */
+    public AzureStorageBlobService azureStorageBlobService;
+
     @Override
     public ValidationResult initialize(RuntimeContainer runtimeContainer, ComponentProperties properties) {
         ValidationResult validationResult = super.initialize(runtimeContainer, properties);
@@ -66,9 +69,10 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
         localFolder = componentProperties.localFolder.getValue();
         remoteBlobsGet = componentProperties.remoteBlobsGet;
         this.dieOnError = componentProperties.dieOnError.getValue();
+        azureStorageBlobService = new AzureStorageBlobService(getAzureConnection(runtimeContainer));
 
         String errorMessage = "";
-        if (remoteBlobsGet.prefix.getValue()==null||remoteBlobsGet.prefix.getValue().isEmpty()) {
+        if (remoteBlobsGet.prefix.getValue() == null || remoteBlobsGet.prefix.getValue().isEmpty()) {
 
             errorMessage = messages.getMessage("error.EmptyBlobs"); //$NON-NLS-1$
         }
@@ -88,34 +92,32 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
     }
 
     private void download(RuntimeContainer runtimeContainer) {
-        FileOutputStream fos = null ;
+        FileOutputStream fos = null;
 
         try {
-            CloudBlobContainer blobContainer = getAzureStorageBlobContainerReference(runtimeContainer, containerName);
             List<RemoteBlobGet> remoteBlobs = createRemoteBlobsGet();
             for (RemoteBlobGet rmtb : remoteBlobs) {
-                for (ListBlobItem blob : blobContainer.listBlobs(rmtb.prefix, rmtb.include)) {
+                for (ListBlobItem blob : azureStorageBlobService.listBlobs(containerName, rmtb.prefix, rmtb.include)) {
                     if (blob instanceof CloudBlob) {
                         // TODO - Action when create is false and include is true ???
                         if (rmtb.create) {
                             new File(localFolder + "/" + ((CloudBlob) blob).getName()).getParentFile().mkdirs();
                         }
                         fos = new FileOutputStream(localFolder + "/" + ((CloudBlob) blob).getName());
-                        ((CloudBlob) blob).download(fos);
-
+                        azureStorageBlobService.download((CloudBlob) blob, fos);
                     }
                 }
             }
-        } catch (StorageException | InvalidKeyException | URISyntaxException | FileNotFoundException e) {
+        } catch (StorageException | URISyntaxException | FileNotFoundException | InvalidKeyException e) {
             LOGGER.error(e.getLocalizedMessage());
             if (dieOnError) {
                 throw new ComponentException(e);
             }
-        }finally{
+        } finally {
             try {
                 fos.close();
             } catch (Exception e) {
-                //ignore
+                // ignore
             }
         }
 
@@ -154,7 +156,6 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
 
         runtimeContainer.setComponentData(componentId, containerKey, this.containerName);
         runtimeContainer.setComponentData(componentId, localFolderKey, this.localFolder);
-
     }
 
 }

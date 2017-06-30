@@ -14,23 +14,39 @@ package org.talend.components.azurestorage.blob.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
 import java.util.ArrayList;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.stubbing.Answer;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.azurestorage.FileUtils;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.RuntimeContainerMock;
+import org.talend.components.azurestorage.blob.AzureStorageBlobService;
 import org.talend.components.azurestorage.blob.helpers.FileMaskTable;
 import org.talend.components.azurestorage.blob.tazurestorageput.TAzureStoragePutProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
+import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
+
+import com.microsoft.azure.storage.StorageException;
 
 public class AzureStoragePutRuntimeTest {
 
@@ -45,7 +61,13 @@ public class AzureStoragePutRuntimeTest {
 
     private AzureStoragePutRuntime storagePut;
 
-    private File localFolder;
+    @Mock
+    private AzureStorageBlobService blobService;
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    private String localFolderPath;
 
     @Before
     public void setup() throws IOException {
@@ -53,6 +75,7 @@ public class AzureStoragePutRuntimeTest {
         properties.setupProperties();
         // valid connection
         properties.connection = new TAzureStorageConnectionProperties(PROP_ + "Connection");
+        properties.connection.protocol.setValue(Protocol.HTTP);
         properties.connection.accountName.setValue("fakeAccountName");
         properties.connection.accountKey.setValue("fakeAccountKey=ANBHFYRJJFHRIKKJFU");
         properties.container.setValue("goog-container-name-1");
@@ -60,15 +83,7 @@ public class AzureStoragePutRuntimeTest {
         runtimeContainer = new RuntimeContainerMock();
         this.storagePut = new AzureStoragePutRuntime();
 
-        localFolder = FileUtils.createTempDirectory();
-    }
-
-    @After
-    public void dispose() {
-        this.storagePut = null;
-        properties = null;
-        runtimeContainer = null;
-        localFolder.delete();
+        localFolderPath = getClass().getClassLoader().getResource("azurestorage-put").getPath();
     }
 
     @Test
@@ -80,7 +95,7 @@ public class AzureStoragePutRuntimeTest {
 
     @Test
     public void testEmptyFileList() {
-        properties.localFolder.setValue(localFolder.getAbsolutePath());
+        properties.localFolder.setValue(localFolderPath);
         properties.useFileList.setValue(true);
         properties.files = new FileMaskTable("fileMaskTable");
         properties.files.fileMask.setValue(new ArrayList<String>());
@@ -92,18 +107,111 @@ public class AzureStoragePutRuntimeTest {
 
     @Test
     public void testValidProperties() {
-        properties.localFolder.setValue(localFolder.getAbsolutePath());
+        properties.localFolder.setValue(localFolderPath);
         properties.useFileList.setValue(true);
         properties.files = new FileMaskTable("fileMaskTable");
         properties.files.fileMask.setValue(new ArrayList<String>());
         properties.files.newName.setValue(new ArrayList<String>());
 
-        properties.files.fileMask.getValue().add("fileName");
-        properties.files.newName.getValue().add("NewFileName");
+        properties.files.fileMask.getValue().add("blob1*");
+        properties.files.newName.getValue().add("blob");
 
         ValidationResult validationResult = storagePut.initialize(runtimeContainer, properties);
         assertNull(validationResult.getMessage());
         assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
+    }
+
+    @Test
+    public void testRunAtDriverHandleStorageException() {
+
+        properties.localFolder.setValue(localFolderPath);
+        properties.useFileList.setValue(true);
+        properties.files = new FileMaskTable("fileMaskTable");
+        properties.files.fileMask.setValue(new ArrayList<String>());
+        properties.files.newName.setValue(new ArrayList<String>());
+        properties.files.fileMask.getValue().add("blob1*");
+        properties.files.newName.getValue().add("blob");
+
+        ValidationResult validationResult = storagePut.initialize(runtimeContainer, properties);
+        assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
+
+        storagePut.azureStorageBlobService = blobService;
+        try {
+            doAnswer(new Answer<Void>() {
+
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    throw new StorageException("some error code", "some storage exception", new RuntimeException());
+                }
+            }).when(blobService).upload(anyString(), anyString(), any(InputStream.class), anyLong());
+            this.storagePut.runAtDriver(runtimeContainer);
+
+        } catch (InvalidKeyException | StorageException | IOException | URISyntaxException e) {
+            fail("should not throw " + e.getMessage());
+        }
+    }
+
+    @Test(expected = ComponentException.class)
+    public void testRunAtDriverHandleDieOnError() {
+
+        properties.localFolder.setValue(localFolderPath);
+        properties.useFileList.setValue(true);
+        properties.files = new FileMaskTable("fileMaskTable");
+        properties.files.fileMask.setValue(new ArrayList<String>());
+        properties.files.newName.setValue(new ArrayList<String>());
+        properties.files.fileMask.getValue().add("blob1*");
+        properties.files.newName.getValue().add("blob");
+        properties.dieOnError.setValue(true);
+
+        ValidationResult validationResult = storagePut.initialize(runtimeContainer, properties);
+        assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
+
+        storagePut.azureStorageBlobService = blobService;
+        try {
+            doAnswer(new Answer<Void>() {
+
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    throw new StorageException("some error code", "some storage exception", new RuntimeException());
+                }
+            }).when(blobService).upload(anyString(), anyString(), any(InputStream.class), anyLong());
+            this.storagePut.runAtDriver(runtimeContainer);
+
+        } catch (InvalidKeyException | StorageException | IOException | URISyntaxException e) {
+            fail("should not throw " + e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testRunAtDriverValid() {
+
+        properties.localFolder.setValue(localFolderPath);
+        properties.useFileList.setValue(true);
+        properties.files = new FileMaskTable("fileMaskTable");
+        properties.files.fileMask.setValue(new ArrayList<String>());
+        properties.files.newName.setValue(new ArrayList<String>());
+        properties.files.fileMask.getValue().add("blob1*");
+        properties.files.newName.getValue().add("blob");
+
+        ValidationResult validationResult = storagePut.initialize(runtimeContainer, properties);
+        assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
+
+        storagePut.azureStorageBlobService = blobService;
+        try {
+            doAnswer(new Answer<Void>() {
+
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    return null;
+                }
+            }).when(blobService).upload(anyString(), anyString(), any(InputStream.class), anyLong());
+            this.storagePut.runAtDriver(runtimeContainer);
+
+        } catch (InvalidKeyException | StorageException | IOException | URISyntaxException e) {
+            fail("should not throw " + e.getMessage());
+        }
+
     }
 
 }

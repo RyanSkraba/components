@@ -10,6 +10,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.queue.AzureStorageQueueDefinition;
+import org.talend.components.azurestorage.queue.AzureStorageQueueService;
 import org.talend.components.azurestorage.queue.tazurestoragequeuedelete.TAzureStorageQueueDeleteProperties;
 import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.i18n.GlobalI18N;
@@ -17,7 +18,6 @@ import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.queue.CloudQueue;
 
 public class AzureStorageQueueDeleteRuntime extends AzureStorageQueueRuntime
         implements ComponentDriverInitialization<ComponentProperties> {
@@ -28,14 +28,21 @@ public class AzureStorageQueueDeleteRuntime extends AzureStorageQueueRuntime
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageQueueDeleteRuntime.class);
-    
+
     private boolean dieOnError;
-    
+
+    public AzureStorageQueueService queueService;
+
     @Override
     public ValidationResult initialize(RuntimeContainer runtimeContainer, ComponentProperties properties) {
+        ValidationResult vr = super.initialize(runtimeContainer, properties);
+        if (!ValidationResult.OK.getStatus().equals(vr.getStatus())) {
+            return vr;
+        }
         this.dieOnError = ((TAzureStorageQueueDeleteProperties) properties).dieOnError.getValue();
-        
-        return super.initialize(runtimeContainer, properties);
+        queueService = new AzureStorageQueueService(getAzureConnection(runtimeContainer));
+
+        return ValidationResult.OK;
     }
 
     @Override
@@ -45,14 +52,12 @@ public class AzureStorageQueueDeleteRuntime extends AzureStorageQueueRuntime
     }
 
     private boolean deleteAzureQueue(RuntimeContainer container) {
-        String queue = QueueName;
         Boolean deleteResult = false;
         try {
-            CloudQueue cqueue = getCloudQueue(container, queue);
-            deleteResult = cqueue.deleteIfExists();
-            LOGGER.debug(messages.getMessage("debug.QueueDeleted", cqueue.getName()));
+            deleteResult = queueService.deleteQueueIfExists(queueName);
+            LOGGER.debug(messages.getMessage("debug.QueueDeleted", queueName));
             if (!deleteResult) {
-                LOGGER.warn(messages.getMessage("warn.CannotDelete", queue));
+                LOGGER.warn(messages.getMessage("warn.CannotDelete", queueName));
             }
         } catch (InvalidKeyException | URISyntaxException | StorageException e) {
             LOGGER.error(e.getLocalizedMessage());
@@ -64,9 +69,8 @@ public class AzureStorageQueueDeleteRuntime extends AzureStorageQueueRuntime
 
     private void setReturnValues(RuntimeContainer container) {
         String componentId = container.getCurrentComponentId();
-        String returnQueueName = AzureStorageUtils
-                .getStudioNameFromProperty(AzureStorageQueueDefinition.RETURN_QUEUE_NAME);
-        container.setComponentData(componentId, returnQueueName, QueueName);
+        String returnQueueName = AzureStorageUtils.getStudioNameFromProperty(AzureStorageQueueDefinition.RETURN_QUEUE_NAME);
+        container.setComponentData(componentId, returnQueueName, queueName);
     }
 
 }

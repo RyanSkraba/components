@@ -23,6 +23,7 @@ import org.talend.components.api.component.runtime.ComponentDriverInitialization
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.azurestorage.blob.AzureStorageBlobService;
 import org.talend.components.azurestorage.blob.AzureStorageContainerDefinition;
 import org.talend.components.azurestorage.blob.helpers.RemoteBlob;
 import org.talend.components.azurestorage.blob.helpers.RemoteBlobsTable;
@@ -33,7 +34,6 @@ import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
 import com.microsoft.azure.storage.blob.ListBlobItem;
 
@@ -47,8 +47,9 @@ public class AzureStorageDeleteRuntime extends AzureStorageContainerRuntime
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageDeleteRuntime.class);
 
-    //
     private RemoteBlobsTable remoteBlobsTable;
+
+    public AzureStorageBlobService azureStorageBlobService;
 
     @Override
     public ValidationResult initialize(RuntimeContainer runtimeContainer, ComponentProperties properties) {
@@ -60,6 +61,7 @@ public class AzureStorageDeleteRuntime extends AzureStorageContainerRuntime
         TAzureStorageDeleteProperties componentProperties = (TAzureStorageDeleteProperties) properties;
         remoteBlobsTable = componentProperties.remoteBlobs;
         this.dieOnError = componentProperties.dieOnError.getValue();
+        this.azureStorageBlobService = new AzureStorageBlobService(getAzureConnection(runtimeContainer));
 
         return componentProperties.remoteBlobs.getValidationResult();
     }
@@ -73,20 +75,18 @@ public class AzureStorageDeleteRuntime extends AzureStorageContainerRuntime
     public void deleteIfExist(RuntimeContainer runtimeContainer) {
 
         try {
-            CloudBlobContainer container = getAzureStorageBlobContainerReference(runtimeContainer, containerName);
-            List<RemoteBlob> remoteBlobs = createRemoteBlobFilter();
-            for (RemoteBlob rmtb : remoteBlobs) {
-                for (ListBlobItem blob : container.listBlobs(rmtb.prefix, rmtb.include)) {
+            for (RemoteBlob rmtb : createRemoteBlobFilter()) {
+                for (ListBlobItem blob : azureStorageBlobService.listBlobs(containerName, rmtb.prefix, rmtb.include)) {
                     if (blob instanceof CloudBlockBlob) {
                         // FIXME - problem with blobs with space in name...
-                        boolean successfulyDeleted = ((CloudBlockBlob) blob).deleteIfExists();
+                        boolean successfulyDeleted = azureStorageBlobService.deleteBlobBlockIfExist((CloudBlockBlob) blob);
                         if (!successfulyDeleted) {
                             LOGGER.warn(messages.getMessage("warn.FaildDelete", ((CloudBlockBlob) blob).getName()));
                         }
                     }
                 }
             }
-        } catch (StorageException | InvalidKeyException | URISyntaxException e) {
+        } catch (StorageException | URISyntaxException | InvalidKeyException e) {
             LOGGER.error(e.getLocalizedMessage());
             if (dieOnError) {
                 throw new ComponentException(e);
@@ -119,9 +119,8 @@ public class AzureStorageDeleteRuntime extends AzureStorageContainerRuntime
 
         String componentId = runtimeContainer.getCurrentComponentId();
         String containerKey = AzureStorageUtils.getStudioNameFromProperty(AzureStorageContainerDefinition.RETURN_CONTAINER);
-        //
-        runtimeContainer.setComponentData(componentId, containerKey, this.containerName);
 
+        runtimeContainer.setComponentData(componentId, containerKey, this.containerName);
     }
 
 }

@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinputloop.TAzureStorageQueueInputLoopProperties;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -32,101 +31,51 @@ import com.microsoft.azure.storage.StorageException;
 
 public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputReader {
 
-    private TAzureStorageQueueInputLoopProperties properties;
-
-    private int nbMsg;
-
     private int loopWaitTime;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageQueueInputLoopReader.class);
-    
+
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageQueueInputLoopReader.class);
 
     public AzureStorageQueueInputLoopReader(RuntimeContainer container, BoundedSource source,
             TAzureStorageQueueInputLoopProperties properties) {
+
         super(container, source, properties);
-        this.properties = properties;
+        loopWaitTime = properties.loopWaitTime.getValue();
+
     }
 
     @Override
     public boolean start() throws IOException {
-        Boolean startable = false;
-        String queueName = properties.queueName.getValue();
-        loopWaitTime = properties.loopWaitTime.getValue();
-        nbMsg = properties.numberOfMessages.getValue();
         // acquire queue and first messages
-        try {
-            queue = ((AzureStorageQueueSource) getCurrentSource()).getCloudQueue(runtime, queueName);
-            messages = queue.retrieveMessages(nbMsg).iterator();
+        startable = retrieveMessages(false); // no sleep
+        while (!startable) {
+            startable = retrieveMessages(true); // sleep and retry
+        }
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
-            LOGGER.error(e.getLocalizedMessage());
-            if (properties.dieOnError.getValue())
-                throw new ComponentException(e);
-        }
-        //
-        try {
-            startable = messages.hasNext();
-            if (startable) {
-                dataCount++;
-                current = messages.next();
-                queue.deleteMessage(current);
-                return startable;
-            }
-        } catch (StorageException e) {
-            LOGGER.error(e.getLocalizedMessage());
-            if (properties.dieOnError.getValue())
-                throw new ComponentException(e);
-        }
-        // first loop to wait for a first message batch
-        while (true) {
-            try {
-                messages = queue.retrieveMessages(nbMsg).iterator();
-                startable = messages.hasNext();
-                if (startable) {
-                    dataCount++;
-                    current = messages.next();
-                    queue.deleteMessage(current);
-                    return startable;
-                }
-                Thread.sleep((long) loopWaitTime * 1000);
-            } catch (InterruptedException | StorageException e) {
-                LOGGER.error(e.getLocalizedMessage());
-            }
-        }
+        return startable;
     }
 
     @Override
     public boolean advance() throws IOException {
-        Boolean advanceable = messages.hasNext();
-        if (advanceable) {
+        advanceable = messages.hasNext();
+        if (messages.hasNext()) {
+            current = messages.next();
+            dataCount++;
             try {
-                dataCount++;
-                current = messages.next();
-                queue.deleteMessage(current);
-                return advanceable;
-            } catch (StorageException e) {
-                LOGGER.error(i18nMessages.getMessage("error.Cannotdelete",current.getId(),e.getLocalizedMessage()));
-            }
-        }
-        // loop to wait for a message batch
-        while (true) {
-            try {
-                LOGGER.debug(i18nMessages.getMessage("debug.Checking"));
-                messages = queue.retrieveMessages(nbMsg).iterator();
-                advanceable = messages.hasNext();
-                if (advanceable) {
-                    dataCount++;
-                    current = messages.next();
-                    queue.deleteMessage(current);
-                    return advanceable;
-                }
-                Thread.sleep((long) loopWaitTime * 1000);
-            } catch (InterruptedException | StorageException e) {
+                queueService.deleteMessage(queueName, current);
+            } catch (InvalidKeyException | URISyntaxException | StorageException e) {
                 LOGGER.error(e.getLocalizedMessage());
             }
+            return true;
         }
+
+        while (!advanceable) {
+            advanceable = retrieveMessages(true);
+        }
+
+        return advanceable;
     }
 
     @Override
@@ -137,6 +86,29 @@ public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputRead
     @Override
     public Map<String, Object> getReturnValues() {
         return super.getReturnValues();
+    }
+
+    private boolean retrieveMessages(boolean sleepFirst) {
+
+        try {
+
+            if (sleepFirst) {
+                Thread.sleep((long) loopWaitTime * 1000);
+            }
+
+            messages = queueService.retrieveMessages(queueName, nbMsg).iterator();
+            if (messages.hasNext()) {
+                current = messages.next();
+                dataCount++;
+                queueService.deleteMessage(queueName, current);
+                return true;
+            }
+
+        } catch (InterruptedException | StorageException | InvalidKeyException | URISyntaxException e) {
+            LOGGER.error(e.getLocalizedMessage());
+        }
+
+        return false;
     }
 
 }

@@ -21,6 +21,7 @@ import org.talend.components.api.component.runtime.ComponentDriverInitialization
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.azurestorage.blob.AzureStorageBlobService;
 import org.talend.components.azurestorage.blob.AzureStorageContainerDefinition;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerexist.TAzureStorageContainerExistDefinition;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerexist.TAzureStorageContainerExistProperties;
@@ -28,7 +29,6 @@ import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.blob.CloudBlobContainer;
 
 public class AzureStorageContainerExistRuntime extends AzureStorageContainerRuntime
         implements ComponentDriverInitialization<ComponentProperties> {
@@ -36,6 +36,9 @@ public class AzureStorageContainerExistRuntime extends AzureStorageContainerRunt
     private static final long serialVersionUID = 8454949161040534258L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageContainerExistRuntime.class);
+
+    /** let this attribute public for test purpose */
+    public AzureStorageBlobService azureStorageBlobService;
 
     @Override
     public ValidationResult initialize(RuntimeContainer runtimeContainer, ComponentProperties properties) {
@@ -45,6 +48,7 @@ public class AzureStorageContainerExistRuntime extends AzureStorageContainerRunt
         }
         TAzureStorageContainerExistProperties componentProperties = (TAzureStorageContainerExistProperties) properties;
         this.dieOnError = componentProperties.dieOnError.getValue();
+        this.azureStorageBlobService = new AzureStorageBlobService(getAzureConnection(runtimeContainer));
 
         return ValidationResult.OK;
     }
@@ -57,8 +61,8 @@ public class AzureStorageContainerExistRuntime extends AzureStorageContainerRunt
 
     private Boolean isAzureStorageBlobContainerExist(RuntimeContainer runtimeContainer) {
         try {
-            CloudBlobContainer container = getAzureStorageBlobContainerReference(runtimeContainer, this.containerName);
-            return container.exists();
+
+            return azureStorageBlobService.containerExist(this.containerName);
 
         } catch (StorageException | URISyntaxException | InvalidKeyException e) {
             LOGGER.error(e.getLocalizedMessage());

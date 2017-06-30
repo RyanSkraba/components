@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
@@ -28,15 +29,17 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.blob.runtime.AzureStorageReader;
+import org.talend.components.azurestorage.queue.AzureStorageQueueService;
 import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureStorageQueueListDefinition;
 import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureStorageQueueListProperties;
 
 import com.microsoft.azure.storage.queue.CloudQueue;
-import com.microsoft.azure.storage.queue.CloudQueueClient;
 
 public class AzureStorageQueueListReader extends AzureStorageReader<IndexedRecord> {
 
-    private TAzureStorageQueueListProperties properties;
+    private boolean dieOnError;
+
+    private Schema schema;
 
     private Iterator<CloudQueue> queues;
 
@@ -44,18 +47,26 @@ public class AzureStorageQueueListReader extends AzureStorageReader<IndexedRecor
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageQueueListReader.class);
 
+    public AzureStorageQueueService queueService;
+
+    private boolean startable;
+
+    private Boolean advanceable;
+
     protected AzureStorageQueueListReader(RuntimeContainer container, BoundedSource source,
             TAzureStorageQueueListProperties properties) {
         super(container, source);
-        this.properties = properties;
+
+        this.dieOnError = properties.dieOnError.getValue();
+        this.schema = properties.schema.schema.getValue();
+        this.queueService = new AzureStorageQueueService(((AzureStorageQueueSource) source).getAzureConnection(container));
     }
 
     @Override
     public boolean start() throws IOException {
-        Boolean startable = false;
+
         try {
-            CloudQueueClient client = ((AzureStorageQueueSource) getCurrentSource()).getStorageQueueClient(runtime);
-            queues = client.listQueues().iterator();
+            queues = queueService.listQueues().iterator();
             startable = queues.hasNext();
             if (startable) {
                 current = queues.next();
@@ -63,15 +74,17 @@ public class AzureStorageQueueListReader extends AzureStorageReader<IndexedRecor
             }
         } catch (InvalidKeyException | URISyntaxException e) {
             LOGGER.error(e.getLocalizedMessage());
-            if (properties.dieOnError.getValue())
+            if (dieOnError) {
                 throw new ComponentException(e);
+            }
         }
+
         return startable;
     }
 
     @Override
     public boolean advance() throws IOException {
-        boolean advanceable = queues.hasNext();
+        advanceable = queues.hasNext();
         if (advanceable) {
             current = queues.next();
             dataCount++;
@@ -81,7 +94,11 @@ public class AzureStorageQueueListReader extends AzureStorageReader<IndexedRecor
 
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
-        IndexedRecord record = new GenericData.Record(properties.schema.schema.getValue());
+        if (!startable || (advanceable != null && !advanceable)) {
+            throw new NoSuchElementException();
+        }
+
+        IndexedRecord record = new GenericData.Record(schema);
         record.put(0, current.getName());
         return record;
     }

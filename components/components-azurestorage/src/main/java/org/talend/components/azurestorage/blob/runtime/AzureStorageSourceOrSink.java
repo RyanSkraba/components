@@ -30,6 +30,7 @@ import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
+import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 
@@ -88,7 +89,8 @@ public class AzureStorageSourceOrSink extends AzureStorageRuntime implements Sou
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
         List<NamedThing> result = new ArrayList<>();
         try {
-            CloudBlobClient client = getServiceClient(container);
+            CloudStorageAccount storageAccount = getAzureConnection(container).getCloudStorageAccount();
+            CloudBlobClient client = storageAccount.createCloudBlobClient();
             for (CloudBlobContainer c : client.listContainers()) {
                 result.add(new SimpleNamedThing(c.getName(), c.getName()));
             }

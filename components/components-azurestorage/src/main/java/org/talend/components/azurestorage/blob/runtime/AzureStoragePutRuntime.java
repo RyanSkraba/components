@@ -29,6 +29,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.blob.AzureStorageBlobDefinition;
+import org.talend.components.azurestorage.blob.AzureStorageBlobService;
 import org.talend.components.azurestorage.blob.AzureStorageContainerDefinition;
 import org.talend.components.azurestorage.blob.helpers.FileMaskTable;
 import org.talend.components.azurestorage.blob.tazurestorageput.TAzureStoragePutProperties;
@@ -38,8 +39,6 @@ import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.blob.CloudBlobContainer;
-import com.microsoft.azure.storage.blob.CloudBlockBlob;
 
 /**
  * Upload a set of files form a local folder to Azure blob storage
@@ -62,6 +61,8 @@ public class AzureStoragePutRuntime extends AzureStorageContainerRuntime
 
     private FileMaskTable files;
 
+    public AzureStorageBlobService azureStorageBlobService;
+
     @Override
     public ValidationResult initialize(RuntimeContainer runtimeContainer, ComponentProperties properties) {
         ValidationResult validationResult = super.initialize(runtimeContainer, properties);
@@ -75,6 +76,7 @@ public class AzureStoragePutRuntime extends AzureStorageContainerRuntime
         useFileList = componentProperties.useFileList.getValue();
         files = componentProperties.files;
         this.dieOnError = componentProperties.dieOnError.getValue();
+        this.azureStorageBlobService = new AzureStorageBlobService(getAzureConnection(runtimeContainer));
 
         // checks local folder
         String errorMessage = "";
@@ -101,14 +103,6 @@ public class AzureStoragePutRuntime extends AzureStorageContainerRuntime
 
     private void upload(RuntimeContainer runtimeContainer) {
 
-        CloudBlobContainer blobContainer;
-        try {
-            blobContainer = getAzureStorageBlobContainerReference(runtimeContainer, containerName);
-        } catch (StorageException | InvalidKeyException | URISyntaxException e) {
-            // we cannot continue if storageContainer is invalid...
-            LOGGER.error(e.getLocalizedMessage());
-            throw new ComponentException(e);
-        }
         AzureStorageUtils utils = new AzureStorageUtils();
         List<Map<String, String>> list = new ArrayList<>();
         // process files list
@@ -130,9 +124,11 @@ public class AzureStoragePutRuntime extends AzureStorageContainerRuntime
         for (Map.Entry<String, String> entry : fileMap.entrySet()) {
             File source = new File(entry.getKey());
             try (FileInputStream stream = new FileInputStream(source)) { // see try-with-resources concept
-                CloudBlockBlob blockBlob = blobContainer.getBlockBlobReference(entry.getValue());
-                blockBlob.upload(stream, source.length()); // TODO Any Action ??? if remoteFolder doesn't exist it will fail...
-            } catch (StorageException | URISyntaxException | IOException e) {
+
+                // TODO Any Action ??? if remoteFolder doesn't exist it will fail...
+                azureStorageBlobService.upload(containerName, entry.getValue(), stream, source.length());
+
+            } catch (StorageException | URISyntaxException | IOException | InvalidKeyException e) {
                 LOGGER.error(e.getLocalizedMessage());
                 if (dieOnError) {
                     throw new ComponentException(e);

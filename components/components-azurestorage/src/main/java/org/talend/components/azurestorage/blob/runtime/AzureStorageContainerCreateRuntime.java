@@ -9,6 +9,7 @@ import org.talend.components.api.component.runtime.ComponentDriverInitialization
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.azurestorage.blob.AzureStorageBlobService;
 import org.talend.components.azurestorage.blob.AzureStorageContainerDefinition;
 import org.talend.components.azurestorage.blob.tazurestoragecontainercreate.TAzureStorageContainerCreateProperties;
 import org.talend.components.azurestorage.blob.tazurestoragecontainercreate.TAzureStorageContainerCreateProperties.AccessControl;
@@ -17,11 +18,7 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageErrorCodeStrings;
 import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.blob.BlobContainerPermissions;
-import com.microsoft.azure.storage.blob.BlobContainerPublicAccessType;
-import com.microsoft.azure.storage.blob.CloudBlobContainer;
 
 /**
  * Runtime implementation for Azure storage container create feature.<br/>
@@ -42,6 +39,9 @@ public class AzureStorageContainerCreateRuntime extends AzureStorageContainerRun
 
     private AccessControl access;
 
+    /** let this attribute public for test purpose */
+    public AzureStorageBlobService blobService;
+
     @Override
     public ValidationResult initialize(RuntimeContainer runtimeContainer, ComponentProperties properties) {
         ValidationResult validationResult = super.initialize(runtimeContainer, properties);
@@ -52,6 +52,7 @@ public class AzureStorageContainerCreateRuntime extends AzureStorageContainerRun
         TAzureStorageContainerCreateProperties componentProperties = (TAzureStorageContainerCreateProperties) properties;
         this.access = componentProperties.accessControl.getValue();
         this.dieOnError = componentProperties.dieOnError.getValue();
+        this.blobService = new AzureStorageBlobService(getAzureConnection(runtimeContainer));
 
         return ValidationResult.OK;
     }
@@ -64,53 +65,24 @@ public class AzureStorageContainerCreateRuntime extends AzureStorageContainerRun
     }
 
     private void createAzureStorageBlobContainer(RuntimeContainer runtimeContainer) {
+
         try {
-            boolean containerCreated;
-            CloudBlobContainer cloudBlobContainer = getAzureStorageBlobContainerReference(runtimeContainer, containerName);
-            containerCreated = createContainerIfNotExist(cloudBlobContainer);
+
+            boolean containerCreated = blobService.createContainerIfNotExist(containerName);
             // Manage accessControl
             if (AccessControl.Public.equals(access) && containerCreated) {
-                // Create a permissions object.
-                BlobContainerPermissions containerPermissions = new BlobContainerPermissions();
-                // Include public access in the permissions object.
-                containerPermissions.setPublicAccess(BlobContainerPublicAccessType.CONTAINER);
-                // Set the permissions on the container.
-                cloudBlobContainer.uploadPermissions(containerPermissions);
+                blobService.setPublicAccess(containerName);
             }
+
             if (!containerCreated) {
                 LOGGER.warn(messages.getMessage("warn.ContainerExists", containerName));
             }
-        } catch (StorageException | InvalidKeyException | URISyntaxException e) {
+        } catch (StorageException | URISyntaxException | InvalidKeyException e) {
             LOGGER.error(e.getLocalizedMessage());
             if (dieOnError) {
                 throw new ComponentException(e);
             }
         }
-    }
-
-    private boolean createContainerIfNotExist(CloudBlobContainer cloudBlobContainer) throws StorageException {
-        boolean containerCreated;
-        try {
-            containerCreated = cloudBlobContainer.createIfNotExists();
-        } catch (StorageException e) {
-            if (!e.getErrorCode().equals(StorageErrorCodeStrings.CONTAINER_BEING_DELETED)) {
-                throw e;
-            }
-            LOGGER.warn(messages.getMessage("error.CONTAINER_BEING_DELETED", containerName));
-            // wait 40 seconds (min is 30s) before retrying.
-            // See
-            // https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/delete-container
-            try {
-                Thread.sleep(40000);
-            } catch (InterruptedException eint) {
-                LOGGER.error(messages.getMessage("error.InterruptedException"));
-                throw new ComponentException(eint);
-            }
-            containerCreated = cloudBlobContainer.createIfNotExists();
-            LOGGER.debug(messages.getMessage("debug.ContainerCreated", containerName));
-        }
-
-        return containerCreated;
     }
 
     private void setReturnValues(RuntimeContainer runtimeContainer) {

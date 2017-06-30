@@ -28,9 +28,9 @@ public class AzureStorageQueueSourceOrSinkTest {
     AzureStorageQueueSourceOrSink sos;
 
     TAzureStorageQueueListProperties props;
-    
+
     TAzureStorageQueueInputProperties queueInputProperties;
-    
+
     private RuntimeContainer runtimeContainer;
 
     @Before
@@ -38,15 +38,15 @@ public class AzureStorageQueueSourceOrSinkTest {
         sos = new AzureStorageQueueSourceOrSink();
         props = new TAzureStorageQueueListProperties("tests");
         props.setupProperties();
-        
+
         queueInputProperties = new TAzureStorageQueueInputProperties("test");
         queueInputProperties.setupProperties();
         queueInputProperties.connection.accountName.setValue("fakeAccountName");
         queueInputProperties.connection.accountKey.setValue("fakeAccountKey=ANBHFYRJJFHRIKKJFU");
-        
+
         runtimeContainer = new RuntimeContainerMock();
     }
-    
+
     @After
     public void dispose() {
         queueInputProperties = null;
@@ -60,49 +60,9 @@ public class AzureStorageQueueSourceOrSinkTest {
     @Test
     public final void testValidate() {
         assertEquals(ValidationResult.Result.ERROR, sos.initialize(null, props).getStatus());
-        
+
         queueInputProperties.queueName.setValue("2queue-name-with-numeric8");
         assertEquals(ValidationResult.Result.OK, sos.initialize(runtimeContainer, queueInputProperties).getStatus());
-    }
-
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.queue.runtime.AzureStorageQueueSourceOrSink#getEndpointSchema(org.talend.components.api.container.RuntimeContainer, java.lang.String)}.
-     */
-    @Test
-    public final void testGetEndpointSchema() {
-    }
-
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.queue.runtime.AzureStorageQueueSourceOrSink#getSchemaNames(org.talend.components.api.container.RuntimeContainer, org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties)}.
-     */
-    @Test
-    public final void testGetSchemaNamesRuntimeContainerTAzureStorageConnectionProperties() {
-    }
-
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.queue.runtime.AzureStorageQueueSourceOrSink#getSchemaNames(org.talend.components.api.container.RuntimeContainer)}.
-     */
-    @Test
-    public final void testGetSchemaNamesRuntimeContainer() {
-    }
-
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.queue.runtime.AzureStorageQueueSourceOrSink#getStorageQueueClient(org.talend.components.api.container.RuntimeContainer)}.
-     */
-    @Test
-    public final void testGetStorageQueueClient() {
-    }
-
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.queue.runtime.AzureStorageQueueSourceOrSink#getCloudQueue(org.talend.components.api.container.RuntimeContainer, java.lang.String)}.
-     */
-    @Test
-    public final void testGetCloudQueue() {
     }
 
 }

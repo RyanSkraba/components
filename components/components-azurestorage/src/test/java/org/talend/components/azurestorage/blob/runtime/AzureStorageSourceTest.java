@@ -23,7 +23,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.azurestorage.blob.AzureStorageBlobProperties;
-import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzureStorageContainerListProperties;
 import org.talend.components.azurestorage.blob.tazurestorageget.TAzureStorageGetProperties;
 import org.talend.components.azurestorage.blob.tazurestoragelist.TAzureStorageListProperties;
 
@@ -46,20 +45,6 @@ public class AzureStorageSourceTest {
 
         // assertEquals(ValidationResult.Result.OK, source.validate(null));
 
-    }
-
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.blob.runtime.AzureStorageSource#createReader(org.talend.components.api.container.RuntimeContainer)}.
-     */
-    @Test
-    public final void testCreateReader() {
-
-        source.initialize(null, new TAzureStorageContainerListProperties("test"));
-        assertTrue(source.createReader(null) instanceof AzureStorageContainerListReader);
-
-        source.initialize(null, new TAzureStorageListProperties("test"));
-        assertTrue(source.createReader(null) instanceof AzureStorageListReader);
     }
 
     /**

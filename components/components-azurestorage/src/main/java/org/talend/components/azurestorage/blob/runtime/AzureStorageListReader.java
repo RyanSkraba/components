@@ -16,8 +16,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -28,6 +30,7 @@ import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.blob.AzureStorageBlobDefinition;
+import org.talend.components.azurestorage.blob.AzureStorageBlobService;
 import org.talend.components.azurestorage.blob.AzureStorageContainerDefinition;
 import org.talend.components.azurestorage.blob.helpers.RemoteBlob;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzureStorageContainerListDefinition;
@@ -36,42 +39,44 @@ import org.talend.components.common.avro.RootSchemaUtils;
 
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlob;
-import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.ListBlobItem;
 
 public class AzureStorageListReader extends AzureStorageReader<IndexedRecord> {
 
     private TAzureStorageListProperties properties;
 
-    private List<CloudBlob> blobs = new ArrayList<>();
-
-    private int blobIndex;
-
-    private int blobSize;
+    private Iterator<CloudBlob> blobsIterator;
 
     private CloudBlob currentBlob;
 
     private IndexedRecord currentRecord;
 
+    private boolean startable;
+
+    private Boolean advanceable;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageListReader.class);
+
+    /** keep this attribute public for test purpose */
+    public AzureStorageBlobService azureStorageBlobService;
 
     public AzureStorageListReader(RuntimeContainer container, BoundedSource source, TAzureStorageListProperties properties) {
         super(container, source);
         this.properties = properties;
+        azureStorageBlobService = new AzureStorageBlobService(
+                ((AzureStorageSource) getCurrentSource()).getAzureConnection(container));
     }
 
     @Override
     public boolean start() throws IOException {
-        Boolean startable = false;
         String mycontainer = properties.container.getValue();
+        List<CloudBlob> blobs = new ArrayList<>();
         // build a list with remote blobs to fetch
         List<RemoteBlob> remoteBlobs = ((AzureStorageSource) getCurrentSource()).getRemoteBlobs();
         try {
-            CloudBlobContainer container = ((AzureStorageSource) getCurrentSource())
-                    .getAzureStorageBlobContainerReference(runtime, mycontainer);
-            blobs = new ArrayList<>();
+
             for (RemoteBlob rmtb : remoteBlobs) {
-                for (ListBlobItem blob : container.listBlobs(rmtb.prefix, rmtb.include)) {
+                for (ListBlobItem blob : azureStorageBlobService.listBlobs(mycontainer, rmtb.prefix, rmtb.include)) {
                     if (blob instanceof CloudBlob) {
                         blobs.add((CloudBlob) blob);
                     }
@@ -79,49 +84,53 @@ public class AzureStorageListReader extends AzureStorageReader<IndexedRecord> {
             }
 
             startable = !blobs.isEmpty();
-        } catch (StorageException | InvalidKeyException | URISyntaxException e) {
+            blobsIterator = blobs.iterator();
+        } catch (StorageException | URISyntaxException | InvalidKeyException e) {
             LOGGER.error(e.getLocalizedMessage());
-            if (properties.dieOnError.getValue())
+            if (properties.dieOnError.getValue()) {
                 throw new ComponentException(e);
+            }
         }
+
         if (startable) {
             dataCount++;
-            blobIndex = 0;
-
+            currentBlob = blobsIterator.next();
             IndexedRecord dataRecord = new GenericData.Record(properties.schema.schema.getValue());
-            dataRecord.put(0, blobs.get(blobIndex).getName());
+            dataRecord.put(0, currentBlob.getName());
             Schema rootSchema = RootSchemaUtils.createRootSchema(properties.schema.schema.getValue(), properties.outOfBandSchema);
             currentRecord = new GenericData.Record(rootSchema);
             currentRecord.put(0, dataRecord);
             currentRecord.put(1, dataRecord);
-            currentBlob = blobs.get(blobIndex);
-            blobSize = blobs.size();
-
         }
         return startable;
     }
 
     @Override
     public boolean advance() throws IOException {
-        blobIndex++;
-        if (blobIndex < blobSize) {
+        advanceable = blobsIterator.hasNext();
+        if (advanceable) {
             dataCount++;
+            currentBlob = blobsIterator.next();
             IndexedRecord dataRecord = new GenericData.Record(properties.schema.schema.getValue());
-            dataRecord.put(0, blobs.get(blobIndex).getName());
+            dataRecord.put(0, currentBlob.getName());
             currentRecord.put(0, dataRecord);
             currentRecord.put(1, dataRecord);
-            currentBlob = blobs.get(blobIndex);
-
-            return true;
         }
-        return false;
+
+        return advanceable;
     }
 
     @Override
     public IndexedRecord getCurrent() {
-        if (runtime != null)
+        if (!startable || (advanceable != null && !advanceable)) {
+            throw new NoSuchElementException();
+        }
+
+        if (runtime != null) {
             runtime.setComponentData(runtime.getCurrentComponentId(), AzureStorageBlobDefinition.RETURN_CURRENT_BLOB,
                     currentRecord.get(0));
+        }
+
         return currentRecord;
     }
 
@@ -130,8 +139,9 @@ public class AzureStorageListReader extends AzureStorageReader<IndexedRecord> {
         Map<String, Object> resultMap = super.getReturnValues();
         resultMap.put(TAzureStorageContainerListDefinition.RETURN_TOTAL_RECORD_COUNT, dataCount);
         resultMap.put(AzureStorageContainerDefinition.RETURN_CONTAINER, properties.container.getValue());
-        if (currentBlob != null)
+        if (currentBlob != null) {
             resultMap.put(AzureStorageBlobDefinition.RETURN_CURRENT_BLOB, currentBlob.getName());
+        }
 
         return resultMap;
     }
