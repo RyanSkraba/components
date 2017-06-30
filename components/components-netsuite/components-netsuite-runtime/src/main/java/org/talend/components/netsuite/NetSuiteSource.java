@@ -26,7 +26,7 @@ import org.talend.components.netsuite.input.NetSuiteSearchInputReader;
 /**
  * Base class for NetSuite sources.
  */
-public abstract class NetSuiteSource extends NetSuiteSourceOrSink implements BoundedSource {
+public class NetSuiteSource extends NetSuiteSourceOrSink implements BoundedSource {
 
     @Override
     public long getEstimatedSizeBytes(RuntimeContainer adaptor) {

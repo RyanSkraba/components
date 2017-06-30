@@ -34,7 +34,7 @@ import org.talend.daikon.properties.ValidationResult;
 /**
  * Base class NetSuite sources and sinks.
  */
-public abstract class NetSuiteSourceOrSink implements SourceOrSink {
+public class NetSuiteSourceOrSink implements SourceOrSink {
 
     protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 

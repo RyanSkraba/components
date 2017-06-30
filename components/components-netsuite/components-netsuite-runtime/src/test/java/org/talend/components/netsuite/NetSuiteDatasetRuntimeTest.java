@@ -11,7 +11,7 @@
 //
 // ============================================================================
 
-package org.talend.components.netsuite.v2016_2;
+package org.talend.components.netsuite;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -30,34 +30,31 @@ import java.util.Map;
 import org.apache.avro.Schema;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.talend.components.netsuite.NetSuiteDatasetRuntime;
-import org.talend.components.netsuite.NetSuiteDatasetRuntimeImpl;
-import org.talend.components.netsuite.NetSuiteSchemaConstants;
 import org.talend.components.netsuite.client.CustomMetaDataSource;
 import org.talend.components.netsuite.client.EmptyCustomMetaDataSource;
 import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteException;
+import org.talend.components.netsuite.test.client.TestNetSuiteClientService;
 import org.talend.components.netsuite.client.model.CustomFieldDesc;
 import org.talend.components.netsuite.client.model.FieldDesc;
 import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.test.TestUtils;
-import org.talend.components.netsuite.v2016_2.client.NetSuiteClientServiceImpl;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.di.DiSchemaConstants;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netsuite.webservices.v2016_2.platform.NetSuitePortType;
+import com.netsuite.webservices.test.platform.NetSuitePortType;
 
 /**
  *
  */
-public class NetSuiteDatasetRuntimeTest extends NetSuiteMockTestBase {
+public class NetSuiteDatasetRuntimeTest {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private NetSuiteClientService<NetSuitePortType> clientService = new NetSuiteClientServiceImpl();
+    private NetSuiteClientService<NetSuitePortType> clientService = new TestNetSuiteClientService();
 
     @Test
     public void testGetSchemaForRecordBasic() throws Exception {

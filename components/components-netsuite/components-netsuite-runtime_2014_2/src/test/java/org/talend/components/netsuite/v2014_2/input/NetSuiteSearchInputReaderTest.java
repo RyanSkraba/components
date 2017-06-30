@@ -62,6 +62,7 @@ public class NetSuiteSearchInputReaderTest extends NetSuiteMockTestBase {
     @Override @Before
     public void setUp() throws Exception {
         installMockTestFixture();
+
         super.setUp();
 
         properties = new NetSuiteInputProperties("test");

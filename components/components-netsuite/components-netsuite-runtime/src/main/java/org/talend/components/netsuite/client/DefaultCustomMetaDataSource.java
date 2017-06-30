@@ -37,10 +37,10 @@ import org.talend.components.netsuite.client.model.customfield.CustomFieldRefTyp
 import org.talend.daikon.java8.Function;
 
 /**
- * Base implementation of <code>CustomMetaDataSource</code> which retrieves custom meta data from NetSuite and
+ * Implementation of <code>CustomMetaDataSource</code> which retrieves custom meta data from NetSuite and
  * caches retrieved data.
  */
-public abstract class DefaultCustomMetaDataSource<PortT> implements CustomMetaDataSource {
+public class DefaultCustomMetaDataSource<PortT> implements CustomMetaDataSource {
     protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected NetSuiteClientService<PortT> clientService;
@@ -49,7 +49,7 @@ public abstract class DefaultCustomMetaDataSource<PortT> implements CustomMetaDa
 
     protected boolean customRecordTypesLoaded = false;
 
-    protected Map<BasicRecordType, List<Object>> customFieldMap = new HashMap<>();
+    protected Map<BasicRecordType, List<?>> customFieldMap = new HashMap<>();
 
     protected Map<String, Map<String, CustomFieldDesc>> recordCustomFieldMap = new HashMap<>();
 
@@ -57,12 +57,15 @@ public abstract class DefaultCustomMetaDataSource<PortT> implements CustomMetaDa
 
     protected Map<String, Map<String, CustomFieldDesc>> customRecordCustomFieldMap = new HashMap<>();
 
+    protected CustomMetaDataRetriever customMetaDataRetriever;
+
     protected static final List<BasicRecordType> fieldCustomizationTypes = Collections.unmodifiableList(
             Arrays.asList(BasicRecordType.CRM_CUSTOM_FIELD, BasicRecordType.ENTITY_CUSTOM_FIELD, BasicRecordType.ITEM_CUSTOM_FIELD,
                     BasicRecordType.OTHER_CUSTOM_FIELD, BasicRecordType.TRANSACTION_BODY_CUSTOM_FIELD, BasicRecordType.TRANSACTION_COLUMN_CUSTOM_FIELD));
 
-    public DefaultCustomMetaDataSource(NetSuiteClientService<PortT> clientService) {
+    public DefaultCustomMetaDataSource(NetSuiteClientService<PortT> clientService, CustomMetaDataRetriever customMetaDataRetriever) {
         this.clientService = clientService;
+        this.customMetaDataRetriever = customMetaDataRetriever;
     }
 
     /**
@@ -140,7 +143,7 @@ public abstract class DefaultCustomMetaDataSource<PortT> implements CustomMetaDa
      * @return custom field descriptors as map
      * @throws NetSuiteException if an error occurs during obtaining of customization data
      */
-    protected <T> Map<String, CustomFieldDesc> createCustomFieldDescMap(
+    public static <T> Map<String, CustomFieldDesc> createCustomFieldDescMap(NetSuiteClientService<?> clientService,
             RecordTypeDesc recordType, BasicRecordType customizationType, List<T> customFieldList)
             throws NetSuiteException {
 
@@ -192,10 +195,10 @@ public abstract class DefaultCustomMetaDataSource<PortT> implements CustomMetaDa
 
         List<NsRef> customTypes = new ArrayList<>();
 
-        List<NsRef> customRecordTypes = retrieveCustomizationIds(BasicRecordType.CUSTOM_RECORD_TYPE);
+        List<NsRef> customRecordTypes = customMetaDataRetriever.retrieveCustomizationIds(BasicRecordType.CUSTOM_RECORD_TYPE);
         customTypes.addAll(customRecordTypes);
 
-        List<NsRef> customTransactionTypes = retrieveCustomizationIds(BasicRecordType.CUSTOM_TRANSACTION_TYPE);
+        List<NsRef> customTransactionTypes = customMetaDataRetriever.retrieveCustomizationIds(BasicRecordType.CUSTOM_TRANSACTION_TYPE);
         customTypes.addAll(customTransactionTypes);
 
         for (NsRef customizationRef : customTypes) {
@@ -227,9 +230,9 @@ public abstract class DefaultCustomMetaDataSource<PortT> implements CustomMetaDa
         Map<String, CustomFieldDesc> fieldDescMap = new HashMap<>();
 
         for (BasicRecordType customizationType : fieldCustomizationTypes) {
-            List<Object> customFieldList = customFieldMap.get(customizationType);
+            List<?> customFieldList = customFieldMap.get(customizationType);
             Map<String, CustomFieldDesc> customFieldDescMap =
-                    createCustomFieldDescMap(recordType, customizationType, customFieldList);
+                    createCustomFieldDescMap(clientService, recordType, customizationType, customFieldList);
             fieldDescMap.putAll(customFieldDescMap);
         }
 
@@ -248,13 +251,13 @@ public abstract class DefaultCustomMetaDataSource<PortT> implements CustomMetaDa
 
         Map<BasicRecordType, List<NsRef>> fieldCustomizationRefs = new HashMap<>(32);
         for (BasicRecordType customizationType : fieldCustomizationTypes) {
-            List<NsRef> customizationRefs = retrieveCustomizationIds(customizationType);
+            List<NsRef> customizationRefs = customMetaDataRetriever.retrieveCustomizationIds(customizationType);
             fieldCustomizationRefs.put(customizationType, customizationRefs);
         }
 
         for (BasicRecordType customizationType : fieldCustomizationTypes) {
             List<NsRef> customizationRefs = fieldCustomizationRefs.get(customizationType);
-            List<Object> fieldCustomizationList = retrieveCustomizations(customizationRefs);
+            List<?> fieldCustomizationList = customMetaDataRetriever.retrieveCustomizations(customizationRefs);
             customFieldMap.put(customizationType, fieldCustomizationList);
         }
 
@@ -272,37 +275,40 @@ public abstract class DefaultCustomMetaDataSource<PortT> implements CustomMetaDa
         if (recordCustomFieldMap != null) {
             return;
         }
-        recordCustomFieldMap = retrieveCustomRecordCustomFields(recordTypeInfo.getRecordType(), recordTypeInfo.getCustomizationRef());
+        recordCustomFieldMap = customMetaDataRetriever.retrieveCustomRecordCustomFields(
+                recordTypeInfo.getRecordType(), recordTypeInfo.getCustomizationRef());
         customRecordCustomFieldMap.put(recordTypeInfo.getName(), recordCustomFieldMap);
     }
 
-    /**
-     * Retrieve customization IDs for given customization type.
-     *
-     * @param type customization type
-     * @return list of customization refs
-     * @throws NetSuiteException if an error occurs during retrieving
-     */
-    protected abstract List<NsRef> retrieveCustomizationIds(final BasicRecordType type) throws NetSuiteException;
+    public interface CustomMetaDataRetriever {
 
-    /**
-     * Retrieve customization for given customization refs.
-     *
-     * @param nsCustomizationRefs customization refs which to retrieve customization data for
-     * @param <T> type of customization record
-     * @return list of customization records
-     * @throws NetSuiteException if an error occurs during retrieving
-     */
-    protected abstract <T> List<T> retrieveCustomizations(final List<NsRef> nsCustomizationRefs) throws NetSuiteException;
+        /**
+         * Retrieve customization IDs for given customization type.
+         *
+         * @param type customization type
+         * @return list of customization refs
+         * @throws NetSuiteException if an error occurs during retrieving
+         */
+        List<NsRef> retrieveCustomizationIds(final BasicRecordType type) throws NetSuiteException;
 
-    /**
-     * Retrieve custom fields for given custom record type.
-     *
-     * @param recordType custom record type descriptor
-     * @param nsCustomizationRef customization ref for the custom record type
-     * @return custom field map which contains <code>(custom field name, custom field descriptor)</code> entries
-     * @throws NetSuiteException if an error occurs during retrieving
-     */
-    protected abstract Map<String, CustomFieldDesc> retrieveCustomRecordCustomFields(final RecordTypeDesc recordType, final NsRef nsCustomizationRef) throws NetSuiteException;
+        /**
+         * Retrieve customization for given customization refs.
+         *
+         * @param nsCustomizationRefs customization refs which to retrieve customization data for
+         * @return list of customization records
+         * @throws NetSuiteException if an error occurs during retrieving
+         */
+        List<?> retrieveCustomizations(final List<NsRef> nsCustomizationRefs) throws NetSuiteException;
 
+        /**
+         * Retrieve custom fields for given custom record type.
+         *
+         * @param recordType custom record type descriptor
+         * @param nsCustomizationRef customization ref for the custom record type
+         * @return custom field map which contains <code>(custom field name, custom field descriptor)</code> entries
+         * @throws NetSuiteException if an error occurs during retrieving
+         */
+        Map<String, CustomFieldDesc> retrieveCustomRecordCustomFields(final RecordTypeDesc recordType, final NsRef nsCustomizationRef) throws NetSuiteException;
+
+    }
 }

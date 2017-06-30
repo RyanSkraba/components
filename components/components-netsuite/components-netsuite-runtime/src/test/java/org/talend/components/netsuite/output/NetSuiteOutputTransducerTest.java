@@ -11,98 +11,65 @@
 //
 // ============================================================================
 
-package org.talend.components.netsuite.v2016_2.output;
+package org.talend.components.netsuite.output;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.talend.components.netsuite.NetSuiteWebServiceMockTestFixture.assertNsObject;
-import static org.talend.components.netsuite.v2016_2.MockTestHelper.makeIndexedRecords;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.IndexedRecord;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.talend.components.netsuite.CustomFieldSpec;
+import org.talend.components.netsuite.AbstractNetSuiteTestBase;
 import org.talend.components.netsuite.NetSuiteDatasetRuntime;
 import org.talend.components.netsuite.NetSuiteDatasetRuntimeImpl;
+import org.talend.components.netsuite.NetSuiteMockTestBase;
 import org.talend.components.netsuite.NetSuiteRuntime;
+import org.talend.components.netsuite.TestNetSuiteRuntimeImpl;
 import org.talend.components.netsuite.client.CustomMetaDataSource;
-import org.talend.components.netsuite.client.EmptyCustomMetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
-import org.talend.components.netsuite.client.NetSuiteException;
-import org.talend.components.netsuite.client.model.CustomFieldDesc;
-import org.talend.components.netsuite.client.model.CustomRecordTypeInfo;
-import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.components.netsuite.client.model.RefType;
 import org.talend.components.netsuite.client.model.TypeDesc;
-import org.talend.components.netsuite.client.model.customfield.CustomFieldRefType;
-import org.talend.components.netsuite.output.NsObjectOutputTransducer;
-import org.talend.components.netsuite.test.TestUtils;
-import org.talend.components.netsuite.v2016_2.NetSuiteMockTestBase;
-import org.talend.components.netsuite.v2016_2.NetSuiteRuntimeImpl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netsuite.webservices.v2016_2.platform.NetSuitePortType;
-import com.netsuite.webservices.v2016_2.platform.core.CustomRecordRef;
-import com.netsuite.webservices.v2016_2.platform.core.RecordRef;
-import com.netsuite.webservices.v2016_2.platform.core.types.RecordType;
-import com.netsuite.webservices.v2016_2.setup.customization.CustomRecord;
-import com.netsuite.webservices.v2016_2.setup.customization.TransactionBodyCustomField;
-import com.netsuite.webservices.v2016_2.setup.customization.types.CustomizationFieldType;
-import com.netsuite.webservices.v2016_2.transactions.sales.Opportunity;
+import com.netsuite.webservices.test.platform.NetSuitePortType;
+import com.netsuite.webservices.test.platform.core.CustomRecordRef;
+import com.netsuite.webservices.test.platform.core.RecordRef;
+import com.netsuite.webservices.test.platform.core.types.RecordType;
+import com.netsuite.webservices.test.setup.customization.CustomRecord;
+import com.netsuite.webservices.test.transactions.sales.Opportunity;
 
 /**
  *
  */
 public class NetSuiteOutputTransducerTest extends NetSuiteMockTestBase {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     protected NetSuitePortType port;
     protected NetSuiteClientService<NetSuitePortType> clientService;
 
-    @BeforeClass
-    public static void classSetUp() throws Exception {
-        installWebServiceTestFixture();
-        setUpClassScopedTestFixtures();
-    }
-
-    @AfterClass
-    public static void classTearDown() throws Exception {
-        tearDownClassScopedTestFixtures();
-    }
-
-    @Override @Before
+    @Override
+    @Before
     public void setUp() throws Exception {
+        installWebServiceMockTestFixture();
         installMockTestFixture();
+
         super.setUp();
 
         port = webServiceMockTestFixture.getPortMock();
         clientService = webServiceMockTestFixture.getClientService();
     }
 
-    @Override @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     @Test
     public void testBasic() throws Exception {
 
-        NetSuiteRuntime netSuiteRuntime = new NetSuiteRuntimeImpl();
+        NetSuiteRuntime netSuiteRuntime = new TestNetSuiteRuntimeImpl(webServiceMockTestFixture.getClientFactory());
         NetSuiteDatasetRuntime dataSetRuntime = netSuiteRuntime.getDatasetRuntime(mockTestFixture.getConnectionProperties());
 
         mockGetRequestResults(null);
@@ -115,7 +82,7 @@ public class NetSuiteOutputTransducerTest extends NetSuiteMockTestBase {
                 webServiceMockTestFixture.getClientService(), typeDesc.getTypeName());
 
         List<IndexedRecord> indexedRecordList = makeIndexedRecords(clientService, schema,
-                new SimpleObjectComposer<>(Opportunity.class), 10);
+                new AbstractNetSuiteTestBase.SimpleObjectComposer<>(Opportunity.class), 10);
 
         for (IndexedRecord indexedRecord : indexedRecordList) {
             Opportunity record = (Opportunity) transducer.write(indexedRecord);
@@ -126,7 +93,7 @@ public class NetSuiteOutputTransducerTest extends NetSuiteMockTestBase {
     @Test
     public void testNonRecordObjects() throws Exception {
 
-        NetSuiteRuntime netSuiteRuntime = new NetSuiteRuntimeImpl();
+        NetSuiteRuntime netSuiteRuntime = new TestNetSuiteRuntimeImpl(webServiceMockTestFixture.getClientFactory());
         NetSuiteDatasetRuntime dataSetRuntime = netSuiteRuntime.getDatasetRuntime(mockTestFixture.getConnectionProperties());
 
         Collection<String> typeNames = Arrays.asList(
@@ -143,7 +110,7 @@ public class NetSuiteOutputTransducerTest extends NetSuiteMockTestBase {
                     typeDesc.getTypeName());
 
             List<IndexedRecord> indexedRecordList = makeIndexedRecords(clientService, schema,
-                    new SimpleObjectComposer<>(typeDesc.getTypeClass()), 10);
+                    new AbstractNetSuiteTestBase.SimpleObjectComposer<>(typeDesc.getTypeClass()), 10);
 
             for (IndexedRecord indexedRecord : indexedRecordList) {
                 Object nsObject = transducer.write(indexedRecord);
@@ -155,7 +122,7 @@ public class NetSuiteOutputTransducerTest extends NetSuiteMockTestBase {
     @Test
     public void testRecordRef() throws Exception {
 
-        NetSuiteRuntime netSuiteRuntime = new NetSuiteRuntimeImpl();
+        NetSuiteRuntime netSuiteRuntime = new TestNetSuiteRuntimeImpl(webServiceMockTestFixture.getClientFactory());
         NetSuiteDatasetRuntime dataSetRuntime = netSuiteRuntime.getDatasetRuntime(mockTestFixture.getConnectionProperties());
 
         TypeDesc typeDesc = clientService.getMetaDataSource().getTypeInfo(RefType.RECORD_REF.getTypeName());
@@ -168,7 +135,7 @@ public class NetSuiteOutputTransducerTest extends NetSuiteMockTestBase {
         transducer.setReference(true);
 
         List<IndexedRecord> indexedRecordList = makeIndexedRecords(clientService, schema,
-                new SimpleObjectComposer<>(typeDesc.getTypeClass()), 10);
+                new AbstractNetSuiteTestBase.SimpleObjectComposer<>(typeDesc.getTypeClass()), 10);
 
         for (IndexedRecord indexedRecord : indexedRecordList) {
             Object nsObject = transducer.write(indexedRecord);
@@ -182,30 +149,28 @@ public class NetSuiteOutputTransducerTest extends NetSuiteMockTestBase {
     @Test
     public void testCustomFields() throws Exception {
 
-        NetSuiteRuntime netSuiteRuntime = new NetSuiteRuntimeImpl();
+        TestCustomMetaDataSource customMetaDataSource = new TestCustomMetaDataSource(clientService, "Opportunity");
+        clientService.getMetaDataSource().setCustomMetaDataSource(customMetaDataSource);
+
+        NetSuiteRuntime netSuiteRuntime = new TestNetSuiteRuntimeImpl(webServiceMockTestFixture.getClientFactory());
         NetSuiteDatasetRuntime dataSetRuntime = netSuiteRuntime.getDatasetRuntime(mockTestFixture.getConnectionProperties());
 
         mockGetRequestResults(null);
 
         TypeDesc basicTypeDesc = clientService.getBasicMetaData().getTypeInfo("Opportunity");
-
-        final Map<String, CustomFieldSpec<RecordType, CustomizationFieldType>> customFieldSpecs =
-                createCustomFieldSpecs();
-        mockCustomizationRequestResults(customFieldSpecs);
+        TypeDesc typeDesc = clientService.getMetaDataSource().getTypeInfo("Opportunity");
 
         final List<Opportunity> recordList = makeNsObjects(
-                new RecordComposer<>(Opportunity.class, customFieldSpecs), 10);
+                new NsObjectComposer<Opportunity>(clientService.getMetaDataSource(), typeDesc), 10);
         mockSearchRequestResults(recordList, 100);
 
-        TypeDesc customizedTypeDesc = clientService.getMetaDataSource().getTypeInfo(basicTypeDesc.getTypeName());
-
-        Schema schema = dataSetRuntime.getSchema(customizedTypeDesc.getTypeName());
+        Schema schema = dataSetRuntime.getSchema(typeDesc.getTypeName());
 
         NsObjectOutputTransducer transducer = new NsObjectOutputTransducer(
-                webServiceMockTestFixture.getClientService(), basicTypeDesc.getTypeName());
+                webServiceMockTestFixture.getClientService(), typeDesc.getTypeName());
 
         List<IndexedRecord> indexedRecordList = makeIndexedRecords(clientService, schema,
-                new RecordComposer<>(Opportunity.class, customFieldSpecs), 10);
+                new NsObjectComposer<Opportunity>(clientService.getMetaDataSource(), typeDesc), 10);
 
         for (IndexedRecord indexedRecord : indexedRecordList) {
             Opportunity record = (Opportunity) transducer.write(indexedRecord);
@@ -215,20 +180,20 @@ public class NetSuiteOutputTransducerTest extends NetSuiteMockTestBase {
 
     @Test
     public void testCustomRecord() throws Exception {
-        final CustomMetaDataSource customMetaDataSource = new TestCustomMetaDataSource();
 
+        CustomMetaDataSource customMetaDataSource = new TestCustomMetaDataSource(clientService);
         clientService.getMetaDataSource().setCustomMetaDataSource(customMetaDataSource);
 
         NetSuiteDatasetRuntime dataSetRuntime = new NetSuiteDatasetRuntimeImpl(clientService.getMetaDataSource());
 
         mockGetRequestResults(null);
 
-        TypeDesc customTypeDesc = clientService.getMetaDataSource().getTypeInfo("custom_record_type_1");
+        TypeDesc typeDesc = clientService.getMetaDataSource().getTypeInfo("custom_record_type_1");
 
-        Schema schema = dataSetRuntime.getSchema(customTypeDesc.getTypeName());
+        Schema schema = dataSetRuntime.getSchema(typeDesc.getTypeName());
 
         NsObjectOutputTransducer transducer = new NsObjectOutputTransducer(
-                webServiceMockTestFixture.getClientService(), customTypeDesc.getTypeName());
+                webServiceMockTestFixture.getClientService(), typeDesc.getTypeName());
 
         GenericRecord indexedRecordToAdd = new GenericData.Record(schema);
 
@@ -248,8 +213,8 @@ public class NetSuiteOutputTransducerTest extends NetSuiteMockTestBase {
 
     @Test
     public void testCustomRecordRef() throws Exception {
-        final CustomMetaDataSource customMetaDataSource = new TestCustomMetaDataSource();
 
+        CustomMetaDataSource customMetaDataSource = new TestCustomMetaDataSource(clientService);
         clientService.getMetaDataSource().setCustomMetaDataSource(customMetaDataSource);
 
         NetSuiteDatasetRuntime dataSetRuntime = new NetSuiteDatasetRuntimeImpl(clientService.getMetaDataSource());
@@ -278,76 +243,4 @@ public class NetSuiteOutputTransducerTest extends NetSuiteMockTestBase {
         }
     }
 
-    protected Map<String, CustomFieldSpec<RecordType, CustomizationFieldType>> createCustomFieldSpecs() {
-        CustomFieldSpec<RecordType, CustomizationFieldType> customBodyField1 = new CustomFieldSpec(
-                "custbody_field1", "1001",
-                RecordType.TRANSACTION_BODY_CUSTOM_FIELD, TransactionBodyCustomField.class,
-                CustomizationFieldType.CHECK_BOX, CustomFieldRefType.BOOLEAN,
-                Arrays.asList("bodyOpportunity")
-        );
-
-        CustomFieldSpec<RecordType, CustomizationFieldType> customBodyField2 = new CustomFieldSpec(
-                "custbody_field2", "1002",
-                RecordType.TRANSACTION_BODY_CUSTOM_FIELD, TransactionBodyCustomField.class,
-                CustomizationFieldType.FREE_FORM_TEXT, CustomFieldRefType.STRING,
-                Arrays.asList("bodyOpportunity")
-        );
-
-        CustomFieldSpec<RecordType, CustomizationFieldType> customBodyField3 = new CustomFieldSpec(
-                "custbody_field3", "1003",
-                RecordType.TRANSACTION_BODY_CUSTOM_FIELD, TransactionBodyCustomField.class,
-                CustomizationFieldType.DATETIME, CustomFieldRefType.DATE,
-                Arrays.asList("bodyOpportunity")
-        );
-
-        Collection<CustomFieldSpec<RecordType, CustomizationFieldType>> specs = Arrays.asList(
-                customBodyField1, customBodyField2, customBodyField3
-        );
-        Map<String, CustomFieldSpec<RecordType, CustomizationFieldType>> specMap = new HashMap<>();
-        for (CustomFieldSpec<RecordType, CustomizationFieldType> spec : specs) {
-            specMap.put(spec.getScriptId(), spec);
-        }
-        return specMap;
-    }
-
-    protected class TestCustomMetaDataSource extends EmptyCustomMetaDataSource {
-
-        @Override
-        public Collection<CustomRecordTypeInfo> getCustomRecordTypes() {
-            return Arrays.asList(getCustomRecordType("custom_record_type_1"));
-        }
-
-        @Override
-        public CustomRecordTypeInfo getCustomRecordType(String typeName) {
-            try {
-                if (typeName.equals("custom_record_type_1")) {
-                    JsonNode recordTypeNode = objectMapper.readTree(NetSuiteOutputTransducerTest.class.getResource(
-                            "/test-data/customRecord-1.json"));
-                    CustomRecordTypeInfo customRecordTypeInfo =
-                            TestUtils.readCustomRecord(clientService.getBasicMetaData(), recordTypeNode);
-                    return customRecordTypeInfo;
-                }
-                return null;
-            } catch (IOException e) {
-                throw new NetSuiteException(e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public Map<String, CustomFieldDesc> getCustomFields(RecordTypeInfo recordTypeInfo) {
-            try {
-                if (recordTypeInfo.getName().equals("custom_record_type_1")) {
-                    JsonNode fieldListNode = objectMapper.readTree(NetSuiteOutputTransducerTest.class.getResource(
-                            "/test-data/customRecordFields-1.json"));
-                    Map<String, CustomFieldDesc> customFieldDescMap =
-                            TestUtils.readCustomFields(fieldListNode);
-                    return customFieldDescMap;
-                }
-                return null;
-            } catch (IOException e) {
-                throw new NetSuiteException(e.getMessage(), e);
-            }
-        }
-
-    }
 }

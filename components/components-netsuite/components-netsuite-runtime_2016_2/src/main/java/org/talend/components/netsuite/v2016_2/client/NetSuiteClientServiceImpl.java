@@ -33,6 +33,7 @@ import org.apache.cxf.feature.LoggingFeature;
 import org.talend.components.netsuite.NetSuiteErrorCode;
 import org.talend.components.netsuite.NetSuiteRuntimeI18n;
 import org.talend.components.netsuite.client.CustomMetaDataSource;
+import org.talend.components.netsuite.client.DefaultCustomMetaDataSource;
 import org.talend.components.netsuite.client.DefaultMetaDataSource;
 import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
@@ -105,223 +106,9 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
     public NetSuiteClientServiceImpl() {
         super();
 
+        portAdapter = new PortAdapterImpl();
+
         metaDataSource = createDefaultMetaDataSource();
-    }
-
-    @Override
-    public <RecT, SearchT> NsSearchResult<RecT> search(final SearchT searchRecord) throws NetSuiteException {
-        return execute(new PortOperation<NsSearchResult<RecT>, NetSuitePortType>() {
-            @Override public NsSearchResult<RecT> execute(NetSuitePortType port) throws Exception {
-                SearchRequest request = new SearchRequest();
-                SearchRecord sr = (SearchRecord) searchRecord;
-                request.setSearchRecord(sr);
-
-                SearchResult result = port.search(request).getSearchResult();
-                return toNsSearchResult(result);
-            }
-        });
-    }
-
-    @Override
-    public <RecT> NsSearchResult<RecT> searchMore(final int pageIndex) throws NetSuiteException {
-        return execute(new PortOperation<NsSearchResult<RecT>, NetSuitePortType>() {
-            @Override public NsSearchResult<RecT> execute(NetSuitePortType port) throws Exception {
-                SearchMoreRequest request = new SearchMoreRequest();
-                request.setPageIndex(pageIndex);
-
-                SearchResult result = port.searchMore(request).getSearchResult();
-                return toNsSearchResult(result);
-            }
-        });
-    }
-
-    @Override
-    public <RecT> NsSearchResult<RecT> searchMoreWithId(
-            final String searchId, final int pageIndex) throws NetSuiteException {
-        return execute(new PortOperation<NsSearchResult<RecT>, NetSuitePortType>() {
-            @Override public NsSearchResult<RecT> execute(NetSuitePortType port) throws Exception {
-                SearchMoreWithIdRequest request = new SearchMoreWithIdRequest();
-                request.setSearchId(searchId);
-                request.setPageIndex(pageIndex);
-
-                SearchResult result = port.searchMoreWithId(request).getSearchResult();
-                return toNsSearchResult(result);
-            }
-        });
-    }
-
-    @Override
-    public <RecT> NsSearchResult<RecT> searchNext() throws NetSuiteException {
-        return execute(new PortOperation<NsSearchResult<RecT>, NetSuitePortType>() {
-            @Override public NsSearchResult<RecT> execute(NetSuitePortType port) throws Exception {
-                SearchNextRequest request = new SearchNextRequest();
-                SearchResult result = port.searchNext(request).getSearchResult();
-                return toNsSearchResult(result);
-            }
-        });
-    }
-
-    @Override
-    public <RecT, RefT> NsReadResponse<RecT> get(final RefT ref) throws NetSuiteException {
-        if (ref == null) {
-            return new NsReadResponse<>();
-        }
-        return execute(new PortOperation<NsReadResponse<RecT>, NetSuitePortType>() {
-            @Override public NsReadResponse<RecT> execute(NetSuitePortType port) throws Exception {
-                GetRequest request = new GetRequest();
-                request.setBaseRef((BaseRef) ref);
-
-                ReadResponse response = port.get(request).getReadResponse();
-                return toNsReadResponse(response);
-            }
-        });
-    }
-
-    @Override
-    public <RecT, RefT> List<NsReadResponse<RecT>> getList(final List<RefT> refs) throws NetSuiteException {
-        if (refs == null) {
-            return Collections.emptyList();
-        }
-        return execute(new PortOperation<List<NsReadResponse<RecT>>, NetSuitePortType>() {
-            @Override public List<NsReadResponse<RecT>> execute(NetSuitePortType port) throws Exception {
-                GetListRequest request = new GetListRequest();
-                for (RefT ref : refs) {
-                    request.getBaseRef().add((BaseRef) ref);
-                }
-
-                ReadResponseList response = port.getList(request).getReadResponseList();
-                return toNsReadResponseList(response);
-            }
-        });
-    }
-
-    @Override
-    public <RecT, RefT> NsWriteResponse<RefT> add(final RecT record) throws NetSuiteException {
-        if (record == null) {
-            return new NsWriteResponse<>();
-        }
-        return execute(new PortOperation<NsWriteResponse<RefT>, NetSuitePortType>() {
-            @Override public NsWriteResponse<RefT> execute(NetSuitePortType port) throws Exception {
-                AddRequest request = new AddRequest();
-                request.setRecord((Record) record);
-
-                WriteResponse response = port.add(request).getWriteResponse();
-                return toNsWriteResponse(response);
-            }
-        });
-    }
-
-    @Override
-    public <RecT, RefT> List<NsWriteResponse<RefT>> addList(final List<RecT> records) throws NetSuiteException {
-        if (records == null || records.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return execute(new PortOperation<List<NsWriteResponse<RefT>>, NetSuitePortType>() {
-            @Override public List<NsWriteResponse<RefT>> execute(NetSuitePortType port) throws Exception {
-                AddListRequest request = new AddListRequest();
-                request.getRecord().addAll(toRecordList(records));
-
-                WriteResponseList writeResponseList = port.addList(request).getWriteResponseList();
-                return toNsWriteResponseList(writeResponseList);
-            }
-        });
-    }
-
-    @Override
-    public <RecT, RefT> NsWriteResponse<RefT> update(final RecT record) throws NetSuiteException {
-        if (record == null) {
-            return new NsWriteResponse<>();
-        }
-        return execute(new PortOperation<NsWriteResponse<RefT>, NetSuitePortType>() {
-            @Override public NsWriteResponse<RefT> execute(NetSuitePortType port) throws Exception {
-                UpdateRequest request = new UpdateRequest();
-                request.setRecord((Record) record);
-
-                WriteResponse response = port.update(request).getWriteResponse();
-                return toNsWriteResponse(response);
-            }
-        });
-    }
-
-    @Override
-    public <RecT, RefT> List<NsWriteResponse<RefT>> updateList(final List<RecT> records) throws NetSuiteException {
-        if (records == null || records.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return execute(new PortOperation<List<NsWriteResponse<RefT>>, NetSuitePortType>() {
-            @Override public List<NsWriteResponse<RefT>> execute(NetSuitePortType port) throws Exception {
-                UpdateListRequest request = new UpdateListRequest();
-                request.getRecord().addAll(toRecordList(records));
-
-                WriteResponseList writeResponseList = port.updateList(request).getWriteResponseList();
-                return toNsWriteResponseList(writeResponseList);
-            }
-        });
-    }
-
-    @Override
-    public <RecT, RefT> NsWriteResponse<RefT> upsert(final RecT record) throws NetSuiteException {
-        if (record == null) {
-            return new NsWriteResponse<>();
-        }
-        return execute(new PortOperation<NsWriteResponse<RefT>, NetSuitePortType>() {
-            @Override public NsWriteResponse<RefT> execute(NetSuitePortType port) throws Exception {
-                UpsertRequest request = new UpsertRequest();
-                request.setRecord((Record) record);
-
-                WriteResponse response = port.upsert(request).getWriteResponse();
-                return toNsWriteResponse(response);
-            }
-        });
-    }
-
-    @Override
-    public <RecT, RefT> List<NsWriteResponse<RefT>> upsertList(final List<RecT> records) throws NetSuiteException {
-        if (records == null || records.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return execute(new PortOperation<List<NsWriteResponse<RefT>>, NetSuitePortType>() {
-            @Override public List<NsWriteResponse<RefT>> execute(NetSuitePortType port) throws Exception {
-                UpsertListRequest request = new UpsertListRequest();
-                request.getRecord().addAll(toRecordList(records));
-
-                WriteResponseList writeResponseList = port.upsertList(request).getWriteResponseList();
-                return toNsWriteResponseList(writeResponseList);
-            }
-        });
-    }
-
-    @Override
-    public <RefT> NsWriteResponse<RefT> delete(final RefT ref) throws NetSuiteException {
-        if (ref == null) {
-            return new NsWriteResponse<>();
-        }
-        return execute(new PortOperation<NsWriteResponse<RefT>, NetSuitePortType>() {
-            @Override public NsWriteResponse<RefT> execute(NetSuitePortType port) throws Exception {
-                DeleteRequest request = new DeleteRequest();
-                BaseRef baseRef = (BaseRef) ref;
-                request.setBaseRef(baseRef);
-
-                WriteResponse writeResponse = port.delete(request).getWriteResponse();
-                return toNsWriteResponse(writeResponse);
-            }
-        });
-    }
-
-    @Override
-    public <RefT> List<NsWriteResponse<RefT>> deleteList(final List<RefT> refs) throws NetSuiteException {
-        if (refs == null || refs.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return execute(new PortOperation<List<NsWriteResponse<RefT>>, NetSuitePortType>() {
-            @Override public List<NsWriteResponse<RefT>> execute(NetSuitePortType port) throws Exception {
-                DeleteListRequest request = new DeleteListRequest();
-                request.getBaseRef().addAll(toBaseRefList(refs));
-
-                WriteResponseList writeResponseList = port.deleteList(request).getWriteResponseList();
-                return toNsWriteResponseList(writeResponseList);
-            }
-        });
     }
 
     @Override
@@ -336,9 +123,10 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
 
     @Override
     public CustomMetaDataSource createDefaultCustomMetaDataSource() {
-        return new DefaultCustomMetaDataSourceImpl(this);
+        return new DefaultCustomMetaDataSource(this, new CustomMetaDataRetrieverImpl(this));
     }
 
+    @Override
     protected void doLogout() throws NetSuiteException {
         try {
             LogoutRequest request = new LogoutRequest();
@@ -348,6 +136,7 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
         }
     }
 
+    @Override
     protected void doLogin() throws NetSuiteException {
         port = getNetSuitePort(endpointUrl, credentials.getAccount());
 
@@ -399,7 +188,7 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
 
         checkLoginError(toNsStatus(status), exceptionMessage);
 
-        remoteLoginHeaders(port);
+        removeLoginHeaders(port);
     }
 
     @Override
@@ -600,5 +389,140 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
         nsDetail.setCode(detail.getCode().value());
         nsDetail.setMessage(detail.getMessage());
         return nsDetail;
+    }
+
+    protected class PortAdapterImpl implements PortAdapter<NetSuitePortType> {
+
+        @Override
+        public <RecT, SearchT> NsSearchResult<RecT> search(final NetSuitePortType port, final SearchT searchRecord) throws Exception {
+            SearchRequest request = new SearchRequest();
+            SearchRecord sr = (SearchRecord) searchRecord;
+            request.setSearchRecord(sr);
+
+            SearchResult result = port.search(request).getSearchResult();
+            return toNsSearchResult(result);
+        }
+
+        @Override
+        public <RecT> NsSearchResult<RecT> searchMore(final NetSuitePortType port, final int pageIndex) throws Exception {
+            SearchMoreRequest request = new SearchMoreRequest();
+            request.setPageIndex(pageIndex);
+
+            SearchResult result = port.searchMore(request).getSearchResult();
+            return toNsSearchResult(result);
+        }
+
+        @Override
+        public <RecT> NsSearchResult<RecT> searchMoreWithId(final NetSuitePortType port,
+                final String searchId, final int pageIndex) throws Exception {
+            SearchMoreWithIdRequest request = new SearchMoreWithIdRequest();
+            request.setSearchId(searchId);
+            request.setPageIndex(pageIndex);
+
+            SearchResult result = port.searchMoreWithId(request).getSearchResult();
+            return toNsSearchResult(result);
+        }
+
+        @Override
+        public <RecT> NsSearchResult<RecT> searchNext(final NetSuitePortType port) throws Exception {
+            SearchNextRequest request = new SearchNextRequest();
+            SearchResult result = port.searchNext(request).getSearchResult();
+            return toNsSearchResult(result);
+        }
+
+        @Override
+        public <RecT, RefT> NsReadResponse<RecT> get(final NetSuitePortType port, final RefT ref) throws Exception {
+            GetRequest request = new GetRequest();
+            request.setBaseRef((BaseRef) ref);
+
+            ReadResponse response = port.get(request).getReadResponse();
+            return toNsReadResponse(response);
+        }
+
+        @Override
+        public <RecT, RefT> List<NsReadResponse<RecT>> getList(final NetSuitePortType port, final List<RefT> refs) throws Exception {
+            GetListRequest request = new GetListRequest();
+            for (RefT ref : refs) {
+                request.getBaseRef().add((BaseRef) ref);
+            }
+
+            ReadResponseList response = port.getList(request).getReadResponseList();
+            return toNsReadResponseList(response);
+        }
+
+        @Override
+        public <RecT, RefT> NsWriteResponse<RefT> add(final NetSuitePortType port, final RecT record) throws Exception {
+            AddRequest request = new AddRequest();
+            request.setRecord((Record) record);
+
+            WriteResponse response = port.add(request).getWriteResponse();
+            return toNsWriteResponse(response);
+        }
+
+        @Override
+        public <RecT, RefT> List<NsWriteResponse<RefT>> addList(final NetSuitePortType port,
+                final List<RecT> records) throws Exception {
+            AddListRequest request = new AddListRequest();
+            request.getRecord().addAll(toRecordList(records));
+
+            WriteResponseList writeResponseList = port.addList(request).getWriteResponseList();
+            return toNsWriteResponseList(writeResponseList);
+        }
+
+        @Override
+        public <RecT, RefT> NsWriteResponse<RefT> update(final NetSuitePortType port, final RecT record) throws Exception {
+            UpdateRequest request = new UpdateRequest();
+            request.setRecord((Record) record);
+
+            WriteResponse response = port.update(request).getWriteResponse();
+            return toNsWriteResponse(response);
+        }
+
+        @Override
+        public <RecT, RefT> List<NsWriteResponse<RefT>> updateList(final NetSuitePortType port, final List<RecT> records) throws Exception {
+            UpdateListRequest request = new UpdateListRequest();
+            request.getRecord().addAll(toRecordList(records));
+
+            WriteResponseList writeResponseList = port.updateList(request).getWriteResponseList();
+            return toNsWriteResponseList(writeResponseList);
+        }
+
+        @Override
+        public <RecT, RefT> NsWriteResponse<RefT> upsert(final NetSuitePortType port, final RecT record) throws Exception {
+            UpsertRequest request = new UpsertRequest();
+            request.setRecord((Record) record);
+
+            WriteResponse response = port.upsert(request).getWriteResponse();
+            return toNsWriteResponse(response);
+        }
+
+        @Override
+        public <RecT, RefT> List<NsWriteResponse<RefT>> upsertList(final NetSuitePortType port, final List<RecT> records) throws Exception {
+            UpsertListRequest request = new UpsertListRequest();
+            request.getRecord().addAll(toRecordList(records));
+
+            WriteResponseList writeResponseList = port.upsertList(request).getWriteResponseList();
+            return toNsWriteResponseList(writeResponseList);
+        }
+
+        @Override
+        public <RefT> NsWriteResponse<RefT> delete(final NetSuitePortType port, final RefT ref) throws Exception {
+            DeleteRequest request = new DeleteRequest();
+            BaseRef baseRef = (BaseRef) ref;
+            request.setBaseRef(baseRef);
+
+            WriteResponse writeResponse = port.delete(request).getWriteResponse();
+            return toNsWriteResponse(writeResponse);
+        }
+
+        @Override
+        public <RefT> List<NsWriteResponse<RefT>> deleteList(final NetSuitePortType port, final List<RefT> refs) throws Exception {
+            DeleteListRequest request = new DeleteListRequest();
+            request.getBaseRef().addAll(toBaseRefList(refs));
+
+            WriteResponseList writeResponseList = port.deleteList(request).getWriteResponseList();
+            return toNsWriteResponseList(writeResponseList);
+        }
+
     }
 }

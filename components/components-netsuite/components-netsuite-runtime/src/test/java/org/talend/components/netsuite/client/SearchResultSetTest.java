@@ -11,7 +11,7 @@
 //
 // ============================================================================
 
-package org.talend.components.netsuite.v2016_2.client;
+package org.talend.components.netsuite.client;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -24,23 +24,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.talend.components.netsuite.client.NetSuiteClientService;
-import org.talend.components.netsuite.client.NsSearchResult;
 import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.components.netsuite.client.model.SearchRecordTypeDesc;
 import org.talend.components.netsuite.client.search.SearchResultSet;
+import org.talend.components.netsuite.test.client.TestNetSuiteClientFactory;
+import org.talend.components.netsuite.test.client.TestNetSuiteClientService;
 
-import com.netsuite.webservices.v2016_2.lists.accounting.Account;
-import com.netsuite.webservices.v2016_2.lists.accounting.AccountSearch;
-import com.netsuite.webservices.v2016_2.lists.accounting.InventoryItem;
-import com.netsuite.webservices.v2016_2.lists.accounting.ItemSearch;
-import com.netsuite.webservices.v2016_2.lists.accounting.ServiceSaleItem;
-import com.netsuite.webservices.v2016_2.platform.core.Record;
-import com.netsuite.webservices.v2016_2.platform.core.RecordList;
-import com.netsuite.webservices.v2016_2.platform.core.SearchResult;
-import com.netsuite.webservices.v2016_2.platform.core.Status;
-import com.netsuite.webservices.v2016_2.platform.messages.SearchMoreWithIdResponse;
-import com.netsuite.webservices.v2016_2.platform.messages.SearchResponse;
+import com.netsuite.webservices.test.lists.accounting.Account;
+import com.netsuite.webservices.test.lists.accounting.AccountSearch;
+import com.netsuite.webservices.test.lists.accounting.InventoryItem;
+import com.netsuite.webservices.test.lists.accounting.ItemSearch;
+import com.netsuite.webservices.test.lists.accounting.ServiceSaleItem;
+import com.netsuite.webservices.test.platform.core.Record;
+import com.netsuite.webservices.test.platform.core.RecordList;
+import com.netsuite.webservices.test.platform.core.SearchResult;
+import com.netsuite.webservices.test.platform.core.Status;
+import com.netsuite.webservices.test.platform.messages.SearchMoreWithIdResponse;
+import com.netsuite.webservices.test.platform.messages.SearchResponse;
 
 /**
  *
@@ -64,11 +64,11 @@ public class SearchResultSetTest {
         response1.setSearchResult(result1);
 
         AccountSearch nsSearchRecord1 = new AccountSearch();
-        NsSearchResult nsSearchResult1 = NetSuiteClientServiceImpl.toNsSearchResult(result1);
+        NsSearchResult nsSearchResult1 = TestNetSuiteClientService.toNsSearchResult(result1);
 
         when(conn.search(eq(nsSearchRecord1))).thenReturn(nsSearchResult1);
 
-        NetSuiteClientService<?> clientService = new NetSuiteClientServiceImpl();
+        NetSuiteClientService<?> clientService = new TestNetSuiteClientService();
         RecordTypeInfo recordTypeInfo = clientService.getMetaDataSource().getRecordType("Account");
         SearchRecordTypeDesc searchRecordTypeDesc = clientService.getMetaDataSource()
                 .getSearchRecordType(recordTypeInfo.getRecordType().getSearchRecordType());
@@ -120,13 +120,13 @@ public class SearchResultSetTest {
         response2.setSearchResult(result2);
 
         AccountSearch nsSearchRecord1 = new AccountSearch();
-        NsSearchResult nsSearchResult1 = NetSuiteClientServiceImpl.toNsSearchResult(result1);
-        NsSearchResult nsSearchResult2 = NetSuiteClientServiceImpl.toNsSearchResult(result2);
+        NsSearchResult nsSearchResult1 = TestNetSuiteClientService.toNsSearchResult(result1);
+        NsSearchResult nsSearchResult2 = TestNetSuiteClientService.toNsSearchResult(result2);
 
         when(conn.search(eq(nsSearchRecord1))).thenReturn(nsSearchResult1);
         when(conn.searchMoreWithId(eq("abc123"), eq(2))).thenReturn(nsSearchResult2);
 
-        NetSuiteClientService<?> clientService = new NetSuiteClientServiceImpl();
+        NetSuiteClientService<?> clientService = new TestNetSuiteClientService();
         RecordTypeInfo recordTypeInfo = clientService.getMetaDataSource().getRecordType("Account");
         SearchRecordTypeDesc searchRecordTypeDesc = clientService.getMetaDataSource()
                 .getSearchRecordType(recordTypeInfo.getRecordType().getSearchRecordType());
@@ -185,13 +185,13 @@ public class SearchResultSetTest {
         response2.setSearchResult(result2);
 
         ItemSearch nsSearchRecord1 = new ItemSearch();
-        NsSearchResult nsSearchResult1 = NetSuiteClientServiceImpl.toNsSearchResult(result1);
-        NsSearchResult nsSearchResult2 = NetSuiteClientServiceImpl.toNsSearchResult(result2);
+        NsSearchResult nsSearchResult1 = TestNetSuiteClientService.toNsSearchResult(result1);
+        NsSearchResult nsSearchResult2 = TestNetSuiteClientService.toNsSearchResult(result2);
 
         when(conn.search(eq(nsSearchRecord1))).thenReturn(nsSearchResult1);
         when(conn.searchMoreWithId(eq("abc123"), eq(2))).thenReturn(nsSearchResult2);
 
-        NetSuiteClientService<?> clientService = new NetSuiteClientServiceImpl();
+        NetSuiteClientService<?> clientService = new TestNetSuiteClientService();
         RecordTypeInfo recordTypeInfo = clientService.getMetaDataSource().getRecordType("InventoryItem");
         SearchRecordTypeDesc searchRecordTypeDesc = clientService.getMetaDataSource()
                 .getSearchRecordType(recordTypeInfo.getRecordType().getSearchRecordType());

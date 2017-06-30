@@ -42,6 +42,10 @@ public abstract class SearchFieldAdapter<T> {
         this.fieldClass = fieldClass;
     }
 
+    public SearchFieldType getFieldType() {
+        return fieldType;
+    }
+
     /**
      * Populate search field with data.
      *

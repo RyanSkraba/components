@@ -1,0 +1,16 @@
+[
+  {
+    "scriptId":"custom_field_1",
+    "internalId":"100001",
+    "externalId":null,
+    "customizationType":"entityCustomField",
+    "valueType":"STRING"
+  },
+  {
+    "scriptId":"custom_field_2",
+    "internalId":"100002",
+    "externalId":null,
+    "customizationType":"entityCustomField",
+    "valueType":"DATE"
+  }
+]

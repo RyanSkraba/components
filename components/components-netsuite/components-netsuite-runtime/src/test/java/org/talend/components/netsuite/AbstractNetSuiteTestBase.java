@@ -17,9 +17,13 @@ import static org.talend.components.netsuite.client.model.beans.Beans.getPropert
 import static org.talend.components.netsuite.client.model.beans.Beans.setProperty;
 import static org.talend.components.netsuite.client.model.beans.Beans.setSimpleProperty;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -31,14 +35,23 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.common.test.TestFixture;
+import org.talend.components.netsuite.client.EmptyCustomMetaDataSource;
 import org.talend.components.netsuite.client.MetaDataSource;
+import org.talend.components.netsuite.client.NetSuiteClientService;
+import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.client.model.CustomFieldDesc;
+import org.talend.components.netsuite.client.model.CustomRecordTypeInfo;
 import org.talend.components.netsuite.client.model.FieldDesc;
+import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.client.model.beans.BeanInfo;
 import org.talend.components.netsuite.client.model.beans.Beans;
 import org.talend.components.netsuite.client.model.beans.PropertyInfo;
+import org.talend.components.netsuite.test.TestUtils;
 import org.talend.daikon.avro.AvroUtils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  *
@@ -48,10 +61,14 @@ public abstract class AbstractNetSuiteTestBase {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected static TestFixtures classScopedTestFixtures = new TestFixtures();
+
     protected TestFixtures testFixtures = new TestFixtures();
 
-    protected static Random rnd = new Random(System.currentTimeMillis());
-    protected static DatatypeFactory datatypeFactory;
+    protected static final Random rnd = new Random(System.currentTimeMillis());
+
+    protected static final DatatypeFactory datatypeFactory;
+
+    protected static final ObjectMapper objectMapper = new ObjectMapper();
 
     static {
         try {
@@ -205,11 +222,11 @@ public abstract class AbstractNetSuiteTestBase {
         }
     }
 
-    public static class SimpleRecordComposer<T> implements ObjectComposer<T> {
+    public static class NsObjectComposer<T> implements ObjectComposer<T> {
         protected MetaDataSource metaDataSource;
         protected TypeDesc typeDesc;
 
-        public SimpleRecordComposer(MetaDataSource metaDataSource, TypeDesc typeDesc) {
+        public NsObjectComposer(MetaDataSource metaDataSource, TypeDesc typeDesc) {
             this.metaDataSource = metaDataSource;
             this.typeDesc = typeDesc;
         }
@@ -286,6 +303,67 @@ public abstract class AbstractNetSuiteTestBase {
             }
             clear();
         }
+    }
+
+    public static class TestCustomMetaDataSource extends EmptyCustomMetaDataSource {
+
+        protected static final ObjectMapper objectMapper = new ObjectMapper();
+
+        protected NetSuiteClientService<?> clientService;
+
+        protected List<String> typeNames;
+
+        public TestCustomMetaDataSource(NetSuiteClientService<?> clientService) {
+            this(clientService, Collections.<String>emptyList());
+        }
+
+        public TestCustomMetaDataSource(NetSuiteClientService<?> clientService, String typeName) {
+            this(clientService, Collections.singletonList(typeName));
+        }
+
+        public TestCustomMetaDataSource(NetSuiteClientService<?> clientService, List<String> typeNames) {
+            this.clientService = clientService;
+            this.typeNames = typeNames;
+        }
+
+        @Override
+        public Collection<CustomRecordTypeInfo> getCustomRecordTypes() {
+            return Arrays.asList(getCustomRecordType("custom_record_type_1"));
+        }
+
+        @Override
+        public CustomRecordTypeInfo getCustomRecordType(String typeName) {
+            try {
+                if (typeName.equals("custom_record_type_1")) {
+                    JsonNode recordTypeNode = objectMapper.readTree(getClass().getResource(
+                            "/test-data/customRecord-1.json"));
+                    CustomRecordTypeInfo customRecordTypeInfo =
+                            TestUtils.readCustomRecord(clientService.getBasicMetaData(), recordTypeNode);
+                    return customRecordTypeInfo;
+                }
+                return null;
+            } catch (IOException e) {
+                throw new NetSuiteException(e.getMessage(), e);
+            }
+        }
+
+        @Override
+        public Map<String, CustomFieldDesc> getCustomFields(RecordTypeInfo recordTypeInfo) {
+            try {
+                if (recordTypeInfo.getName().equals("custom_record_type_1") ||
+                        typeNames.contains(recordTypeInfo.getName())) {
+                    JsonNode fieldListNode = objectMapper.readTree(getClass().getResource(
+                            "/test-data/customRecordFields-1.json"));
+                    Map<String, CustomFieldDesc> customFieldDescMap =
+                            TestUtils.readCustomFields(fieldListNode);
+                    return customFieldDescMap;
+                }
+                return Collections.emptyMap();
+            } catch (IOException e) {
+                throw new NetSuiteException(e.getMessage(), e);
+            }
+        }
+
     }
 
 }

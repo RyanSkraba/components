@@ -82,28 +82,48 @@ public class NetSuiteWebServiceMockTestFixture<PortT, AdapterT extends NetSuiteP
         this.portName = portName;
     }
 
+    public NetSuiteWebServiceMockTestFixture(
+            NetSuiteClientFactory<PortT> clientFactory,
+            Class<PortT> portClass,
+            Class<AdapterT> portAdapterClass) {
+
+        this.clientFactory = clientFactory;
+        this.portClass = portClass;
+        this.portAdapterClass = portAdapterClass;
+    }
+
     @Override
     public void setUp() throws Exception {
         System.setProperty("com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize", "true");
 
-        int retryCount = 3;
-        while (retryCount > 0) {
-            retryCount--;
-            try {
-                publish();
-                break;
-            } catch (WebServiceException | IOException e) {
-                logger.error("Service publishing error: {}", e);
-                if (retryCount == 0) {
-                    throw e;
+        if (serviceFactory != null) {
+            int retryCount = 3;
+            while (retryCount > 0) {
+                retryCount--;
+                try {
+                    publish();
+                    break;
+                } catch (WebServiceException | IOException e) {
+                    logger.error("Service publishing error: {}", e);
+                    if (retryCount == 0) {
+                        throw e;
+                    }
                 }
             }
+
+            URL wsdlLocation = new URL(portMockAdapter.getEndpointAddress().toString().concat("?wsdl"));
+            //        assertNotNull(wsdlLocation.getContent());
+
+            service = serviceFactory.createService(wsdlLocation);
+        } else {
+            if (portName == null) {
+                NetSuiteVersion version = clientFactory.getApiVersion();
+                portName = "NetSuitePort_" + version.getAsString("_");
+            }
+
+            portMockAdapter = portAdapterClass.newInstance();
+            portMockAdapter.setEndpointAddress(new URL("http://localhost/services/" + portName));
         }
-
-        URL wsdlLocation = new URL(portMockAdapter.getEndpointAddress().toString().concat("?wsdl"));
-//        assertNotNull(wsdlLocation.getContent());
-
-        service = serviceFactory.createService(wsdlLocation);
 
         credentials = new NetSuiteCredentials(
                 "test@test.com", "12345", "test", "3");
@@ -145,7 +165,14 @@ public class NetSuiteWebServiceMockTestFixture<PortT, AdapterT extends NetSuiteP
 
     public void reinstall() {
         portMock = createPortMock();
-        portMockAdapter.setPort(portMock);
+
+        if (portMockAdapter != null) {
+            portMockAdapter.setPort(portMock);
+        }
+
+        if (clientFactory instanceof NetSuitePortMockInstallAware) {
+            ((NetSuitePortMockInstallAware<PortT>) clientFactory).portMockInstalled(portMock);
+        }
 
         clientService = clientFactory.createClient();
         clientService.setEndpointUrl(getEndpointAddress().toString());
@@ -173,7 +200,7 @@ public class NetSuiteWebServiceMockTestFixture<PortT, AdapterT extends NetSuiteP
     }
 
     public URL getEndpointAddress()  {
-        return portMockAdapter.getEndpointAddress();
+        return portMockAdapter != null ? portMockAdapter.getEndpointAddress() : null;
     }
 
     public NetSuiteClientService<PortT> getClientService() {
@@ -271,5 +298,10 @@ public class NetSuiteWebServiceMockTestFixture<PortT, AdapterT extends NetSuiteP
     public interface NetSuiteServiceFactory<T> {
 
         T createService(URL endpointUrl);
+    }
+
+    public interface NetSuitePortMockInstallAware<PortT> {
+
+        void portMockInstalled(PortT port);
     }
 }

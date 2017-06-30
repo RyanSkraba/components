@@ -11,7 +11,7 @@
 //
 // ============================================================================
 
-package org.talend.components.netsuite.v2016_2;
+package org.talend.components.netsuite;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -21,6 +21,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Date;
+
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.avro.Schema;
@@ -28,14 +30,14 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.MutableDateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.talend.components.netsuite.NetSuiteDatasetRuntimeImpl;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.client.model.FieldDesc;
 import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.input.NsObjectInputTransducer;
 import org.talend.components.netsuite.json.NsTypeResolverBuilder;
-import org.talend.components.netsuite.v2016_2.client.NetSuiteClientServiceImpl;
+import org.talend.components.netsuite.test.client.TestNetSuiteClientService;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.exception.ExceptionContext;
 
@@ -44,22 +46,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netsuite.webservices.v2016_2.lists.accounting.Account;
-import com.netsuite.webservices.v2016_2.lists.accounting.types.AccountType;
-import com.netsuite.webservices.v2016_2.lists.accounting.types.ConsolidatedRate;
-import com.netsuite.webservices.v2016_2.platform.NetSuitePortType;
-import com.netsuite.webservices.v2016_2.platform.core.BooleanCustomFieldRef;
-import com.netsuite.webservices.v2016_2.platform.core.CustomFieldList;
-import com.netsuite.webservices.v2016_2.platform.core.RecordRef;
-import com.netsuite.webservices.v2016_2.platform.core.RecordRefList;
-import com.netsuite.webservices.v2016_2.platform.core.StringCustomFieldRef;
+import com.netsuite.webservices.test.lists.accounting.Account;
+import com.netsuite.webservices.test.lists.accounting.types.AccountType;
+import com.netsuite.webservices.test.lists.accounting.types.ConsolidatedRate;
+import com.netsuite.webservices.test.platform.core.BooleanCustomFieldRef;
+import com.netsuite.webservices.test.platform.core.CustomFieldList;
+import com.netsuite.webservices.test.platform.core.RecordRef;
+import com.netsuite.webservices.test.platform.core.RecordRefList;
+import com.netsuite.webservices.test.platform.core.StringCustomFieldRef;
 
 /**
  *
  */
-public class ValueConverterTest extends NetSuiteMockTestBase {
+public class ValueConverterTest extends AbstractNetSuiteTestBase {
 
-    private NetSuiteClientService<NetSuitePortType> clientService = new NetSuiteClientServiceImpl();
+    private NetSuiteClientService<?> clientService = new TestNetSuiteClientService();
     private TypeDesc typeDesc;
     private Schema schema;
 
@@ -94,10 +95,14 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
         FieldDesc fieldDesc = typeDesc.getField("acctType");
         AvroConverter<Enum<AccountType>, String> converter1 =
                 (AvroConverter<Enum<AccountType>, String>) transducer.getValueConverter(fieldDesc);
+        assertEquals(AvroUtils._string(), converter1.getSchema());
+        assertEquals(AccountType.class, converter1.getDatumClass());
         assertEquals(AccountType.ACCOUNTS_PAYABLE.value(),
                 converter1.convertToAvro(AccountType.ACCOUNTS_PAYABLE));
         assertEquals(AccountType.ACCOUNTS_PAYABLE,
                 converter1.convertToDatum(AccountType.ACCOUNTS_PAYABLE.value()));
+        assertEquals(AccountType.ACCOUNTS_PAYABLE,
+                converter1.convertToDatum(AccountType.ACCOUNTS_PAYABLE.name()));
 
         fieldDesc = typeDesc.getField("generalRate");
         assertNotNull(fieldDesc);
@@ -133,10 +138,19 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
 
         AvroConverter<XMLGregorianCalendar, Long> converter1 =
                 (AvroConverter<XMLGregorianCalendar, Long>) transducer.getValueConverter(fieldInfo);
+        assertEquals(AvroUtils._logicalTimestamp(), converter1.getSchema());
+        assertEquals(XMLGregorianCalendar.class, converter1.getDatumClass());
         assertEquals(controlValue1,
                 converter1.convertToAvro(xmlCalendar1));
         assertEquals(xmlCalendar1,
                 converter1.convertToDatum(controlValue1));
+
+        AvroConverter<XMLGregorianCalendar, Object> converter2 =
+                (AvroConverter<XMLGregorianCalendar, Object>) transducer.getValueConverter(fieldInfo);
+        assertEquals(xmlCalendar1,
+                converter2.convertToDatum(new Date(controlValue1.longValue())));
+
+        assertNull(converter1.convertToAvro(null));
     }
 
     @Test
@@ -177,6 +191,8 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
 
         AvroConverter<Account, String> converter1 =
                 (AvroConverter<Account, String>) transducer.getValueConverter(account1.getClass());
+        assertEquals(AvroUtils._string(), converter1.getSchema());
+        assertEquals(account1.getClass(), converter1.getDatumClass());
 
         String testJson1 = converter1.convertToAvro(account1);
         assertNotNull(testJson1);

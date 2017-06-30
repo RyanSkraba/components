@@ -50,10 +50,6 @@ public class CustomRecordTypeInfo extends RecordTypeInfo {
         return customizationRef;
     }
 
-    public void setCustomizationRef(NsRef customizationRef) {
-        this.customizationRef = customizationRef;
-    }
-
     @Override
     public RefType getRefType() {
         return RefType.CUSTOM_RECORD_REF;

@@ -20,7 +20,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.talend.components.netsuite.v2016_2.MockTestHelper.makeIndexedRecords;
 import static org.talend.components.netsuite.v2016_2.NetSuitePortTypeMockAdapterImpl.createSuccessStatus;
 
 import java.util.ArrayList;

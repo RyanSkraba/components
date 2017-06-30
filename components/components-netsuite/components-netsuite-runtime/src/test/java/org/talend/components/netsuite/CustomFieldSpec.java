@@ -15,6 +15,7 @@ package org.talend.components.netsuite;
 
 import java.util.Collection;
 
+import org.talend.components.netsuite.client.model.RecordTypeDesc;
 import org.talend.components.netsuite.client.model.customfield.CustomFieldRefType;
 
 /**

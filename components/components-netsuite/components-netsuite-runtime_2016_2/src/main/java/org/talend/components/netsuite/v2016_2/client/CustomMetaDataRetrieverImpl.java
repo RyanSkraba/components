@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.netsuite.client.DefaultCustomMetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteException;
@@ -45,13 +47,16 @@ import com.netsuite.webservices.v2016_2.setup.customization.CustomRecordType;
 /**
  *
  */
-public class DefaultCustomMetaDataSourceImpl extends DefaultCustomMetaDataSource<NetSuitePortType> {
+public class CustomMetaDataRetrieverImpl implements DefaultCustomMetaDataSource.CustomMetaDataRetriever {
+    private transient final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public DefaultCustomMetaDataSourceImpl(NetSuiteClientServiceImpl clientService) {
-        super(clientService);
+    private NetSuiteClientService<NetSuitePortType> clientService;
+
+    public CustomMetaDataRetrieverImpl(NetSuiteClientService<NetSuitePortType> clientService) {
+        this.clientService = clientService;
     }
 
-    protected List<NsRef> retrieveCustomizationIds(final BasicRecordType type) throws NetSuiteException {
+    public List<NsRef> retrieveCustomizationIds(final BasicRecordType type) throws NetSuiteException {
         GetCustomizationIdResult result = clientService.execute(new NetSuiteClientService.PortOperation<GetCustomizationIdResult, NetSuitePortType>() {
             @Override public GetCustomizationIdResult execute(NetSuitePortType port) throws Exception {
                 logger.debug("Retrieving customization IDs: {}", type.getType());
@@ -92,7 +97,7 @@ public class DefaultCustomMetaDataSourceImpl extends DefaultCustomMetaDataSource
         }
     }
 
-    protected <T> List<T> retrieveCustomizations(final List<NsRef> nsCustomizationRefs) throws NetSuiteException {
+    public List<?> retrieveCustomizations(final List<NsRef> nsCustomizationRefs) throws NetSuiteException {
         if (nsCustomizationRefs.isEmpty()) {
             return Collections.emptyList();
         }
@@ -122,10 +127,10 @@ public class DefaultCustomMetaDataSourceImpl extends DefaultCustomMetaDataSource
             }
         });
         if (!result.isEmpty()) {
-            List<T> customizations = new ArrayList<>(result.size());
-            for (NsReadResponse response : result) {
+            List<Record> customizations = new ArrayList<>(result.size());
+            for (NsReadResponse<Record> response : result) {
                 if (response.getStatus().isSuccess()) {
-                    customizations.add((T) response.getRecord());
+                    customizations.add(response.getRecord());
                 } else {
                     throw new NetSuiteException("Retrieving of customization was not successful: " + response.getStatus());
                 }
@@ -137,21 +142,21 @@ public class DefaultCustomMetaDataSourceImpl extends DefaultCustomMetaDataSource
     }
 
     @Override
-    protected Map<String, CustomFieldDesc> retrieveCustomRecordCustomFields(
+    public Map<String, CustomFieldDesc> retrieveCustomRecordCustomFields(
             RecordTypeDesc recordType, NsRef nsCustomizationRef) throws NetSuiteException {
 
-        List<CustomRecordType> customizationList = retrieveCustomizations(Collections.singletonList(nsCustomizationRef));
+        List<?> customizationList = retrieveCustomizations(Collections.singletonList(nsCustomizationRef));
 
         if (customizationList.isEmpty()) {
             return null;
         }
 
-        CustomRecordType customRecordType = customizationList.get(0);
+        CustomRecordType customRecordType = (CustomRecordType) customizationList.get(0);
 
         List<?> customFieldList = customRecordType.getCustomFieldList().getCustomField();
 
-        Map<String, CustomFieldDesc> customFieldDescMap = createCustomFieldDescMap(recordType,
-                BasicRecordType.getByType(nsCustomizationRef.getType()), customFieldList);
+        Map<String, CustomFieldDesc> customFieldDescMap = DefaultCustomMetaDataSource.createCustomFieldDescMap(
+                clientService, recordType, BasicRecordType.getByType(nsCustomizationRef.getType()), customFieldList);
 
         return customFieldDescMap;
     }

@@ -60,6 +60,13 @@ public class NsRef {
     /** Identifier of a referenced object's type. */
     private String typeId;
 
+    public NsRef() {
+    }
+
+    public NsRef(RefType refType) {
+        this.refType = refType;
+    }
+
     public RefType getRefType() {
         return refType;
     }
@@ -126,6 +133,7 @@ public class NsRef {
         Object ref = basicMetaData.createInstance(refType.getTypeName());
         BeanInfo beanInfo = Beans.getBeanInfo(ref.getClass());
         setSimpleProperty(ref, "internalId", internalId);
+        setSimpleProperty(ref, "externalId", externalId);
         if (refType == RefType.CUSTOMIZATION_REF || refType == RefType.CUSTOM_RECORD_REF) {
             setSimpleProperty(ref, "scriptId", scriptId);
         }

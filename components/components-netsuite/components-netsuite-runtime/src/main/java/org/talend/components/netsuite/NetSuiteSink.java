@@ -22,7 +22,7 @@ import org.talend.components.netsuite.output.NetSuiteWriteOperation;
 /**
  * Base class for NetSuite sinks.
  */
-public abstract class NetSuiteSink extends NetSuiteSourceOrSink implements Sink {
+public class NetSuiteSink extends NetSuiteSourceOrSink implements Sink {
 
     @Override
     public WriteOperation<?> createWriteOperation() {

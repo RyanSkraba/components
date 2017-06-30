@@ -14,6 +14,7 @@
 package org.talend.components.netsuite.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -108,6 +109,8 @@ public abstract class NetSuiteClientService<PortT> {
 
     /** NetSuite Web Service port implementor. */
     protected PortT port;
+
+    protected PortAdapter<PortT> portAdapter;
 
     /** Source of meta data. */
     protected MetaDataSource metaDataSource;
@@ -228,8 +231,17 @@ public abstract class NetSuiteClientService<PortT> {
      * @return search result wrapper object
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RecT, SearchT> NsSearchResult<RecT> search(final SearchT searchRecord)
-            throws NetSuiteException;
+    public <RecT, SearchT> NsSearchResult<RecT> search(final SearchT searchRecord)
+            throws NetSuiteException {
+
+        return execute(new PortOperation<NsSearchResult<RecT>, PortT>() {
+
+            @Override
+            public NsSearchResult<RecT> execute(PortT port) throws Exception {
+                return portAdapter.search(port, searchRecord);
+            }
+        });
+    }
 
     /**
      * Retrieve search results page by index.
@@ -239,8 +251,17 @@ public abstract class NetSuiteClientService<PortT> {
      * @return search result wrapper object
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RecT> NsSearchResult<RecT> searchMore(final int pageIndex)
-            throws NetSuiteException;
+    public <RecT> NsSearchResult<RecT> searchMore(final int pageIndex)
+            throws NetSuiteException {
+
+        return execute(new PortOperation<NsSearchResult<RecT>, PortT>() {
+
+            @Override
+            public NsSearchResult<RecT> execute(PortT port) throws Exception {
+                return portAdapter.searchMore(port, pageIndex);
+            }
+        });
+    }
 
     /**
      * Retrieve search results page by search ID and page index.
@@ -251,8 +272,17 @@ public abstract class NetSuiteClientService<PortT> {
      * @return search result wrapper object
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RecT> NsSearchResult<RecT> searchMoreWithId(final String searchId, final int pageIndex)
-            throws NetSuiteException;
+    public <RecT> NsSearchResult<RecT> searchMoreWithId(final String searchId, final int pageIndex)
+            throws NetSuiteException {
+
+        return execute(new PortOperation<NsSearchResult<RecT>, PortT>() {
+
+            @Override
+            public NsSearchResult<RecT> execute(PortT port) throws Exception {
+                return portAdapter.searchMoreWithId(port, searchId, pageIndex);
+            }
+        });
+    }
 
     /**
      * Retrieve next search results page.
@@ -261,8 +291,17 @@ public abstract class NetSuiteClientService<PortT> {
      * @return search result wrapper object
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RecT> NsSearchResult<RecT> searchNext()
-            throws NetSuiteException;
+    public <RecT> NsSearchResult<RecT> searchNext()
+            throws NetSuiteException {
+
+        return execute(new PortOperation<NsSearchResult<RecT>, PortT>() {
+
+            @Override
+            public NsSearchResult<RecT> execute(PortT port) throws Exception {
+                return portAdapter.searchNext(port);
+            }
+        });
+    }
 
     /**
      * Retrieve a record by record ref.
@@ -273,8 +312,21 @@ public abstract class NetSuiteClientService<PortT> {
      * @return read response wrapper object
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RecT, RefT> NsReadResponse<RecT> get(final RefT ref)
-            throws NetSuiteException;
+    public <RecT, RefT> NsReadResponse<RecT> get(final RefT ref)
+            throws NetSuiteException {
+
+        if (ref == null) {
+            return new NsReadResponse<>();
+        }
+
+        return execute(new PortOperation<NsReadResponse<RecT>, PortT>() {
+
+            @Override
+            public NsReadResponse<RecT> execute(PortT port) throws Exception {
+                return portAdapter.get(port, ref);
+            }
+        });
+    }
 
     /**
      * Retrieve records by record refs.
@@ -285,8 +337,21 @@ public abstract class NetSuiteClientService<PortT> {
      * @return list of read response wrapper objects
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RecT, RefT> List<NsReadResponse<RecT>> getList(final List<RefT> refs)
-            throws NetSuiteException;
+    public <RecT, RefT> List<NsReadResponse<RecT>> getList(final List<RefT> refs)
+            throws NetSuiteException {
+
+        if (refs == null) {
+            return Collections.emptyList();
+        }
+
+        return execute(new PortOperation<List<NsReadResponse<RecT>>, PortT>() {
+
+            @Override
+            public List<NsReadResponse<RecT>> execute(PortT port) throws Exception {
+                return portAdapter.getList(port, refs);
+            }
+        });
+    }
 
     /**
      * Add a record.
@@ -297,8 +362,21 @@ public abstract class NetSuiteClientService<PortT> {
      * @return write response wrapper object
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RecT, RefT> NsWriteResponse<RefT> add(final RecT record)
-            throws NetSuiteException;
+    public <RecT, RefT> NsWriteResponse<RefT> add(final RecT record)
+            throws NetSuiteException {
+
+        if (record == null) {
+            return new NsWriteResponse<>();
+        }
+
+        return execute(new PortOperation<NsWriteResponse<RefT>, PortT>() {
+
+            @Override
+            public NsWriteResponse<RefT> execute(PortT port) throws Exception {
+                return portAdapter.add(port, record);
+            }
+        });
+    }
 
     /**
      * Add records.
@@ -309,8 +387,21 @@ public abstract class NetSuiteClientService<PortT> {
      * @return list of write response wrapper objects
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RecT, RefT> List<NsWriteResponse<RefT>> addList(final List<RecT> records)
-            throws NetSuiteException;
+    public <RecT, RefT> List<NsWriteResponse<RefT>> addList(final List<RecT> records)
+            throws NetSuiteException {
+
+        if (records == null || records.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return execute(new PortOperation<List<NsWriteResponse<RefT>>, PortT>() {
+
+            @Override
+            public List<NsWriteResponse<RefT>> execute(PortT port) throws Exception {
+                return portAdapter.addList(port, records);
+            }
+        });
+    }
 
     /**
      * Update a record.
@@ -321,8 +412,21 @@ public abstract class NetSuiteClientService<PortT> {
      * @return write response wrapper object
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RecT, RefT> NsWriteResponse<RefT> update(final RecT record)
-            throws NetSuiteException;
+    public <RecT, RefT> NsWriteResponse<RefT> update(final RecT record)
+            throws NetSuiteException {
+
+        if (record == null) {
+            return new NsWriteResponse<>();
+        }
+
+        return execute(new PortOperation<NsWriteResponse<RefT>, PortT>() {
+
+            @Override
+            public NsWriteResponse<RefT> execute(PortT port) throws Exception {
+                return portAdapter.update(port, record);
+            }
+        });
+    }
 
     /**
      * Update records.
@@ -333,8 +437,21 @@ public abstract class NetSuiteClientService<PortT> {
      * @return list of write response wrapper objects
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RecT, RefT> List<NsWriteResponse<RefT>> updateList(final List<RecT> records)
-            throws NetSuiteException;
+    public <RecT, RefT> List<NsWriteResponse<RefT>> updateList(final List<RecT> records)
+            throws NetSuiteException {
+
+        if (records == null || records.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return execute(new PortOperation<List<NsWriteResponse<RefT>>, PortT>() {
+
+            @Override
+            public List<NsWriteResponse<RefT>> execute(PortT port) throws Exception {
+                return portAdapter.updateList(port, records);
+            }
+        });
+    }
 
     /**
      * Upsert a record.
@@ -345,8 +462,21 @@ public abstract class NetSuiteClientService<PortT> {
      * @return write response wrapper object
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RecT, RefT> NsWriteResponse<RefT> upsert(final RecT record)
-            throws NetSuiteException;
+    public <RecT, RefT> NsWriteResponse<RefT> upsert(final RecT record)
+            throws NetSuiteException {
+
+        if (record == null) {
+            return new NsWriteResponse<>();
+        }
+
+        return execute(new PortOperation<NsWriteResponse<RefT>, PortT>() {
+
+            @Override
+            public NsWriteResponse<RefT> execute(PortT port) throws Exception {
+                return portAdapter.upsert(port, record);
+            }
+        });
+    }
 
     /**
      * Upsert records.
@@ -357,8 +487,21 @@ public abstract class NetSuiteClientService<PortT> {
      * @return list of write response wrapper objects
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RecT, RefT> List<NsWriteResponse<RefT>> upsertList(final List<RecT> records)
-            throws NetSuiteException;
+    public <RecT, RefT> List<NsWriteResponse<RefT>> upsertList(final List<RecT> records)
+            throws NetSuiteException {
+
+        if (records == null || records.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return execute(new PortOperation<List<NsWriteResponse<RefT>>, PortT>() {
+
+            @Override
+            public List<NsWriteResponse<RefT>> execute(PortT port) throws Exception {
+                return portAdapter.upsertList(port, records);
+            }
+        });
+    }
 
     /**
      * Delete a record.
@@ -368,8 +511,21 @@ public abstract class NetSuiteClientService<PortT> {
      * @return write response wrapper object
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RefT> NsWriteResponse<RefT> delete(final RefT ref)
-            throws NetSuiteException;
+    public <RefT> NsWriteResponse<RefT> delete(final RefT ref)
+            throws NetSuiteException {
+
+        if (ref == null) {
+            return new NsWriteResponse<>();
+        }
+
+        return execute(new PortOperation<NsWriteResponse<RefT>, PortT>() {
+
+            @Override
+            public NsWriteResponse<RefT> execute(PortT port) throws Exception {
+                return portAdapter.delete(port, ref);
+            }
+        });
+    }
 
     /**
      * Delete records.
@@ -379,8 +535,21 @@ public abstract class NetSuiteClientService<PortT> {
      * @return list of write response wrapper objects
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    public abstract <RefT> List<NsWriteResponse<RefT>> deleteList(final List<RefT> refs)
-            throws NetSuiteException;
+    public <RefT> List<NsWriteResponse<RefT>> deleteList(final List<RefT> refs)
+            throws NetSuiteException {
+
+        if (refs == null || refs.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return execute(new PortOperation<List<NsWriteResponse<RefT>>, PortT>() {
+
+            @Override
+            public List<NsWriteResponse<RefT>> execute(PortT port) throws Exception {
+                return portAdapter.deleteList(port, refs);
+            }
+        });
+    }
 
     /**
      * Execute an operation that use NetSuite web service port.
@@ -719,7 +888,7 @@ public abstract class NetSuiteClientService<PortT> {
      * Check whether given error can be requires new log-in.
      *
      * @param t error to be checked
-     * @return {@code true} if the error requies new log-in, {@code false} otherwise
+     * @return {@code true} if the error requires new log-in, {@code false} otherwise
      */
     protected abstract boolean errorRequiresNewLogin(Throwable t);
 
@@ -783,7 +952,7 @@ public abstract class NetSuiteClientService<PortT> {
      * @param port port
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    protected void remoteLoginHeaders(PortT port) throws NetSuiteException {
+    protected void removeLoginHeaders(PortT port) throws NetSuiteException {
         removeHeader(port, new QName(getPlatformMessageNamespaceUri(), "applicationInfo"));
     }
 
@@ -793,11 +962,15 @@ public abstract class NetSuiteClientService<PortT> {
      * @param port port
      */
     protected void setHttpClientPolicy(PortT port) {
-        Client proxy = ClientProxy.getClient(port);
-        HTTPConduit conduit = (HTTPConduit) proxy.getConduit();
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
         httpClientPolicy.setConnectionTimeout(connectionTimeout);
         httpClientPolicy.setReceiveTimeout(receiveTimeout);
+        setHttpClientPolicy(port, httpClientPolicy);
+    }
+
+    protected void setHttpClientPolicy(PortT port, HTTPClientPolicy httpClientPolicy) {
+        Client proxy = ClientProxy.getClient(port);
+        HTTPConduit conduit = (HTTPConduit) proxy.getConduit();
         conduit.setClient(httpClientPolicy);
     }
 
@@ -902,4 +1075,166 @@ public abstract class NetSuiteClientService<PortT> {
         }
     }
 
+    protected interface PortAdapter<PortT> {
+
+        /**
+         * Search records.
+         *
+         * <p>Retrieval of search results uses pagination. To retrieve next page use
+         * {@link #searchMoreWithId(String, int)} method.
+         *
+         * @param searchRecord search record to be sent to NetSuite
+         * @param <RecT> type of record data object
+         * @param <SearchT> type of search record data object
+         * @return search result wrapper object
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RecT, SearchT> NsSearchResult<RecT> search(final PortT port, final SearchT searchRecord) throws Exception;
+
+        /**
+         * Retrieve search results page by index.
+         *
+         * @param pageIndex page index
+         * @param <RecT> type of record data object
+         * @return search result wrapper object
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RecT> NsSearchResult<RecT> searchMore(final PortT port, final int pageIndex) throws Exception;
+
+        /**
+         * Retrieve search results page by search ID and page index.
+         *
+         * @param searchId identifier of search
+         * @param pageIndex page index
+         * @param <RecT> type of record data object
+         * @return search result wrapper object
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RecT> NsSearchResult<RecT> searchMoreWithId(final PortT port, final String searchId, final int pageIndex)
+                throws Exception;
+
+        /**
+         * Retrieve next search results page.
+         *
+         * @param <RecT> type of record data object
+         * @return search result wrapper object
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RecT> NsSearchResult<RecT> searchNext(final PortT port) throws Exception;
+
+        /**
+         * Retrieve a record by record ref.
+         *
+         * @param ref record ref data object
+         * @param <RecT> type of record data object
+         * @param <RefT> type of record ref data object
+         * @return read response wrapper object
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RecT, RefT> NsReadResponse<RecT> get(final PortT port, final RefT ref) throws Exception;
+
+        /**
+         * Retrieve records by record refs.
+         *
+         * @param refs list of record refs
+         * @param <RecT> type of record data object
+         * @param <RefT> type of record ref data object
+         * @return list of read response wrapper objects
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RecT, RefT> List<NsReadResponse<RecT>> getList(final PortT port, final List<RefT> refs)
+                throws Exception;
+
+        /**
+         * Add a record.
+         *
+         * @param record record data object to be sent to NetSuite
+         * @param <RecT> type of record data object
+         * @param <RefT> type of record ref data object
+         * @return write response wrapper object
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RecT, RefT> NsWriteResponse<RefT> add(final PortT port, final RecT record) throws Exception;
+
+        /**
+         * Add records.
+         *
+         * @param records list of record data objects to be sent to NetSuite
+         * @param <RecT> type of record data object
+         * @param <RefT> type of record ref data object
+         * @return list of write response wrapper objects
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RecT, RefT> List<NsWriteResponse<RefT>> addList(final PortT port, final List<RecT> records)
+                throws Exception;
+
+        /**
+         * Update a record.
+         *
+         * @param record record data object to be sent to NetSuite
+         * @param <RecT> type of record data object
+         * @param <RefT> type of record ref data object
+         * @return write response wrapper object
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RecT, RefT> NsWriteResponse<RefT> update(final PortT port, final RecT record)
+                throws Exception;
+
+        /**
+         * Update records.
+         *
+         * @param records list of record data objects to be sent to NetSuite
+         * @param <RecT> type of record data object
+         * @param <RefT> type of record ref data object
+         * @return list of write response wrapper objects
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RecT, RefT> List<NsWriteResponse<RefT>> updateList(final PortT port, final List<RecT> records)
+                throws Exception;
+
+        /**
+         * Upsert a record.
+         *
+         * @param record record data object to be sent to NetSuite
+         * @param <RecT> type of record data object
+         * @param <RefT> type of record ref data object
+         * @return write response wrapper object
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RecT, RefT> NsWriteResponse<RefT> upsert(final PortT port, final RecT record) throws Exception;
+
+        /**
+         * Upsert records.
+         *
+         * @param records list of record data objects to be sent to NetSuite
+         * @param <RecT> type of record data object
+         * @param <RefT> type of record ref data object
+         * @return list of write response wrapper objects
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RecT, RefT> List<NsWriteResponse<RefT>> upsertList(final PortT port, final List<RecT> records)
+                throws Exception;
+
+        /**
+         * Delete a record.
+         *
+         * @param ref record ref data object to be sent to NetSuite
+         * @param <RefT> type of record ref data object
+         * @return write response wrapper object
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RefT> NsWriteResponse<RefT> delete(final PortT port, final RefT ref) throws Exception;
+
+        /**
+         * Delete records.
+         *
+         * @param refs list of record ref data objects to be sent to NetSuite
+         * @param <RefT> type of record ref data object
+         * @return list of write response wrapper objects
+         * @throws Exception if an error occurs during performing of operation
+         */
+        <RefT> List<NsWriteResponse<RefT>> deleteList(final PortT port, final List<RefT> refs)
+                throws Exception;
+
+    }
 }
