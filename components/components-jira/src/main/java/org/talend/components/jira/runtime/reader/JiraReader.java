@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Source;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.jira.avro.IssueAdapterFactory;
 import org.talend.components.jira.avro.IssueIndexedRecord;
 import org.talend.components.jira.connection.JiraResponse;
@@ -33,6 +34,10 @@ import org.talend.components.jira.connection.Rest;
 import org.talend.components.jira.datum.Entity;
 import org.talend.components.jira.runtime.JiraSource;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.exception.error.DefaultErrorCode;
+
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 /**
  * Jira reader implementation
@@ -98,7 +103,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
 
     /**
      * Constructor sets required properties for http connection
-     * 
+     *
      * @param source instance of {@link Source}, which had created this {@link Reader}
      * @param resource REST resource to communicate
      */
@@ -107,7 +112,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         this.resource = resource;
         this.sharedParameters = createSharedParameters();
         this.result = new Result();
-        rest = new Rest(source.getHostPort());
+        setRest(new Rest(source.getHostPort()));
         String userId = source.getUserId();
         if (userId != null && !userId.isEmpty()) {
             rest.setCredentials(userId, source.getUserPassword());
@@ -121,8 +126,16 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
     }
 
     /**
+     *
+     * @param rest initialized REST to set
+     */
+    void setRest(Rest rest) {
+        this.rest = rest;
+    }
+
+    /**
      * {@inheritDoc}
-     * 
+     *
      * @throws IOException in case of exception during http connection
      */
     @Override
@@ -134,7 +147,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws IOException in case {@link JiraReader#start()} wasn't invoked or
      * in case of exception during http connection
      */
@@ -156,7 +169,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
 
     /**
      * Tries to get more records
-     * 
+     *
      * @throws IOException in case of exception during http connection
      */
     protected abstract void requestMoreRecords() throws IOException;
@@ -204,7 +217,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
 
     /**
      * Returns {@link JiraSource} instance
-     * 
+     *
      * @return {@link JiraSource} instance, which had created this {@link Reader}
      */
     @Override
@@ -214,7 +227,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
 
     /**
      * Returns return values
-     * 
+     *
      * @return map with return values
      */
     @Override
@@ -224,12 +237,16 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
 
     /**
      * Makes http request to the server and process its response
-     * 
-     * @throws IOException in case of exception during http connection
+     *
+     * @throws ComponentException in case of response code is not SC_OK (200)
+     * @throws IOException      in case of exception during http connection
      */
     protected void makeHttpRequest() throws IOException {
         Map<String, Object> parameters = prepareParameters();
         JiraResponse jiraResponse = rest.get(resource, parameters);
+        if (jiraResponse.getStatusCode() != SC_OK) {
+            throw generateJiraException(jiraResponse.getStatusCode(), jiraResponse.getBody());
+        }
         response = jiraResponse.getBody();
         entities = processResponse(response);
         if (!entities.isEmpty()) {
@@ -242,7 +259,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
     /**
      * Prepares and returns map with http parameters suitable for current REST API resource.
      * Returns shared parameters by default
-     * 
+     *
      * @return map with shared parameters
      */
     protected Map<String, Object> prepareParameters() {
@@ -252,7 +269,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
     /**
      * Process response. Updates http parameters for next request if needed.
      * Retrieves entities from response
-     * 
+     *
      * @param response http response
      * @return {@link List} of entities retrieved from response
      */
@@ -260,7 +277,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
 
     /**
      * Creates and returns map with shared http query parameters
-     * 
+     *
      * @return shared http parameters
      */
     private Map<String, Object> createSharedParameters() {
@@ -274,6 +291,18 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         String maxResultsKey = "maxResults";
         sharedParameters.put(maxResultsKey, batchSize);
         return Collections.unmodifiableMap(sharedParameters);
+    }
+
+    /**
+     * Creates and returns RuntimeException with prepared error message
+     *
+     * @return ComponentException with error message when jira server return not OK status code
+     */
+    private ComponentException generateJiraException(int code, String errorMessage) {
+
+        return new ComponentException(new DefaultErrorCode(code), ExceptionContext.build()
+                .put("message", "Can't get response from server, error code is " + code + "\n" + errorMessage));
+
     }
 
 }

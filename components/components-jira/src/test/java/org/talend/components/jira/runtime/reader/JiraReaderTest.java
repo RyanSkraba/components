@@ -13,6 +13,10 @@
 package org.talend.components.jira.runtime.reader;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.talend.components.jira.testutils.JiraTestConstants.*;
 
 import java.io.IOException;
@@ -21,13 +25,17 @@ import java.util.NoSuchElementException;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
-import org.talend.components.api.component.ComponentDefinition;
+import org.junit.rules.ExpectedException;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.api.service.common.ComponentServiceImpl;
+import org.talend.components.jira.connection.JiraResponse;
+import org.talend.components.jira.connection.Rest;
 import org.talend.components.jira.runtime.JiraSource;
 import org.talend.components.jira.tjirainput.TJiraInputDefinition;
 import org.talend.components.jira.tjirainput.TJiraInputProperties;
@@ -50,6 +58,9 @@ public class JiraReaderTest {
     private JiraSource source;
 
     private TJiraInputProperties properties;
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     /**
      * Creates {@link ComponentService} for tests
@@ -123,5 +134,22 @@ public class JiraReaderTest {
         JiraSource currentSource = jiraReader.getCurrentSource();
         jiraReader.close();
         assertEquals(source, currentSource);
+    }
+
+    @Test
+    public void testThrowComponentExceptionWhenErrorOccurred() throws IOException {
+        thrown.expect(ComponentException.class);
+        thrown.expectMessage("Can't get response from server, error code is 400\nSome error message");
+
+        JiraSearchReader jiraReader = new JiraSearchReader(source);
+        Rest rest = mock(Rest.class);
+
+        JiraResponse jr = new JiraResponse(400, "Some error message");
+        when(rest.get(anyString(), anyMap())).thenReturn(jr);
+
+        jiraReader.setRest(rest);
+
+        jiraReader.makeHttpRequest();
+
     }
 }
