@@ -537,16 +537,25 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
             }
             // getLeadActivity
             if (inputOperation.getValue().equals(getLeadActivity)) {
+                // first set all in/exclude types visibles
+                form.getWidget(setIncludeTypes.getName()).setVisible(true);
+                form.getWidget(includeTypes.getName()).setVisible(setIncludeTypes.getValue());
+                form.getWidget(setExcludeTypes.getName()).setVisible(true);
+                form.getWidget(excludeTypes.getName()).setVisible(setExcludeTypes.getValue());
                 if (useSOAP) {
                     form.getWidget(leadKeyTypeSOAP.getName()).setVisible(true);
                     form.getWidget(leadKeyValue.getName()).setVisible(true);
                 } else {
                     form.getWidget(sinceDateTime.getName()).setVisible(true);
+                    if (setIncludeTypes.getValue()) {
+                        setExcludeTypes.setValue(false);
+                        form.getWidget(setExcludeTypes.getName()).setVisible(false);
+                        form.getWidget(excludeTypes.getName()).setVisible(false);
+                    } else if (setExcludeTypes.getValue()) {
+                        form.getWidget(setIncludeTypes.getName()).setVisible(false);
+                        form.getWidget(includeTypes.getName()).setVisible(false);
+                    }
                 }
-                form.getWidget(setIncludeTypes.getName()).setVisible(true);
-                form.getWidget(includeTypes.getName()).setVisible(setIncludeTypes.getValue());
-                form.getWidget(setExcludeTypes.getName()).setVisible(true);
-                form.getWidget(excludeTypes.getName()).setVisible(setExcludeTypes.getValue());
                 form.getWidget(batchSize.getName()).setVisible(true);
             }
             // getLeadChanges
