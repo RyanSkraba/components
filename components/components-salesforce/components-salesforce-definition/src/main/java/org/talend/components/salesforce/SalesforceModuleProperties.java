@@ -81,7 +81,7 @@ public class SalesforceModuleProperties extends ComponentPropertiesImpl implemen
         this.schemaListener = schemaListener;
     }
 
-    // consider beforeActivate and beforeRender (change after to afterActivate)l
+    // consider beforeActivate and beforeRender (change after to afterActivate)
 
     public ValidationResult beforeModuleName() throws Exception {
         try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS, USE_CURRENT_JVM_PROPS)) {
@@ -93,10 +93,10 @@ public class SalesforceModuleProperties extends ComponentPropertiesImpl implemen
                     List<NamedThing> moduleNames = ss.getSchemaNames(null);
                     moduleName.setPossibleNamedThingValues(moduleNames);
                 } catch (Exception ex) {
-                    throw new ComponentException(ExceptionUtil.exceptionToValidationResult(ex));
+                    return ExceptionUtil.exceptionToValidationResult(ex);
                 }
             } else {
-                throw new ComponentException(vr);
+                return vr;
             }
             
             return ValidationResult.OK;
