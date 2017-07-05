@@ -28,6 +28,8 @@ import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.common.SalesforceRuntimeSourceOrSink;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResultMutable;
@@ -40,6 +42,9 @@ import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
 public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         implements SalesforceProvideConnectionProperties, SerializeSetVersion {
+
+    protected static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(SalesforceConnectionProperties.class);
 
     public static final String DEFAULT_API_VERSION = "39.0";
 
@@ -185,7 +190,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
             ss.initialize(null, SalesforceConnectionProperties.this);
             ValidationResultMutable vr = new ValidationResultMutable(ss.validate(null));
             if (vr.getStatus() == ValidationResult.Result.OK) {
-                vr.setMessage("Connection successful");
+                vr.setMessage(MESSAGES.getMessage("connection.success"));
                 getForm(FORM_WIZARD).setAllowForward(true);
             } else {
                 getForm(FORM_WIZARD).setAllowForward(false);
