@@ -28,6 +28,7 @@ import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.azurestorage.table.AzureStorageTableService;
 import org.talend.components.azurestorage.table.avro.AzureStorageAvroRegistry;
 import org.talend.components.azurestorage.table.avro.AzureStorageTableAdaptorFactory;
 import org.talend.components.azurestorage.table.tazurestorageinputtable.TAzureStorageInputTableProperties;
@@ -36,7 +37,6 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
 import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.table.CloudTable;
 import com.microsoft.azure.storage.table.DynamicTableEntity;
 import com.microsoft.azure.storage.table.TableQuery;
 
@@ -44,13 +44,9 @@ public class AzureStorageTableReader extends AbstractBoundedReader<IndexedRecord
 
     private TAzureStorageInputTableProperties properties;
 
-    private RuntimeContainer runtime;
-
-    private int dataCount;
-
     private transient DynamicTableEntity current;
 
-    private transient Iterator<DynamicTableEntity> results;
+    private transient Iterator<DynamicTableEntity> recordsIterator;
 
     private transient Schema querySchema;
 
@@ -58,17 +54,26 @@ public class AzureStorageTableReader extends AbstractBoundedReader<IndexedRecord
 
     private transient Map<String, String> nameMappings;
 
+    private boolean started;
+
+    private Boolean advanceable;
+
+    private Result result;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageTableReader.class);
-    
+
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageTableReader.class);
+
+    public AzureStorageTableService tableService;
 
     public AzureStorageTableReader(RuntimeContainer container, BoundedSource source,
             TAzureStorageInputTableProperties properties) {
         super(source);
-        this.runtime = container;
         this.properties = properties;
         this.nameMappings = properties.nameMapping.getNameMappings();
+        this.tableService = new AzureStorageTableService(((AzureStorageTableSource) source).getAzureConnection(container));
+        this.result = new Result();
     }
 
     private Schema getSchema() throws IOException {
@@ -95,7 +100,7 @@ public class AzureStorageTableReader extends AbstractBoundedReader<IndexedRecord
 
     @Override
     public boolean start() throws IOException {
-        Boolean startable = Boolean.FALSE;
+
         String tableName = properties.tableName.getValue();
         String filter = "";
         if (properties.useFilterExpression.getValue()) {
@@ -103,7 +108,6 @@ public class AzureStorageTableReader extends AbstractBoundedReader<IndexedRecord
             LOGGER.debug(i18nMessages.getMessage("debug.FilterApplied", filter));
         }
         try {
-            CloudTable table = ((AzureStorageTableSource) getCurrentSource()).getStorageTableReference(runtime, tableName);
             TableQuery<DynamicTableEntity> partitionQuery;
             if (filter.isEmpty()) {
                 partitionQuery = TableQuery.from(DynamicTableEntity.class);
@@ -112,12 +116,12 @@ public class AzureStorageTableReader extends AbstractBoundedReader<IndexedRecord
             }
             // Using execute will automatically and lazily follow the continuation tokens from page to page of results.
             // So, we bypass the 1000 entities limit.
-            Iterable<DynamicTableEntity> entities = table.execute(partitionQuery);
-            results = entities.iterator();
-            startable = results.hasNext();
-            if (startable) {
-                dataCount++;
-                current = results.next();
+            Iterable<DynamicTableEntity> entities = tableService.executeQuery(tableName, partitionQuery);
+            recordsIterator = entities.iterator();
+            if (recordsIterator.hasNext()) {
+                started = true;
+                result.totalCount++;
+                current = recordsIterator.next();
             }
         } catch (InvalidKeyException | URISyntaxException | StorageException e) {
             LOGGER.error(e.getLocalizedMessage());
@@ -125,21 +129,32 @@ public class AzureStorageTableReader extends AbstractBoundedReader<IndexedRecord
                 throw new ComponentException(e);
             }
         }
-        return startable;
+
+        return started;
     }
 
     @Override
     public boolean advance() throws IOException {
-        Boolean advanceable = results.hasNext();
-        if (advanceable) {
-            dataCount++;
-            current = results.next();
+        if (!started) {
+            advanceable = false;
+            return false;
         }
+
+        advanceable = recordsIterator.hasNext();
+        if (advanceable) {
+            result.totalCount++;
+            current = recordsIterator.next();
+        }
+
         return advanceable;
     }
 
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
+        if (!started || (advanceable != null && !advanceable)) {
+            throw new NoSuchElementException();
+        }
+
         try {
             return getFactory().convertToAvro(current);
         } catch (Exception e) {
@@ -153,9 +168,6 @@ public class AzureStorageTableReader extends AbstractBoundedReader<IndexedRecord
 
     @Override
     public Map<String, Object> getReturnValues() {
-        Result res = new Result();
-        res.totalCount = dataCount;
-
-        return res.toMap();
+        return result.toMap();
     }
 }

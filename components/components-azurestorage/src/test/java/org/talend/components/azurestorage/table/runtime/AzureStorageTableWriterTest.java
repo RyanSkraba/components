@@ -12,150 +12,318 @@
 // ============================================================================
 package org.talend.components.azurestorage.table.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
 
-import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
-import org.apache.avro.generic.IndexedRecord;
-import org.junit.Before;
-import org.junit.Test;
-import org.talend.components.azurestorage.table.avro.AzureStorageAvroRegistry;
-import org.talend.components.azurestorage.table.avro.AzureStorageTableAdaptorFactory;
-import org.talend.components.azurestorage.table.helpers.NameMappingTable;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.*;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.stubbing.Answer;
+import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
+import org.talend.components.azurestorage.RuntimeContainerMock;
+import org.talend.components.azurestorage.table.AzureStorageTableService;
+import org.talend.components.azurestorage.table.TableHelper;
 import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableProperties;
-import org.talend.daikon.avro.AvroUtils;
-import org.talend.daikon.avro.SchemaConstants;
+import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableProperties.ActionOnData;
+import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableProperties.ActionOnTable;
+import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
+import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
+import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.table.DynamicTableEntity;
+import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.table.TableOperation;
+import com.microsoft.azure.storage.table.TableResult;
 
 public class AzureStorageTableWriterTest {
 
-    AzureStorageTableWriter writer;
-    TAzureStorageOutputTableProperties p;
+    private AzureStorageTableWriter writer;
+
+    private TAzureStorageOutputTableProperties properties;
+
+    public static final String PROP_ = "PROP_";
+
+    private RuntimeContainer container;
+
+    private AzureStorageTableSink sink;
+
+    @Mock
+    private AzureStorageTableService tableService;
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() throws Exception {
-        AzureStorageTableSink sink = new AzureStorageTableSink();
-        p = new TAzureStorageOutputTableProperties("test");
-        p.connection.setupProperties();
-        p.setupProperties();
-        p.tableName.setValue("test");
-        p.dieOnError.setValue(true);
-        p.nameMapping = new NameMappingTable("test");
-        List<String> schemaMappings = new ArrayList<>();
-        List<String> propertyMappings = new ArrayList<>();
 
-        schemaMappings.add("daty");
-        propertyMappings.add("datyMapped");
-        schemaMappings.add("inty");
-        propertyMappings.add("intyMapped");
-        
-        p.nameMapping.schemaColumnName.setValue(schemaMappings);
-        p.nameMapping.entityPropertyName.setValue(propertyMappings);
+        container = new RuntimeContainerMock();
+        sink = new AzureStorageTableSink();
 
-        sink.initialize(null, p);
+        properties = new TAzureStorageOutputTableProperties(PROP_ + "InputTable");
+        properties.setupProperties();
+        // valid fake connection
+        properties.connection = new TAzureStorageConnectionProperties(PROP_ + "Connection");
+        properties.connection.protocol.setValue(Protocol.HTTP);
+        properties.connection.accountName.setValue("fakeAccountName");
+        properties.connection.accountKey.setValue("fakeAccountKey=ANBHFYRJJFHRIKKJFU");
 
-        writer = (AzureStorageTableWriter) sink.createWriteOperation().createWriter(null);
+        properties.dieOnError.setValue(false);
+        properties.tableName.setValue(TableHelper.generateRandomTableName());
+        properties.actionOnTable.setValue(ActionOnTable.Create_table_if_does_not_exist);
+        properties.actionOnData.setValue(ActionOnData.Insert);
+
+        properties.schema.schema.setValue(TableHelper.getWriteSchema());
+        properties.schemaReject.schema.setValue(TableHelper.getRejectSchema());
+        properties.partitionKey.setStoredValue("PartitionKey");
+        properties.rowKey.setStoredValue("RowKey");
+
     }
-    
+
     @Test
-    public void testSchema(){
-        
-        Schema s = SchemaBuilder.record("Main").fields()
-                //
-                .name("PartitionKey").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
-                .type(AvroUtils._string()).noDefault()
-                //
-                .name("RowKey").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
-                .type(AvroUtils._string()).noDefault()
-                //
-                .endRecord();
-        assertEquals(s, p.schema.schema.getValue());
-        
-    }
+    public void testOpenWriterWhenSinkAvailable() {
+        // setup
+        assertEquals(ValidationResult.Result.OK, sink.initialize(container, properties).getStatus());
+        assertEquals(ValidationResult.Result.OK, sink.validate(container).getStatus());
+        WriteOperation<?> writeOperation = sink.createWriteOperation();
+        writeOperation.initialize(container);
+        writer = (AzureStorageTableWriter) writeOperation.createWriter(container);
 
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.table.runtime.AzureStorageTableWriter#open(java.lang.String)}.
-     *
-     * @throws IOException
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public final void testOpen() throws IOException {
-        writer.open("test");
-        fail("Should fail...");
-    }
-
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.table.runtime.AzureStorageTableWriter#write(java.lang.Object)}.
-     *
-     * @throws IOException
-     */
-    @Test(expected = NullPointerException.class)
-    public final void testWrite() throws IOException {
-
-        DynamicTableEntity entity = new DynamicTableEntity();
-        entity.setPartitionKey("pk");
-        entity.setRowKey("rk");
-        AzureStorageAvroRegistry registry = AzureStorageAvroRegistry.get();
-        AzureStorageTableAdaptorFactory recordConv = new AzureStorageTableAdaptorFactory(null);
-        Schema s = registry.inferSchema(entity);
-        recordConv.setSchema(s);
-        IndexedRecord record = recordConv.convertToAvro(entity);
+        // mock
+        writer.tableservice = tableService;
         try {
-            writer.open("test");
-        } catch (Exception e) {
+            doAnswer(new Answer<Void>() {
+
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    return null;
+                }
+            }).when(tableService).handleActionOnTable(anyString(), any(ActionOnTable.class));
+
+            // open should not fail
+            writer.open(RandomStringUtils.random(12));
+
+        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+            fail("should not throw " + e.getMessage());
         }
-        writer.write(null);
-        writer.write(record);
-        writer.close();
     }
 
-    /**
-     * Test method for {@link org.talend.components.azurestorage.table.runtime.AzureStorageTableWriter#close()}.
-     *
-     * @throws IOException
-     */
-    @Test
-    public final void testClose() throws IOException {
-        assertNull(writer.close());
+    @Test(expected = ComponentException.class)
+    public void testOpenWriterWehnSinkHasError() {
+        // setup
+        assertEquals(ValidationResult.Result.OK, sink.initialize(container, properties).getStatus());
+        assertEquals(ValidationResult.Result.OK, sink.validate(container).getStatus());
+        WriteOperation<?> writeOperation = sink.createWriteOperation();
+        writeOperation.initialize(container);
+        writer = (AzureStorageTableWriter) writeOperation.createWriter(container);
+
+        // mock
+        writer.tableservice = tableService;
+        try {
+            doAnswer(new Answer<Void>() {
+
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    throw new StorageException("500", "Unavailable sink", new RuntimeException());
+                }
+            }).when(tableService).handleActionOnTable(anyString(), any(ActionOnTable.class));
+
+            // open should not fail
+            writer.open(RandomStringUtils.random(12));
+
+        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+            fail("should not throw " + e.getMessage());
+        }
     }
 
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.table.runtime.AzureStorageTableWriter#getWriteOperation()}.
-     */
     @Test
-    public final void testGetWriteOperation() {
+    public void testWriteNullRecordToSink() {
+        // setup
+        assertEquals(ValidationResult.Result.OK, sink.initialize(container, properties).getStatus());
+        assertEquals(ValidationResult.Result.OK, sink.validate(container).getStatus());
+        WriteOperation<?> writeOperation = sink.createWriteOperation();
+        writeOperation.initialize(container);
+        writer = (AzureStorageTableWriter) writeOperation.createWriter(container);
+
+        // mock
+        writer.tableservice = tableService;
+        try {
+            doAnswer(new Answer<Void>() {
+
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    return null;
+                }
+            }).when(tableService).handleActionOnTable(anyString(), any(ActionOnTable.class));
+
+            // should not fail when record is null
+            writer.open(RandomStringUtils.random(12));
+            writer.write(null);
+            writer.close();
+
+        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+            fail("should not throw " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testWriteValidRecordsToAvailableSink() {
+        // setup
+        assertEquals(ValidationResult.Result.OK, sink.initialize(container, properties).getStatus());
+        assertEquals(ValidationResult.Result.OK, sink.validate(container).getStatus());
+        WriteOperation<?> writeOperation = sink.createWriteOperation();
+        writeOperation.initialize(container);
+        writer = (AzureStorageTableWriter) writeOperation.createWriter(container);
+
+        // mock
+        writer.tableservice = tableService;
+        try {
+            doAnswer(new Answer<Void>() {
+
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    return null;
+                }
+            }).when(tableService).handleActionOnTable(anyString(), any(ActionOnTable.class));
+            when(tableService.executeOperation(anyString(), any(TableOperation.class))).thenReturn(new TableResult(200));
+
+            // assert
+            writer.open(RandomStringUtils.random(12));
+            for (int i = 0; i < 500; i++) {
+                writer.write(TableHelper.getRecord(i));
+            }
+            writer.close();
+
+        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+            fail("should not throw " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testWriteRecordWithDynamicSchemaToAvailableSink() {
+        // setup
+        properties.schema.schema.setValue(TableHelper.getDynamicWriteSchema());
+
+        assertEquals(ValidationResult.Result.OK, sink.initialize(container, properties).getStatus());
+        assertEquals(ValidationResult.Result.OK, sink.validate(container).getStatus());
+        WriteOperation<?> writeOperation = sink.createWriteOperation();
+        writeOperation.initialize(container);
+        writer = (AzureStorageTableWriter) writeOperation.createWriter(container);
+
+        // mock
+        writer.tableservice = tableService;
+        try {
+            doAnswer(new Answer<Void>() {
+
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    return null;
+                }
+            }).when(tableService).handleActionOnTable(anyString(), any(ActionOnTable.class));
+            when(tableService.executeOperation(anyString(), any(TableOperation.class))).thenReturn(new TableResult(200));
+
+            // assert
+            writer.open(RandomStringUtils.random(12));
+            writer.write(TableHelper.getRecord(0));
+            writer.close();
+
+        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+            fail("should not throw " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testWriteToUnavailableSinkHandleError() {
+
+        assertEquals(ValidationResult.Result.OK, sink.initialize(container, properties).getStatus());
+        assertEquals(ValidationResult.Result.OK, sink.validate(container).getStatus());
+        WriteOperation<?> writeOperation = sink.createWriteOperation();
+        writeOperation.initialize(container);
+        writer = (AzureStorageTableWriter) writeOperation.createWriter(container);
+
+        // mock
+        writer.tableservice = tableService;
+        try {
+            doAnswer(new Answer<Void>() {
+
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    return null;
+                }
+            }).when(tableService).handleActionOnTable(anyString(), any(ActionOnTable.class));
+            when(tableService.executeOperation(anyString(), any(TableOperation.class)))
+                    .thenThrow(new StorageException("500", "insertion problem", new RuntimeException()));
+
+            // assert
+            writer.open(RandomStringUtils.random(12));
+            for (int i = 0; i < 2; i++) {
+                writer.write(TableHelper.getRecord(i));
+            }
+            writer.close();
+
+        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+            fail("should not throw " + e.getMessage());
+        }
+
+    }
+
+    @Test(expected = ComponentException.class)
+    public void testWriteToUnavailableSinkDieOnError() {
+
+        properties.dieOnError.setValue(true);
+
+        assertEquals(ValidationResult.Result.OK, sink.initialize(container, properties).getStatus());
+        assertEquals(ValidationResult.Result.OK, sink.validate(container).getStatus());
+        WriteOperation<?> writeOperation = sink.createWriteOperation();
+        writeOperation.initialize(container);
+        writer = (AzureStorageTableWriter) writeOperation.createWriter(container);
+
+        // mock
+        writer.tableservice = tableService;
+        try {
+            doAnswer(new Answer<Void>() {
+
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    return null;
+                }
+            }).when(tableService).handleActionOnTable(anyString(), any(ActionOnTable.class));
+            when(tableService.executeOperation(anyString(), any(TableOperation.class)))
+                    .thenThrow(new StorageException("500", "insertion problem", new RuntimeException()));
+
+            // assert
+            writer.open(RandomStringUtils.random(12));
+            for (int i = 0; i < 2; i++) {
+                writer.write(TableHelper.getRecord(i));
+            }
+            writer.close();
+
+        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+            fail("should not throw " + e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testGetWriteOperation() {
+        // setup
+        assertEquals(ValidationResult.Result.OK, sink.initialize(container, properties).getStatus());
+        assertEquals(ValidationResult.Result.OK, sink.validate(container).getStatus());
+        WriteOperation<?> writeOperation = sink.createWriteOperation();
+        writeOperation.initialize(container);
+        writer = (AzureStorageTableWriter) writeOperation.createWriter(container);
+        assertNotNull(writer);
         assertNotNull(writer.getWriteOperation());
     }
 
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.table.runtime.AzureStorageTableWriter#getSuccessfulWrites()}.
-     */
-    @Test
-    public final void testGetSuccessfulWrites() {
-        assertEquals(Arrays.asList(), writer.getSuccessfulWrites());
-    }
 
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.table.runtime.AzureStorageTableWriter#getRejectedWrites()}.
-     */
-    @Test
-    public final void testGetRejectedWrites() {
-        assertEquals(Arrays.asList(), writer.getRejectedWrites());
-    }
 
 }

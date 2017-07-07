@@ -81,7 +81,7 @@ public abstract class AzureStorageTableBaseTestIT extends AzureStorageBaseTestIT
             sink = new AzureStorageTableSink();
             sink.initialize(null, properties);
             sink.validate(null);
-            tableClient = sink.getStorageTableClient(null);
+            tableClient = sink.getStorageAccount(null).createCloudTableClient();
         } catch (InvalidKeyException | URISyntaxException e) {
             e.printStackTrace();
         }

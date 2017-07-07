@@ -27,6 +27,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.blob.runtime.AzureStorageSourceOrSink;
 import org.talend.components.azurestorage.table.AzureStorageTableProperties;
+import org.talend.components.azurestorage.table.AzureStorageTableService;
 import org.talend.components.azurestorage.table.avro.AzureStorageAvroRegistry;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.daikon.NamedThing;
@@ -36,8 +37,6 @@ import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.table.CloudTable;
-import com.microsoft.azure.storage.table.CloudTableClient;
 import com.microsoft.azure.storage.table.DynamicTableEntity;
 import com.microsoft.azure.storage.table.TableQuery;
 
@@ -88,8 +87,8 @@ public class AzureStorageTableSourceOrSink extends AzureStorageSourceOrSink impl
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
         List<NamedThing> result = new ArrayList<>();
         try {
-            CloudTableClient client = getStorageTableClient(container);
-            for (String t : client.listTables()) {
+            AzureStorageTableService tableService = new AzureStorageTableService(getAzureConnection(container));
+            for (String t : tableService.listTables()) {
                 result.add(new SimpleNamedThing(t, t));
             }
         } catch (InvalidKeyException | URISyntaxException e) {
@@ -108,31 +107,22 @@ public class AzureStorageTableSourceOrSink extends AzureStorageSourceOrSink impl
 
     @Override
     public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
-        CloudTable table;
+
         try {
-            table = getStorageTableReference(container, schemaName);
+            AzureStorageTableService tableService = new AzureStorageTableService(getAzureConnection(container));
             TableQuery<DynamicTableEntity> partitionQuery;
             partitionQuery = TableQuery.from(DynamicTableEntity.class).take(1);
-            Iterable<DynamicTableEntity> entities = table.execute(partitionQuery);
-            if(entities.iterator().hasNext()){
+            Iterable<DynamicTableEntity> entities = tableService.executeQuery(schemaName, partitionQuery);
+            if (entities.iterator().hasNext()) {
                 DynamicTableEntity result = entities.iterator().next();
                 return AzureStorageAvroRegistry.get().inferSchema(result);
-            }else{
+            } else {
                 return null;
             }
-            
+
         } catch (InvalidKeyException | URISyntaxException | StorageException e) {
             LOGGER.error(e.getLocalizedMessage());
             throw new ComponentException(e);
         }
-    }
-
-    public CloudTableClient getStorageTableClient(RuntimeContainer runtime) throws InvalidKeyException, URISyntaxException {
-        return getStorageAccount(runtime).createCloudTableClient();
-    }
-
-    public CloudTable getStorageTableReference(RuntimeContainer runtime, String tableName)
-            throws InvalidKeyException, URISyntaxException, StorageException {
-        return getStorageTableClient(runtime).getTableReference(tableName);
     }
 }

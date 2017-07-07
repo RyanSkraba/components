@@ -17,8 +17,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,13 +25,12 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
-
 public class AzureStorageTableSinkTest {
 
     AzureStorageTableSink sink;
+
     TAzureStorageOutputTableProperties p;
-    
+
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageTableSink.class);
 
@@ -117,34 +114,6 @@ public class AzureStorageTableSinkTest {
     @Test(expected = IllegalArgumentException.class)
     public final void testGetSchema() throws IOException {
         AzureStorageTableSourceOrSink.getSchema(null, sink.getConnectionProperties(), "test");
-        fail("Should have failed...");
-    }
-
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.table.runtime.AzureStorageTableSourceOrSink#getStorageTableClient(org.talend.components.api.container.RuntimeContainer)}.
-     *
-     * @throws URISyntaxException
-     * @throws InvalidKeyException
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public final void testGetStorageTableClient() throws IOException, InvalidKeyException, URISyntaxException {
-        sink.getStorageTableClient(null);
-        fail("Should have failed...");
-    }
-
-    /**
-     * Test method for
-     * {@link org.talend.components.azurestorage.table.runtime.AzureStorageTableSourceOrSink#getStorageTableReference(org.talend.components.api.container.RuntimeContainer, java.lang.String)}.
-     * 
-     * @throws StorageException
-     * @throws URISyntaxException
-     * @throws InvalidKeyException
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public final void testGetStorageTableReference()
-            throws IOException, InvalidKeyException, URISyntaxException, StorageException {
-        sink.getStorageTableReference(null, "table");
         fail("Should have failed...");
     }
 
