@@ -201,8 +201,7 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
             if (null == inputValue || inputValue instanceof String) {
                 row[i] = inputValue;
             } else if (AvroUtils.isSameType(s, AvroUtils._date())) {
-                Date date = (Date) inputValue;
-                row[i] = date.getTime();
+                row[i] = inputValue;
             } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timeMillis()) {
                 Date date = new Date((int) inputValue);
                 row[i] = timeFormatter.format(date);

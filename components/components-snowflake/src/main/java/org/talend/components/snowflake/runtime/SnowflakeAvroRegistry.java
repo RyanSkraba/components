@@ -103,28 +103,47 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
     public JDBCConverter getConverter(final Field f) {
         final Schema basicSchema = AvroUtils.unwrapIfNullable(f.schema());
 
-        return null == basicSchema.getLogicalType() ? super.getConverter(f) : new JDBCConverter() {
+        JDBCConverter converter = null;
+        if (AvroUtils.isSameType(basicSchema, AvroUtils._decimal())) {
+            converter = new JDBCConverter() {
 
-            @Override
-            public Object convertToAvro(ResultSet value) {
-                int index = f.pos() + 1;
-                try {
-                    if (basicSchema.getLogicalType() == LogicalTypes.date()) {
-                        // Snowflake stores the value as the number of days. So it is possible to retrieve that as an
-                        // int value instead of converting it to Date first and then to days from milliseconds. If we
-                        // convert it to date, Snowflake jdbc shifts the time to 00:00 in current timezone.
-                        return value.getInt(index);
-                    } else if (basicSchema.getLogicalType() == LogicalTypes.timeMillis()) {
-                        java.sql.Time time = value.getTime(index);
-                        return (time != null) ? (int) time.getTime() : null;
-                    } else {
-                        java.sql.Timestamp timestamp = value.getTimestamp(index);
-                        return (timestamp != null) ? timestamp.getTime() : null;
+                @Override
+                public Object convertToAvro(ResultSet value) {
+                    try {
+                        return value.getBigDecimal(f.pos() + 1).toString();
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
                     }
-                } catch (SQLException e) {
-                    throw new ComponentException(e);
                 }
-            }
-        };
+
+            };
+        } else if (null != basicSchema.getLogicalType()) {
+            converter = new JDBCConverter() {
+
+                @Override
+                public Object convertToAvro(ResultSet value) {
+                    int index = f.pos() + 1;
+                    try {
+                        if (basicSchema.getLogicalType() == LogicalTypes.date()) {
+                            // Snowflake stores the value as the number of days. So it is possible to retrieve that as an
+                            // int value instead of converting it to Date first and then to days from milliseconds. If we
+                            // convert it to date, Snowflake jdbc shifts the time to 00:00 in current timezone.
+                            return value.getInt(index);
+                        } else if (basicSchema.getLogicalType() == LogicalTypes.timeMillis()) {
+                            java.sql.Time time = value.getTime(index);
+                            return (time != null) ? (int) time.getTime() : null;
+                        } else {
+                            java.sql.Timestamp timestamp = value.getTimestamp(index);
+                            return (timestamp != null) ? timestamp.getTime() : null;
+                        }
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+            };
+        } else {
+            converter = super.getConverter(f);
+        }
+        return converter;
     }
 }

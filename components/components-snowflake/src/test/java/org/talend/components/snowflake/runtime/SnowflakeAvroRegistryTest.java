@@ -169,9 +169,9 @@ public class SnowflakeAvroRegistryTest {
 
     @Test
     public void testGetConverterForInt() throws SQLException {
-        BigDecimal value = new BigDecimal(49);
+        String value = new BigDecimal(49).toString();
         ResultSet rs = Mockito.mock(ResultSet.class);
-        Mockito.when(rs.getBigDecimal(0)).thenReturn(value);
+        Mockito.when(rs.getBigDecimal(0)).thenReturn(new BigDecimal(value));
         Schema.Field field = snowflakeAvroRegistry
                 .sqlType2Avro(size, scale, Types.INTEGER, nullable, FIELD_NAME, DB_COLUMN_NAME, null);
         JDBCConverter dateJDBCConverter = snowflakeAvroRegistry.getConverter(field);

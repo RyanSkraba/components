@@ -201,7 +201,7 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
                 LOGGER.debug("check - id: " + row.get(iId) + " C1: " + row.get(iC1) + " C2: " + row.get(iC2) + " C3: "
                         + row.get(iC3) + " C4: " + row.get(iC4) + " C5: " + row.get(iC5));
             }
-            assertEquals(BigDecimal.valueOf(checkCount), row.get(iId));
+            assertEquals(String.valueOf(checkCount), row.get(iId));
             assertEquals("foo_" + checkCount, row.get(iC1));
             assertEquals(Boolean.valueOf(true), row.get(iC2));
             assertEquals(Double.valueOf(checkCount), row.get(iC3));
