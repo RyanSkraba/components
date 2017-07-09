@@ -12,7 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,11 +19,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.LogicalTypeUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.java8.SerializableFunction;
@@ -226,7 +227,7 @@ public class SalesforceAvroRegistry extends AvroRegistry {
             return new StringToDoubleConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._int())) {
             return new StringToIntegerConverter(f);
-        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._date())) {
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._date()) || LogicalTypeUtils.isLogicalTimestampMillis(fieldSchema)) {
             return new StringToDateConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._bytes())) {
             return new StringToBytesConverter(f);
@@ -286,15 +287,15 @@ public class SalesforceAvroRegistry extends AvroRegistry {
         }
     }
 
-    public static class StringToDecimalConverter extends AsStringConverter<BigDecimal> {
+    public static class StringToDecimalConverter extends AsStringConverter<String> {
 
         StringToDecimalConverter(Schema.Field field) {
             super(field);
         }
 
         @Override
-        public BigDecimal convertToAvro(String value) {
-            return StringUtils.isEmpty(value) ? null : new BigDecimal(value);
+        public String convertToAvro(String value) {
+            return StringUtils.stripToNull(value);
         }
     }
 
@@ -318,7 +319,7 @@ public class SalesforceAvroRegistry extends AvroRegistry {
             super(field);
             String pattern = field.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
             // TODO: null handling
-            format = new SimpleDateFormat(pattern);
+            format = StringUtils.isEmpty(pattern) ? new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'.000Z'") : new SimpleDateFormat(pattern);
         }
 
         @Override
@@ -334,7 +335,7 @@ public class SalesforceAvroRegistry extends AvroRegistry {
         public String convertToDatum(Long value) {
             return value == null ? null : format.format(new Date(value));
         }
-        
+
         public DateFormat getFormat() {
             return format;
         }

@@ -33,15 +33,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.TimeZone;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.joda.time.DateTime;
 import org.junit.AfterClass;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -60,6 +63,8 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinit
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 
 import com.sforce.ws.util.Base64;
 
@@ -92,9 +97,9 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             .name("BillingState").type().stringType().noDefault().endRecord();
 
     public static Schema SCHEMA_INSERT_EVENT = SchemaBuilder.builder().record("Schema").fields() //
-            .name("StartDateTime").type().stringType().noDefault() // Actual type:dateTime
-            .name("EndDateTime").type().stringType().noDefault() // Actual type:dateTime
-            .name("ActivityDate").type().stringType().noDefault() // Actual type:date
+            .name("StartDateTime").type(AvroUtils._logicalTimestamp()).noDefault() // Actual type:dateTime
+            .name("EndDateTime").type(AvroUtils._logicalTimestamp()).noDefault() // Actual type:dateTime
+            .name("ActivityDate").type(AvroUtils._logicalTimestamp()).noDefault() // Actual type:dateTime
             .name("DurationInMinutes").type().stringType().noDefault() // Actual type:int
             .name("IsPrivate").type().stringType().noDefault() // Actual type:boolean
             .name("Subject").type().stringType().noDefault() // Actual type:boolean
@@ -102,9 +107,9 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
     public static Schema SCHEMA_INPUT_AND_DELETE_EVENT = SchemaBuilder.builder().record("Schema").fields() //
             .name("Id").type().stringType().noDefault() //
-            .name("StartDateTime").type().stringType().noDefault() // Actual type:dateTime
-            .name("EndDateTime").type().stringType().noDefault() // Actual type:dateTime
-            .name("ActivityDate").type().stringType().noDefault() // Actual type:date
+            .name("StartDateTime").type(AvroUtils._logicalTimestamp()).noDefault()
+            .name("EndDateTime").type(AvroUtils._logicalTimestamp()).noDefault() // Actual type:dateTime
+            .name("ActivityDate").type(AvroUtils._logicalTimestamp()).noDefault() // Actual type:dateTime
             .name("DurationInMinutes").type().stringType().noDefault() // Actual type:int
             .name("IsPrivate").type().stringType().noDefault() // Actual type:boolean
             .name("Subject").type().stringType().noDefault() // Actual type:boolean
@@ -1007,17 +1012,20 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         List<IndexedRecord> records = new ArrayList<>();
         String random = createNewRandom();
         IndexedRecord r1 = new GenericData.Record(SCHEMA_INSERT_EVENT);
-        r1.put(0, "2011-02-02T02:02:02");
-        r1.put(1, "2011-02-02T22:02:02.000Z");
-        r1.put(2, "2011-02-02");
+        long time1 = System.currentTimeMillis();
+        long step = 10 * 60 * 60 * 1000;
+        r1.put(0, time1);
+        r1.put(1, time1 + 2 * step);
+        r1.put(2, time1);
         r1.put(3, "1200");
         r1.put(4, "true");
         r1.put(5, random);
         // Rejected and successful writes are reset on the next record.
         IndexedRecord r2 = new GenericData.Record(SCHEMA_INSERT_EVENT);
-        r2.put(0, "2016-02-02T02:02:02.000Z");
-        r2.put(1, "2016-02-02T12:02:02");
-        r2.put(2, "2016-02-02");
+        long time2 = System.currentTimeMillis();
+        r2.put(0, time2);
+        r2.put(1, time2 + step);
+        r2.put(2, time2);
         r2.put(3, "600");
         r2.put(4, "0");
         r2.put(5, random);
@@ -1036,22 +1044,40 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         TSalesforceInputProperties sfInputProps = getSalesforceInputProperties();
         sfInputProps.copyValuesFrom(sfProps);
         sfInputProps.condition.setValue("Subject = '" + random + "' ORDER BY DurationInMinutes ASC");
-
+        SCHEMA_INPUT_AND_DELETE_EVENT.getField("StartDateTime").addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
+        SCHEMA_INPUT_AND_DELETE_EVENT.getField("EndDateTime").addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
+        SCHEMA_INPUT_AND_DELETE_EVENT.getField("ActivityDate").addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd");
         sfInputProps.module.main.schema.setValue(SCHEMA_INPUT_AND_DELETE_EVENT);
         List<IndexedRecord> inpuRecords = readRows(sfInputProps);
         try {
             assertEquals(2, inpuRecords.size());
-            IndexedRecord inputRecords_1 = inpuRecords.get(0);
-            IndexedRecord inputRecords_2 = inpuRecords.get(1);
+            IndexedRecord inputRecords_1;
+            IndexedRecord inputRecords_2;
+            //Check the order to further assertion
+            if(inpuRecords.get(0).get(3).equals("1200")) {
+                inputRecords_1 = inpuRecords.get(0);
+                inputRecords_2 = inpuRecords.get(1);
+            } else {
+                inputRecords_1 = inpuRecords.get(1);
+                inputRecords_2 = inpuRecords.get(0);
+            }
             assertEquals(random, inputRecords_1.get(6));
             assertEquals(random, inputRecords_2.get(6));
-            // we use containsInAnyOrder because we are not garanteed to have the same order every run.
-            assertThat(Arrays.asList("2011-02-02T02:02:02.000Z", "2016-02-02T02:02:02.000Z"),
-                    containsInAnyOrder(inputRecords_1.get(1), inputRecords_2.get(1)));
-            assertThat(Arrays.asList("2011-02-02T22:02:02.000Z", "2016-02-02T12:02:02.000Z"),
-                    containsInAnyOrder(inputRecords_1.get(2), inputRecords_2.get(2)));
-            assertThat(Arrays.asList("2011-02-02", "2016-02-02"),
-                    containsInAnyOrder(inputRecords_1.get(3), inputRecords_2.get(3)));
+
+            long startDate1 = new Date(time1).getTime() - (TimeZone.getDefault().getDSTSavings() + TimeZone.getDefault().getRawOffset());
+            long startDate2 = new Date(time2).getTime() - (TimeZone.getDefault().getDSTSavings() + TimeZone.getDefault().getRawOffset());
+            long endDate1 = new Date(time1 + 2 * step).getTime() - (TimeZone.getDefault().getDSTSavings() + TimeZone.getDefault().getRawOffset());
+            long endDate2 = new Date(time2 + step).getTime() - (TimeZone.getDefault().getDSTSavings() + TimeZone.getDefault().getRawOffset());
+            // Need to reduce difference in timezone.
+            assertTrue(Math.abs(startDate1 - (Long) inputRecords_1.get(1)) < 2_000);
+            assertTrue(Math.abs(startDate2 - (Long) inputRecords_2.get(1)) < 2_000);
+            assertTrue(Math.abs(endDate1 - (Long) inputRecords_1.get(2)) < 2_000);
+            assertTrue(Math.abs(endDate2 - (Long) inputRecords_2.get(2)) < 2_000);
+            DateTime atMidnight1 = new DateTime(startDate1).withTimeAtStartOfDay();
+            DateTime atMidnight2 = new DateTime(startDate1).withTimeAtStartOfDay();
+            assertTrue(Math.abs(atMidnight1.getMillis() - (Long) inputRecords_1.get(3)) < 2_000);
+            assertTrue(Math.abs(atMidnight2.getMillis() - (Long) inputRecords_2.get(3)) < 2_000);
+
             assertThat(Arrays.asList("1200", "600"), containsInAnyOrder(inputRecords_1.get(4), inputRecords_2.get(4)));
             assertThat(Arrays.asList("true", "false"), containsInAnyOrder(inputRecords_1.get(5), inputRecords_2.get(5)));
 
