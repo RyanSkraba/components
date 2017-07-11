@@ -115,6 +115,13 @@ public class MarketoSourceTest extends MarketoRuntimeTestBase {
         assertFalse(source.isInvalidDate(FastDateParser.getInstance("yyyy-MM-dd HH:mm:ss Z").format(new java.util.Date())));
         assertFalse(source.isInvalidDate("2017-05-16 11:24:17 +0100"));
         assertFalse(source.isInvalidDate("2017-05-16 11:24:17 -0100"));
+        //
+        assertFalse(source.isInvalidDate("2017-05-16 11:24:17+0000"));
+        assertFalse(source.isInvalidDate("2017-05-16 11:24:17-0000"));
+        assertFalse(source.isInvalidDate("2017-05-16 11:24:17+0100"));
+        assertFalse(source.isInvalidDate("2017-05-16 11:24:17-0100"));
+        assertFalse(source.isInvalidDate("2017-07-10 13:53:26Z"));
+        assertFalse(source.isInvalidDate("2017-05-16T11:24:17+0100"));
     }
 
     @Test
