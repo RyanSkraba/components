@@ -17,18 +17,17 @@
 		</dependencySet>
 	</dependencySets>
 	<fileSets>
-		<!-- configuration files -->
+		<!-- configuration files and binaries-->
 		<fileSet>
-			<directory>${project.basedir}${file.separator}target${file.separator}external-resources${file.separator}config</directory>
+			<directory>${project.build.directory}${file.separator}external-resources${file.separator}config</directory>
 			<outputDirectory>${file.separator}config</outputDirectory>
 			<includes>
-				<include>*.*</include>
+				<include>**/*</include>
 			</includes>
 		</fileSet>
-
 		<!-- Start up scripts -->
 		<fileSet>
-			<directory>${project.basedir}${file.separator}target${file.separator}external-resources</directory>
+			<directory>${project.build.directory}${file.separator}external-resources</directory>
 			<outputDirectory>${file.separator}</outputDirectory>
 			<filtered>true</filtered>
 			<fileMode>0755</fileMode>
@@ -38,7 +37,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>${project.basedir}${file.separator}target${file.separator}external-resources</directory>
+			<directory>${project.build.directory}${file.separator}external-resources</directory>
 			<outputDirectory>${file.separator}</outputDirectory>
 			<filtered>true</filtered>
 			<fileMode>0755</fileMode>
@@ -49,7 +48,7 @@
 		</fileSet>
 		<!-- Maven repo for runtime -->
 		<fileSet>
-			<directory>${project.basedir}${file.separator}target${file.separator}mvn-repo${file.separator}.m2</directory>
+			<directory>${project.build.directory}${file.separator}mvn-repo${file.separator}.m2</directory>
 			<outputDirectory>${file.separator}.m2</outputDirectory>
 		</fileSet>
 	</fileSets>

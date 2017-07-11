@@ -12,7 +12,6 @@ import org.talend.daikon.properties.ValidationResult;
 /**
  * Unit tests for {@link S3DatastoreRuntime}.
  */
-@Ignore("DEVOPS-2382")
 public class S3DatastoreRuntimeTestIT {
 
     /** Set up credentials for integration tests. */
@@ -27,6 +26,7 @@ public class S3DatastoreRuntimeTestIT {
     }
 
     @Test
+    @Ignore("It fails. Should be fixed")
     public void doHealthChecksTest_s3() {
         runtime.initialize(null, s3.createS3DatastoreProperties());
         Iterable<ValidationResult> validationResults = runtime.doHealthChecks(null);

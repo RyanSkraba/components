@@ -38,9 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.simplefileio.SimpleFileIOFormat;
 import org.talend.components.simplefileio.SimpleFileIODatasetProperties.FieldDelimiterType;
 import org.talend.components.simplefileio.SimpleFileIODatasetProperties.RecordDelimiterType;
+import org.talend.components.simplefileio.SimpleFileIOFormat;
 import org.talend.components.simplefileio.input.SimpleFileIOInputDefinition;
 import org.talend.components.simplefileio.input.SimpleFileIOInputProperties;
 import org.talend.components.simplefileio.output.SimpleFileIOOutputProperties;
@@ -389,7 +389,7 @@ public class SimpleFileIOInputRuntimeTest {
             inOnMinFS.write(IOUtils.toByteArray(in));
         }
         String fileSpec = mini.getFs().getUri().resolve("/user/test/two_lines.snappy.parquet").toString();
-        String fileSpecOutput = mini.getLocalFs().getUri().resolve(mini.newFolder() + "/output.csv").toString();
+        String fileSpecOutput = mini.getLocalFs().getUri().resolve(new Path(mini.newFolder().toString(), "output.csv").toUri()).toString();
 
         // Configure the component.
         SimpleFileIOInputProperties inputProps = createInputComponentProperties();

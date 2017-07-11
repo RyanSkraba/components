@@ -34,7 +34,6 @@ import com.talend.shaded.com.amazonaws.services.s3.AmazonS3;
 /**
  * Unit tests for {@link S3DatasetRuntime}.
  */
-@Ignore("DEVOPS-2382")
 public class S3DatasetRuntimeTestIT {
 
     /** Set up credentials for integration tests. */
@@ -49,7 +48,7 @@ public class S3DatasetRuntimeTestIT {
     }
 
     @Test
-    @Ignore("It's a very slowly test, need 10 more mins")
+    @Ignore("It's slow (10 or more mins), our account doesn't allow to create this amount of buckets")
     public void listBuckets() {
         String uuid = UUID.randomUUID().toString().substring(0, 8);
         String bucketFormat = "tcomp-s3-dataset-test-%s-" + uuid;

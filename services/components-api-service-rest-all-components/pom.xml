@@ -23,8 +23,6 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<hadoop.version>2.7.0</hadoop.version>
-		<beam.version>0.6.0-tlnd</beam.version>
 		<!-- Used for Docker images name -->
 		<git_branch>local</git_branch>
 		<docker_tag_suffix>${maven.build.timestamp}</docker_tag_suffix>
@@ -172,7 +170,7 @@
 									<type>zip</type>
 									<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
 								</artifactItem>
-								<!-- import the components list -->
+								<!-- import the components list and binary dependencies -->
 								<artifactItem>
 									<groupId>org.talend.components</groupId>
 									<artifactId>components-maven-repo</artifactId>

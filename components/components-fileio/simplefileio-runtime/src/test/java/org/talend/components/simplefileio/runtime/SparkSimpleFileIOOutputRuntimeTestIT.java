@@ -54,7 +54,7 @@ public class SparkSimpleFileIOOutputRuntimeTestIT {
     @Test
     public void testBasicDefaults() throws IOException {
         FileSystem fs = FileSystem.get(spark.createHadoopConfiguration());
-        String fileSpec = fs.getUri().resolve(tmp.getRoot() + "/basic").toString();
+        String fileSpec = fs.getUri().resolve(new Path(tmp.getRoot().toString(), "basic").toUri()).toString();
 
         // Configure the component.
         SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
@@ -82,7 +82,7 @@ public class SparkSimpleFileIOOutputRuntimeTestIT {
     @Test
     public void testCsv_merge() throws IOException {
         FileSystem fs = FileSystem.get(spark.createHadoopConfiguration());
-        String fileSpec = fs.getUri().resolve(tmp.getRoot() + "/output.csv").toString();
+        String fileSpec = fs.getUri().resolve(new Path(tmp.getRoot().toString(), "output.csv").toUri()).toString();
 
         // Configure the component.
         SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
@@ -112,7 +112,7 @@ public class SparkSimpleFileIOOutputRuntimeTestIT {
     @Test
     public void testAvro_merge() throws IOException {
         FileSystem fs = FileSystem.get(spark.createHadoopConfiguration());
-        String fileSpec = fs.getUri().resolve(tmp.getRoot() + "/output.avro").toString();
+        String fileSpec = fs.getUri().resolve(new Path(tmp.getRoot().toString(), "output.avro").toUri()).toString();
 
         // Configure the component.
         SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
@@ -146,7 +146,7 @@ public class SparkSimpleFileIOOutputRuntimeTestIT {
     @Test
     public void testParquet_merge() throws IOException {
         FileSystem fs = FileSystem.get(spark.createHadoopConfiguration());
-        String fileSpec = fs.getUri().resolve(tmp.getRoot() + "/output.parquet").toString();
+        String fileSpec = fs.getUri().resolve(new Path(tmp.getRoot().toString(), "output.parquet").toUri()).toString();
 
         // Configure the component.
         SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();

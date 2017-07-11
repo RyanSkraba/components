@@ -23,5 +23,13 @@
                 <include>*.*</include>
             </includes>
         </fileSet>
+        <!-- hadoop winutils binaries -->
+        <fileSet>
+            <directory>${project.build.directory}${file.separator}binaries</directory>
+            <outputDirectory>${file.separator}</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
     </fileSets>
 </assembly>
