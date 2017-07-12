@@ -27,7 +27,6 @@ import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
-import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 
 public class FileSourceOrSink implements SourceOrSink {
@@ -107,7 +106,7 @@ public class FileSourceOrSink implements SourceOrSink {
     public static Schema getDynamicSchema(String[] columnsName, String schemaName, Schema designSchema) {
         if (columnsName != null && columnsName.length > 0) {
             // FIXME can we use "DiSchemaConstants" here?
-            String dynamicPosProp = designSchema.getProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION);
+            String dynamicPosProp = designSchema.getProp("di.dynamic.column.position");
             List<Schema.Field> fields = new ArrayList<>();
             if (dynamicPosProp != null) {
                 int dynPos = Integer.parseInt(dynamicPosProp);
