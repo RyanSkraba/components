@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.snowflake.runtime;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -110,7 +111,12 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
                 @Override
                 public Object convertToAvro(ResultSet value) {
                     try {
-                        return value.getBigDecimal(f.pos() + 1).toString();
+                        BigDecimal bigDecimalValue = value.getBigDecimal(f.pos() + 1);
+                        if (null != bigDecimalValue) {
+                            return bigDecimalValue.toString();
+                        }
+
+                        return null;
                     } catch (SQLException e) {
                         throw new ComponentException(e);
                     }
