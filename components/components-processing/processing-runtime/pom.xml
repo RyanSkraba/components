@@ -13,6 +13,10 @@
 
     <name>Components - Processing Runtime</name>
 
+    <properties>
+        <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.talend.components</groupId>

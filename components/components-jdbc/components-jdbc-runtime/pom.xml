@@ -12,6 +12,10 @@
     <artifactId>components-jdbc-runtime</artifactId>
     <packaging>bundle</packaging>
 
+    <properties>
+        <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
+    </properties>
+
     <dependencies>
     	<dependency>
             <groupId>org.talend.components</groupId>

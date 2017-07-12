@@ -27,6 +27,11 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<docker.removeVolumes>true</docker.removeVolumes>
 		<talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
+
+		<coverage.sonar.reportRoot>${project.basedir}</coverage.sonar.reportRoot>
+		<sonar.jacoco.reportPath>${coverage.sonar.reportRoot}/target/jacoco.exec</sonar.jacoco.reportPath>
+		<sonar.jacoco.itReportPath>${coverage.sonar.reportRoot}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
+
 	</properties>
 
 	<scm>
@@ -430,6 +435,7 @@
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>2.18</version>
 				<configuration>
+					<argLine>${jacoco.agent.it.argLine}</argLine>
 					<systemProperties>
 						<!-- settings.xml and repo are used for pax tests on branch build that 
 							mirror the talend_nexus repo -->
@@ -448,25 +454,48 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.7.201606060606</version>
+				<version>0.7.8</version>
+				<configuration>
+					<includes>
+						<includes>org/talend/**/*</includes>
+					</includes>
+				</configuration>
 				<executions>
 					<execution>
-						<id>default-prepare-agent</id>
+						<id>prepare-agent-ut</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
+						<configuration>
+							<append>true</append>
+						</configuration>
 					</execution>
 					<execution>
-						<id>default-report</id>
+						<id>prepare-agent-it</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>prepare-agent-integration</goal>
+						</goals>
+						<configuration>
+							<propertyName>jacoco.agent.it.argLine</propertyName>
+							<append>true</append>
+						</configuration>
+					</execution>
+					<execution>
+						<id>report</id>
 						<phase>prepare-package</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
 					</execution>
+					<execution>
+						<id>report-it</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>report-integration</goal>
+						</goals>
+					</execution>
 				</executions>
-				<configuration>
-					<append>true</append>
-				</configuration>
 			</plugin>
 			<!-- this was supposed to deploy only when all the modules are succesfully 
 				build -->

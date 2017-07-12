@@ -13,6 +13,10 @@
     <name>Components - Processing Definition</name>
     <packaging>jar</packaging>
 
+    <properties>
+        <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
+    </properties>
+
     <dependencies>
         <!-- APIs for all Components -->
         <dependency>

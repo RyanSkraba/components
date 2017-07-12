@@ -9,6 +9,7 @@
 	</parent>
 	<properties>
 		<jetty.version>9.2.19.v20160908</jetty.version>
+		<coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
 	</properties>
 
 	<name>Components - Salesforce Definition</name>
@@ -186,7 +187,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<argLine>-Xms512m -Xmx1024m</argLine>
+					<argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
 					<systemPropertyVariables>
 						<pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
 					</systemPropertyVariables>

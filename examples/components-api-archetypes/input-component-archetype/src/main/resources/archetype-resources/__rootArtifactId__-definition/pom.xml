@@ -13,6 +13,11 @@
 	<version>\${version}</version>
 	<name>Components - \${componentName} Definition</name>
 	<packaging>bundle</packaging>
+
+	<properties>
+		<coverage.sonar.reportRoot>\${project.basedir}/..</coverage.sonar.reportRoot>
+	</properties>
+
 	<repositories>
 		<repository>
 			<id>talend_nexus</id>

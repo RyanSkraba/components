@@ -18,6 +18,7 @@
     <properties>
         <!-- skip the deployment for integration tests, not necessary -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
 
     <dependencies>

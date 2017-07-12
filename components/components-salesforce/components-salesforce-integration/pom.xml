@@ -17,6 +17,7 @@
 		<!-- skip the deployment for integration tests, not necessary -->
 		<maven.deploy.skip>true</maven.deploy.skip>
 		<jetty.version>9.2.19.v20160908</jetty.version>
+		<coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
 	</properties>
 
 	<dependencies>
@@ -197,7 +198,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<argLine>-Xms512m -Xmx1024m</argLine>
+					<argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
 					<systemPropertyVariables>
 						<salesforce.user>${salesforce.user}</salesforce.user>
 						<salesforce.password>${salesforce.password}</salesforce.password>
