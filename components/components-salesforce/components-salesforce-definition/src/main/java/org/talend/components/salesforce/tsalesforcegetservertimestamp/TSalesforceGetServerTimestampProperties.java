@@ -12,6 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcegetservertimestamp;
 
+import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
+
+import java.util.Collections;
+import java.util.Set;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.component.Connector;
@@ -23,9 +28,6 @@ import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
-
-import java.util.Collections;
-import java.util.Set;
 
 public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComponentProperties
         implements SalesforceProvideConnectionProperties {
@@ -48,7 +50,8 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
         Schema s = SchemaBuilder.record("Main").fields().name("ServerTimeStamp")
                 .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "20")//$NON-NLS-1$
-                .type(AvroUtils._date()).noDefault().endRecord();
+                .type(AvroUtils._logicalTimestamp()).noDefault().endRecord();
+        s.addProp(TALEND_IS_LOCKED, "true");
         schema.schema.setValue(s);
     }
 
@@ -82,7 +85,7 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
         if (isOutputConnection) {
             return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema"));
         } else {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
     }
 

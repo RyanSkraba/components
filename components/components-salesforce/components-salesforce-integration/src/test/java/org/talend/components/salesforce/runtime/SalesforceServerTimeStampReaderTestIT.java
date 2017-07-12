@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
 
+import org.apache.avro.generic.IndexedRecord;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.salesforce.integration.SalesforceTestBase;
@@ -40,14 +41,15 @@ public class SalesforceServerTimeStampReaderTestIT extends SalesforceTestBase {
         TSalesforceGetServerTimestampProperties props = (TSalesforceGetServerTimestampProperties) new TSalesforceGetServerTimestampProperties(
                 "foo").init();
         setupProps(props.connection, !ADD_QUOTES);
-        BoundedReader<?> bounderReader = createBoundedReader(props);
+        BoundedReader<IndexedRecord> bounderReader = createBoundedReader(props);
         try {
             assertTrue(bounderReader.start());
             assertFalse(bounderReader.advance());
-            Object row = bounderReader.getCurrent();
-            assertNotNull(row);
+            IndexedRecord record = bounderReader.getCurrent();
+            assertNotNull(record);
+            Long timestamp = (Long) record.get(0);
             Calendar ms = Calendar.getInstance();
-            ms.setTimeInMillis((Long)row);
+            ms.setTimeInMillis(timestamp);
             return ms;
         } finally {
             bounderReader.close();

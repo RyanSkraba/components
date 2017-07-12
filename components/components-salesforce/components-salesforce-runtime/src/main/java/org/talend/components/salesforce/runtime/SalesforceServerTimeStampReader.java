@@ -17,6 +17,8 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
@@ -25,18 +27,21 @@ import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforc
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
 
-public class SalesforceServerTimeStampReader extends AbstractBoundedReader<Long> {
+public class SalesforceServerTimeStampReader extends AbstractBoundedReader<IndexedRecord> {
 
-    private transient Long result;
+    private transient IndexedRecord result;
 
     protected int dataCount;
 
     protected RuntimeContainer container;
 
+    protected TSalesforceGetServerTimestampProperties properties;
+
     public SalesforceServerTimeStampReader(RuntimeContainer container, SalesforceSource source,
-                                           TSalesforceGetServerTimestampProperties props) {
+            TSalesforceGetServerTimestampProperties properties) {
         super(source);
         this.container = container;
+        this.properties = properties;
     }
 
     @Override
@@ -45,7 +50,9 @@ public class SalesforceServerTimeStampReader extends AbstractBoundedReader<Long>
         try {
             Calendar serverTimestamp = connection.getServerTimestamp().getTimestamp();
             if (serverTimestamp != null) {
-                result = serverTimestamp.getTimeInMillis();
+                long timestamp = serverTimestamp.getTimeInMillis();
+                result = new GenericData.Record(properties.schema.schema.getValue());
+                result.put(0, timestamp);
             }
             if (result != null) {
                 dataCount++;
@@ -64,7 +71,7 @@ public class SalesforceServerTimeStampReader extends AbstractBoundedReader<Long>
     }
 
     @Override
-    public Long getCurrent() throws NoSuchElementException {
+    public IndexedRecord getCurrent() throws NoSuchElementException {
         return result;
     }
 
