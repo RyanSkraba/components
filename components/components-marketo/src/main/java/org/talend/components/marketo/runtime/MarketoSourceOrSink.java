@@ -44,7 +44,6 @@ import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.avro.AvroUtils;
-import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
@@ -60,6 +59,8 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
     public static final String RESOURCE_OPPORTUNITY = "resourceOpportunity";
 
     public static final String RESOURCE_OPPORTUNITY_ROLE = "resourceOpportunityRole";
+    
+    public static final String TALEND6_DYNAMIC_COLUMN_POSITION = "di.dynamic.column.position";
 
     protected MarketoProvideConnectionProperties properties;
 
@@ -331,7 +332,7 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
 
     public static Schema mergeDynamicSchemas(Schema data, Schema flow) {
         // TODO when https://jira.talendforge.org/browse/TDKN-154 will be resolved, use the new property here!
-        String dynamicFieldProperty = flow.getProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION);
+        String dynamicFieldProperty = flow.getProp(TALEND6_DYNAMIC_COLUMN_POSITION);
         int dynamicFieldPosition = -1;
         if (AvroUtils.isIncludeAllFields(flow) && dynamicFieldProperty != null) {
             dynamicFieldPosition = Integer.valueOf(dynamicFieldProperty);

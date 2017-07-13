@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction;
 import org.talend.daikon.avro.AvroUtils;
-import org.talend.daikon.di.DiSchemaConstants;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.SchemaProperty;
@@ -25,6 +25,8 @@ import org.talend.daikon.properties.property.SchemaProperty;
  * Unit tests for {@link TSnowflakeOutputProperties} class
  */
 public class TSnowflakeOutputPropertiesTest {
+    
+    private static final String TALEND6_COLUMN_TALEND_TYPE = "di.column.talendType";
 
     TSnowflakeOutputProperties outputProperties;
 
@@ -114,9 +116,9 @@ public class TSnowflakeOutputPropertiesTest {
                 .name("age").type().intType().noDefault() //
                 .name("valid").type().booleanType().noDefault() //
                 .name("address").type().stringType().noDefault() //
-                .name("comment").prop(DiSchemaConstants.TALEND6_COLUMN_LENGTH, "255").type().stringType().noDefault() //
-                .name("createdDate").prop(DiSchemaConstants.TALEND6_COLUMN_TALEND_TYPE, "id_Date") //
-                .prop(DiSchemaConstants.TALEND6_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'000Z'").type().nullable().longType() //
+                .name("comment").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255").type().stringType().noDefault() //
+                .name("createdDate").prop(TALEND6_COLUMN_TALEND_TYPE, "id_Date") //
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'000Z'").type().nullable().longType() //
                 .noDefault() //
                 .endRecord(); //
 

@@ -50,7 +50,6 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
-import org.talend.daikon.di.DiSchemaConstants;
 
 /**
  * Provides information about NetSuite data set for components in design time or run time.
@@ -374,7 +373,7 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
 
             Schema avroFieldSchema = AvroUtils.unwrapIfNullable(avroField.schema());
 
-            avroField.addProp(DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME, fieldDesc.getName());
+            avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, fieldDesc.getName());
 
             if (AvroUtils.isSameType(avroFieldSchema, AvroUtils._string())) {
                 if (fieldDesc.getLength() != 0) {
@@ -386,7 +385,7 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
                 CustomFieldDesc customFieldInfo = (CustomFieldDesc) fieldDesc;
                 CustomFieldRefType customFieldRefType = customFieldInfo.getCustomFieldType();
 
-                avroField.addProp(DiSchemaConstants.TALEND6_COLUMN_SOURCE_TYPE, customFieldRefType.getTypeName());
+                avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_TYPE, customFieldRefType.getTypeName());
 
                 if (customFieldRefType == CustomFieldRefType.DATE) {
                     avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
@@ -394,13 +393,13 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
 
                 NsRef ref = customFieldInfo.getCustomizationRef();
                 if (StringUtils.isNotEmpty(ref.getName())) {
-                    avroField.addProp(DiSchemaConstants.TALEND6_COMMENT, ref.getName());
+                    avroField.addProp(NetSuiteSchemaConstants.TALEND6_COMMENT, ref.getName());
                 }
 
             } else {
                 Class<?> fieldType = fieldDesc.getValueType();
 
-                avroField.addProp(DiSchemaConstants.TALEND6_COLUMN_SOURCE_TYPE, fieldType.getSimpleName());
+                avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_TYPE, fieldType.getSimpleName());
 
                 if (fieldType == XMLGregorianCalendar.class) {
                     avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
@@ -734,7 +733,7 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
      * @return name
      */
     public static String getNsFieldName(Schema.Field field) {
-        String name = field.getProp(DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME);
+        String name = field.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
         return name != null ? toInitialLower(name) : toInitialLower(field.name());
     }
 

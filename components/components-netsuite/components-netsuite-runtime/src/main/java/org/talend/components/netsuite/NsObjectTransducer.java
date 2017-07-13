@@ -50,7 +50,6 @@ import org.talend.components.netsuite.client.model.customfield.CustomFieldRefTyp
 import org.talend.components.netsuite.json.NsTypeResolverBuilder;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.converter.AvroConverter;
-import org.talend.daikon.di.DiSchemaConstants;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
@@ -134,7 +133,7 @@ public abstract class NsObjectTransducer {
 
         Map<String, FieldDesc> fieldMap = typeDesc.getFieldMap();
 
-        String dynamicPosProp = designSchema.getProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION);
+        String dynamicPosProp = designSchema.getProp(NetSuiteSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION);
         List<Schema.Field> fields = new ArrayList<>();
 
         if (dynamicPosProp != null) {

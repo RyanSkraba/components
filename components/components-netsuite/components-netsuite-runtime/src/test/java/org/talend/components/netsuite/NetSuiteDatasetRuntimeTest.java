@@ -42,7 +42,6 @@ import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.test.TestUtils;
 import org.talend.daikon.avro.SchemaConstants;
-import org.talend.daikon.di.DiSchemaConstants;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,30 +70,30 @@ public class NetSuiteDatasetRuntimeTest {
         Schema.Field f = getNsFieldByName(s, fieldDesc.getName());
         assertUnionType(f.schema(), Arrays.asList(Schema.Type.STRING, Schema.Type.NULL));
         assertThat(f.getObjectProps().keySet(), containsInAnyOrder(
-                DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME,
-                DiSchemaConstants.TALEND6_COLUMN_SOURCE_TYPE
+                SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME,
+                SchemaConstants.TALEND_COLUMN_DB_TYPE
         ));
-        assertThat(f.getProp(DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME), is(fieldDesc.getName()));
+        assertThat(f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME), is(fieldDesc.getName()));
         assertThat(f.schema().getObjectProps().keySet(), empty());
 
         fieldDesc = typeDesc.getField("acctName");
         f = getNsFieldByName(s, fieldDesc.getName());
         assertUnionType(f.schema(), Arrays.asList(Schema.Type.STRING, Schema.Type.NULL));
         assertThat(f.getObjectProps().keySet(), containsInAnyOrder(
-                DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME,
-                DiSchemaConstants.TALEND6_COLUMN_SOURCE_TYPE
+                SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME,
+                SchemaConstants.TALEND_COLUMN_DB_TYPE
         ));
-        assertThat(f.getProp(DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME), is(fieldDesc.getName()));
+        assertThat(f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME), is(fieldDesc.getName()));
         assertThat(f.schema().getObjectProps().keySet(), empty());
 
         fieldDesc = typeDesc.getField("inventory");
         f = getNsFieldByName(s, fieldDesc.getName());
         assertUnionType(f.schema(), Arrays.asList(Schema.Type.BOOLEAN, Schema.Type.NULL));
         assertThat(f.getObjectProps().keySet(), containsInAnyOrder(
-                DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME,
-                DiSchemaConstants.TALEND6_COLUMN_SOURCE_TYPE
+                SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME,
+                SchemaConstants.TALEND_COLUMN_DB_TYPE
         ));
-        assertThat(f.getProp(DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME), is(fieldDesc.getName()));
+        assertThat(f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME), is(fieldDesc.getName()));
         assertThat(f.schema().getObjectProps().keySet(), empty());
 
         fieldDesc = typeDesc.getField("tranDate");
@@ -102,11 +101,11 @@ public class NetSuiteDatasetRuntimeTest {
         assertUnionType(f.schema(), Arrays.asList(Schema.Type.LONG, Schema.Type.NULL));
         assertThat(f.getObjectProps().keySet(), containsInAnyOrder(
                 SchemaConstants.TALEND_COLUMN_PATTERN,
-                DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME,
-                DiSchemaConstants.TALEND6_COLUMN_SOURCE_TYPE
+                SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME,
+                SchemaConstants.TALEND_COLUMN_DB_TYPE
         ));
         assertThat(f.getProp(SchemaConstants.TALEND_COLUMN_PATTERN), is("yyyy-MM-dd'T'HH:mm:ss'.000Z'"));
-        assertThat(f.getProp(DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME), is(fieldDesc.getName()));
+        assertThat(f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME), is(fieldDesc.getName()));
     }
 
     @Test
@@ -146,15 +145,15 @@ public class NetSuiteDatasetRuntimeTest {
         Schema.Field f = getNsFieldByName(s, fieldDesc.getName());
         assertUnionType(f.schema(), Arrays.asList(Schema.Type.STRING, Schema.Type.NULL));
         assertThat(f.getObjectProps().keySet(), containsInAnyOrder(
-                DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME,
-                DiSchemaConstants.TALEND6_COLUMN_SOURCE_TYPE,
+                SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME,
+                SchemaConstants.TALEND_COLUMN_DB_TYPE,
                 NetSuiteSchemaConstants.NS_CUSTOM_FIELD,
                 NetSuiteSchemaConstants.NS_CUSTOM_FIELD_SCRIPT_ID,
                 NetSuiteSchemaConstants.NS_CUSTOM_FIELD_INTERNAL_ID,
                 NetSuiteSchemaConstants.NS_CUSTOM_FIELD_CUSTOMIZATION_TYPE,
                 NetSuiteSchemaConstants.NS_CUSTOM_FIELD_TYPE
         ));
-        assertThat(f.getProp(DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME), is(fieldDesc.getName()));
+        assertThat(f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME), is(fieldDesc.getName()));
         CustomFieldDesc customFieldDesc = NetSuiteDatasetRuntimeImpl.readCustomField(f);
         assertThat(customFieldDesc.getName(), is(fieldDesc.getName()));
     }

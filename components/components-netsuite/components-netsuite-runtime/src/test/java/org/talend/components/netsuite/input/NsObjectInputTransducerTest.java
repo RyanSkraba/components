@@ -33,7 +33,7 @@ import org.talend.components.netsuite.client.model.RefType;
 import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.client.search.SearchResultSet;
 import org.talend.daikon.avro.AvroUtils;
-import org.talend.daikon.di.DiSchemaConstants;
+import org.talend.components.netsuite.NetSuiteSchemaConstants;
 
 import com.netsuite.webservices.test.platform.NetSuitePortType;
 import com.netsuite.webservices.test.platform.core.Record;
@@ -169,8 +169,8 @@ public class NsObjectInputTransducerTest extends NetSuiteMockTestBase {
                 .noDefault()
                 //
                 .endRecord();
-        designSchema.addProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION, "1");
-        designSchema.addProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_ID, "dynamic");
+        designSchema.addProp(NetSuiteSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION, "1");
+        designSchema.addProp(NetSuiteSchemaConstants.TALEND6_DYNAMIC_COLUMN_ID, "dynamic");
 
         Schema schema = AvroUtils.setIncludeAllFields(designSchema, true);
 
@@ -215,8 +215,8 @@ public class NsObjectInputTransducerTest extends NetSuiteMockTestBase {
                 .noDefault()
                 //
                 .endRecord();
-        designSchema.addProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION, "3");
-        designSchema.addProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_ID, "dynamic");
+        designSchema.addProp(NetSuiteSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION, "3");
+        designSchema.addProp(NetSuiteSchemaConstants.TALEND6_DYNAMIC_COLUMN_ID, "dynamic");
 
         Schema schema = AvroUtils.setIncludeAllFields(designSchema, true);
 

@@ -15,6 +15,7 @@ package org.talend.components.marketo.runtime;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.talend.components.marketo.runtime.MarketoSourceOrSink.TALEND6_DYNAMIC_COLUMN_POSITION;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +41,6 @@ import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.daikon.avro.AvroUtils;
-import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
@@ -152,7 +152,7 @@ public class MarketoRuntimeTestBase {
         Field f1 = new Schema.Field("email", AvroUtils._string(), "", null, Order.ASCENDING);
         Field f2 = new Schema.Field("firstName", AvroUtils._string(), "", null, Order.ASCENDING);
         schema.setFields(Arrays.asList(f1, f2));
-        schema.addProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION, 2);
+        schema.addProp(TALEND6_DYNAMIC_COLUMN_POSITION, 2);
         schema = AvroUtils.setIncludeAllFields(schema, true);
         return schema;
     }

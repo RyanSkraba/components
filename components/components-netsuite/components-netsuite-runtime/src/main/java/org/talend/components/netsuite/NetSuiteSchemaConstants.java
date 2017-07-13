@@ -13,14 +13,17 @@
 
 package org.talend.components.netsuite;
 
-import org.talend.daikon.di.DiSchemaConstants;
-
 /**
  * Holds schema related constants that are used by NetSuite classes.
  */
 public abstract class NetSuiteSchemaConstants {
+    
+    public static final String TALEND6_DYNAMIC_COLUMN_POSITION = "di.dynamic.column.position";
+    public static final String TALEND6_DYNAMIC_COLUMN_ID = "di.dynamic.column.id";
+    public static final String TALEND6_ADDITIONAL_PROPERTIES = "di.prop.";
+    public static final String TALEND6_COMMENT = "di.table.comment";
 
-    public static final String NS_PREFIX = DiSchemaConstants.TALEND6_ADDITIONAL_PROPERTIES + "netsuite.";
+    public static final String NS_PREFIX = TALEND6_ADDITIONAL_PROPERTIES + "netsuite.";
 
     public static final String NS_CUSTOM_RECORD = NS_PREFIX + "customRecord";
     public static final String NS_CUSTOM_RECORD_SCRIPT_ID = NS_PREFIX + "customRecord.scriptId";
