@@ -31,18 +31,23 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.SalesforceOutputProperties;
+import org.talend.components.salesforce.runtime.common.ConnectionHolder;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.LogicalTypeUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.error.DefaultErrorCode;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.Error;
@@ -55,6 +60,11 @@ import com.sforce.ws.bind.XmlObject;
 import com.sforce.ws.util.Base64;
 
 final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
+
+    private transient static final Logger LOGGER = LoggerFactory.getLogger(SalesforceWriter.class);
+
+    private static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(SalesforceWriter.class);
 
     private final SalesforceWriteOperation salesforceWriteOperation;
 
@@ -126,7 +136,11 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
-        connection = sink.connect(container).connection;
+        ConnectionHolder ch = sink.connect(container);
+        connection = ch.connection;
+        if (ch.bulkConnection != null) {
+            LOGGER.info(MESSAGES.getMessage("info.bulkConnectionUsage"));
+        }
         if (null == mainSchema) {
             mainSchema = sprops.module.main.schema.getValue();
             moduleSchema = sink.getSchema(connection, sprops.module.moduleName.getStringValue());

@@ -17,19 +17,28 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.runtime.common.ConnectionHolder;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.sforce.soap.partner.PartnerConnection;
 
 public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
+
+    private transient static final Logger LOGGER = LoggerFactory.getLogger(SalesforceReader.class);
+
+    private static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(SalesforceReader.class);
 
     private transient PartnerConnection connection;
 
@@ -50,7 +59,11 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
 
     protected PartnerConnection getConnection() throws IOException {
         if (connection == null) {
-            connection = ((SalesforceSource) getCurrentSource()).connect(container).connection;
+            ConnectionHolder ch = ((SalesforceSource) getCurrentSource()).connect(container);
+            connection = ch.connection;
+            if (ch.bulkConnection != null) {
+                LOGGER.info(MESSAGES.getMessage("info.bulkConnectionUsage"));
+            }
         }
         return connection;
     }
