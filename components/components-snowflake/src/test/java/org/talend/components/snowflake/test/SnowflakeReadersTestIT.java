@@ -74,7 +74,7 @@ public class SnowflakeReadersTestIT extends SnowflakeRuntimeIOTestIT {
         setupTableWithStaticValues(props);
         List<IndexedRecord> rows = readRows(props);
         assertEquals(19, rows.size());
-        assertEquals(String.valueOf(81), rows.get(0).get(0));
+        assertEquals(BigDecimal.valueOf(81), rows.get(0).get(0));
         assertEquals("foo_81", rows.get(0).get(1));
     }
 
@@ -93,7 +93,7 @@ public class SnowflakeReadersTestIT extends SnowflakeRuntimeIOTestIT {
         assertEquals(19, rows.size());
         Schema schema = rows.get(0).getSchema();
         LOGGER.debug(schema.toString());
-        assertEquals(String.valueOf(81), rows.get(0).get(0));
+        assertEquals(BigDecimal.valueOf(81), rows.get(0).get(0));
         assertThat((String) rows.get(0).get(1), containsString("\"bar\": 81"));
     }
 
