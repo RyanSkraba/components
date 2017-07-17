@@ -231,7 +231,7 @@ public class SalesforceAvroRegistryTest {
     /**
      * Tests {@link SalesforceAvroRegistry#inferSchema(Object)} returns {@link Schema} of type {@link Type#DOUBLE},
      * when percent Field is passed
-     *
+     * 
      * This test-case related to https://jira.talendforge.org/browse/TDI-37479 bug
      */
     @Test
@@ -294,11 +294,10 @@ public class SalesforceAvroRegistryTest {
         assertEquals(String.class, converter.getDatumClass());
         assertEquals(schema.getField("Field_A").schema(), converter.getSchema());
 
-        String input = "20000000000000000000000000.123456789";
-        Object value = converter.convertToAvro(input);
+        Object value = converter.convertToAvro("20000000000000000000000000.123456789");
         assertNotNull(value);
-        assertThat(value, instanceOf(String.class));
-        assertEquals(value, input);
+        assertThat(value, instanceOf(BigDecimal.class));
+        assertThat((BigDecimal) value, equalTo(new BigDecimal("20000000000000000000000000.123456789")));
 
         assertNull(converter.convertToAvro(""));
         assertNull(converter.convertToAvro(null));
