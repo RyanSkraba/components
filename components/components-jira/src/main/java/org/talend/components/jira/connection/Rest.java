@@ -29,6 +29,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
@@ -45,7 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Apache Http components library wrapper. It uses Basic authentification by default
+ * Apache Http components library wrapper. It uses Basic authentication by default.
  * 
  * @author ivan.honchar
  */
@@ -91,14 +94,27 @@ public class Rest {
      * @param hostPort URL
      */
     public Rest(String hostPort) {
-        headers = new LinkedList<Header>();
+        headers = new LinkedList<>();
         if (!hostPort.endsWith("/")) {
             hostPort = hostPort + "/";
         }
         this.hostPort = hostPort;
+
         contentType = ContentType.create("application/json", StandardCharsets.UTF_8);
-        executor = Executor.newInstance();
+
+        executor = Executor.newInstance(createHttpClient());
         executor.use(new BasicCookieStore());
+    }
+
+    /**
+     * Create {@code HttpClient} to be used for communicating with JIRA server.
+     *
+     * @return {@code HttpClient}
+     */
+    private CloseableHttpClient createHttpClient() {
+        CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(
+                RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
+        return httpClient;
     }
 
     /**
@@ -109,7 +125,7 @@ public class Rest {
      */
     public int checkConnection() throws IOException {
         int statusCode = 0;
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try (CloseableHttpClient httpClient = createHttpClient()) {
             HttpHead httpHead = new HttpHead(hostPort);
             try (CloseableHttpResponse response = httpClient.execute(httpHead)) {
                 statusCode = response.getStatusLine().getStatusCode();
