@@ -89,7 +89,7 @@ public class TSalesforceInputPropertiesIT {
         properties.setupLayout();
         properties.connection.userPassword.userId.setValue(System.getProperty("salesforce.user"));
         properties.connection.userPassword.password.setValue(System.getProperty("salesforce.password"));
-        properties.connection.userPassword.securityKey.setValue(System.getProperty("salesforce.key"));
+        properties.connection.userPassword.securityToken.setValue(System.getProperty("salesforce.key"));
         properties.query.setValue("SELECT Id, Name, BillingCity FROM Account");
         ValidationResult validationResult = properties.validateGuessSchema();
 

@@ -25,7 +25,7 @@ public class SalesforceDatasetPropertiesTestIT extends SalesforceTestBase {
 
         datastore.userId.setValue(userId);
         datastore.password.setValue(password);
-        datastore.securityKey.setValue(securityKey);
+        datastore.securityKey.setValue(securityToken);
 
         dataset.sourceType.setValue(SourceType.MODULE_SELECTION);
 
@@ -61,7 +61,7 @@ public class SalesforceDatasetPropertiesTestIT extends SalesforceTestBase {
 
         datastore.userId.setValue(userId);
         datastore.password.setValue(password);
-        datastore.securityKey.setValue(securityKey);
+        datastore.securityKey.setValue(securityToken);
 
         dataset.sourceType.setValue(SourceType.MODULE_SELECTION);
         dataset.moduleName.setValue("Account");

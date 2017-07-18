@@ -79,7 +79,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     static public final String password = System.getProperty("salesforce.password");
 
-    static public final String securityKey = System.getProperty("salesforce.key");
+    static public final String securityToken = System.getProperty("salesforce.key");
 
     public SalesforceTestBase() {
     }
@@ -123,7 +123,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         Properties userPassword = (Properties) props.getProperty("userPassword");
         ((Property) userPassword.getProperty("userId")).setValue(addQuotes ? "\"" + userId + "\"" : userId);
         ((Property) userPassword.getProperty("password")).setValue(addQuotes ? "\"" + password + "\"" : password);
-        ((Property) userPassword.getProperty("securityKey")).setValue(addQuotes ? "\"" + securityKey + "\"" : securityKey);
+        ((Property) userPassword.getProperty("securityToken")).setValue(addQuotes ? "\"" + securityToken + "\"" : securityToken);
         return props;
     }
 

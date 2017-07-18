@@ -24,7 +24,7 @@ import org.talend.daikon.properties.property.Property;
 
 public class SalesforceUserPasswordProperties extends UserPasswordProperties {
 
-    public Property<String> securityKey = newString("securityKey")
+    public Property<String> securityToken = newString("securityToken")
             .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     public SalesforceUserPasswordProperties(String name) {
@@ -35,7 +35,7 @@ public class SalesforceUserPasswordProperties extends UserPasswordProperties {
     public void setupLayout() {
         super.setupLayout();
         Form form = getForm(Form.MAIN);
-        form.addColumn(widget(securityKey).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
+        form.addColumn(widget(securityToken).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
 
     }
 

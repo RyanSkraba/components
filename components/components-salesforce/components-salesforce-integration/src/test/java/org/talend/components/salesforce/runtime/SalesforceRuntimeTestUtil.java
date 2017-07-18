@@ -94,7 +94,7 @@ public class SalesforceRuntimeTestUtil {
 
     private final String password = System.getProperty("salesforce.password");
 
-    private final String securityKey = System.getProperty("salesforce.key");
+    private final String securityToken = System.getProperty("salesforce.key");
 
     public Schema getTestSchema1() {
         return schema1;
@@ -125,7 +125,7 @@ public class SalesforceRuntimeTestUtil {
 
         config.setAuthEndpoint(endpoint);
         config.setUsername(username);
-        config.setPassword(password + securityKey);
+        config.setPassword(password + securityToken);
         config.setConnectionTimeout(60000);
         config.setUseChunkedPost(true);
 
@@ -287,7 +287,7 @@ public class SalesforceRuntimeTestUtil {
             TSalesforceBulkExecProperties modelProperties, Schema schema, Schema output) {
         modelProperties.connection.userPassword.userId.setValue(username);
         modelProperties.connection.userPassword.password.setValue(password);
-        modelProperties.connection.userPassword.securityKey.setValue(securityKey);
+        modelProperties.connection.userPassword.securityToken.setValue(securityToken);
 
         modelProperties.connection.timeout.setValue(60000);
         modelProperties.connection.bulkConnection.setValue(true);
