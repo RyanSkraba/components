@@ -92,7 +92,11 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
     }
 
     public void setJdbcUrl(String jdbcUrl) {
-        this.jdbcUrl = jdbcUrl;
+        if (jdbcUrl != null) {
+            this.jdbcUrl = jdbcUrl.trim();
+        }else{
+            this.jdbcUrl = null;
+        }
     }
 
     public List<String> getDriverPaths() {
