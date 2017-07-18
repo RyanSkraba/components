@@ -46,9 +46,5 @@ public class TMarketoBulkExecDefinition extends MarketoComponentDefinition {
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TMarketoBulkExecProperties.class;
     }
-    
-    @Override
-    public boolean isStartable() {
-        return false;
-    }
+
 }
