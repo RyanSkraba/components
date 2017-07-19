@@ -52,8 +52,11 @@ public class S3DatastoreProperties extends PropertiesImpl implements DatastorePr
         // Main properties
         if (form.getName().equals(Form.MAIN)) {
             // handle S3
-            form.getWidget(accessKey.getName()).setVisible(specifyCredentials.getValue());
-            form.getWidget(secretKey.getName()).setVisible(specifyCredentials.getValue());
+            final boolean isSpecifyCredentialsEnabled = specifyCredentials.getValue();
+            accessKey.setRequired(isSpecifyCredentialsEnabled);
+            secretKey.setRequired(isSpecifyCredentialsEnabled);
+            form.getWidget(accessKey.getName()).setVisible(isSpecifyCredentialsEnabled);
+            form.getWidget(secretKey.getName()).setVisible(isSpecifyCredentialsEnabled);
         }
     }
 

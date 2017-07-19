@@ -63,8 +63,8 @@ public class S3DatastorePropertiesTest {
             assertThat(w, notNullValue());
         }
 
-        assertThat(properties.accessKey.isRequired(), is(false));
-        assertThat(properties.secretKey.isRequired(), is(false));
+        assertThat(properties.accessKey.isRequired(), is(true));
+        assertThat(properties.secretKey.isRequired(), is(true));
         assertThat(main.getWidget("secretKey").getWidgetType(), is(Widget.HIDDEN_TEXT_WIDGET_TYPE));
     }
 
@@ -83,9 +83,10 @@ public class S3DatastorePropertiesTest {
         properties.specifyCredentials.setValue(false);
         properties.afterSpecifyCredentials();
 
+        assertThat(properties.accessKey.isRequired(), is(false));
+        assertThat(properties.secretKey.isRequired(), is(false));
         assertThat(main.getWidget("specifyCredentials").isVisible(), is(true));
         assertThat(main.getWidget("accessKey").isVisible(), is(false));
         assertThat(main.getWidget("secretKey").isVisible(), is(false));
-
     }
 }
