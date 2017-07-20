@@ -45,6 +45,10 @@ public class JdbcRuntimeInfo extends JarRuntimeInfo {
         this.props = props;
     }
 
+    public JarRuntimeInfo cloneWithNewJarUrlString(String newJarUrlString) {
+        return new JdbcRuntimeInfo(this.props, newJarUrlString, this.getDepTxtPath(), this.getRuntimeClassName());
+    }
+
     @Override
     public List<URL> getMavenUrlDependencies() {
         List<URL> result = new ArrayList<>(super.getMavenUrlDependencies());

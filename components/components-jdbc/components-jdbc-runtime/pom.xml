@@ -57,12 +57,6 @@
             <artifactId>daikon-spring-utils</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.ops4j.pax.url</groupId>
-            <artifactId>pax-url-aether</artifactId>             
-            <version>2.4.7</version>
-            <scope>test</scope>
-        </dependency>
         
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>

@@ -88,6 +88,10 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
         }
     }
 
+    public JarRuntimeInfo cloneWithNewJarUrlString(String newJarUrlString) {
+        return new JarRuntimeInfo(newJarUrlString, this.getDepTxtPath(), this.getRuntimeClassName());
+    }
+
     public URL getJarUrl() {
         return jarUrl;
     }
