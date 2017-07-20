@@ -136,10 +136,12 @@ public class TSalesforceOutputBulkExecPropertiesTest extends SalesforceTestBase 
         properties.outputAction.setValue(SalesforceOutputProperties.OutputAction.INSERT);
         properties.afterOutputAction();
         assertFalse(advForm.getWidget(properties.upsertRelationTable.getName()).isVisible());
+        assertEquals(SalesforceOutputProperties.OutputAction.INSERT, properties.outputBulkProperties.outputAction.getValue());
 
         properties.outputAction.setValue(SalesforceOutputProperties.OutputAction.UPSERT);
         properties.afterOutputAction();
         assertTrue(advForm.getWidget(properties.upsertRelationTable.getName()).isVisible());
+        assertEquals(SalesforceOutputProperties.OutputAction.UPSERT, properties.outputBulkProperties.outputAction.getValue());
     }
 
     @Test

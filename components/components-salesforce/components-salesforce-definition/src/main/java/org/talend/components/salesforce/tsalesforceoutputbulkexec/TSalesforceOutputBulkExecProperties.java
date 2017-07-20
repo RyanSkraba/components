@@ -46,7 +46,7 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-
+        outputBulkProperties.outputAction.setValue(this.outputAction.getValue());
         if (Form.ADVANCED.equals(form.getName())) {
             boolean isUpsert = OutputAction.UPSERT.equals(outputAction.getValue());
             form.getWidget(upsertRelationTable.getName()).setHidden(!isUpsert);

@@ -16,13 +16,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.components.common.runtime.BulkFileWriter;
+import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
+import org.talend.daikon.avro.SchemaConstants;
 
 /**
  * Prepare Data Files for bulk execution
@@ -36,13 +39,15 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
 
     @Override
     public String[] getHeaders(Schema schema) {
-        TSalesforceOutputBulkProperties salesforceBulkProperties = (TSalesforceOutputBulkProperties) bulkProperties;
+        TSalesforceOutputBulkProperties salesforceBulkProperties = getBulkProperties();
 
         List<String> headers = new ArrayList<String>();
         StringBuilder sbuilder = new StringBuilder();
         for (Schema.Field f : schema.getFields()) {
             String header = f.name();
-
+            if (checkDeleteOption(f)) {
+                continue;
+            }
             String ref_module_name = f.getProp(SalesforceSchemaConstants.REF_MODULE_NAME);
             String ref_field_name = f.getProp(SalesforceSchemaConstants.REF_FIELD_NAME);
             if (ref_module_name != null) {
@@ -61,13 +66,13 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
                                 .getValue();
                         List<String> externalIdFromLookupFields = salesforceBulkProperties.upsertRelationTable.lookupFieldExternalIdName
                                 .getValue();
-                        
+
                         Object polymorphic = polymorphics.get(index);
                         boolean poly = false;
                         if(polymorphic!=null && polymorphic instanceof Boolean) {
                             poly = (Boolean)polymorphic;
                         }
-                        
+
                         if (poly) {
                             sbuilder.append(lookupFieldModuleNames.get(index)).append(":");
                         }
@@ -91,13 +96,21 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
         return columnNames.indexOf(columnName);
     }
 
+    private boolean checkDeleteOption(Field f) {
+        return OutputAction.DELETE.equals(getBulkProperties().outputAction.getValue())
+                && !Boolean.valueOf(f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+    }
+
     @Override
     public List<String> getValues(Object datum) {
         IndexedRecord input = getFactory(datum).convertToAvro((IndexedRecord) datum);
         List<String> values = new ArrayList<String>();
-        for (Schema.Field f : input.getSchema().getFields()) {
+        for (Field f : input.getSchema().getFields()) {
+            if (checkDeleteOption(f)) {
+                continue;
+            }
             if (input.get(f.pos()) == null) {
-                if (((TSalesforceOutputBulkProperties) bulkProperties).ignoreNull.getValue()) {
+                if (getBulkProperties().ignoreNull.getValue()) {
                     values.add("");
                 } else {
                     values.add("#N/A");
@@ -107,5 +120,9 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
             }
         }
         return values;
+    }
+
+    protected TSalesforceOutputBulkProperties getBulkProperties() {
+        return (TSalesforceOutputBulkProperties) bulkProperties;
     }
 }
