@@ -3,7 +3,7 @@ Components API Service REST with all components
 This is a module that packages together the Web Service along with all the components packaged the maven-component-repo module.
 
 
-###Run locally:
+### Run locally:
 
 ```
 mvn clean package
@@ -13,12 +13,14 @@ cd components-api-service-rest-all-components-{current_version}-SNAPSHOT
 ./start.sh
 ```
 
-###Build docker image:
+### Build docker image
+
 ```
 mvn -Pdocker install
 ```
 
-###Run docker: 
+### Run docker
+
 ```
 docker run -p 8989:8989 -d --name tcomp-service registry.datapwn.com/talend/tcomp-components-api-service-rest-all-components-master:{your_latest_tag}
 ```
@@ -41,6 +43,7 @@ Following environment variables can be used to configure filebeat (default value
 7. KAFKA_TOPIC=tpsvclogs
 
 At least following variables should be changed to enable sending logs to Kafka:
+
 ```
 LOG_PATH=/maven/logs
 KAFKA_ON=true
@@ -69,6 +72,7 @@ For this case following configuration should be added to *docker-compose.yml*:
 ```
 
 To run services launch following command from the directory where *docker-compose.yml* is located
+
 ```
 docker-compose up -d
 ```
@@ -78,18 +82,22 @@ docker-compose up -d
 To check whether logs are sent to logging service you need to produce some log events. Currently Component service is configured to log only INFO level events. To test logs you need to set some class logger to DEBUG level.
 
 For instance,
+
 ```
-    <logger name="org.talend.components.service.rest.impl.DefinitionsControllerImpl" level="DEBUG">
-        <appender-ref ref="FILE" />
-        <appender-ref ref="CONSOLE" />
-    </logger>
+<logger name="org.talend.components.service.rest.impl.DefinitionsControllerImpl" level="DEBUG">
+    <appender-ref ref="FILE" />
+    <appender-ref ref="CONSOLE" />
+</logger>
 ```
 
 Then calls `http://192.168.99.100:8989/tcomp/definitions/components` will produce some logs
 
-###Change the jdbc configation to add a new driver
+### Change the jdbc configation to add a new driver
+
 The service is packaged with some start and stop scripts along with a **config** and **.m2** folder.
+
 #### install the driver
+
 The **.m2** folder contains a maven repostory. You need to install you driver into this maven repository.
 
 Let's say you have dowloaded the latest Oracle driver called *ojdbc7.jar*, to install it, please 
@@ -104,22 +112,21 @@ Where
 * **my_version** is a version number following the [maven versioning rules] (http://books.sonatype.com/mvnref-book/reference/pom-relationships-sect-pom-syntax.html)
 
 #### Update the configuration file 
+
 please open the file **config/jdbc_config.json** and add one entry for the new jdbc driver you have just installed in the *.m2* repository.
 
-a new entry like this
+A new entry like this
 
 ```
-,
-    {
-        "id" : "the_db_id",
-        "class" : "the_class_driver",
-        "url" : "the_jdbc_url",
-        "paths" : 
-        [
-            {"path" : "mvn:jdbc-drivers/my_databse_name/my_version"}
-        ]
-    
-    }
+{
+    "id" : "the_db_id",
+    "class" : "the_class_driver",
+    "url" : "the_jdbc_url",
+    "paths" : 
+    [
+        { "path" : "mvn:jdbc-drivers/my_databse_name/my_version" }
+    ]
+}
 ```    
 
 Where :
@@ -129,22 +136,22 @@ Where :
 * **my_databse_name** see the previous paragraph.
 * **my_version** see the previous paragraph.
 
-here is an example for oracle
+Here is an example for oracle
+
 ```
-,
-    {
-        "id" : "Oracle Thin",
-        "class" : "oracle.jdbc.driver.OracleDriver",
-        "url" : "jdbc:oracle:thin:@myhost:1521:thedb",
-        "paths" : 
-        [
-            {"path" : "mvn:jdbc-drivers/oracle/7"}
-        ]
-    
-    }
+{
+    "id" : "Oracle Thin",
+    "class" : "oracle.jdbc.driver.OracleDriver",
+    "url" : "jdbc:oracle:thin:@myhost:1521:thedb",
+    "paths" :
+    [
+      { "path" : "mvn:jdbc-drivers/oracle/7" }
+    ]
+}
 ```    
  
-###How this service is built
+### How this service is built
+
 * This module unzips all the component maven repository build by the maven module service/components-maven-repo
 * it also unzip the list of components of the above maven repo in the configuration folder.
 * it adds the service artifact in the component maven repository to have a complete autonomous maven repository.
