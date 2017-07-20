@@ -51,14 +51,14 @@ public class LazyAvroKeyWrapper<DatumT> extends AtomicCoder<AvroKey<DatumT>> {
     }
 
     @Override
-    public void encode(AvroKey<DatumT> value, OutputStream outStream, Context context) throws IOException {
-        datumCoder.encode(value.datum(), outStream, context);
+    public void encode(AvroKey<DatumT> value, OutputStream outStream) throws IOException {
+        datumCoder.encode(value.datum(), outStream);
     }
 
     @Override
-    public AvroKey<DatumT> decode(InputStream inStream, Context context) throws IOException {
+    public AvroKey<DatumT> decode(InputStream inStream) throws IOException {
         AvroKey<DatumT> key = new AvroKey<>();
-        key.datum(datumCoder.decode(inStream, context));
+        key.datum(datumCoder.decode(inStream));
         return key;
     }
 

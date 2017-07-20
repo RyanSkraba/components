@@ -17,14 +17,15 @@ import java.io.IOException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO;
+import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PDone;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.adapter.beam.BeamJobRuntimeContainer;
 import org.talend.components.adapter.beam.gcp.GcpServiceAccountOptions;
 import org.talend.components.adapter.beam.gcp.ServiceAccountCredentialFactory;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
@@ -50,43 +51,52 @@ public class BigQueryOutputRuntime extends PTransform<PCollection<IndexedRecord>
      */
     private BigQueryOutputProperties properties;
 
+    private BigQueryDatasetProperties dataset;
+
+    private BigQueryDatastoreProperties datastore;
+
     @Override
     public ValidationResult initialize(RuntimeContainer container, BigQueryOutputProperties properties) {
         this.properties = properties;
+        this.dataset = properties.getDatasetProperties();
+        this.datastore = dataset.getDatastoreProperties();
+
+        Object pipelineOptionsObj = container.getGlobalData(BeamJobRuntimeContainer.PIPELINE_OPTIONS);
+        if (pipelineOptionsObj != null) {
+            PipelineOptions pipelineOptions = (PipelineOptions) pipelineOptionsObj;
+            GcpServiceAccountOptions gcpOptions = pipelineOptions.as(GcpServiceAccountOptions.class);
+            if (!"DataflowRunner".equals(gcpOptions.getRunner().getSimpleName())) {
+                // when using Dataflow runner, these properties has been set on pipeline level
+                gcpOptions.setProject(datastore.projectName.getValue());
+                gcpOptions.setTempLocation(datastore.tempGsFolder.getValue());
+                gcpOptions.setCredentialFactoryClass(ServiceAccountCredentialFactory.class);
+                gcpOptions.setServiceAccountFile(datastore.serviceAccountFile.getValue());
+                gcpOptions.setGcpCredential(BigQueryConnection.createCredentials(datastore));
+            }
+        }
+
         return ValidationResult.OK;
     }
 
     @Override
     public PDone expand(PCollection<IndexedRecord> in) {
-        final BigQueryDatasetProperties dataset = properties.getDatasetProperties();
-        final BigQueryDatastoreProperties datastore = dataset.getDatastoreProperties();
-
-        GcpServiceAccountOptions gcpOptions = in.getPipeline().getOptions().as(GcpServiceAccountOptions.class);
-        if (!"DataflowRunner".equals(gcpOptions.getRunner().getSimpleName())) {
-            // when using Dataflow runner, these properties has been set on pipeline level
-            gcpOptions.setProject(datastore.projectName.getValue());
-            gcpOptions.setTempLocation(datastore.tempGsFolder.getValue());
-            gcpOptions.setCredentialFactoryClass(ServiceAccountCredentialFactory.class);
-            gcpOptions.setServiceAccountFile(datastore.serviceAccountFile.getValue());
-            gcpOptions.setGcpCredential(BigQueryConnection.createCredentials(datastore));
-        }
-
         TableReference table = new TableReference();
         table.setProjectId(datastore.projectName.getValue());
         table.setDatasetId(dataset.bqDataset.getValue());
         table.setTableId(dataset.tableName.getValue());
 
-        BigQueryIO.Write.Bound bigQueryIOPTransform = BigQueryIO.Write.to(table);
+        BigQueryIO.Write bigQueryIOPTransform = BigQueryIO.writeTableRows().to(table);
 
         bigQueryIOPTransform = setTableOperation(bigQueryIOPTransform);
         bigQueryIOPTransform = setWriteOperation(bigQueryIOPTransform);
 
         // When the BigQueryOutput specify schema, use it for create table and construct converter,
         // else use incoming data's schema for construct converter, and do not support create table
-        return in.apply(ParDo.of(new IndexedRecordToTableRowFn(dataset.main.schema.getValue()))).apply(bigQueryIOPTransform);
+        in.apply(ParDo.of(new IndexedRecordToTableRowFn(dataset.main.schema.getValue()))).apply(bigQueryIOPTransform);
+        return PDone.in(in.getPipeline());
     }
 
-    private BigQueryIO.Write.Bound setTableOperation(BigQueryIO.Write.Bound bigQueryIOPTransform) {
+    private BigQueryIO.Write setTableOperation(BigQueryIO.Write bigQueryIOPTransform) {
         TableSchema bqSchema = null;
         if (properties.tableOperation.getValue() == BigQueryOutputProperties.TableOperation.CREATE_IF_NOT_EXISTS
                 || properties.tableOperation.getValue() == BigQueryOutputProperties.TableOperation.DROP_IF_EXISTS_AND_CREATE) {
@@ -121,7 +131,7 @@ public class BigQueryOutputRuntime extends PTransform<PCollection<IndexedRecord>
         return bigQueryIOPTransform;
     }
 
-    private BigQueryIO.Write.Bound setWriteOperation(BigQueryIO.Write.Bound bigQueryIOPTransform) {
+    private BigQueryIO.Write setWriteOperation(BigQueryIO.Write bigQueryIOPTransform) {
         if (properties.tableOperation.getValue() == BigQueryOutputProperties.TableOperation.NONE
                 || properties.tableOperation.getValue() == BigQueryOutputProperties.TableOperation.CREATE_IF_NOT_EXISTS) {
             switch (properties.writeOperation.getValue()) {

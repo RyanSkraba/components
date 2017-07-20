@@ -19,12 +19,13 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.coders.AvroCoder;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO;
+import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.commons.lang3.StringUtils;
+import org.talend.components.adapter.beam.BeamJobRuntimeContainer;
 import org.talend.components.adapter.beam.gcp.GcpServiceAccountOptions;
 import org.talend.components.adapter.beam.gcp.ServiceAccountCredentialFactory;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
@@ -47,11 +48,17 @@ public class BigQueryInputRuntime extends PTransform<PBegin, PCollection<Indexed
      */
     private BigQueryInputProperties properties = null;
 
+    private BigQueryDatasetProperties dataset = null;
+
+    private BigQueryDatastoreProperties datastore = null;
+
     private AvroCoder<?> defaultOutputCoder;
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, BigQueryInputProperties properties) {
         this.properties = properties;
+        this.dataset = properties.getDatasetProperties();
+        this.datastore = dataset.getDatastoreProperties();
 
         // Data returned by BigQueryIO do not contains self schema, so have to retrieve it before read and write
         // operations
@@ -62,6 +69,20 @@ public class BigQueryInputRuntime extends PTransform<PBegin, PCollection<Indexed
             schema = schemaFetcher.getSchema();
         }
 
+        Object pipelineOptionsObj = container.getGlobalData(BeamJobRuntimeContainer.PIPELINE_OPTIONS);
+        if (pipelineOptionsObj != null) {
+            PipelineOptions pipelineOptions = (PipelineOptions) pipelineOptionsObj;
+            GcpServiceAccountOptions gcpOptions = pipelineOptions.as(GcpServiceAccountOptions.class);
+            if (!"DataflowRunner".equals(gcpOptions.getRunner().getSimpleName())) {
+                // when using Dataflow runner, these properties has been set on pipeline level
+                gcpOptions.setProject(datastore.projectName.getValue());
+                gcpOptions.setTempLocation(datastore.tempGsFolder.getValue());
+                gcpOptions.setCredentialFactoryClass(ServiceAccountCredentialFactory.class);
+                gcpOptions.setServiceAccountFile(datastore.serviceAccountFile.getValue());
+                gcpOptions.setGcpCredential(BigQueryConnection.createCredentials(datastore));
+            }
+        }
+
         this.defaultOutputCoder = AvroCoder.of(schema);
 
         return ValidationResult.OK;
@@ -69,31 +90,18 @@ public class BigQueryInputRuntime extends PTransform<PBegin, PCollection<Indexed
 
     @Override
     public PCollection<IndexedRecord> expand(PBegin in) {
-        BigQueryDatasetProperties dataset = properties.getDatasetProperties();
-        BigQueryDatastoreProperties datastore = dataset.getDatastoreProperties();
-
-        GcpServiceAccountOptions gcpOptions = in.getPipeline().getOptions().as(GcpServiceAccountOptions.class);
-        if (!"DataflowRunner".equals(gcpOptions.getRunner().getSimpleName())) {
-            // when using Dataflow runner, these properties has been set on pipeline level
-            gcpOptions.setProject(datastore.projectName.getValue());
-            gcpOptions.setTempLocation(datastore.tempGsFolder.getValue());
-            gcpOptions.setCredentialFactoryClass(ServiceAccountCredentialFactory.class);
-            gcpOptions.setServiceAccountFile(datastore.serviceAccountFile.getValue());
-            gcpOptions.setGcpCredential(BigQueryConnection.createCredentials(datastore));
-        }
-
-        BigQueryIO.Read.Bound bigQueryIOPTransform;
+        BigQueryIO.Read bigQueryIOPTransform;
         switch (dataset.sourceType.getValue()) {
         case TABLE_NAME: {
             TableReference table = new TableReference();
             table.setProjectId(datastore.projectName.getValue());
             table.setDatasetId(dataset.bqDataset.getValue());
             table.setTableId(dataset.tableName.getValue());
-            bigQueryIOPTransform = BigQueryIO.Read.from(table);
+            bigQueryIOPTransform = BigQueryIO.read().from(table);
             break;
         }
         case QUERY: {
-            bigQueryIOPTransform = BigQueryIO.Read.fromQuery(dataset.query.getValue());
+            bigQueryIOPTransform = BigQueryIO.read().fromQuery(dataset.query.getValue());
             if (!dataset.useLegacySql.getValue()) {
                 bigQueryIOPTransform = bigQueryIOPTransform.usingStandardSql();
             } else {

@@ -173,7 +173,7 @@ public class RowGeneratorIO {
         }
 
         @Override
-        public void validate(PBegin input) {
+        public void validate(PipelineOptions options) {
             checkState(getJsonSchema() != null, "RowGeneratorIO.read() requires a schema" + " to be set via withSchema(schema)");
             checkState(getRows() >= 0, "RowGeneratorIO.read() requires withRows(rows)"
                     + " to be called with a non-negative value.");
@@ -240,7 +240,7 @@ public class RowGeneratorIO {
         }
 
         @Override
-        public List<BoundedRowGeneratorSource> splitIntoBundles(long desiredBundleSizeBytes, PipelineOptions options)
+        public List<BoundedRowGeneratorSource> split(long desiredBundleSizeBytes, PipelineOptions options)
                 throws Exception {
             // The desiredBundleSizeBytes is ignored to split the rows into the bundles specified by the spec.
             if (partitionId != -1) {

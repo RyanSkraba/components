@@ -25,7 +25,7 @@ import org.talend.components.elasticsearch.ElasticsearchDatastoreProperties;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class ElasticsearchDatastoreRuntime implements DatastoreRuntime<ElasticsearchDatastoreProperties> {
 
@@ -48,13 +48,13 @@ public class ElasticsearchDatastoreRuntime implements DatastoreRuntime<Elasticse
                     new BasicHeader("", ""));
             ElasticsearchResponse esResponse = new ElasticsearchResponse(response);
             if (esResponse.isOk()) {
-                JsonObject entity = esResponse.getEntity();
-                String status = entity.getAsJsonPrimitive("status").getAsString();
+                JsonNode entity = esResponse.getEntity();
+                String status = entity.path("status").asText();
                 if (status != "red") {
                     validationResult = ValidationResult.OK;
                 } else {
                     validationResult = new ValidationResult(TalendRuntimeException.createUnexpectedException(
-                            String.format("Cluster %s status is red", entity.getAsJsonPrimitive("cluster_name").getAsString())));
+                            String.format("Cluster %s status is red", entity.path("cluster_name").asText())));
                 }
             } else {
                 validationResult = new ValidationResult(

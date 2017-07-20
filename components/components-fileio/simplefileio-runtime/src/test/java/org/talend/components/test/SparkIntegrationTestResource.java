@@ -143,7 +143,6 @@ public class SparkIntegrationTestResource extends TemporaryFolder {
      */
     public Pipeline createPipeline() {
         Pipeline p = Pipeline.create(getOptions());
-        LazyAvroCoder.registerAsFallback(p);
         return p;
     }
 

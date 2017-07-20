@@ -76,8 +76,6 @@ public class S3SparkRuntimeTestIT {
         pWrite = Pipeline.create(options);
         pRead = Pipeline.create(options);
 
-        LazyAvroCoder.registerAsFallback(pWrite);
-        LazyAvroCoder.registerAsFallback(pRead);
     }
 
     /**

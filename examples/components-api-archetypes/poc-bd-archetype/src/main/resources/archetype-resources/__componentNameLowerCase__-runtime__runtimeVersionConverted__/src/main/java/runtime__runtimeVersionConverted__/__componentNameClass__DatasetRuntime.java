@@ -70,7 +70,6 @@ public class ${componentNameClass}DatasetRuntime implements DatasetRuntime<${com
         PipelineOptions options = PipelineOptionsFactory.create();
 //        options.setRunner(DirectRunner.class);
         final Pipeline p = Pipeline.create(options);
-        LazyAvroCoder.registerAsFallback(p);
 
         try (DirectConsumerCollector<IndexedRecord> collector = DirectConsumerCollector.of(consumer)) {
             // Collect a sample of the input records.

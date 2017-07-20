@@ -22,8 +22,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.io.Read;
 import org.apache.beam.sdk.io.TextIO;
-import org.apache.beam.sdk.io.Write;
-import org.apache.beam.sdk.io.hdfs.WritableCoder;
+import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.Values;
@@ -45,6 +44,7 @@ import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.ReflectionUtils;
+import org.talend.components.simplefileio.runtime.beamcopy.Write;
 import org.talend.components.simplefileio.runtime.sinks.UgiFileSinkBase;
 import org.talend.components.simplefileio.runtime.sources.CsvHdfsFileSource;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
@@ -83,7 +83,7 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
 
         PCollection<?> pc2;
         if (path.startsWith("gs://")) {
-            pc2 = in.apply(TextIO.Read.from(path));
+            pc2 = in.apply(TextIO.read().from(path));
         } else {
             CsvHdfsFileSource source = CsvHdfsFileSource.of(doAs, path, recordDelimiter);
             source.getExtraHadoopConfiguration().addFrom(getExtraHadoopConfiguration());
@@ -103,7 +103,7 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
     public PDone write(PCollection<IndexedRecord> in) {
 
         if (path.startsWith("gs://")) {
-            TextIO.Write.Bound b = TextIO.Write.to(path);
+            TextIO.Write b = TextIO.write().to(path);
 
             PCollection<String> pc1 = in.apply(ParDo.of(new FormatCsvRecord2(fieldDelimiter.charAt(0))));
             return pc1.apply(b);

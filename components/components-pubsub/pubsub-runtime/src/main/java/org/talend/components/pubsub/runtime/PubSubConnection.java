@@ -21,18 +21,11 @@ import org.talend.components.pubsub.PubSubDatastoreProperties;
 import com.google.api.services.pubsub.PubsubScopes;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.pubsub.PubSub;
-import com.google.cloud.pubsub.PubSubOptions;
 
 public class PubSubConnection {
 
-    public static PubSub createClient(PubSubDatastoreProperties datastore) {
-        if (datastore.serviceAccountFile.getValue() == null) {
-            return PubSubOptions.getDefaultInstance().getService();
-        } else {
-            return PubSubOptions.newBuilder().setProjectId(datastore.projectName.getValue())
-                    .setCredentials(createCredentials(datastore)).build().getService();
-        }
+    public static PubSubClient createClient(PubSubDatastoreProperties datastore) {
+        return new PubSubClient(datastore);
     }
 
     public static Credentials createCredentials(PubSubDatastoreProperties datastore) {

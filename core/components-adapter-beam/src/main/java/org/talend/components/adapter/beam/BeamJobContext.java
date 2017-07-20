@@ -13,6 +13,7 @@
 package org.talend.components.adapter.beam;
 
 import org.apache.beam.sdk.Pipeline;
+import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.values.PCollection;
 
 /**
@@ -56,5 +57,15 @@ public interface BeamJobContext {
      * @return The Beam Pipeline currently under construction in the job.
      */
     Pipeline getPipeline();
+
+    /**
+     * @return The Beam Pipeline Options currently under construction in the job.
+     */
+    PipelineOptions getPipelineOptions();
+
+    /**
+     * @return The Runtime container for share data between components on Driver.
+     */
+    BeamJobRuntimeContainer getRuntimeContainer();
 
 }

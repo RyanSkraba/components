@@ -13,7 +13,6 @@
 package org.talend.components.kafka.runtime;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.apache.avro.Schema;
@@ -23,8 +22,6 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DecoderFactory;
-import org.apache.beam.sdk.coders.ByteArrayCoder;
-import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.io.kafka.KafkaIO;
 import org.apache.beam.sdk.io.kafka.KafkaRecord;
 import org.apache.beam.sdk.transforms.DoFn;
@@ -35,7 +32,6 @@ import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
 import org.joda.time.Duration;
-import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
@@ -75,14 +71,14 @@ public class KafkaInputPTransformRuntime extends PTransform<PBegin, PCollection<
                 // use component's schema directly as we are avro natural
                 schema = properties.getDatasetProperties().main.schema.getValue();
             }
-            return kafkaRecords.apply(ParDo.of(new ConvertToAvro(schema.toString()))).setCoder(getDefaultOutputCoder());
+            return kafkaRecords.apply(ParDo.of(new ConvertToAvro(schema.toString())));
         }
         case CSV: {
             // FIXME(bchen) KafkaAvroRegistry do not have way to record adaptation, it infer schema by the data rather
             // than use the defined schema
-            return ((PCollection) kafkaRecords
+            return kafkaRecords
                     .apply(ParDo.of(new ExtractCsvSplit(properties.getDatasetProperties().fieldDelimiter.getValue())))
-                    .apply((PTransform) ConvertToIndexedRecord.of())).setCoder(getDefaultOutputCoder());
+                    .apply(ConvertToIndexedRecord.<String[]>of());
         }
         default:
             throw new RuntimeException("To be implemented: " + properties.getDatasetProperties().valueFormat.getValue());
@@ -94,11 +90,6 @@ public class KafkaInputPTransformRuntime extends PTransform<PBegin, PCollection<
     public ValidationResult initialize(RuntimeContainer container, KafkaInputProperties properties) {
         this.properties = properties;
         return ValidationResult.OK;
-    }
-
-    @Override
-    public Coder getDefaultOutputCoder() {
-        return LazyAvroCoder.of();
     }
 
     public static class ExtractRecord extends DoFn<KafkaRecord<byte[], byte[]>, KV<byte[], byte[]>> {

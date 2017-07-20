@@ -40,7 +40,7 @@ public class TCompBoundedSourceAdapter extends BoundedSource<IndexedRecord> {
     }
 
     @Override
-    public List<? extends BoundedSource<IndexedRecord>> splitIntoBundles(long desiredBundleSizeBytes, PipelineOptions options)
+    public List<? extends BoundedSource<IndexedRecord>> split(long desiredBundleSizeBytes, PipelineOptions options)
             throws Exception {
         List<? extends org.talend.components.api.component.runtime.BoundedSource> boundedSources = tCompSource
                 .splitIntoBundles(desiredBundleSizeBytes, null);

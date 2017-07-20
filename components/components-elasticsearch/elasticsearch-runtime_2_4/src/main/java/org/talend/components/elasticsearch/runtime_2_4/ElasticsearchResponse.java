@@ -14,20 +14,20 @@
 package org.talend.components.elasticsearch.runtime_2_4;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import org.apache.http.StatusLine;
 import org.elasticsearch.client.Response;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ElasticsearchResponse {
 
     private StatusLine statusLine;
 
-    private JsonObject entity;
+    private JsonNode entity;
+
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     public ElasticsearchResponse(Response response) throws IOException {
         this.statusLine = response.getStatusLine();
@@ -36,14 +36,11 @@ public class ElasticsearchResponse {
         }
     }
 
-    private static JsonObject parseResponse(Response response) throws IOException {
-        InputStream content = response.getEntity().getContent();
-        InputStreamReader inputStreamReader = new InputStreamReader(content, "UTF-8");
-        JsonObject jsonObject = new Gson().fromJson(inputStreamReader, JsonObject.class);
-        return jsonObject;
+    private static JsonNode parseResponse(Response response) throws IOException {
+        return mapper.readValue(response.getEntity().getContent(), JsonNode.class);
     }
 
-    public JsonObject getEntity() {
+    public JsonNode getEntity() {
         return entity;
     }
 

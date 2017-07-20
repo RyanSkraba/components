@@ -1,23 +1,13 @@
 package org.talend.components.pubsub.runtime;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.talend.components.pubsub.runtime.PubSubTestConstants.addSubscriptionForDataset;
-import static org.talend.components.pubsub.runtime.PubSubTestConstants.createDataset;
-import static org.talend.components.pubsub.runtime.PubSubTestConstants.createDatasetFromAvro;
-import static org.talend.components.pubsub.runtime.PubSubTestConstants.createDatasetFromCSV;
-import static org.talend.components.pubsub.runtime.PubSubTestConstants.createDatastore;
+import static org.junit.Assert.*;
+import static org.talend.components.pubsub.runtime.PubSubTestConstants.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
+import com.google.api.services.pubsub.model.PubsubMessage;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
@@ -27,11 +17,9 @@ import org.junit.Test;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.daikon.java8.Consumer;
 
-import com.google.cloud.ByteArray;
-import com.google.cloud.pubsub.Message;
-import com.google.cloud.pubsub.PubSub;
-import com.google.cloud.pubsub.SubscriptionInfo;
-import com.google.cloud.pubsub.TopicInfo;
+import com.google.api.services.pubsub.Pubsub;
+import com.google.api.services.pubsub.model.Subscription;
+import com.google.api.services.pubsub.model.Topic;
 
 public class PubSubDatasetRuntimeTestIT {
 
@@ -55,7 +43,7 @@ public class PubSubDatasetRuntimeTestIT {
 
     final static String fieldDelimited = ";";
 
-    static PubSub client = PubSubConnection.createClient(createDatastore());
+    static PubSubClient client = PubSubConnection.createClient(createDatastore());
 
     static List<Person> expectedPersons;
 
@@ -64,31 +52,31 @@ public class PubSubDatasetRuntimeTestIT {
     @BeforeClass
     public static void initTopics() throws IOException {
         for (String topic : topics) {
-            client.create(TopicInfo.of(topic));
+            client.createTopic(topic);
         }
         for (String sub : subscriptionsForTP1) {
-            client.create(SubscriptionInfo.of(topics.get(0), sub));
+            client.createSubscription(topics.get(0), sub);
         }
-        client.create(SubscriptionInfo.of(topics.get(1), subForTP2));
-        client.create(SubscriptionInfo.of(topics.get(1), sub2ForTP2));
-        client.create(SubscriptionInfo.of(topics.get(2), subForTP3));
-        client.create(SubscriptionInfo.of(topics.get(2), sub2ForTP3));
+        client.createSubscription(topics.get(1), subForTP2);
+        client.createSubscription(topics.get(1), sub2ForTP2);
+        client.createSubscription(topics.get(2), subForTP3);
+        client.createSubscription(topics.get(2), sub2ForTP3);
 
         Integer maxRecords = 10;
         String testID = "sampleTest" + new Random().nextInt();
         expectedPersons = Person.genRandomList(testID, maxRecords);
 
         // send csv format to topic 2
-        List<Message> messages = new ArrayList<>();
+        List<PubsubMessage> messages = new ArrayList<>();
         for (Person person : expectedPersons) {
-            messages.add(Message.of(person.toCSV(fieldDelimited)));
+            messages.add(new PubsubMessage().encodeData(person.toCSV(fieldDelimited).getBytes()));
         }
         client.publish(topics.get(1), messages);
 
         // send avro format to topic 3
         messages = new ArrayList<>();
         for (Person person : expectedPersons) {
-            messages.add(Message.of(ByteArray.copyFrom(person.serToAvroBytes())));
+            messages.add(new PubsubMessage().encodeData(person.serToAvroBytes()));
         }
         client.publish(topics.get(2), messages);
     }
@@ -105,7 +93,6 @@ public class PubSubDatasetRuntimeTestIT {
         client.deleteSubscription(sub2ForTP2);
         client.deleteSubscription(subForTP3);
         client.deleteSubscription(sub2ForTP3);
-        client.close();
     }
 
     @Before

@@ -13,30 +13,26 @@
 
 package org.talend.components.pubsub.runtime;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
+import com.google.api.services.pubsub.Pubsub;
+import com.google.api.services.pubsub.model.ListTopicSubscriptionsResponse;
+import com.google.api.services.pubsub.model.ListTopicsResponse;
+import com.google.api.services.pubsub.model.Topic;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.runners.direct.DirectOptions;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Sample;
 import org.talend.components.adapter.beam.BeamLocalRunnerOption;
-import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.transform.DirectConsumerCollector;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.pubsub.PubSubDatasetProperties;
+import org.talend.components.pubsub.PubSubDatastoreProperties;
 import org.talend.components.pubsub.input.PubSubInputProperties;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.google.cloud.Page;
-import com.google.cloud.pubsub.PubSub;
-import com.google.cloud.pubsub.SubscriptionId;
-import com.google.cloud.pubsub.Topic;
 
 // import org.apache.beam.runners.direct.DirectRunner;
 
@@ -89,7 +85,6 @@ public class PubSubDatasetRuntime implements IPubSubDatasetRuntime {
 
         DirectOptions options = BeamLocalRunnerOption.getOptions();
         final Pipeline p = Pipeline.create(options);
-        LazyAvroCoder.registerAsFallback(p);
 
         try (DirectConsumerCollector<IndexedRecord> collector = DirectConsumerCollector.of(consumer)) {
             // Collect a sample of the input records.
@@ -101,33 +96,15 @@ public class PubSubDatasetRuntime implements IPubSubDatasetRuntime {
 
     @Override
     public Set<String> listTopics() throws Exception {
-        try (PubSub pubsub = PubSubConnection.createClient(properties.getDatastoreProperties())) {
-            Page<Topic> topicPage = pubsub.listTopics(PubSub.ListOption.pageSize(100));
-            Iterator<Topic> topicIterator = topicPage.iterateAll();
-            Set<String> topicsName = new HashSet<>();
-            while (topicIterator.hasNext()) {
-                topicsName.add(topicIterator.next().getName());
-            }
-            return topicsName;
-        } catch (Exception e) {
-            throw e;
-        }
+        PubSubDatastoreProperties datastore = properties.getDatastoreProperties();
+        PubSubClient client = PubSubConnection.createClient(datastore);
+        return client.listTopics();
     }
 
     @Override
     public Set<String> listSubscriptions() throws Exception {
-        try (PubSub pubsub = PubSubConnection.createClient(properties.getDatastoreProperties())) {
-            Page<SubscriptionId> subscriptionIdPage = pubsub.listSubscriptions(properties.topic.getValue(),
-
-                    PubSub.ListOption.pageSize(100));
-            Iterator<SubscriptionId> subscriptionIterator = subscriptionIdPage.iterateAll();
-            Set<String> subscriptionNames = new HashSet<>();
-            while (subscriptionIterator.hasNext()) {
-                subscriptionNames.add(subscriptionIterator.next().getSubscription());
-            }
-            return subscriptionNames;
-        } catch (Exception e) {
-            throw e;
-        }
+        PubSubDatastoreProperties datastore = properties.getDatastoreProperties();
+        PubSubClient client = PubSubConnection.createClient(datastore);
+        return client.listSubscriptions(properties.topic.getValue());
     }
 }

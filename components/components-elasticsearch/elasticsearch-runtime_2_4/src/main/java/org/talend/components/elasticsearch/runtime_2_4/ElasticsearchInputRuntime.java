@@ -12,22 +12,29 @@
 // ============================================================================
 package org.talend.components.elasticsearch.runtime_2_4;
 
+import java.io.IOException;
+
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.io.elasticsearch.ElasticsearchIO;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.elasticsearch.ElasticsearchDatasetProperties;
 import org.talend.components.elasticsearch.input.ElasticsearchInputProperties;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.ValidationResult;
 
 public class ElasticsearchInputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>>
         implements RuntimableRuntime<ElasticsearchInputProperties> {
+
+    private static Logger LOG = LoggerFactory.getLogger(ElasticsearchInputRuntime.class);
 
     /**
      * The component instance that this runtime is configured for.
@@ -43,9 +50,14 @@ public class ElasticsearchInputRuntime extends PTransform<PBegin, PCollection<In
     }
 
     protected static ElasticsearchIO.ConnectionConfiguration createConnectionConf(ElasticsearchDatasetProperties dataset) {
-        ElasticsearchIO.ConnectionConfiguration connectionConfiguration = ElasticsearchIO.ConnectionConfiguration.create(
-                resolveAddresses(dataset.getDatastoreProperties().nodes.getValue()), dataset.index.getValue(),
-                dataset.type.getValue());
+        ElasticsearchIO.ConnectionConfiguration connectionConfiguration = null;
+        try {
+            connectionConfiguration = ElasticsearchIO.ConnectionConfiguration.create(
+                    resolveAddresses(dataset.getDatastoreProperties().nodes.getValue()), dataset.index.getValue(),
+                    dataset.type.getValue());
+        } catch (IOException e) {
+            throw TalendRuntimeException.createUnexpectedException(e);
+        }
         if (dataset.getDatastoreProperties().auth.useAuth.getValue()) {
             connectionConfiguration = connectionConfiguration
                     .withUsername(dataset.getDatastoreProperties().auth.userId.getValue())
@@ -69,7 +81,7 @@ public class ElasticsearchInputRuntime extends PTransform<PBegin, PCollection<In
         }
         PCollection<String> readFromElasticsearch = in.apply("ReadFromElasticsearch", esRead);
         //TODO(bchen) String data is a json format, convert json to avro is better than string to avro
-        return readFromElasticsearch.apply(ConvertToIndexedRecord.<String, IndexedRecord> of());
+        return readFromElasticsearch.apply(ConvertToIndexedRecord.<String> of());
     }
 
     @Override

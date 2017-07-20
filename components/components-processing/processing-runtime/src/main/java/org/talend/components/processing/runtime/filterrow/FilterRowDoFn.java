@@ -73,7 +73,7 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
             }
         } else {
             if (hasRejectSchema) {
-                context.sideOutput(FilterRowRuntime.rejectOutput, inputRecord);
+                context.output(FilterRowRuntime.rejectOutput, inputRecord);
             }
         }
     }

@@ -48,7 +48,8 @@ import org.talend.components.elasticsearch.input.ElasticsearchInputProperties;
 import org.talend.components.elasticsearch.output.ElasticsearchOutputProperties;
 import org.talend.daikon.java8.Consumer;
 
-import com.google.gson.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ElasticsearchBeamRuntimeTestIT implements Serializable {
 
@@ -232,11 +233,16 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
 
     public static class ExtractJson extends SimpleFunction<IndexedRecord, String> {
 
+        private static final ObjectMapper mapper = new ObjectMapper();
+
         @Override
         public String apply(IndexedRecord input) {
-            JsonParser parser = new JsonParser();
-            String content = parser.parse(String.valueOf(input.get(0))).getAsJsonObject().get("field").getAsString();
-            return content;
+            try {
+                JsonNode jsonNode = mapper.readValue(String.valueOf(input.get(0)), JsonNode.class);
+                return jsonNode.path("field").asText();
+            } catch (IOException e) {
+                return null;
+            }
         }
     }
 }

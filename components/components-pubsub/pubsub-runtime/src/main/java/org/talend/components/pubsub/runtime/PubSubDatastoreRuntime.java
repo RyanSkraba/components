@@ -12,14 +12,14 @@
 // ============================================================================
 package org.talend.components.pubsub.runtime;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.datastore.runtime.DatastoreRuntime;
 import org.talend.components.pubsub.PubSubDatastoreProperties;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.ValidationResult;
-
-import com.google.cloud.pubsub.PubSub;
 
 public class PubSubDatastoreRuntime implements DatastoreRuntime<PubSubDatastoreProperties> {
 
@@ -36,13 +36,12 @@ public class PubSubDatastoreRuntime implements DatastoreRuntime<PubSubDatastoreP
 
     @Override
     public Iterable<ValidationResult> doHealthChecks(RuntimeContainer container) {
-        try (PubSub pubsub = PubSubConnection.createClient(properties)) {
-            pubsub.listTopics(PubSub.ListOption.pageSize(1));
+        PubSubClient client = PubSubConnection.createClient(properties);
+        try {
+            client.listTopics();
             return Arrays.asList(ValidationResult.OK);
-        } catch (Exception pubsubException) {
-            return Arrays.asList(
-                    new ValidationResult(ValidationResult.Result.ERROR, pubsubException.getMessage()));
+        } catch (IOException e) {
+            return Arrays.asList(new ValidationResult(TalendRuntimeException.createUnexpectedException(e.getMessage())));
         }
-
     }
 }

@@ -19,9 +19,9 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.beam.sdk.extensions.gcp.auth.CredentialFactory;
+import org.apache.beam.sdk.extensions.gcp.auth.GcpCredentialFactory;
 import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.util.CredentialFactory;
-import org.apache.beam.sdk.util.GcpCredentialFactory;
 
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;

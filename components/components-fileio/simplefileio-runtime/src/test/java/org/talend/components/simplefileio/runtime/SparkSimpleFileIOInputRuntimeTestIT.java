@@ -21,7 +21,7 @@ import java.util.List;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.testing.PAssert;
-import org.apache.beam.sdk.testing.RunnableOnService;
+import org.apache.beam.sdk.testing.ValidatesRunner;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.DoFn;
@@ -48,7 +48,7 @@ public class SparkSimpleFileIOInputRuntimeTestIT {
     /**
      * Demonstration using the {@link SparkIntegrationTestResource}.
      */
-    @Category(RunnableOnService.class)
+    @Category(ValidatesRunner.class)
     @Test
     public void testSparkIntegrationTestResource() throws IOException {
         // Use the resource to create the pipeline.
@@ -80,7 +80,7 @@ public class SparkSimpleFileIOInputRuntimeTestIT {
     /**
      * Basic unit test using all default values (except for the path) on an in-memory DFS cluster.
      */
-    @Category(RunnableOnService.class)
+    @Category(ValidatesRunner.class)
     @Test
     public void testBasicDefaults() throws IOException {
         FileSystem fs = FileSystem.get(spark.createHadoopConfiguration());

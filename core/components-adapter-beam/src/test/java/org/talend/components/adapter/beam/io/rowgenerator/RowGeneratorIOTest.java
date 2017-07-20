@@ -24,8 +24,8 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
-import org.apache.beam.sdk.testing.RunnableOnService;
 import org.apache.beam.sdk.testing.TestPipeline;
+import org.apache.beam.sdk.testing.ValidatesRunner;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.values.PCollection;
 import org.junit.Rule;
@@ -46,7 +46,7 @@ public class RowGeneratorIOTest {
     public final TestPipeline pipeline = TestPipeline.create();
 
     @Test
-    @Category(RunnableOnService.class)
+    @Category(ValidatesRunner.class)
     public void testBasic() throws Exception {
         // Non-deterministic read, just do a count.
         PCollection<IndexedRecord> output = pipeline.apply(RowGeneratorIO.read().withSchema(SampleSchemas.recordSimple()));
@@ -67,7 +67,7 @@ public class RowGeneratorIOTest {
         assertThat("Wrong unsplit number of rows", initialSource.getNumRows(), is(95L));
 
         // Ensure that the rows are evenly distributed across partitions after split.
-        List<BoundedRowGeneratorSource> sources = initialSource.splitIntoBundles(0L, options);
+        List<BoundedRowGeneratorSource> sources = initialSource.split(0L, options);
         assertThat("All partitions generated", sources, hasSize(10));
 
         // The calculated expected partitions and row IDs are incrementally generated and in order.
@@ -75,7 +75,7 @@ public class RowGeneratorIOTest {
         for (int partitionId = 0; partitionId < sources.size(); partitionId++) {
             BoundedRowGeneratorSource src = sources.get(partitionId);
             assertThat("Partition size", src.getNumRows(), either(is(9L)).or(is(10L)));
-            assertThat("Can not be resplit", src.splitIntoBundles(0L, options), contains(src));
+            assertThat("Can not be resplit", src.split(0L, options), contains(src));
             assertThat("Wrong partition id", src.getPartitionId(), is(partitionId));
             for (int i = 0; i < src.getNumRows(); i++) {
                 long rowId = src.getStartRowId() + i;
@@ -87,7 +87,7 @@ public class RowGeneratorIOTest {
     }
 
     @Test
-    @Category(RunnableOnService.class)
+    @Category(ValidatesRunner.class)
     public void testBasicDeterministic() throws Exception {
         // Non-deterministic read, just do a count.
         PCollection<IndexedRecord> output = pipeline.apply(RowGeneratorIO.read()

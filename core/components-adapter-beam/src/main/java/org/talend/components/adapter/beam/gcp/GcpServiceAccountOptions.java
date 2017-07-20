@@ -13,9 +13,8 @@
 
 package org.talend.components.adapter.beam.gcp;
 
-import org.apache.beam.sdk.options.Default;
+import org.apache.beam.sdk.extensions.gcp.options.GcpOptions;
 import org.apache.beam.sdk.options.Description;
-import org.apache.beam.sdk.options.GcpOptions;
 import org.apache.beam.sdk.options.PipelineOptions;
 
 /**

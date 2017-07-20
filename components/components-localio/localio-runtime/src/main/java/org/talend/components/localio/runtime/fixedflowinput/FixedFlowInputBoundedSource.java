@@ -32,7 +32,7 @@ public class FixedFlowInputBoundedSource extends BoundedSource<IndexedRecord> {
     private int nbRows = 1;
 
     @Override
-    public List<? extends BoundedSource<IndexedRecord>> splitIntoBundles(long desiredBundleSizeBytes, PipelineOptions options)
+    public List<? extends BoundedSource<IndexedRecord>> split(long desiredBundleSizeBytes, PipelineOptions options)
             throws Exception {
         return Arrays.asList(this);
     }

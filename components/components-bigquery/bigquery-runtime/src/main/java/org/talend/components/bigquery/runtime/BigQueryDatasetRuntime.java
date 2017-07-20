@@ -24,8 +24,8 @@ import org.apache.beam.runners.direct.DirectOptions;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.transforms.Sample;
+import org.talend.components.adapter.beam.BeamJobRuntimeContainer;
 import org.talend.components.adapter.beam.BeamLocalRunnerOption;
-import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.transform.DirectConsumerCollector;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
@@ -61,17 +61,16 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
 
     @Override
     public void getSample(int limit, Consumer<IndexedRecord> consumer) {
+        // Create a pipeline using the input component to get records.
+        DirectOptions options = BeamLocalRunnerOption.getOptions();
+        final Pipeline p = Pipeline.create(options);
+
         // Create an input runtime based on the properties.
         BigQueryInputRuntime inputRuntime = new BigQueryInputRuntime();
         BigQueryInputProperties inputProperties = new BigQueryInputProperties(null);
         inputProperties.init();
         inputProperties.setDatasetProperties(properties);
-        inputRuntime.initialize(null, inputProperties);
-
-        // Create a pipeline using the input component to get records.
-        DirectOptions options = BeamLocalRunnerOption.getOptions();
-        final Pipeline p = Pipeline.create(options);
-        LazyAvroCoder.registerAsFallback(p);
+        inputRuntime.initialize(new BeamJobRuntimeContainer(options), inputProperties);
 
         try (DirectConsumerCollector<IndexedRecord> collector = DirectConsumerCollector.of(consumer)) {
             // Collect a sample of the input records.

@@ -92,6 +92,6 @@ public class SandboxedFixedFlowInputRuntimeTest {
         RuntimeInfo ri = def.getRuntimeInfo(ExecutionEngine.BEAM, createComponentProperties(), ConnectorTopology.OUTGOING);
         List<URL> dependencies = ri.getMavenUrlDependencies();
         // The important part of the test is that no exceptions are thrown while creating the RuntimeInfo.
-        assertThat(dependencies, hasSize(greaterThan(70)));
+        assertThat(dependencies, hasSize(greaterThan(40)));
     }
 }

@@ -51,7 +51,6 @@ public class BeamDirectTestResource extends TemporaryFolder {
      */
     public Pipeline createPipeline() {
         Pipeline p = Pipeline.create(getOptions());
-        LazyAvroCoder.registerAsFallback(p);
         return p;
     }
 
@@ -62,7 +61,6 @@ public class BeamDirectTestResource extends TemporaryFolder {
     public Pipeline createPipeline(int targetParallelism) {
         getOptions().setTargetParallelism(targetParallelism);
         Pipeline p = Pipeline.create(getOptions());
-        LazyAvroCoder.registerAsFallback(p);
         return p;
     }
 

@@ -31,7 +31,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.runners.spark.SparkContextOptions;
 import org.apache.beam.runners.spark.SparkRunner;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.coders.TableRowJsonCoder;
+import org.apache.beam.sdk.io.gcp.bigquery.TableRowJsonCoder;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
@@ -46,6 +46,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.talend.components.adapter.beam.BeamJobRuntimeContainer;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.io.rowgenerator.RowGeneratorIO;
 import org.talend.components.bigquery.BigQueryDatastoreProperties;
@@ -71,6 +72,8 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
 
     BigQueryDatastoreProperties datastore;
 
+    BeamJobRuntimeContainer runtimeContainer;
+
     @BeforeClass
     public static void initDataset() throws IOException {
         BigQuery bigquery = BigQueryConnection.createClient(createDatastore());
@@ -88,6 +91,7 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
     @Before
     public void init() {
         datastore = createDatastore();
+        runtimeContainer = new BeamJobRuntimeContainer(pipeline.getOptions());
     }
 
     @Test
@@ -127,7 +131,7 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
         options.setProvidedSparkContext(jsc);
         options.setUsesProvidedSparkContext(true);
         options.setRunner(SparkRunner.class);
-
+        runtimeContainer = new BeamJobRuntimeContainer(options);
         return Pipeline.create(options);
     }
 
@@ -141,7 +145,7 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
         outputProperties.getDatasetProperties().main.schema.setValue(schema);
 
         BigQueryOutputRuntime outputRuntime = new BigQueryOutputRuntime();
-        outputRuntime.initialize(null, outputProperties);
+        outputRuntime.initialize(runtimeContainer, outputProperties);
 
         List<TableRow> rows = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
@@ -200,7 +204,7 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
         BigQueryInputProperties inputProperties = createInput(createDatasetFromTable(datastore, datasetName, tableName));
 
         BigQueryInputRuntime inputRuntime = new BigQueryInputRuntime();
-        inputRuntime.initialize(null, inputProperties);
+        inputRuntime.initialize(runtimeContainer, inputProperties);
 
         PCollection<TableRow> tableRowPCollection = pipeline.apply(inputRuntime)
                 .apply(ParDo.of(new BigQueryOutputRuntime.IndexedRecordToTableRowFn(schema))).setCoder(TableRowJsonCoder.of());
@@ -217,7 +221,7 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
             outputProperties.tableOperation.setValue(BigQueryOutputProperties.TableOperation.DROP_IF_EXISTS_AND_CREATE);
             outputProperties.getDatasetProperties().main.schema.setValue(schema);
             BigQueryOutputRuntime outputRuntime = new BigQueryOutputRuntime();
-            outputRuntime.initialize(null, outputProperties);
+            outputRuntime.initialize(runtimeContainer, outputProperties);
 
             // Generate 10 rows.
             PCollection<IndexedRecord> pc1 = pipeline.apply(RowGeneratorIO.read().withSchema(schema).withRows(10).withSeed(0L));
@@ -230,7 +234,7 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
         {
             BigQueryInputProperties inputProperties = createInput(createDatasetFromTable(datastore, datasetName, tableName));
             BigQueryInputRuntime inputRuntime = new BigQueryInputRuntime();
-            inputRuntime.initialize(null, inputProperties);
+            inputRuntime.initialize(runtimeContainer, inputProperties);
             PCollection<IndexedRecord> pc2 = pipeline.apply(inputRuntime);
             // TODO: This only tests that 10 records were read back, we should probably check the values.
             // TODO: To be completed when RowGeneratorIO is more stable.

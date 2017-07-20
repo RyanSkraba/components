@@ -62,12 +62,6 @@ public class S3RoundTripRuntimeTestIT {
     @Rule
     public S3TestResource s3 = S3TestResource.of();
 
-    @Before
-    public void setupLazyAvroCoder() {
-        LazyAvroCoder.registerAsFallback(pWrite);
-        LazyAvroCoder.registerAsFallback(pRead);
-    }
-
     /**
      * Tests a round-trip on the data when writing to the data source using the given output properties, then
      * subsequently reading using the given input properties. This is the equivalent of two pipeline jobs.

@@ -116,7 +116,7 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
     }
 
     @Override
-    public WriteOperation<KV<K, V>, ?> createWriteOperation(PipelineOptions options) {
+    public WriteOperation<KV<K, V>, ?> createWriteOperation() {
         return new UgiWriteOperation<>(this, path, mergeOutput);
     }
 

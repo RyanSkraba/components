@@ -16,8 +16,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.AvroKey;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.io.Read;
-import org.apache.beam.sdk.io.Write;
-import org.apache.beam.sdk.io.hdfs.WritableCoder;
+import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Keys;
 import org.apache.beam.sdk.transforms.ParDo;
@@ -28,6 +27,7 @@ import org.apache.beam.sdk.values.PDone;
 import org.apache.hadoop.io.NullWritable;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
+import org.talend.components.simplefileio.runtime.beamcopy.Write;
 import org.talend.components.simplefileio.runtime.coders.LazyAvroKeyWrapper;
 import org.talend.components.simplefileio.runtime.sinks.AvroHdfsFileSink;
 import org.talend.components.simplefileio.runtime.sources.AvroHdfsFileSource;
@@ -61,7 +61,7 @@ public class SimpleRecordFormatAvroIO extends SimpleRecordFormatBase {
         PCollection<Object> pc2 = pc1.apply(ParDo.of(new ExtractRecordFromAvroKey()));
         pc2 = pc2.setCoder(lac);
 
-        PCollection<IndexedRecord> pc3 = pc2.apply(ConvertToIndexedRecord.<Object, IndexedRecord> of());
+        PCollection<IndexedRecord> pc3 = pc2.apply(ConvertToIndexedRecord.<Object> of());
 
         return pc3;
     }

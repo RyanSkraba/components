@@ -15,9 +15,10 @@ package org.talend.components.pubsub.runtime;
 
 import java.nio.charset.Charset;
 
+import org.apache.beam.sdk.io.gcp.pubsub.PubsubMessage;
 import org.apache.beam.sdk.transforms.DoFn;
 
-public class ExtractCsvSplit extends DoFn<byte[], String[]> {
+public class ExtractCsvSplit extends DoFn<PubsubMessage, String[]> {
 
     static {
         // Ensure that the singleton for the PubSubAvroRegistry is created.
@@ -32,7 +33,7 @@ public class ExtractCsvSplit extends DoFn<byte[], String[]> {
 
     @DoFn.ProcessElement
     public void processElement(ProcessContext c) {
-        String record = new String(c.element(), Charset.forName("UTF-8"));
+        String record = new String(c.element().getPayload(), Charset.forName("UTF-8"));
         c.output(record.split(fieldDelimiter));
     }
 

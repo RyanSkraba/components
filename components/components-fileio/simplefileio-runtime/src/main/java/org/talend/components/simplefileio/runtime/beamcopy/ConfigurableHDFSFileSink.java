@@ -29,17 +29,19 @@ import static org.apache.beam.sdk.repackaged.com.google.common.base.Precondition
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
-import org.apache.beam.sdk.io.Sink;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.repackaged.com.google.common.collect.Lists;
 import org.apache.beam.sdk.repackaged.com.google.common.collect.Maps;
 import org.apache.beam.sdk.repackaged.com.google.common.collect.Sets;
+import org.apache.beam.sdk.transforms.windowing.BoundedWindow;
+import org.apache.beam.sdk.transforms.windowing.PaneInfo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -110,7 +112,7 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
     }
 
     @Override
-    public Sink.WriteOperation<KV<K, V>, ?> createWriteOperation(PipelineOptions options) {
+    public Sink.WriteOperation<KV<K, V>, ?> createWriteOperation() {
         return new HDFSWriteOperation<>(this, path, mergeOutput, formatClass);
     }
 

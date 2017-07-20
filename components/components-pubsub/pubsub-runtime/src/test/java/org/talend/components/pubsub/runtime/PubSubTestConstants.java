@@ -29,6 +29,14 @@ public class PubSubTestConstants {
         SERVICE_ACCOUNT_FILE = System.getProperty("bigquery.service.account.file");
     }
 
+    public static String createTopicPath(String topic) {
+        return null;
+    }
+
+    public static String createSubscriptionPath(String topic, String subscription) {
+        return null;
+    }
+
     public static PubSubDatastoreProperties createDatastore() {
         PubSubDatastoreProperties datastore = new PubSubDatastoreProperties("datastore");
         datastore.init();
