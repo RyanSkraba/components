@@ -34,25 +34,25 @@ public class SalesforceModuleWizardDefinitionTest {
     private final String repoLocation = "___DRI";
 
     private SalesforceModuleWizardDefinition definition;
-    private SalesforceModuleProperties properties;
+    private SalesforceModuleListProperties properties;
 
     @Before
     public void setUp() {
         definition = new SalesforceModuleWizardDefinition();
 
-        properties = new SalesforceModuleProperties("module");
+        properties = new SalesforceModuleListProperties("module");
         properties.init();
     }
 
     @Test
     public void testSupportsProperties() {
-        assertTrue(definition.supportsProperties(SalesforceConnectionProperties.class));
-        assertFalse(definition.supportsProperties(SalesforceModuleListProperties.class));
+        assertTrue(definition.supportsProperties(SalesforceModuleListProperties.class));
+        assertFalse(definition.supportsProperties(SalesforceConnectionProperties.class));
     }
 
     @Test
     public void testCreateWizard() {
-        ComponentWizard wizard = definition.createWizard(properties.connection, repoLocation);
+        ComponentWizard wizard = definition.createWizard(properties, repoLocation);
 
         assertThat(wizard, instanceOf(SalesforceModuleWizard.class));
         assertEquals(definition, wizard.getDefinition());

@@ -56,6 +56,7 @@ import org.talend.components.salesforce.SalesforceConnectionWizard;
 import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
 import org.talend.components.salesforce.SalesforceModuleListProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.components.salesforce.SalesforceModuleWizard;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.SalesforceUserPasswordProperties;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
@@ -381,22 +382,27 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
 
         ComponentWizard[] subWizards = getComponentService().getComponentWizardsForProperties(connProps, "location")
-                .toArray(new ComponentWizard[3]);
+                .toArray(new ComponentWizard[2]);
         Arrays.sort(subWizards, new WizardNameComparator());
-        assertEquals(3, subWizards.length);
+        assertEquals(2, subWizards.length);
         // Edit connection wizard - we copy the connection properties, as we present the UI, so we use the
         // connection properties object created by the new wizard
         assertFalse(connProps == subWizards[1].getForms().get(0).getProperties());
-        // Add module wizard - we refer to the existing connection properties as we don't present the UI
-        // for them.
-        assertTrue(connProps == ((SalesforceModuleListProperties) subWizards[2].getForms().get(0).getProperties())
-                .getConnectionProperties());
         assertFalse(subWizards[1].getDefinition().isTopLevel());
         assertEquals("Edit Salesforce Connection", subWizards[1].getDefinition().getMenuItemName());
         assertTrue(subWizards[0].getDefinition().isTopLevel());
         assertEquals("Create Salesforce Connection", subWizards[0].getDefinition().getMenuItemName());
-        assertFalse(subWizards[2].getDefinition().isTopLevel());
-        assertEquals("Add Salesforce Modules", subWizards[2].getDefinition().getMenuItemName());
+
+        // Checking wizard for SalesforceModuleListProperties
+        SalesforceModuleListProperties moduleListProperties = new SalesforceModuleListProperties("moduleList");
+        moduleListProperties.setConnection(connProps);
+        List<ComponentWizard> moduleListWizardList = getComponentService().getComponentWizardsForProperties(moduleListProperties, "location");
+        ComponentWizard moduleListWizard = moduleListWizardList.get(0);
+
+        assertTrue(moduleListWizard instanceof SalesforceModuleWizard);
+        assertEquals(1, moduleListWizardList.size());
+        assertFalse(moduleListWizard.getDefinition().isTopLevel());
+        assertEquals("Add Salesforce Modules", moduleListWizard.getDefinition().getMenuItemName());
     }
 
     @Test

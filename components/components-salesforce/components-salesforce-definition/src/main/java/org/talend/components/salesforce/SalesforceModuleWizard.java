@@ -23,22 +23,23 @@ import org.talend.daikon.properties.presentation.Form;
  */
 public class SalesforceModuleWizard extends ComponentWizard {
 
-    SalesforceModuleListProperties mProps;
+    SalesforceModuleListProperties salesforceModuleListProperties;
 
     SalesforceModuleWizard(ComponentWizardDefinition def, String repositoryLocation) {
         super(def, repositoryLocation);
 
-        mProps = new SalesforceModuleListProperties("mProps").setRepositoryLocation(getRepositoryLocation());
-        mProps.init();
-        addForm(mProps.getForm(Form.MAIN));
+        salesforceModuleListProperties = new SalesforceModuleListProperties("salesforceModuleListProperties")
+                .setRepositoryLocation(getRepositoryLocation());
+        salesforceModuleListProperties.init();
+        addForm(salesforceModuleListProperties.getForm(Form.MAIN));
     }
 
     public boolean supportsProperties(ComponentProperties properties) {
-        return properties instanceof SalesforceConnectionProperties;
+        return properties instanceof SalesforceModuleListProperties;
     }
 
-    public void setupProperties(SalesforceConnectionProperties cProps) {
-        mProps.setConnection(cProps);
+    public void setupProperties(SalesforceModuleListProperties salesforceModuleListProperties) {
+        this.salesforceModuleListProperties.copyValuesFrom(salesforceModuleListProperties);
     }
 
 }
