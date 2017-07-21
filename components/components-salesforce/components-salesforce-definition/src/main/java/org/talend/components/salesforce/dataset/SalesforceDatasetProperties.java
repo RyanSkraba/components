@@ -78,7 +78,7 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
                 @Override
                 public void accept(SalesforceRuntimeSourceOrSink runtime) throws IOException {
                     List<NamedThing> moduleNames = runtime.getSchemaNames(null);
-                    moduleName.setPossibleNamedThingValues(moduleNames);
+                    moduleName.setPossibleNamedThingValues(filter(moduleNames));
                 }
             };
             runtimeTask(consumer);
@@ -93,7 +93,7 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
                 @Override
                 public void accept(SalesforceRuntimeSourceOrSink runtime) throws IOException {
                     List<NamedThing> moduleNames = runtime.getSchemaNames(null);
-                    moduleName.setPossibleNamedThingValues(moduleNames);
+                    moduleName.setPossibleNamedThingValues(filter(moduleNames));
 
                     Schema schema = runtime.getEndpointSchema(null, moduleName.getValue());
                     List<NamedThing> columns = new ArrayList<>();
@@ -105,6 +105,17 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
             };
             runtimeTask(consumer);
         }
+    }
+    
+    private List<NamedThing> filter(List<NamedThing> moduleNames) {
+        if (moduleNames != null) {
+            for (int i = 0; i < moduleNames.size(); i++) {
+                if ("AcceptedEventRelation".equalsIgnoreCase(moduleNames.get(i).getName())) {
+                    moduleNames.remove(i);
+                }
+            }
+        }
+        return moduleNames;
     }
 
     private interface Consumer {

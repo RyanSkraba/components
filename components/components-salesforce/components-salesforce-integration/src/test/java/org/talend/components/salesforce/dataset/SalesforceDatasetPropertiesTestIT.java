@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties.SourceType;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreProperties;
 import org.talend.components.salesforce.integration.SalesforceTestBase;
+import org.talend.daikon.NamedThing;
 
 public class SalesforceDatasetPropertiesTestIT extends SalesforceTestBase {
 
@@ -40,6 +41,11 @@ public class SalesforceDatasetPropertiesTestIT extends SalesforceTestBase {
         }
 
         modules = dataset.moduleName.getPossibleValues();
+        for (Object object : modules) {
+            if("AcceptedEventRelation".equalsIgnoreCase((String)object)){
+                Assert.fail("AcceptedEventRelation is not supported by Bulk API");
+            }
+        }
         Assert.assertTrue("the module list is empty after calling 'afterSourceType' method, not right",
                 modules != null && !modules.isEmpty());
         Assert.assertTrue("the module value must be empty at this point", StringUtils.isEmpty(dataset.moduleName.getValue()));
