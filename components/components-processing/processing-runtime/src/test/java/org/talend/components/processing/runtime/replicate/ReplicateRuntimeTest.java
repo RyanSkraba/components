@@ -13,7 +13,8 @@ import org.mockito.Mockito;
 import org.talend.components.adapter.beam.BeamJobContext;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.processing.replicate.ReplicateProperties;
+import org.talend.components.processing.definition.replicate.ReplicateProperties;
+import org.talend.components.processing.runtime.replicate.ReplicateRuntime;
 import org.talend.daikon.avro.GenericDataRecordHelper;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
@@ -33,7 +34,6 @@ public class ReplicateRuntimeTest {
 
     /**
      * Check {@link ReplicateRuntime#initialize(RuntimeContainer, Properties)}
-     * returns //TODO
      */
     @Test
     public void testInitialize() {
@@ -43,7 +43,6 @@ public class ReplicateRuntimeTest {
 
     /**
      * Check {@link ReplicateRuntime#build(BeamJobContext)}
-     * returns
      */
     @Test
     public void testBuild() {

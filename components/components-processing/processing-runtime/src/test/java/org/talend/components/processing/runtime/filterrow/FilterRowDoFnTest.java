@@ -24,8 +24,10 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.util.Utf8;
 import org.apache.beam.sdk.transforms.DoFnTester;
 import org.junit.Test;
-import org.talend.components.processing.filterrow.ConditionsRowConstant;
-import org.talend.components.processing.filterrow.FilterRowProperties;
+import org.talend.components.processing.definition.filterrow.ConditionsRowConstant;
+import org.talend.components.processing.definition.filterrow.FilterRowProperties;
+import org.talend.components.processing.runtime.filterrow.FilterRowDoFn;
+import org.talend.components.processing.runtime.filterrow.FilterRowRuntime;
 import org.talend.daikon.exception.TalendRuntimeException;
 
 public class FilterRowDoFnTest {

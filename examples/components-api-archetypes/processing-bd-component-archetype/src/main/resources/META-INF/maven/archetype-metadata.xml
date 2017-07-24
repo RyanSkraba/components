@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor name="partial" partial="true">
+
+    <requiredProperties>
+        <requiredProperty key="componentName">
+            <defaultValue>${artifactId}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="componentNameLowerCase">
+            <defaultValue>${componentName.toLowerCase()}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="componentNameClass">
+            <defaultValue>${componentName}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="package">
+            <defaultValue>${groupId}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="packageTalend">
+            <defaultValue>org.talend.components</defaultValue>
+        </requiredProperty>
+
+        <requiredProperty key="packageDaikon">
+            <defaultValue>org.talend.daikon</defaultValue>
+        </requiredProperty>
+    </requiredProperties>
+
+    <fileSets>
+        <!-- Metadata for definition module - main -->
+        <fileSet filtered="true" packaged="true">
+            <directory>processing-runtime/src/main/java/</directory>
+            <includes>
+                <include>**/*.java</include>
+            </includes>
+        </fileSet>
+
+        <fileSet filtered="true" packaged="true">
+            <directory>processing-definition/src/main/java/</directory>
+            <includes>
+                <include>**/*.java</include>
+            </includes>
+        </fileSet>
+
+        <fileSet filtered="true" packaged="true">
+            <directory>processing-definition/src/main/resources/</directory>
+            <includes>
+                <include>**/*.properties</include>
+                <include>**/*.png</include>
+            </includes>
+        </fileSet>
+
+        <!-- Metadata for definition module - test -->
+        <fileSet filtered="true" packaged="true">
+            <directory>processing-definition/src/test/java/</directory>
+            <includes>
+                <include>**/*.java</include>
+            </includes>
+        </fileSet>
+
+        <fileSet filtered="true" packaged="true">
+            <directory>processing-runtime/src/test/java/</directory>
+            <includes>
+                <include>**/*.java</include>
+            </includes>
+        </fileSet>
+
+    </fileSets>
+</archetype-descriptor>

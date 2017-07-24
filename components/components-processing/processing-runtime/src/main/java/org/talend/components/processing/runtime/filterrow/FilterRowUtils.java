@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.processing.runtime.filterrow;
 
-import org.talend.components.processing.filterrow.ConditionsRowConstant;
+import org.talend.components.processing.definition.filterrow.ConditionsRowConstant;
 
 public class FilterRowUtils {
 

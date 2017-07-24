@@ -22,8 +22,8 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.transforms.DoFnTester;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.talend.components.processing.pythonrow.MapType;
-import org.talend.components.processing.pythonrow.PythonRowProperties;
+import org.talend.components.processing.definition.pythonrow.MapType;
+import org.talend.components.processing.definition.pythonrow.PythonRowProperties;
 import org.talend.daikon.avro.GenericDataRecordHelper;
 import org.talend.daikon.properties.ValidationResult;
 
