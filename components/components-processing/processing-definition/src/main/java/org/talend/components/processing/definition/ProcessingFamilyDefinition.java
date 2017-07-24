@@ -12,15 +12,17 @@
 // ============================================================================
 package org.talend.components.processing.definition;
 
-import com.google.auto.service.AutoService;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.processing.definition.filterrow.FilterRowDefinition;
+import org.talend.components.processing.definition.normalize.NormalizeDefinition;
+import org.talend.components.processing.definition.pythonrow.PythonRowDefinition;
 import org.talend.components.processing.definition.replicate.ReplicateDefinition;
 import org.talend.components.processing.definition.window.WindowDefinition;
-import org.talend.components.processing.definition.pythonrow.PythonRowDefinition;
+
+import com.google.auto.service.AutoService;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -41,7 +43,7 @@ public class ProcessingFamilyDefinition extends AbstractComponentFamilyDefinitio
     public ProcessingFamilyDefinition() {
         super(NAME,
                 // Components
-                new WindowDefinition(), new ReplicateDefinition(),new FilterRowDefinition(), new PythonRowDefinition()
+                new WindowDefinition(), new ReplicateDefinition(),new FilterRowDefinition(), new PythonRowDefinition(), new NormalizeDefinition()
         // Component wizards
         );
     }
