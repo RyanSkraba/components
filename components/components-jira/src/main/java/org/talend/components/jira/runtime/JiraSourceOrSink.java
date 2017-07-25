@@ -15,9 +15,12 @@ package org.talend.components.jira.runtime;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.SourceOrSink;
@@ -99,32 +102,24 @@ public class JiraSourceOrSink implements SourceOrSink {
     }
 
     /**
-     * Validates connection to the Host
+     * Validates this {@code SourceOrSink}.
      * 
-     * @param container Runtime container
-     * @return {@link Result#OK} if connection was established and {@link Result#ERROR} otherwise
+     * @param container runtime container
+     * @return {@link Result#OK} if {@code SourceOrSink} is valid and connection was established, {@link Result#ERROR} otherwise
      */
     @Override
     public ValidationResult validate(RuntimeContainer container) {
-        Rest rest = new Rest(hostPort);
-        String errorMessage;
-        try {
-            int statusCode = rest.checkConnection();
-            if (statusCode == SC_OK) {
-                return ValidationResult.OK;
-            } else {
-                errorMessage = messages.getMessage("error.wrongStatusCode", statusCode);
-                LOG.debug(errorMessage);
-            }
-        } catch (IOException e) {
-            errorMessage = messages.getMessage("error.connectionException", e);
-            LOG.debug(errorMessage);
+        ValidationResult connectionPropsValidationResult = validateConnectionProperties();
+        if (Result.ERROR.equals(connectionPropsValidationResult.getStatus())) {
+            return connectionPropsValidationResult;
         }
-        String validationFailed = messages.getMessage("error.hostNotValidated", hostPort);
-        StringBuilder sb = new StringBuilder(validationFailed);
-        sb.append(System.lineSeparator());
-        sb.append(errorMessage);
-        return new ValidationResult(Result.ERROR, sb.toString());
+
+        ValidationResult connectionValidationResult = validateConnection();
+        if (Result.ERROR.equals(connectionValidationResult.getStatus())) {
+            return connectionValidationResult;
+        }
+
+        return ValidationResult.OK;
     }
 
     /**
@@ -172,4 +167,60 @@ public class JiraSourceOrSink implements SourceOrSink {
         return userPassword;
     }
 
+    /**
+     * Validate connection related properties before connecting.
+     *
+     * @return {@link Result#OK} if connection related properties are valid, {@link Result#ERROR} otherwise
+     */
+    protected ValidationResult validateConnectionProperties() {
+        if (StringUtils.isEmpty(hostPort) || StringUtils.isBlank(hostPort)) {
+            return new ValidationResult(Result.ERROR, messages.getMessage("error.hostUrl.shouldNotBeEmpty"));
+        } else {
+            try {
+                new URL(hostPort);
+            } catch (MalformedURLException e) {
+                return new ValidationResult(Result.ERROR, messages.getMessage("error.hostUrl.notValid", hostPort));
+            }
+        }
+
+        // Null or blank user ID is not allowed, empty user ID is allowed (for anonymous access)
+        if (userId == null || (!userId.isEmpty() && StringUtils.isBlank(userId))) {
+            return new ValidationResult(Result.ERROR, messages.getMessage("error.userId.shouldNotBeNullOrBlank"));
+        }
+
+        // Null or blank password is not allowed, empty password is allowed
+        if (userPassword == null || (!userPassword.isEmpty() && StringUtils.isBlank(userPassword))) {
+            return new ValidationResult(Result.ERROR, messages.getMessage("error.password.shouldNotBeNullOrBlank"));
+        }
+
+        return ValidationResult.OK;
+    }
+
+    /**
+     * Validate connection to JIRA server.
+     *
+     * @return {@link Result#OK} if connection is valid, {@link Result#ERROR} otherwise
+     */
+    protected ValidationResult validateConnection() {
+        Rest rest = new Rest(hostPort);
+        String errorMessage;
+        try {
+            int statusCode = rest.checkConnection();
+            if (statusCode == SC_OK) {
+                return ValidationResult.OK;
+            } else {
+                errorMessage = messages.getMessage("error.wrongStatusCode", statusCode);
+                LOG.debug(errorMessage);
+            }
+        } catch (IOException e) {
+            errorMessage = messages.getMessage("error.connectionException", e);
+            LOG.debug(errorMessage);
+        }
+
+        String validationFailed = messages.getMessage("error.hostNotValidated", hostPort);
+        StringBuilder sb = new StringBuilder(validationFailed);
+        sb.append(System.lineSeparator());
+        sb.append(errorMessage);
+        return new ValidationResult(Result.ERROR, sb.toString());
+    }
 }
