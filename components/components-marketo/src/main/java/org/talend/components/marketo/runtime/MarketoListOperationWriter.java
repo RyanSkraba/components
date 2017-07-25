@@ -186,7 +186,7 @@ public class MarketoListOperationWriter extends MarketoWriter {
                 record.put(f.pos(), listOpeParms.getLeadKeyType());
             }
             if (f.name().equals(FIELD_LEAD_KEY_VALUE)) {
-                record.put(f.pos(), status.getId());
+                record.put(f.pos(), String.valueOf(status.getId()));
             }
             if (f.name().equals(FIELD_LIST_ID)) {
                 record.put(f.pos(), listOpeParms.getListId());
