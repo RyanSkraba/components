@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
@@ -71,7 +72,7 @@ public class JiraWriter implements Writer<Result> {
 
     /**
      * Constructor sets {@link WriteOperation}
-     * 
+     *
      * @param writeOperation Jira {@link WriteOperation} instance
      */
     public JiraWriter(JiraWriteOperation writeOperation) {
@@ -81,7 +82,7 @@ public class JiraWriter implements Writer<Result> {
 
     /**
      * Initializes connection of this {@link Writer}
-     * 
+     *
      * @param uId Unique ID of this {@link Writer}
      */
     @Override
@@ -111,7 +112,7 @@ public class JiraWriter implements Writer<Result> {
 
     /**
      * Closes connection and resets instance to initial state Successors should also reset data counter
-     * 
+     *
      * @return {@link Result} with {@link Writer} ID and number of data written
      */
     @Override
@@ -136,7 +137,7 @@ public class JiraWriter implements Writer<Result> {
 
     /**
      * Returns connection of this {@link Writer}
-     * 
+     *
      * @return {@link Rest} connection instance
      */
     protected Rest getConnection() {
@@ -145,7 +146,7 @@ public class JiraWriter implements Writer<Result> {
 
     /**
      * Returns IndexedRecord converter
-     * 
+     *
      * @param datum data object
      * @return IndexedRecord converter
      */
@@ -161,8 +162,8 @@ public class JiraWriter implements Writer<Result> {
      * Constructs {@link DataRejectException}, includes error message information and
      * {@link IndexedRecord}
      * Iterates reject records count
-     * 
-     * @param error error message
+     *
+     * @param error  error message
      * @param record current {@link IndexedRecord}
      * @throws DataRejectException with specified error and current {@link IndexedRecord}
      */
@@ -178,9 +179,9 @@ public class JiraWriter implements Writer<Result> {
      * Constructs error message, which includes information about error reason, record content
      * and message from Jira server, returns {@link IOException} with this message
      * Iterates reject records count
-     * 
-     * @param reasonKey reason message i18n key
-     * @param json record json
+     *
+     * @param reasonKey     reason message i18n key
+     * @param json          record json
      * @param serverMessage error message from Jira server
      * @return {@link IOException} which provides error message
      */
@@ -196,5 +197,19 @@ public class JiraWriter implements Writer<Result> {
         sb.append(MESSAGES.getMessage("error.error"));
         sb.append(serverMessage);
         return new IOException(sb.toString());
+    }
+
+    /**
+     * Validate request body (json content) before submitting of a request.
+     *
+     * <p>The method checks JSON for {@code null}.
+     *
+     * @param json json content to be validated
+     * @throws IOException if json content is not valid
+     */
+    protected void validateRequestBody(String json) throws IOException {
+        if (StringUtils.isEmpty(json)) {
+            throw createRejectException("error.invalidRecordCreate", json, MESSAGES.getMessage("error.jsonEmpty"));
+        }
     }
 }

@@ -27,6 +27,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.jira.connection.JiraResponse;
 import org.talend.components.jira.runtime.JiraWriteOperation;
 
@@ -94,7 +95,9 @@ public class JiraUpdateWriter extends JiraWriter {
 
         String id = (String) record.get(idPos);
         String resourceToUpdate = resource + "/" + id;
+
         String json = (String) record.get(jsonPos);
+        validateRequestBody(json);
 
         JiraResponse response = getConnection().put(resourceToUpdate, json);
         handleResponse(response, json, record);
