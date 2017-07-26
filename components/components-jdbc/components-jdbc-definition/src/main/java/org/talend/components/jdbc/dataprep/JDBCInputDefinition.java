@@ -60,7 +60,6 @@ public class JDBCInputDefinition extends AbstractComponentDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        String runtimeClass = "";
         switch (engine) {
         case BEAM:
             return new JdbcRuntimeInfo((JDBCInputProperties) properties, JDBCFamilyDefinition.getBeamRuntimeMavenURI(),

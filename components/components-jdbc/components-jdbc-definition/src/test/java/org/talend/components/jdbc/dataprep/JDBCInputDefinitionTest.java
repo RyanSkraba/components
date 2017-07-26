@@ -18,8 +18,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class JDBCInputDefinitionTest {
@@ -33,9 +35,14 @@ public class JDBCInputDefinitionTest {
 
     @Test
     public void getRuntimeInfo() throws Exception {
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, null, null);
+        AllSetting allSetting = Mockito.mock(AllSetting.class);
+        Mockito.when(allSetting.getDriverClass()).thenReturn("anyDriverClass");
+        JDBCInputProperties anyProperties = Mockito.mock(JDBCInputProperties.class);
+        Mockito.when(anyProperties.getRuntimeSetting()).thenReturn(allSetting);
+        
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, anyProperties, null);
         assertEquals(JDBCInputDefinition.DI_RUNTIME, runtimeInfo.getRuntimeClassName());
-        runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.BEAM, null, null);
+        runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.BEAM, anyProperties, null);
         assertEquals(JDBCInputDefinition.BEAM_RUNTIME, runtimeInfo.getRuntimeClassName());
     }
 

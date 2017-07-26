@@ -14,7 +14,9 @@ package org.talend.components.api.component.runtime;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -79,12 +81,11 @@ public class JarRuntimeInfoTest {
     }
 
     public void checkFullExampleDependencies(List<URL> mavenUrlDependencies) throws MalformedURLException {
-        assertThat(mavenUrlDependencies,
-                containsInAnyOrder(new URL("mvn:org.apache.avro/avro/1.8.0/jar"),
-                        new URL("mvn:net.sourceforge.javacsv/javacsv/2.0/jar"),
-                        new URL("mvn:com.cedarsoftware/json-io/4.4.1-SNAPSHOT/jar"), new URL("mvn:joda-time/joda-time/2.8.2/jar"),
-                        new URL("mvn:org.xerial.snappy/snappy-java/1.1.1.3/jar"), new URL(
-                                "mvn:org.talend.components/components-api/0.13.1/jar"),
+        assertThat(mavenUrlDependencies, containsInAnyOrder(new URL("mvn:org.apache.avro/avro/1.8.0/jar"),
+                new URL("mvn:net.sourceforge.javacsv/javacsv/2.0/jar"),
+                new URL("mvn:com.cedarsoftware/json-io/4.4.1-SNAPSHOT/jar"), new URL("mvn:joda-time/joda-time/2.8.2/jar"),
+                new URL("mvn:org.xerial.snappy/snappy-java/1.1.1.3/jar"),
+                new URL("mvn:org.talend.components/components-api/0.13.1/jar"),
                 new URL("mvn:com.thoughtworks.paranamer/paranamer/2.7/jar"), new URL("mvn:org.talend.daikon/daikon/0.12.1/jar"),
                 new URL("mvn:com.fasterxml.jackson.core/jackson-annotations/2.5.3/jar"),
                 new URL("mvn:com.fasterxml.jackson.core/jackson-core/2.5.3/jar"),
@@ -129,4 +130,35 @@ public class JarRuntimeInfoTest {
         assertEquals("foo", jarRuntimeInfo.getRuntimeClassName());
     }
 
+    /**
+     * Checks {@link JarRuntimeInfo#isClassLoaderReusable()} returns <code>true</code> if <code>reusable</code> argument is not
+     * passed to Constructor
+     */
+    @Test
+    public void testIsClassLoaderReusableDefault() {
+        JarRuntimeInfo jarRuntimeInfo = new JarRuntimeInfo("http://dummyurl", "dummyString", "dummyString");
+        assertTrue(jarRuntimeInfo.isClassLoaderReusable());
+    }
+
+    /**
+     * Checks {@link JarRuntimeInfo#isClassLoaderReusable()} returns <code>true</code> if <code>true</code> was passed to
+     * Constructor
+     * as value of <code>reusable</code> argument
+     */
+    @Test
+    public void testIsClassLoaderReusableTrue() {
+        JarRuntimeInfo jarRuntimeInfo = new JarRuntimeInfo("http://dummyurl", "dummyString", "dummyString", true);
+        assertTrue(jarRuntimeInfo.isClassLoaderReusable());
+    }
+
+    /**
+     * Checks {@link JarRuntimeInfo#isClassLoaderReusable()} returns <code>true</code> if <code>true</code> was passed to
+     * Constructor
+     * as value of <code>reusable</code> argument
+     */
+    @Test
+    public void testIsClassLoaderReusableFalse() {
+        JarRuntimeInfo jarRuntimeInfo = new JarRuntimeInfo("http://dummyurl", "dummyString", "dummyString", false);
+        assertFalse(jarRuntimeInfo.isClassLoaderReusable());
+    }
 }

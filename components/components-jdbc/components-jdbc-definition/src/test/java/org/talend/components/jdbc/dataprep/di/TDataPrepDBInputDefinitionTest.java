@@ -7,9 +7,10 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
@@ -49,9 +50,13 @@ public class TDataPrepDBInputDefinitionTest {
      */
     @Test
     public void testGetRuntimeInfo() throws Exception {
+        AllSetting allSetting = Mockito.mock(AllSetting.class);
+        Mockito.when(allSetting.getDriverClass()).thenReturn("anyDriverClass");
+        TDataPrepDBInputProperties properties = Mockito.mock(TDataPrepDBInputProperties.class);
+        Mockito.when(properties.getRuntimeSetting()).thenReturn(allSetting);
+        
         TDataPrepDBInputDefinition fixture = new TDataPrepDBInputDefinition();
         ExecutionEngine engine = ExecutionEngine.DI;
-        ComponentProperties properties = new TDataPrepDBInputProperties("input");
 
         RuntimeInfo result = fixture.getRuntimeInfo(engine, properties, ConnectorTopology.OUTGOING);
         assertNotNull(result);

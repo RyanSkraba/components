@@ -7,9 +7,11 @@ import static org.junit.Assert.assertNull;
 import java.util.Set;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -113,9 +115,13 @@ public class TJDBCCloseDefinitionTest {
      */
     @Test
     public void testGetRuntimeInfo() throws Exception {
+        AllSetting allSetting = Mockito.mock(AllSetting.class);
+        Mockito.when(allSetting.getDriverClass()).thenReturn("anyDriverClass");
+        TJDBCCloseProperties properties = Mockito.mock(TJDBCCloseProperties.class);
+        Mockito.when(properties.getRuntimeSetting()).thenReturn(allSetting);
+        
         TJDBCCloseDefinition fixture = new TJDBCCloseDefinition();
         ExecutionEngine engine = ExecutionEngine.DI;
-        ComponentProperties properties = new TJDBCCloseProperties("");
 
         RuntimeInfo result = fixture.getRuntimeInfo(engine, properties, ConnectorTopology.NONE);
         assertNotNull(result);

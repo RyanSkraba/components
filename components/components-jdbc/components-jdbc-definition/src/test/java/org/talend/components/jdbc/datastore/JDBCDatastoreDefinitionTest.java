@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.talend.components.common.dataset.DatasetProperties;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -69,8 +71,12 @@ public class JDBCDatastoreDefinitionTest {
      */
     @Test
     public void testGetRuntimeInfo() throws Exception {
+        AllSetting allSetting = Mockito.mock(AllSetting.class);
+        Mockito.when(allSetting.getDriverClass()).thenReturn("anyDriverClass");
+        JDBCDatastoreProperties properties = Mockito.mock(JDBCDatastoreProperties.class);
+        Mockito.when(properties.getRuntimeSetting()).thenReturn(allSetting);
+        
         JDBCDatastoreDefinition fixture = new JDBCDatastoreDefinition();
-        JDBCDatastoreProperties properties = new JDBCDatastoreProperties("datastore");
 
         RuntimeInfo result = fixture.getRuntimeInfo(properties);
         assertNotNull(result);

@@ -45,10 +45,10 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
      * 
      * @param jarUrl url of the jar to read the dependency.txt from
      * @param depTxtPath, path used to locate the dependency.txt file
-     * @param runtimeClassName class to be instanciated
+     * @param runtimeClassName class to be instantiated
      */
     public JarRuntimeInfo(URL jarUrl, String depTxtPath, String runtimeClassName) {
-        this(jarUrl, depTxtPath, runtimeClassName, true);
+        this(jarUrl, depTxtPath, runtimeClassName, SandboxControl.CLASSLOADER_REUSABLE);
     }
 
     /**
@@ -57,7 +57,7 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
      *
      * @param jarUrl url of the jar to read the dependency.txt from
      * @param depTxtPath, path used to locate the dependency.txt file
-     * @param runtimeClassName class to be instanciated
+     * @param runtimeClassName class to be instantiated
      * @param reusable whether the ClassLoader for the runtime instance is cacheable and reusable across calls.
      */
     public JarRuntimeInfo(URL jarUrl, String depTxtPath, String runtimeClassName, boolean reusable) {
@@ -73,11 +73,24 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
      * 
      * @param jarUrlString url of the jar to read the dependency.txt from
      * @param depTxtPath, path used to locate the dependency.txt file
-     * @param runtimeClassName class to be instanciated
+     * @param runtimeClassName class to be instantiated
      * @throws {@link TalendRuntimeException} if the jarUrlString is malformed
      */
     public JarRuntimeInfo(String jarUrlString, String depTxtPath, String runtimeClassName) {
-        this(createJarUrl(jarUrlString), depTxtPath, runtimeClassName, true);
+        this(createJarUrl(jarUrlString), depTxtPath, runtimeClassName, SandboxControl.CLASSLOADER_REUSABLE);
+    }
+
+    /**
+     * Constructor
+     * 
+     * @param jarUrlString URL of the jar to read the dependency.txt from
+     * @param depTxtPath path used to locate the dependency.txt file
+     * @param runtimeClassName class to be instantiated
+     * @param reusable defines whether {@link ClassLoader} should be cached or not
+     * @throws {@link TalendRuntimeException} if the jarUrlString is malformed
+     */
+    public JarRuntimeInfo(String jarUrlString, String depTxtPath, String runtimeClassName, boolean reusable) {
+        this(createJarUrl(jarUrlString), depTxtPath, runtimeClassName, reusable);
     }
 
     private static URL createJarUrl(String jarUrlString) {

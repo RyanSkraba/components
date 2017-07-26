@@ -17,17 +17,29 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
+import org.talend.daikon.sandbox.SandboxControl;
 
+/**
+ * {@link RuntimeInfo} for JDBC components. {@link ClassLoader} for JDBC components should not be reusable, because component
+ * support different databases,
+ * which requires different set of classes loaded
+ */
 public class JdbcRuntimeInfo extends JarRuntimeInfo {
 
     /**
-     * 
+     * Provides Runtime Settings
      */
     private final RuntimeSettingProvider props;
+
+    /**
+     * JDBC Driver class name
+     */
+    private final String driverClassName;
 
     /**
      * @param runtimeClassName
@@ -35,39 +47,51 @@ public class JdbcRuntimeInfo extends JarRuntimeInfo {
      */
     public JdbcRuntimeInfo(RuntimeSettingProvider props, String runtimeClassName) {
         // add the version to fix the issue, not good, could we avoid it?
-        super(JDBCFamilyDefinition.getDIRuntimeMavenURI(), DependenciesReader.computeDependenciesFilePath(
+        this(props, JDBCFamilyDefinition.getDIRuntimeMavenURI(), DependenciesReader.computeDependenciesFilePath(
                 JDBCFamilyDefinition.getDIRuntimeGroupId(), JDBCFamilyDefinition.getDIRuntimeArtifactId()), runtimeClassName);
-        this.props = props;
     }
 
     public JdbcRuntimeInfo(RuntimeSettingProvider props, String jarUrlString, String depTxtPath, String runtimeClassName) {
-        super(jarUrlString, depTxtPath, runtimeClassName);
+        super(jarUrlString, depTxtPath, runtimeClassName, SandboxControl.CLASSLOADER_REUSABLE);
+        if (props == null) {
+            throw new NullPointerException("props must not be null");
+        }
         this.props = props;
+        if (props.getRuntimeSetting().getDriverClass() == null) {
+            throw new NullPointerException("props must provide not null driver class");
+        }
+        this.driverClassName = props.getRuntimeSetting().getDriverClass();
     }
 
-    public JarRuntimeInfo cloneWithNewJarUrlString(String newJarUrlString) {
+    public JdbcRuntimeInfo cloneWithNewJarUrlString(String newJarUrlString) {
         return new JdbcRuntimeInfo(this.props, newJarUrlString, this.getDepTxtPath(), this.getRuntimeClassName());
     }
 
     @Override
     public List<URL> getMavenUrlDependencies() {
-        List<URL> result = new ArrayList<>(super.getMavenUrlDependencies());
-        // add user specific drivers to the dependency list
+        List<URL> dependencies = new ArrayList<>(super.getMavenUrlDependencies());
+        dependencies.addAll(getDriverDependencies());
+        return dependencies;
+    }
+
+    /**
+     * Return list of JDBC driver dependencies
+     * 
+     * @return list of JDBC driver dependencies
+     */
+    private List<URL> getDriverDependencies() {
         try {
-            if (this.props != null) {
-                List<String> drivers = this.props.getRuntimeSetting().getDriverPaths();
-                if (drivers != null) {
-                    for (String driver : drivers) {
-                        result.add(new URL(removeQuote(driver)));
-                    }
+            List<URL> driverUrls = new ArrayList<>();
+            List<String> driverPaths = props.getRuntimeSetting().getDriverPaths();
+            if (driverPaths != null) {
+                for (String driver : driverPaths) {
+                    driverUrls.add(new URL(removeQuote(driver)));
                 }
             }
-
+            return driverUrls;
         } catch (MalformedURLException e) {
             throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
         }
-
-        return result;
     }
 
     // @TODO this should not exists in TCOMP, this is Studio related.
@@ -77,6 +101,38 @@ public class JdbcRuntimeInfo extends JarRuntimeInfo {
         }
 
         return content;
+    }
+
+    /**
+     * Computes hash code taking into account also {@link #driverClassName}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(super.hashCode()).append(driverClassName).toHashCode();
+    }
+
+    /**
+     * Checks whether this instance equals to <code>obj</code>.
+     * {@link #driverClassName} also is taken into account during comparison
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof JdbcRuntimeInfo)) {
+            return false;
+        }
+        JdbcRuntimeInfo other = (JdbcRuntimeInfo) obj;
+        return super.equals(obj) && this.driverClassName.equals(other.driverClassName);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", JdbcRuntimeInfo: {driverClassName:" + driverClassName + "}";
     }
 
 }
