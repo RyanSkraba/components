@@ -45,7 +45,7 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
         StringBuilder sbuilder = new StringBuilder();
         for (Schema.Field f : schema.getFields()) {
             String header = f.name();
-            if (checkDeleteOption(f)) {
+            if (checkDeleteOption(header)) {
                 continue;
             }
             String ref_module_name = f.getProp(SalesforceSchemaConstants.REF_MODULE_NAME);
@@ -96,9 +96,9 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
         return columnNames.indexOf(columnName);
     }
 
-    private boolean checkDeleteOption(Field f) {
+    private boolean checkDeleteOption(String columnName) {
         return OutputAction.DELETE.equals(getBulkProperties().outputAction.getValue())
-                && !Boolean.valueOf(f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+                && !"Id".equalsIgnoreCase(columnName);
     }
 
     @Override
@@ -106,7 +106,7 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
         IndexedRecord input = getFactory(datum).convertToAvro((IndexedRecord) datum);
         List<String> values = new ArrayList<String>();
         for (Field f : input.getSchema().getFields()) {
-            if (checkDeleteOption(f)) {
+            if (checkDeleteOption(f.name())) {
                 continue;
             }
             if (input.get(f.pos()) == null) {
