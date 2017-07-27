@@ -246,9 +246,9 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
         ConnectorConfig config = new ConnectorConfig();
         config.setUsername(StringUtils.strip(connProps.userPassword.userId.getStringValue(), "\""));
         String password = StringUtils.strip(connProps.userPassword.password.getStringValue(), "\"");
-        String securityToken = StringUtils.strip(connProps.userPassword.securityToken.getStringValue(), "\"");
-        if (StringUtils.isNotEmpty(securityToken)) {
-            password = password + securityToken;
+        String securityKey = StringUtils.strip(connProps.userPassword.securityKey.getStringValue(), "\"");
+        if (StringUtils.isNotEmpty(securityKey)) {
+            password = password + securityKey;
         }
         config.setPassword(password);
 

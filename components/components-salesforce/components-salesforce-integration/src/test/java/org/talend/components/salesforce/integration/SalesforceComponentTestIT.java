@@ -127,7 +127,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
                 .createProperties();
         assertTrue(props.userPassword.userId.isRequired());
         assertTrue(props.userPassword.password.isRequired());
-        assertFalse(props.userPassword.securityToken.isRequired());
+        assertFalse(props.userPassword.securityKey.isRequired());
 
         assertFalse(props.proxy.userPassword.userId.isRequired());
         assertFalse(props.proxy.userPassword.password.isRequired());

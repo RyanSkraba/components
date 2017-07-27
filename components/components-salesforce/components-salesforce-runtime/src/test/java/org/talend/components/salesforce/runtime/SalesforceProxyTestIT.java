@@ -85,7 +85,7 @@ public class SalesforceProxyTestIT extends SalesforceTestBase {
         properties.bulkConnection.setValue(true);
         properties.userPassword.userId.setValue(userId);
         properties.userPassword.password.setValue(password);
-        properties.userPassword.securityToken.setValue(securityToken);
+        properties.userPassword.securityKey.setValue(securityKey);
 
         SourceOrSink sourceOrSink = new SalesforceSourceOrSink();
         sourceOrSink.initialize(null, properties);
@@ -108,7 +108,7 @@ public class SalesforceProxyTestIT extends SalesforceTestBase {
 
         properties.connection.userPassword.userId.setValue(userId);
         properties.connection.userPassword.password.setValue(password);
-        properties.connection.userPassword.securityToken.setValue(securityToken);
+        properties.connection.userPassword.securityKey.setValue(securityKey);
 
         Source source = new SalesforceSource();
         source.initialize(null, properties);
