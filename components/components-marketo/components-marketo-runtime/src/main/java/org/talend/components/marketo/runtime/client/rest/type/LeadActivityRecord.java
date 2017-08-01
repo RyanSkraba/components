@@ -22,6 +22,10 @@ public class LeadActivityRecord {
 
     private List<Map<String, String>> attributes;
 
+    private String marketoGUID;
+
+    private Integer campaignId;
+
     public Integer getId() {
         return id;
     }
@@ -84,6 +88,22 @@ public class LeadActivityRecord {
 
     public void setAttributes(List<Map<String, String>> attributes) {
         this.attributes = attributes;
+    }
+
+    public String getMarketoGUID() {
+        return marketoGUID;
+    }
+
+    public void setMarketoGUID(String marketoGUID) {
+        this.marketoGUID = marketoGUID;
+    }
+
+    public Integer getCampaignId() {
+        return campaignId;
+    }
+
+    public void setCampaignId(Integer campaignId) {
+        this.campaignId = campaignId;
     }
 
     @Override

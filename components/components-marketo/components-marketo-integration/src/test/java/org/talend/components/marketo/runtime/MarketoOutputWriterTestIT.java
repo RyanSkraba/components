@@ -36,6 +36,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talend.components.marketo.MarketoConstants;
+import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OperationType;
@@ -135,7 +136,7 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         fields.add(field);
         field = new Schema.Field("AccountType", Schema.create(Schema.Type.STRING), null, (Object) null);
         fields.add(field);
-        Schema s = props.newSchema(props.schemaInput.schema.getValue(), "leadAttribute", fields);
+        Schema s = MarketoUtils.newSchema(props.schemaInput.schema.getValue(), "leadAttribute", fields);
         props.schemaInput.schema.setValue(s);
         props.updateOutputSchemas();
         props.beforeMappingInput();
@@ -160,7 +161,7 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         fields.add(field);
         field = new Schema.Field("Email", Schema.create(Schema.Type.STRING), null, (Object) null);
         fields.add(field);
-        Schema s = props.newSchema(MarketoConstants.getEmptySchema(), "leadAttribute", fields);
+        Schema s = MarketoUtils.newSchema(MarketoConstants.getEmptySchema(), "leadAttribute", fields);
         props.schemaInput.schema.setValue(s);
         props.updateOutputSchemas();
         props.beforeMappingInput();
@@ -200,7 +201,7 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         List<Field> fields = new ArrayList<>();
         Field field = new Schema.Field("accountType", Schema.create(Schema.Type.STRING), null, (Object) null);
         fields.add(field);
-        Schema s = props.newSchema(props.schemaInput.schema.getValue(), "leadAttribute", fields);
+        Schema s = MarketoUtils.newSchema(props.schemaInput.schema.getValue(), "leadAttribute", fields);
         props.schemaInput.schema.setValue(s);
         props.updateOutputSchemas();
         //
@@ -226,7 +227,7 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         List<Field> fields = new ArrayList<>();
         Field field = new Schema.Field("accountType", Schema.create(Schema.Type.STRING), null, (Object) null);
         fields.add(field);
-        Schema s = props.newSchema(props.schemaInput.schema.getValue(), "leadAttribute", fields);
+        Schema s = MarketoUtils.newSchema(props.schemaInput.schema.getValue(), "leadAttribute", fields);
         props.schemaInput.schema.setValue(s);
         props.updateOutputSchemas();
         //

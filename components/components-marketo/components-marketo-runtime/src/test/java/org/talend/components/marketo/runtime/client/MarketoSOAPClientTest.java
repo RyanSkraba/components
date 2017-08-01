@@ -24,15 +24,23 @@ import static org.mockito.Mockito.spy;
 import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.SOAP;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
 
+import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.marketo.MarketoConstants;
+import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.runtime.client.type.ListOperationParameters;
 import org.talend.components.marketo.runtime.client.type.MarketoError;
 import org.talend.components.marketo.runtime.client.type.MarketoException;
@@ -46,6 +54,7 @@ import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListP
 import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperationProperties;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation;
+import org.talend.daikon.avro.AvroUtils;
 
 import com.marketo.mktows.ActivityRecord;
 import com.marketo.mktows.ArrayOfActivityRecord;
@@ -54,7 +63,9 @@ import com.marketo.mktows.ArrayOfLeadChangeRecord;
 import com.marketo.mktows.ArrayOfLeadRecord;
 import com.marketo.mktows.ArrayOfLeadStatus;
 import com.marketo.mktows.ArrayOfSyncStatus;
+import com.marketo.mktows.Attribute;
 import com.marketo.mktows.AuthenticationHeader;
+import com.marketo.mktows.ForeignSysType;
 import com.marketo.mktows.LeadActivityList;
 import com.marketo.mktows.LeadChangeRecord;
 import com.marketo.mktows.LeadKey;
@@ -97,6 +108,8 @@ public class MarketoSOAPClientTest {
 
     ObjectFactory objectFactory;
 
+    DatatypeFactory factory;
+
     TMarketoInputProperties iprops;
 
     TMarketoOutputProperties oprops;
@@ -107,6 +120,10 @@ public class MarketoSOAPClientTest {
 
     MarketoSyncResult mktoSR;
 
+    String DATE_EXPECTED = "2017-07-19 14:56:52Z";
+
+    GregorianCalendar gcDateTest;
+
     public SuccessGetLead getGetLeadResult() {
         SuccessGetLead result = new SuccessGetLead();
         ResultGetLead res = new ResultGetLead();
@@ -114,9 +131,15 @@ public class MarketoSOAPClientTest {
         ArrayOfLeadRecord leadrecords = new ArrayOfLeadRecord();
         LeadRecord r = new LeadRecord();
         r.setId(objectFactory.createLeadRecordId(12345));
-        r.setEmail(objectFactory.createLeadRecordEmail("t@t.com"));
-        r.setForeignSysPersonId(objectFactory.createLeadRecordForeignSysPersonId(""));
-        r.setForeignSysType(objectFactory.createLeadRecordForeignSysType(null));
+        r.setEmail(objectFactory.createLeadRecordEmail("email@email.com"));
+        r.setForeignSysPersonId(objectFactory.createLeadRecordForeignSysPersonId("foreignSysPersonId"));
+        r.setForeignSysType(objectFactory.createLeadRecordForeignSysType(ForeignSysType.SFDC));
+        ArrayOfAttribute aoa = objectFactory.createArrayOfAttribute();
+        Attribute attr = new Attribute();
+        attr.setAttrName("attrName");
+        attr.setAttrValue("attrValue");
+        aoa.getAttributes().add(attr);
+        r.setLeadAttributeList(objectFactory.createActivityRecordActivityAttributes(aoa));
         leadrecords.getLeadRecords().add(r);
         QName qname = new QName("http://www.marketo.com/mktows/", "leadAttributeList");
         JAXBElement<ArrayOfLeadRecord> attrList = new JAXBElement(qname, LeadRecord.class, leadrecords);
@@ -146,7 +169,7 @@ public class MarketoSOAPClientTest {
         return result;
     }
 
-    public SuccessGetLeadActivity getLeadActivityResult() {
+    public SuccessGetLeadActivity getLeadActivityResult() throws Exception {
         SuccessGetLeadActivity result = new SuccessGetLeadActivity();
         LeadActivityList res = new LeadActivityList();
         res.setReturnCount(1);
@@ -155,17 +178,26 @@ public class MarketoSOAPClientTest {
         sp.setOffset(objectFactory.createStreamPositionOffset(""));
         res.setNewStartPosition(sp);
         ArrayOfActivityRecord arecords = new ArrayOfActivityRecord();
+        //
         ActivityRecord ar = new ActivityRecord();
-        ar.setId(123456);
-        ar.setMktgAssetName("asset");
-        ar.setActivityDateTime(null);
-        ar.setActivityType(null);
-        ar.setCampaign(null);
-        ar.setForeignSysId(null);
-        ar.setForeignSysOrgId(null);
-        ar.setPersonName(null);
-        ar.setOrgName(null);
-        ar.setActivityAttributes(objectFactory.createActivityRecordActivityAttributes(new ArrayOfAttribute()));
+        ar.setId(objectFactory.createActivityRecordId(123456L));
+        ar.setMarketoGUID("ABC-123-DEF");
+        ar.setMktgAssetName("mktgAssetName");
+        ar.setActivityDateTime(factory.newXMLGregorianCalendar(gcDateTest));
+        ar.setActivityType("activityType");
+        ar.setCampaign(objectFactory.createActivityRecordCampaign("campaign"));
+        ar.setForeignSysId(objectFactory.createActivityRecordForeignSysId("foreignSysId"));
+        ar.setForeignSysOrgId(objectFactory.createActivityRecordForeignSysOrgId("foreignSysOrgId"));
+        ar.setMktPersonId("mktPersonId");
+        ar.setPersonName(objectFactory.createActivityRecordPersonName("personName"));
+        ar.setOrgName(objectFactory.createActivityRecordOrgName("orgName"));
+        ArrayOfAttribute aoa = objectFactory.createArrayOfAttribute();
+        Attribute attr = new Attribute();
+        attr.setAttrName("attrName");
+        attr.setAttrValue("attrValue");
+        aoa.getAttributes().add(attr);
+        ar.setActivityAttributes(objectFactory.createActivityRecordActivityAttributes(aoa));
+        //
         arecords.getActivityRecords().add(ar);
         res.setActivityRecordList(objectFactory.createLeadActivityListActivityRecordList(arecords));
         result.setLeadActivityList(res);
@@ -181,18 +213,24 @@ public class MarketoSOAPClientTest {
         StreamPosition sp = new StreamPosition();
         sp.setOffset(objectFactory.createStreamPositionOffset(""));
         res.setNewStartPosition(sp);
-
+        //
         ArrayOfLeadChangeRecord lcr = new ArrayOfLeadChangeRecord();
         LeadChangeRecord lc = new LeadChangeRecord();
-        lc.setId(123456);
-        lc.setMktgAssetName(objectFactory.createLeadChangeRecordMktgAssetName("asset"));
-        lc.setActivityDateTime(null);
-        lc.setActivityType(null);
-        lc.setCampaign(null);
-        lc.setMktPersonId(null);
-        lc.setActivityAttributes(objectFactory.createActivityRecordActivityAttributes(new ArrayOfAttribute()));
-
+        lc.setId(objectFactory.createLeadChangeRecordId(123456L));
+        lc.setMarketoGUID("ABC-123-DEF");
+        lc.setMktgAssetName(objectFactory.createLeadChangeRecordMktgAssetName("mktgAssetName"));
+        lc.setActivityDateTime(factory.newXMLGregorianCalendar(gcDateTest));
+        lc.setActivityType("activityType");
+        lc.setCampaign("campaign");
+        lc.setMktPersonId("mktPersonId");
+        ArrayOfAttribute aoa = objectFactory.createArrayOfAttribute();
+        Attribute attr = new Attribute();
+        attr.setAttrName("attrName");
+        attr.setAttrValue("attrValue");
+        aoa.getAttributes().add(attr);
+        lc.setActivityAttributes(objectFactory.createActivityRecordActivityAttributes(aoa));
         lcr.getLeadChangeRecords().add(lc);
+        //
         res.setLeadChangeRecordList(objectFactory.createResultGetLeadChangesLeadChangeRecordList(lcr));
         result.setResult(res);
 
@@ -306,6 +344,10 @@ public class MarketoSOAPClientTest {
         client.connect();
 
         objectFactory = new ObjectFactory();
+        factory = DatatypeFactory.newInstance();
+        Date dateTest = MarketoUtils.parseDateString(DATE_EXPECTED);
+        gcDateTest = new GregorianCalendar();
+        gcDateTest.setTime(dateTest);
     }
 
     @Test
@@ -322,10 +364,26 @@ public class MarketoSOAPClientTest {
     public void testGetLead() throws Exception {
         doReturn(getGetLeadResult()).when(port).getLead(any(ParamsGetLead.class), any(AuthenticationHeader.class));
         iprops.afterInputOperation();
+        Field attr = new Field("attrName", AvroUtils._string(), "", null);
+        iprops.schemaInput.schema
+                .setValue(MarketoUtils.newSchema(iprops.schemaInput.schema.getValue(), "test", Collections.singletonList(attr)));
+        iprops.beforeMappingInput();
         iprops.leadKeyTypeSOAP.setValue(LeadKeyTypeSOAP.IDNUM);
         mktoRR = client.getLead(iprops, null);
         assertNotNull(mktoRR);
         assertTrue(mktoRR.isSuccess());
+        List<IndexedRecord> records = mktoRR.getRecords();
+        assertNotNull(records);
+        IndexedRecord record = records.get(0);
+        assertNotNull(record);
+        Schema refSchema = iprops.schemaInput.schema.getValue();
+        assertEquals(refSchema, record.getSchema());
+        assertEquals(12345, record.get(refSchema.getField("Id").pos()));
+        assertEquals("email@email.com", record.get(refSchema.getField("Email").pos()));
+        assertEquals("foreignSysPersonId", record.get(refSchema.getField("ForeignSysPersonId").pos()));
+        assertEquals("SFDC", record.get(refSchema.getField("ForeignSysType").pos()));
+        assertEquals("attrValue", record.get(refSchema.getField("attrName").pos()));
+        //
         doThrow(new RuntimeException("error")).when(port).getLead(any(ParamsGetLead.class), any(AuthenticationHeader.class));
         mktoRR = client.getLead(iprops, null);
         assertNotNull(mktoRR);
@@ -407,11 +465,35 @@ public class MarketoSOAPClientTest {
     public void testGetLeadActivity() throws Exception {
         doReturn(getLeadActivityResult()).when(port).getLeadActivity(any(ParamsGetLeadActivity.class),
                 any(AuthenticationHeader.class));
+        iprops.inputOperation.setValue(InputOperation.getLeadActivity);
         iprops.afterInputOperation();
+        Field attr = new Field("attrName", AvroUtils._string(), "", null);
+        iprops.schemaInput.schema
+                .setValue(MarketoUtils.newSchema(iprops.schemaInput.schema.getValue(), "test", Collections.singletonList(attr)));
+        iprops.beforeMappingInput();
         iprops.leadKeyTypeSOAP.setValue(LeadKeyTypeSOAP.IDNUM);
         mktoRR = client.getLeadActivity(iprops, null);
         assertNotNull(mktoRR);
         assertTrue(mktoRR.isSuccess());
+        List<IndexedRecord> records = mktoRR.getRecords();
+        assertNotNull(records);
+        IndexedRecord record = records.get(0);
+        assertNotNull(record);
+        Schema refSchema = iprops.schemaInput.schema.getValue();
+        assertEquals(refSchema, record.getSchema());
+        assertEquals("ABC-123-DEF", record.get(refSchema.getField("marketoGUID").pos()));
+        assertEquals(123456L, record.get(refSchema.getField("Id").pos()));
+        assertEquals("mktgAssetName", record.get(refSchema.getField("MktgAssetName").pos()));
+        assertTrue(record.get(refSchema.getField("ActivityDateTime").pos()) instanceof Long);
+        assertEquals("activityType", record.get(refSchema.getField("ActivityType").pos()));
+        assertEquals("mktgAssetName", record.get(refSchema.getField("MktgAssetName").pos()));
+        assertEquals("mktPersonId", record.get(refSchema.getField("MktPersonId").pos()));
+        assertEquals("campaign", record.get(refSchema.getField("Campaign").pos()));
+        assertEquals("foreignSysId", record.get(refSchema.getField("ForeignSysId").pos()));
+        assertEquals("personName", record.get(refSchema.getField("PersonName").pos()));
+        assertEquals("orgName", record.get(refSchema.getField("OrgName").pos()));
+        assertEquals("foreignSysOrgId", record.get(refSchema.getField("ForeignSysOrgId").pos()));
+        assertEquals("attrValue", record.get(refSchema.getField("attrName").pos()));
         //
         doThrow(new RuntimeException("error")).when(port).getLeadActivity(any(ParamsGetLeadActivity.class),
                 any(AuthenticationHeader.class));
@@ -424,13 +506,32 @@ public class MarketoSOAPClientTest {
     public void testGetLeadChanges() throws Exception {
         doReturn(getLeadChangeResult()).when(port).getLeadChanges(any(ParamsGetLeadChanges.class),
                 any(AuthenticationHeader.class));
+        iprops.inputOperation.setValue(InputOperation.getLeadChanges);
         iprops.afterInputOperation();
+        Field attr = new Field("attrName", AvroUtils._string(), "", null);
+        iprops.schemaInput.schema
+                .setValue(MarketoUtils.newSchema(iprops.schemaInput.schema.getValue(), "test", Collections.singletonList(attr)));
+        iprops.beforeMappingInput();
         iprops.leadKeyTypeSOAP.setValue(LeadKeyTypeSOAP.IDNUM);
         iprops.oldestCreateDate.setValue("2017-01-20 00:00:00 +0100");
         iprops.latestCreateDate.setValue("2017-01-31 00:00:00 +0100");
         mktoRR = client.getLeadChanges(iprops, null);
         assertNotNull(mktoRR);
         assertTrue(mktoRR.isSuccess());
+        List<IndexedRecord> records = mktoRR.getRecords();
+        assertNotNull(records);
+        IndexedRecord record = records.get(0);
+        assertNotNull(record);
+        Schema refSchema = iprops.schemaInput.schema.getValue();
+        assertEquals(refSchema, record.getSchema());
+        assertEquals("ABC-123-DEF", record.get(refSchema.getField("marketoGUID").pos()));
+        assertEquals(123456L, record.get(refSchema.getField("Id").pos()));
+        assertTrue(record.get(refSchema.getField("ActivityDateTime").pos()) instanceof Long);
+        assertEquals("activityType", record.get(refSchema.getField("ActivityType").pos()));
+        assertEquals("mktgAssetName", record.get(refSchema.getField("MktgAssetName").pos()));
+        assertEquals("mktPersonId", record.get(refSchema.getField("MktPersonId").pos()));
+        assertEquals("campaign", record.get(refSchema.getField("Campaign").pos()));
+        assertEquals("attrValue", record.get(refSchema.getField("attrName").pos()));
         //
         doThrow(new RuntimeException("error")).when(port).getLeadChanges(any(ParamsGetLeadChanges.class),
                 any(AuthenticationHeader.class));

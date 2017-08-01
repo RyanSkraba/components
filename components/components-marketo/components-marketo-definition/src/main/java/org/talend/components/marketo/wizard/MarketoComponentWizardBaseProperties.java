@@ -113,7 +113,7 @@ public class MarketoComponentWizardBaseProperties extends MarketoComponentProper
             for (NamedThing nl : selectedLeadColumns.getValue()) {
                 newFields.add(MarketoUtils.generateNewField(allAvailableleadFields.get(nl.getName())));
             }
-            Schema s = newSchema(getEmptySchema(), "selectedLeadFields", newFields);
+            Schema s = MarketoUtils.newSchema(getEmptySchema(), "selectedLeadFields", newFields);
             schemaInput.schema.setValue(s);
             // cleanup allAvailableleadFields
             allAvailableleadFields.clear();

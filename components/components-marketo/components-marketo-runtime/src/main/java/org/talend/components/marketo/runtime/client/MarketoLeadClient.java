@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client;
 
+import static org.talend.components.marketo.MarketoConstants.FIELD_MARKETO_GUID;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
 
 import java.util.ArrayList;
@@ -89,6 +90,8 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
     public static final String FIELD_PRIMARY_ATTRIBUTE_VALUE = "primaryAttributeValue";
 
     public static final String FIELD_PRIMARY_ATTRIBUTE_VALUE_ID = "primaryAttributeValueId";
+
+    public static final String FIELD_CAMPAIGN_ID = "campaignId";
 
     public static final String API_PATH_LIST = "/v1/list/";
 
@@ -202,6 +205,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 case FIELD_ID:
                     record.put(f.pos(), input.getId());
                     break;
+                case FIELD_MARKETO_GUID:
+                    record.put(f.pos(), input.getMarketoGUID());
+                    break;
                 case FIELD_LEAD_ID:
                     record.put(f.pos(), input.getLeadId());
                     break;
@@ -219,6 +225,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                     break;
                 case FIELD_PRIMARY_ATTRIBUTE_VALUE:
                     record.put(f.pos(), input.getPrimaryAttributeValue());
+                    break;
+                case FIELD_CAMPAIGN_ID:
+                    record.put(f.pos(), input.getCampaignId());
                     break;
                 default:
                     for (Map<String, String> attr : input.getAttributes()) {
@@ -245,6 +254,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 case FIELD_ID:
                     record.put(f.pos(), input.getId());
                     break;
+                case FIELD_MARKETO_GUID:
+                    record.put(f.pos(), input.getMarketoGUID());
+                    break;
                 case FIELD_LEAD_ID:
                     record.put(f.pos(), input.getLeadId());
                     break;
@@ -259,6 +271,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                     break;
                 case FIELD_FIELDS:
                     record.put(f.pos(), gson.toJson(input.getFields()));
+                    break;
+                case FIELD_CAMPAIGN_ID:
+                    record.put(f.pos(), input.getCampaignId());
                     break;
                 default:
                     for (Map<String, String> attr : input.getAttributes()) {

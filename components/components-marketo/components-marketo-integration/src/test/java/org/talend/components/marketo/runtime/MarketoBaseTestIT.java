@@ -29,6 +29,7 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.runtime.client.MarketoRESTClient;
 import org.talend.components.marketo.runtime.client.rest.type.SyncStatus;
 import org.talend.components.marketo.runtime.client.type.ListOperationParameters;
@@ -156,7 +157,7 @@ public class MarketoBaseTestIT {
         field = new Schema.Field("company", Schema.create(Type.STRING), null, (Object) null);
         fields.add(field);
 
-        Schema s = p.newSchema(p.schemaInput.schema.getValue(), "leadAttribute", fields);
+        Schema s = MarketoUtils.newSchema(p.schemaInput.schema.getValue(), "leadAttribute", fields);
         p.schemaInput.schema.setValue(s);
         p.updateOutputSchemas();
         //

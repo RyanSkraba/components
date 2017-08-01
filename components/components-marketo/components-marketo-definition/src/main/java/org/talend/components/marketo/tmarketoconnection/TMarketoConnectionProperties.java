@@ -65,7 +65,7 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
 
     public static final String DEFAULT_ENDPOINT_REST = "https://123-ABC-456.mktorest.com/rest";
 
-    public static final String DEFAULT_ENDPOINT_SOAP = "https://123-ABC-456.mktoapi.com/soap/mktows/2_9";
+    public static final String DEFAULT_ENDPOINT_SOAP = "https://123-ABC-456.mktoapi.com/soap/mktows/3_1";
 
     private String repositoryLocation;
 

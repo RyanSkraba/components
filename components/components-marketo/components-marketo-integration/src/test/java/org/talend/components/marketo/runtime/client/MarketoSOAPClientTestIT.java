@@ -45,6 +45,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
+import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.runtime.MarketoSource;
 import org.talend.components.marketo.runtime.client.rest.type.SyncStatus;
 import org.talend.components.marketo.runtime.client.type.ListOperationParameters;
@@ -734,7 +735,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         fields.add(field);
         field = new Schema.Field("LastName", Schema.create(Schema.Type.STRING), null, (Object) null);
         fields.add(field);
-        Schema s = outProperties.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
+        Schema s = MarketoUtils.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
         record = new GenericData.Record(s);
         record.put(0, 10);
         record.put(1, "undx@undx.net");
@@ -795,7 +796,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         fields.add(field);
         field = new Schema.Field("AccountType", Schema.create(Schema.Type.STRING), null, (Object) null);
         fields.add(field);
-        Schema s = outProperties.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
+        Schema s = MarketoUtils.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
         IndexedRecord record = new GenericData.Record(s);
         record.put(0, null);
         record.put(1, "undx@undx.net");
@@ -822,7 +823,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         List<Field> fields = new ArrayList<>();
         Field field = new Schema.Field("AccountType", Schema.create(Schema.Type.STRING), null, (Object) null);
         fields.add(field);
-        Schema s = outProperties.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
+        Schema s = MarketoUtils.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
         outProperties.schemaInput.schema.setValue(s);
         outProperties.beforeMappingInput();
         List<IndexedRecord> records = new ArrayList<>();

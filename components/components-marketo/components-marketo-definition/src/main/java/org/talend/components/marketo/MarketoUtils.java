@@ -14,7 +14,9 @@ package org.talend.components.marketo;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.Schema;
@@ -66,6 +68,37 @@ public class MarketoUtils {
             field.addProp(entry.getKey(), entry.getValue());
         }
         return field;
+    }
+
+    public static List<String> getSchemaFields(Schema schema) {
+        List<String> fieldNames = new ArrayList<>();
+        for (Schema.Field f : schema.getFields()) {
+            fieldNames.add(f.name());
+        }
+        return fieldNames;
+    }
+
+    public static Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields) {
+        Schema newSchema = Schema.createRecord(newSchemaName, metadataSchema.getDoc(), metadataSchema.getNamespace(),
+                metadataSchema.isError());
+
+        List<Schema.Field> copyFieldList = new ArrayList<>();
+        for (Schema.Field se : metadataSchema.getFields()) {
+            Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
+            field.getObjectProps().putAll(se.getObjectProps());
+            for (Map.Entry<String, Object> entry : se.getObjectProps().entrySet()) {
+                field.addProp(entry.getKey(), entry.getValue());
+            }
+            copyFieldList.add(field);
+        }
+        copyFieldList.addAll(moreFields);
+
+        newSchema.setFields(copyFieldList);
+        for (Map.Entry<String, Object> entry : metadataSchema.getObjectProps().entrySet()) {
+            newSchema.addProp(entry.getKey(), entry.getValue());
+        }
+
+        return newSchema;
     }
 
 }

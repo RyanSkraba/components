@@ -39,7 +39,8 @@ public class MarketoConstantsTest {
     public void testLeadChangesSchemaSOAP() throws Exception {
         Schema ref = MarketoConstants.getSOAPSchemaForGetLeadChanges();
         assertEquals("LONG", ref.getField("Id").schema().getTypes().get(0).getType().toString());
-        assertEquals("true", ref.getField("Id").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+        assertEquals("STRING", ref.getField("marketoGUID").schema().getTypes().get(0).getType().toString());
+        assertEquals("true", ref.getField("marketoGUID").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
         assertEquals("LONG", ref.getField("ActivityDateTime").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("ActivityDateTime").getProp(SchemaConstants.JAVA_CLASS_FLAG));
         assertEquals(DATETIME_PATTERN_SOAP, ref.getField("ActivityDateTime").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
@@ -53,7 +54,8 @@ public class MarketoConstantsTest {
     public void testLeadActivitySchemaSOAP() throws Exception {
         Schema ref = MarketoConstants.getSOAPSchemaForGetLeadActivity();
         assertEquals("LONG", ref.getField("Id").schema().getTypes().get(0).getType().toString());
-        assertEquals("true", ref.getField("Id").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+        assertEquals("STRING", ref.getField("marketoGUID").schema().getTypes().get(0).getType().toString());
+        assertEquals("true", ref.getField("marketoGUID").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
         assertEquals("LONG", ref.getField("ActivityDateTime").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("ActivityDateTime").getProp(SchemaConstants.JAVA_CLASS_FLAG));
         assertEquals(DATETIME_PATTERN_SOAP, ref.getField("ActivityDateTime").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
@@ -169,7 +171,8 @@ public class MarketoConstantsTest {
     public void testGetLeadChangesSchemaREST() throws Exception {
         Schema ref = MarketoConstants.getRESTSchemaForGetLeadChanges();
         assertEquals("INT", ref.getField("id").schema().getTypes().get(0).getType().toString());
-        assertEquals("true", ref.getField("id").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+        assertEquals("STRING", ref.getField("marketoGUID").schema().getTypes().get(0).getType().toString());
+        assertEquals("true", ref.getField("marketoGUID").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
         assertEquals("INT", ref.getField("leadId").schema().getTypes().get(0).getType().toString());
         assertEquals("LONG", ref.getField("activityDate").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("activityDate").getProp(SchemaConstants.JAVA_CLASS_FLAG));
@@ -183,7 +186,8 @@ public class MarketoConstantsTest {
     public void testGetLeadActivitySchemaREST() throws Exception {
         Schema ref = MarketoConstants.getRESTSchemaForGetLeadActivity();
         assertEquals("INT", ref.getField("id").schema().getTypes().get(0).getType().toString());
-        assertEquals("true", ref.getField("id").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+        assertEquals("STRING", ref.getField("marketoGUID").schema().getTypes().get(0).getType().toString());
+        assertEquals("true", ref.getField("marketoGUID").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
         assertEquals("INT", ref.getField("leadId").schema().getTypes().get(0).getType().toString());
         assertEquals("LONG", ref.getField("activityDate").schema().getType().toString());
         assertEquals("java.util.Date", ref.getField("activityDate").getProp(SchemaConstants.JAVA_CLASS_FLAG));

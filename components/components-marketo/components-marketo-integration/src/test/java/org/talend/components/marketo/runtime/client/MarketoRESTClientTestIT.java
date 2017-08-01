@@ -47,6 +47,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.marketo.MarketoConstants;
+import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.runtime.MarketoSource;
 import org.talend.components.marketo.runtime.client.rest.type.SyncStatus;
 import org.talend.components.marketo.runtime.client.type.ListOperationParameters;
@@ -680,7 +681,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         List<Field> fields = new ArrayList<>();
         Field field = new Schema.Field("accountType", Schema.create(Schema.Type.STRING), null, (Object) null);
         fields.add(field);
-        Schema s = outProperties.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
+        Schema s = MarketoUtils.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
         IndexedRecord record = new GenericData.Record(s);
         record.put(0, null);
         record.put(1, "undx71@undx.net");

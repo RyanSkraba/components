@@ -28,17 +28,20 @@ import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectio
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.marketo.MarketoConstants;
+import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.runtime.MarketoRuntimeTestBase;
 import org.talend.components.marketo.runtime.client.rest.response.DescribeFieldsResult;
 import org.talend.components.marketo.runtime.client.rest.response.LeadActivitiesResult;
@@ -64,6 +67,7 @@ import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListP
 import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperationProperties;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation;
+import org.talend.daikon.avro.AvroUtils;
 
 import com.google.gson.JsonObject;
 
@@ -174,6 +178,7 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         lv.put("id", "12345");
         lv.put("firstName", "testFN");
         lv.put("lastName", "testLN");
+        lv.put("attrName", "attrValue");
         kv.add(lv);
         lr.setResult(kv);
         return lr;
@@ -185,6 +190,10 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         iprops.leadKeyTypeREST.setValue(LeadKeyTypeREST.id);
         iprops.leadKeyValue.setValue("12345");
         iprops.afterInputOperation();
+        Field attr = new Field("attrName", AvroUtils._string(), "", null);
+        iprops.schemaInput.schema
+                .setValue(MarketoUtils.newSchema(iprops.schemaInput.schema.getValue(), "test", Collections.singletonList(attr)));
+        iprops.beforeMappingInput();
         //
         doThrow(new MarketoException("REST", "error")).when(client).executeFakeGetRequestForLead(anyString());
         mktoRR = client.getLead(iprops, null);
@@ -198,6 +207,16 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         doReturn(getLeadResult()).when(client).executeFakeGetRequestForLead(anyString());
         mktoRR = client.getLead(iprops, null);
         assertTrue(mktoRR.isSuccess());
+        List<IndexedRecord> records = mktoRR.getRecords();
+        assertNotNull(records);
+        IndexedRecord record = records.get(0);
+        assertNotNull(record);
+        Schema refSchema = iprops.schemaInput.schema.getValue();
+        assertEquals(refSchema, record.getSchema());
+        assertEquals(12345, record.get(refSchema.getField("id").pos()));
+        assertEquals("testFN", record.get(refSchema.getField("firstName").pos()));
+        assertEquals("testLN", record.get(refSchema.getField("lastName").pos()));
+        assertEquals("attrValue", record.get(refSchema.getField("attrName").pos()));
     }
 
     @Test
@@ -234,6 +253,11 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         iprops.leadKeyValues.setValue("12345");
         iprops.includeTypes.type.setValue(Arrays.asList(IncludeExcludeFieldsREST.AddToList.name()));
         iprops.afterInputOperation();
+        List<Field> moreFields = new ArrayList<>();
+        moreFields.add(new Field("attrName", AvroUtils._string(), "", null));
+        moreFields.add(new Field("campaignId", AvroUtils._int(), "", null));
+        iprops.schemaInput.schema.setValue(MarketoUtils.newSchema(iprops.schemaInput.schema.getValue(), "test", moreFields));
+        iprops.beforeMappingInput();
         //
         doThrow(new MarketoException("REST", "error")).when(client).executeGetRequest(LeadActivitiesResult.class);
         mktoRR = client.getLeadActivity(iprops, null);
@@ -248,18 +272,41 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         lar.setSuccess(true);
         List<LeadActivityRecord> lars = new ArrayList<>();
         LeadActivityRecord larecord = new LeadActivityRecord();
-        larecord.setId(666123);
+        larecord.setId(123456);
+        larecord.setMarketoGUID("ABC-123-DEF");
         larecord.setLeadId(12345);
         larecord.setActivityTypeId(1);
         larecord.setActivityTypeValue("Visit Webpage");
         larecord.setPrimaryAttributeValue("changed");
         larecord.setPrimaryAttributeValueId(123);
         larecord.setActivityDate(new Date());
+        larecord.setCampaignId(456);
+        List<Map<String, String>> attributes = new ArrayList<>();
+        Map<String, String> attribute = new HashMap<>();
+        attribute.put("attrName", "attrValue");
+        attributes.add(attribute);
+        larecord.setAttributes(attributes);
         lars.add(larecord);
         lar.setResult(lars);
         doReturn(lar).when(client).executeGetRequest(LeadActivitiesResult.class);
         mktoRR = client.getLeadActivity(iprops, null);
         assertTrue(mktoRR.isSuccess());
+        List<IndexedRecord> records = mktoRR.getRecords();
+        assertNotNull(records);
+        IndexedRecord record = records.get(0);
+        assertNotNull(record);
+        Schema refSchema = iprops.schemaInput.schema.getValue();
+        assertEquals(refSchema, record.getSchema());
+        assertEquals(123456, record.get(refSchema.getField("id").pos()));
+        assertEquals("ABC-123-DEF", record.get(refSchema.getField("marketoGUID").pos()));
+        assertEquals(12345, record.get(refSchema.getField("leadId").pos()));
+        assertEquals(1, record.get(refSchema.getField("activityTypeId").pos()));
+        assertEquals("Visit Webpage", record.get(refSchema.getField("activityTypeValue").pos()));
+        assertEquals(123, record.get(refSchema.getField("primaryAttributeValueId").pos()));
+        assertEquals(456, record.get(refSchema.getField("campaignId").pos()));
+        assertEquals("changed", record.get(refSchema.getField("primaryAttributeValue").pos()));
+        assertTrue(record.get(refSchema.getField("activityDate").pos()) instanceof Long);
+        assertEquals("attrValue", record.get(refSchema.getField("attrName").pos()));
     }
 
     @Test
@@ -267,6 +314,11 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         iprops.inputOperation.setValue(InputOperation.getLeadChanges);
         iprops.sinceDateTime.setValue("2017-01-30 10:00:00 +0100");
         iprops.afterInputOperation();
+        List<Field> moreFields = new ArrayList<>();
+        moreFields.add(new Field("attrName", AvroUtils._string(), "", null));
+        moreFields.add(new Field("campaignId", AvroUtils._int(), "", null));
+        iprops.schemaInput.schema.setValue(MarketoUtils.newSchema(iprops.schemaInput.schema.getValue(), "test", moreFields));
+        iprops.beforeMappingInput();
         //
         doThrow(new MarketoException("REST", "error")).when(client).executeGetRequest(LeadChangesResult.class);
         mktoRR = client.getLeadChanges(iprops, null);
@@ -281,16 +333,44 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         lcr.setSuccess(true);
         List<LeadChangeRecord> lcrs = new ArrayList<>();
         LeadChangeRecord lc = new LeadChangeRecord();
-        lc.setId(666123);
+        lc.setId(123456);
+        lc.setMarketoGUID("ABC-123-DEF");
         lc.setLeadId(12345);
         lc.setActivityTypeId(1);
         lc.setActivityTypeValue("Visit Webpage");
         lc.setActivityDate(new Date());
+        lc.setCampaignId(456);
+        List<Map<String, String>> fields = new ArrayList<>();
+        Map<String, String> field = new HashMap<>();
+        field.put("field1", "value1");
+        fields.add(field);
+        lc.setFields(fields);
+        List<Map<String, String>> attributes = new ArrayList<>();
+        Map<String, String> attribute = new HashMap<>();
+        attribute.put("attrName", "attrValue");
+        attributes.add(attribute);
+        lc.setAttributes(attributes);
         lcrs.add(lc);
         lcr.setResult(lcrs);
+        //
         doReturn(lcr).when(client).executeGetRequest(LeadChangesResult.class);
         mktoRR = client.getLeadChanges(iprops, null);
         assertTrue(mktoRR.isSuccess());
+        List<IndexedRecord> records = mktoRR.getRecords();
+        assertNotNull(records);
+        IndexedRecord record = records.get(0);
+        assertNotNull(record);
+        Schema refSchema = iprops.schemaInput.schema.getValue();
+        assertEquals(refSchema, record.getSchema());
+        assertEquals(123456, record.get(refSchema.getField("id").pos()));
+        assertEquals("ABC-123-DEF", record.get(refSchema.getField("marketoGUID").pos()));
+        assertEquals(12345, record.get(refSchema.getField("leadId").pos()));
+        assertEquals(1, record.get(refSchema.getField("activityTypeId").pos()));
+        assertEquals("Visit Webpage", record.get(refSchema.getField("activityTypeValue").pos()));
+        assertEquals(456, record.get(refSchema.getField("campaignId").pos()));
+        assertEquals("[{\"field1\":\"value1\"}]", record.get(refSchema.getField("fields").pos()));
+        assertTrue(record.get(refSchema.getField("activityDate").pos()) instanceof Long);
+        assertEquals("attrValue", record.get(refSchema.getField("attrName").pos()));
     }
 
     public SyncResult getListOperationResult(boolean isSuccess, String status) {
