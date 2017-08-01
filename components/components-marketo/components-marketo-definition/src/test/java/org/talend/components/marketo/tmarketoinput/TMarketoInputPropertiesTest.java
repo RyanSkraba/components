@@ -955,13 +955,6 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     }
 
     @Test
-    public void testAfterFetchLeadSchema() throws Exception {
-        props.afterFetchLeadSchema();
-        assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads().getName(),
-                props.schemaInput.schema.getValue().getName());
-    }
-
-    @Test
     public void testLeadActivityVisibility() throws Exception {
         String tl_setExcludeTypes = props.setExcludeTypes.getName();
         String tl_excludeTypes = props.excludeTypes.getName();

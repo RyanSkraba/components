@@ -24,7 +24,6 @@ import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -170,7 +169,6 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
         super.setupLayout();
 
         Form mainForm = getForm(Form.MAIN);
-        mainForm.addColumn(Widget.widget(fetchLeadSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE).setLongRunning(true));
         mainForm.addRow(outputOperation);
         mainForm.addColumn(operationType);
         //
@@ -185,10 +183,6 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
         mainForm.addRow(deleteLeadsInBatch);
         mainForm.addRow(batchSize);
         mainForm.addRow(dieOnError);
-        //
-        Form selectLeadSchemaForm = new Form(this, FORM_FETCH_LEAD_SCHEMA);
-        selectLeadSchemaForm.addRow(widget(selectedLeadColumns).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
-        fetchLeadSchema.setFormtoShow(selectLeadSchemaForm);
     }
 
     @Override
@@ -208,8 +202,6 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
             form.getWidget(customObjectName.getName()).setVisible(false);
             form.getWidget(customObjectDedupeBy.getName()).setVisible(false);
             form.getWidget(customObjectDeleteBy.getName()).setVisible(false);
-            //
-            form.getWidget(fetchLeadSchema.getName()).setVisible(false);
             // batchSize
             if (outputOperation.getValue().equals(syncMultipleLeads)) {
                 form.getWidget(deDupeEnabled.getName()).setVisible(true);
@@ -225,7 +217,6 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
                     form.getWidget(deDupeEnabled.getName()).setVisible(true);
                     form.getWidget(operationType.getName()).setHidden(deDupeEnabled.getValue());
                     form.getWidget(lookupField.getName()).setHidden(deDupeEnabled.getValue());
-                    form.getWidget(fetchLeadSchema.getName()).setVisible(true);
                     break;
                 case deleteLeads:
                     form.getWidget(deleteLeadsInBatch.getName()).setVisible(true);
@@ -308,23 +299,6 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
     public void afterBatchSize() {
         updateOutputSchemas();
         refreshLayout(getForm(Form.MAIN));
-    }
-
-    @Override
-    public void beforeFormPresentFetchLeadSchema() throws IOException {
-        try {
-            getForm(FORM_FETCH_LEAD_SCHEMA).setSubtitle(messages.getMessage("form.fetchLeadSchema.subtitle"));
-            super.beforeFormPresentFetchLeadSchema();
-        } catch (IOException e) {
-            LOG.error(e.getMessage());
-            getForm(FORM_FETCH_LEAD_SCHEMA).setSubtitle(e.getMessage());
-        }
-    }
-
-    @Override
-    public void afterFetchLeadSchema() {
-        super.afterFetchLeadSchema();
-        updateOutputSchemas();
     }
 
     public void updateSchemaRelated() {

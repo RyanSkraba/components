@@ -260,10 +260,4 @@ public class TMarketoOutputPropertiesTest {
         assertFalse(props.postDeserialize(0, null, false));
     }
 
-    @Test
-    public void testAfterFetchLeadSchema() throws Exception {
-        props.afterFetchLeadSchema();
-        assertEquals(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads().getName(),
-                props.schemaInput.schema.getValue().getName());
-    }
 }
