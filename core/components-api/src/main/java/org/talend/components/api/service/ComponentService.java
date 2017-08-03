@@ -208,4 +208,6 @@ public interface ComponentService extends PropertiesService<Properties> {
     Set<? extends Connector> getAvailableConnectors(ComponentProperties componentProperties,
             Set<? extends Connector> connectedConnetor, boolean isOuput);
 
+    <T extends Properties> void postDeserialize(T props);
+
 }

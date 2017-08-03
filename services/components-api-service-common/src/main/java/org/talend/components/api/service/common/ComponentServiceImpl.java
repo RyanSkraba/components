@@ -84,8 +84,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
     @Override
     public ComponentProperties getComponentProperties(String name) {
         ComponentDefinition compDef = getComponentDefinition(name);
-        ComponentProperties properties = compDef.createProperties();
-        return properties;
+        return definitionRegistry.createProperties(compDef, "root");
     }
 
     @Override
@@ -192,7 +191,8 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(String componentName, ExecutionEngine engine, Properties properties, ConnectorTopology topology) {
+    public RuntimeInfo getRuntimeInfo(String componentName, ExecutionEngine engine, Properties properties,
+            ConnectorTopology topology) {
         ComponentDefinition componentDef = getComponentDefinition(componentName);
         return componentDef.getRuntimeInfo(engine, (ComponentProperties) properties, topology);
     }
@@ -222,6 +222,11 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
     @Override
     public void setSchema(ComponentProperties componentProperties, Connector connector, Schema schema, boolean isOuput) {
         componentProperties.setConnectedSchema(connector, schema, isOuput);
+    }
+
+    @Override
+    public <T extends Properties> void postDeserialize(T props) {
+        definitionRegistry.postDeserialize(props);
     }
 
 }

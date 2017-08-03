@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.api.service.common;
 
-import static org.slf4j.LoggerFactory.*;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -31,6 +31,7 @@ import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.PropertiesImpl;
+import org.talend.daikon.properties.PropertiesUtils;
 
 /**
  * Utility for getting and setting the definitions registered in the component framework.
@@ -45,8 +46,7 @@ public class DefinitionRegistry implements ComponentInstaller.ComponentFramework
     private static final Logger LOGGER = getLogger(DefinitionRegistry.class);
 
     /**
-     * All of the {@link Definition}s that have been added to the framework, including
-     * {@link ComponentDefinition}s.
+     * All of the {@link Definition}s that have been added to the framework, including {@link ComponentDefinition}s.
      */
     private Map<String, Definition> definitions;
 
@@ -65,7 +65,7 @@ public class DefinitionRegistry implements ComponentInstaller.ComponentFramework
 
     /**
      * @return a map of all the extended {@link Definition} that have been added to the framework keyed with their
-     *         unique name.
+     * unique name.
      */
     public Map<String, Definition> getDefinitions() {
         return definitions;
@@ -171,7 +171,17 @@ public class DefinitionRegistry implements ComponentInstaller.ComponentFramework
     @Override
     public <P extends Properties> P createProperties(Definition<P> definition, String name) {
         P newInstance = PropertiesImpl.createNewInstance(definition.getPropertiesClass(), name);
+        injectDefinitionRegistry(newInstance);
         newInstance.init();
         return newInstance;
     }
+
+    public <P extends Properties> void postDeserialize(P props) {
+        injectDefinitionRegistry(props);
+    }
+
+    public <P extends Properties, V> void injectDefinitionRegistry(P props) {
+        PropertiesUtils.injectObject(props, this);
+    }
+
 }

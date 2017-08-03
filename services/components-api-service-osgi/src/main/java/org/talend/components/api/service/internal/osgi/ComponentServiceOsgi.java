@@ -199,8 +199,14 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(String componentName, ExecutionEngine engine, Properties properties, ConnectorTopology componentType) {
+    public RuntimeInfo getRuntimeInfo(String componentName, ExecutionEngine engine, Properties properties,
+            ConnectorTopology componentType) {
         return componentServiceDelegate.getRuntimeInfo(componentName, engine, properties, componentType);
+    }
+
+    @Override
+    public <T extends Properties> void postDeserialize(T props) {
+        componentServiceDelegate.postDeserialize(props);
     }
 
 }
