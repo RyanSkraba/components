@@ -87,6 +87,11 @@
             <version>${beam.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.beam</groupId>
+            <artifactId>beam-sdks-java-extensions-google-cloud-platform-core</artifactId>
+            <version>${beam.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
             <version>${hadoop.version}</version>
@@ -221,6 +226,11 @@
                         <s3.bucket>${s3.bucket}</s3.bucket>
                         <s3.ssekmskey>${s3.ssekmskey}</s3.ssekmskey>
                         <s3.csekmskey>${s3.csekmskey}</s3.csekmskey>
+                        <bigquery.project>${bigquery.project}</bigquery.project>
+                        <bigquery.service.account.file>${bigquery.service.account.file}
+                        </bigquery.service.account.file>
+                        <bigquery.gcp.temp.folder>${bigquery.gcp.temp.folder}
+                        </bigquery.gcp.temp.folder>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
