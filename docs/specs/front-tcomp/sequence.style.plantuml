@@ -1,0 +1,45 @@
+/' Styles ----------------------------------------------------------------
+
+Installing plantuml is easy, you can do it through maven!
+
+# Get the plantuml jar.
+mvn dependency:get -Dartifact=net.sourceforge.plantuml:plantuml:8045
+
+# Alias to run.
+alias plantuml='java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/.m2/repository/net/sourceforge/plantuml/plantuml/8045/plantuml-8045.jar'
+
+# Continuously generate all diagrams in a directory.
+cd my_plant_diagrams_folder
+plantuml -gui .
+'/
+
+hide footbox
+skinparam backgroundColor transparent
+skinparam shadowing false
+
+skinparam sequenceArrowThickness 2
+
+skinparam note {
+  BackgroundColor #fedc89
+  BorderColor #fdb913
+}
+
+skinparam sequence {
+  ArrowColor #236192
+
+  DividerBackgroundColor #c0be80
+
+  LifeLineBorderColor #53565a
+  LifeLineBackgroundColor #b5bd00
+  ' 817c00, c0be80
+
+  GroupBackgroundColor #f4b68f
+  GroupBorderColor #e86d1f
+
+  ActorBackgroundColor #80d7ed
+  DatabaseBackgroundColor #80d7ed
+  ParticipantBackgroundColor #80d7ed
+  ActorBorderColor #236192
+  DatabaseBorderColor #236192
+  ParticipantBorderColor #236192
+}

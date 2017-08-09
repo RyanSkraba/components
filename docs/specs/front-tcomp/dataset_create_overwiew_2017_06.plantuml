@@ -1,0 +1,74 @@
+/' 
+ Use plantuml to make this into an image or SVG.
+Installing plantuml is easy, you can do it through maven!
+
+# Get the plantuml jar.
+mvn dependency:get -Dartifact=net.sourceforge.plantuml:plantuml:8045
+
+# Alias to run.
+alias plantuml='java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/.m2/repository/net/sourceforge/plantuml/plantuml/8045/plantuml-8045.jar'
+
+# Continuously generate all diagrams in a directory.
+cd my_plant_diagrams_folder
+plantuml -gui .
+'/
+
+
+
+
+@startuml
+!include sequence.style.plantuml
+
+participant User
+participant "Data Prep\nFront" as Front
+participant "Data Prep\nBack" as Middleware
+database "Data Prep\nPersistence" as DB
+participant TCOMP
+
+== create dataset  ==
+
+autonumber "<b>[000]"
+
+Front -> Middleware: create a dataset for JdbcDatastore2
+Middleware -> DB: getDatastore properties (datastoreId)
+activate DB
+DB -> Middleware
+deactivate DB
+rnote over Middleware #dddedf
+    datastore ui-properties
+end rnote
+
+
+Middleware -> TCOMP: POST /properties/JDBCDatastore/dataset?formName=MAIN
+rnote over TCOMP #dddedf
+    datastore ui-properties
+end rnote
+
+
+TCOMP-> Middleware
+rnote over Middleware #dddedf
+    datasset ui-specs(json-schema/ui-schema/ui-properties)
+end rnote
+
+Middleware -> Middleware: inject App metadata into the tcomp payload
+
+Middleware -> Front
+rnote over Front #dddedf
+    app-datasset app-ui-specs(app-json-schema/app-ui-shcema/app-ui-properties)
+end rnote
+
+activate Front
+User -> Front: user setup Dataset
+Front -> Middleware : save Dataset
+deactivate Front
+rnote over Middleware #dddedf
+    app-datasset app-ui-specs(app-json-schema/app-ui-shcema/app-ui-properties)
+end rnote
+
+Middleware -> Middleware: extract tcomp data
+rnote over Middleware #dddedf
+    Dataset ui-properties
+end rnote
+
+Middleware -> DB: store Dataset ui-properties
+@enduml

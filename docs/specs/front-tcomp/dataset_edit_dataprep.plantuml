@@ -1,0 +1,184 @@
+/' 
+ Use plantuml to make this into an image or SVG.
+Installing plantuml is easy, you can do it through maven!
+
+# Get the plantuml jar.
+mvn dependency:get -Dartifact=net.sourceforge.plantuml:plantuml:8045
+
+# Alias to run.
+alias plantuml='java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/.m2/repository/net/sourceforge/plantuml/plantuml/8045/plantuml-8045.jar'
+
+# Continuously generate all diagrams in a directory.
+cd my_plant_diagrams_folder
+plantuml -gui .
+'/
+
+
+
+
+@startuml
+!include sequence.style.plantuml
+
+participant "TDP Front" as Front
+participant "TDP Back(Middleware)" as Middleware
+database "TDP Persistence" as DB
+participant TCOMP
+
+== create a dataset.  ==
+
+autonumber "<b>[000]"
+
+Front -> Middleware: getUiSpecs for datasetType
+Middleware -> TCOMP: getDataset and Datastore
+activate DB
+DB -> Middleware
+
+rnote over Middleware #dddedf
+  {//guess, to be confirmed !
+    **"tcomp-dataset-properties":** {
+        "sourceType": "QUERY",
+        "sql": "select * from tshirts",
+        ...,
+        "@definitionName": "JDBCDataset"
+    }
+    **"tcomp-datastore-properties":** {
+        "dbTypes": "MYSQL",
+        "jdbcUrl": "jdbc:mysql://localhost:3306/db",
+        "userId": "root",
+        "password": "secret",
+        "@definitionName": "JDBCDatastore"
+    }
+  }
+end rnote
+
+Middleware -> TCOMP: post /properties/JDBCDataset?formName=MAIN
+
+rnote over TCOMP #dddedf
+{   **dataset-tcom-properties**
+    "properties": {
+        "sourceType": "QUERY",
+        "sql": "select * from tshirts",
+        ...
+        "@definitionName": "JDBCDataset"
+    },
+    "dependencies": [{
+        "dbTypes": "MYSQL",
+        "jdbcUrl": "jdbc:mysql://localhost:3306/db",
+        "userId": "root",
+        "password": "secret",
+        "@definitionName": "JDBCDatastore"
+    }]
+}
+end rnote
+TCOMP-> Middleware
+
+rnote over Middleware #dddedf
+  **dataset-tcom-ui-specs**:
+  {
+    {
+      **"jsonSchema"**: {
+        "title": "Database data set",
+        "type": "object",
+        "properties": {
+          "sourceType": {
+            "title": "Source type",
+            "type": "string",
+            "enumNames": [
+              "Table name",
+              "Query"
+            ]
+          },
+          "tableName": {
+            "title": "Table name",
+            "type": "string"
+          }...
+        }
+      },
+      **"uiSchema"**: {
+        "sourceType": {
+          "ui:trigger": [
+            "after"
+          ]
+        },
+        "tableName": {
+          "ui:widget": "hidden"
+        },
+        ...
+      },
+      **"properties"**: {
+        "sourceType": "QUERY",
+        "sql": "select * from mytable",
+        "datastore": "JDBCDatastore",
+        "main": {
+          "schema": "{\"type\":\"record\",\"name\":\"EmptyRecord\",\"fields\":[]}"
+        },
+        "@definitionName": "JDBCDataset"
+      }
+    }
+  }
+end rnote
+
+Middleware -> Middleware: inject dataprep metadata into the tcomp payload
+
+Middleware -> Front
+
+rnote over Front #dddedf
+  **dataset-tdp-ui-specs**:
+  {
+    **"jsonSchema":** {
+      "tdp.label": {
+        "title": "Name",
+        "type": "string",
+      },
+      "tdp.type": {
+        "type": "string",
+      },
+      "tdp.id": {
+        "type": "integer",
+      },
+      "tdp.version": {
+        "type": "string",
+      },
+      "title": "Database data set",//tcomp payload embedded
+      "type": "object",
+      "properties": {
+        "sourceType": {
+          "title": "Source type",
+          "type": "string",
+          "enum": [
+            "TABLE_NAME",
+            "QUERY"
+          ]
+        },
+        "tableName": {
+            ...
+        }
+      }
+    },
+    **"uiSchema":** {
+      "tdp.label"={ui:widget:"text"}
+      "sourceType": {//tcomp payload embedded
+        "ui:trigger": [
+          "after"
+        ]
+      },
+      "tableName": {"ui:widget": "hidden"}
+    },
+    **"properties"**: {
+      "tdp.label": "My MySql dataset",
+      "tdp.type": "JDBCDatastore",
+      "tdp.id": "014535",
+      "tdp.version": "4",
+      "sourceType": "QUERY",//tcomp payload embedded
+      "sql": "select * from tshirts",
+      "datastore": "JDBCDatastore",
+      "main": {
+        "schema": "{\"type\":\"record\",\"name\":\"EmptyRecord\",\"fields\":[]}"
+      },
+      "@definitionName": "JDBCDataset"
+  }
+}
+end rnote
+
+
+@enduml

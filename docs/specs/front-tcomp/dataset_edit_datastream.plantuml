@@ -1,0 +1,202 @@
+/' 
+ Use plantuml to make this into an image or SVG.
+Installing plantuml is easy, you can do it through maven!
+
+# Get the plantuml jar.
+mvn dependency:get -Dartifact=net.sourceforge.plantuml:plantuml:8045
+
+# Alias to run.
+alias plantuml='java -DPLANTUML_LIMIT_SIZE=8192 -jar ~/.m2/repository/net/sourceforge/plantuml/plantuml/8045/plantuml-8045.jar'
+
+# Continuously generate all diagrams in a directory.
+cd my_plant_diagrams_folder
+plantuml -gui .
+'/
+
+
+@startuml
+!include sequence.style.plantuml
+
+participant "Data Streams\nFront" as Front
+participant "Data Streams\nBack" as Middleware
+database "Data Streams\nPersistence" as DB
+participant TCOMP
+
+
+== update dataset.  ==
+
+autonumber "<b>[000]"
+
+Front -> Middleware: getUiSpecs for datasetId
+Middleware -> DB: getDataset and Datastore
+activate DB
+DB -> Middleware
+
+rnote over Middleware #dddedf
+  {//guess, to be confirmed !
+    **"Datastream dataset properties":** {
+      "label": "tshirt list",
+      "type": "JDBCDataset",
+      "id": "01453",
+      "version": "2",
+      "type": "object",
+      "**tcomp-properties**": {
+        "sourceType": "QUERY",
+        "sql": "select * from tshirts",
+        ...,
+        "@definitionName": "JDBCDataset"
+      }
+    }
+    **"Datastream datastore properties":** {
+      "label": "Prod connection",
+      "type": "JDBCDatastore",
+      "id": "014535",
+      "version": "4",
+      "type": "object",
+      "**tcomp-properties**": {
+        "dbTypes": "MYSQL",
+        "jdbcUrl": "jdbc:mysql://localhost:3306/db",
+        "@definitionName": "JDBCDatastore"
+      }
+    }
+  }
+end rnote
+
+Middleware -> TCOMP: post /properties/JDBCDataset?formName=MAIN
+
+rnote over TCOMP #dddedf
+{   **dataset-tcom-properties**
+    "properties": {
+        "sql": "select * from tshirts",
+        "@definitionName": "JDBCDataset"
+    },
+    "dependencies": [{
+        "dbTypes": "MYSQL",
+        "jdbcUrl": "jdbc:mysql://localhost:3306/db",
+        "userId": "root",
+        "password": "secret",
+        "@definitionName": "JDBCDatastore"
+    }]
+}
+end rnote
+TCOMP-> Middleware
+
+rnote over Middleware #dddedf
+  **dataset-tcomp-ui-specs**:
+  {
+    {
+      **"jsonSchema"**: {
+        "title": "Database data set",
+        "type": "object",
+        "properties": {
+          "sourceType": {
+            "title": "Source type",
+            "type": "string",
+            "enumNames": [
+              "Table name",
+              "Query"
+            ]
+          },
+          "tableName": {
+            "title": "Table name",
+            "type": "string"
+          }...
+        }
+      },
+      **"uiSchema"**: {
+        "sourceType": {
+          "ui:trigger": [
+            "after"
+          ]
+        },
+        "tableName": {
+          "ui:widget": "hidden"
+        },
+        ...
+      },
+      **"properties"**: {
+        "sourceType": "QUERY",
+        "sql": "select * from mytable",
+        "datastore": "JDBCDatastore",
+        "main": {
+          "schema": "{\"type\":\"record\",\"name\":\"EmptyRecord\",\"fields\":[]}"
+        },
+        "@definitionName": "JDBCDataset"
+      }
+    }
+  }
+end rnote
+
+Middleware -> Middleware: nest tcomp payload into datastream ui-specs
+
+Middleware -> Front
+
+rnote over Front #dddedf
+{   **dataset-stream-ui-specs**
+    **"jsonSchema":** {
+      "label": {
+        "title": "Name",
+        "type": "string",
+      },
+      "type": {
+        "type": "string",
+      },
+      "id": {
+        "type": "integer",
+      },
+      "version": {
+        "type": "string",
+      },
+      "type": "object",
+      "properties": {//tcomp payload nested
+        "**tcomp-properties**":  {
+            "title": "Database data set",
+            "type": "object",
+            "properties": {
+              "sourceType": {
+                "title": "Source type",
+                "type": "string",
+                "enum": [
+                  "TABLE_NAME",
+                  "QUERY"
+                ]
+              },
+              "tableName": {
+                  ...
+              }
+            }
+          }
+      }
+    },
+    **"uiSchema":** {
+      "label"={ui:widget:"text"}
+      "**tcomp-properties**": {//tcomp payload nested
+        "sourceType": {
+          "ui:trigger": [
+            "after"
+          ]
+        },
+        "tableName": {"ui:widget": "hidden"}
+      }
+    }
+  },
+  **"properties"**: {
+      "label": "Prod connection",
+      "type": "JDBCDatastore",
+      "id": "014535",
+      "version": "4",
+      "**tcomp-properties**": {//tcomp payload nested
+        "sourceType": "QUERY",
+        "sql": "select * from tshirts",
+        "datastore": "JDBCDatastore",
+        "main": {
+          "schema": "{\"type\":\"record\",\"name\":\"EmptyRecord\",\"fields\":[]}"
+        },
+        "@definitionName": "JDBCDataset"
+      }
+  }
+}
+end rnote
+
+
+@enduml
