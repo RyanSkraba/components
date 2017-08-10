@@ -25,6 +25,7 @@ import java.util.TimeZone;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,6 +37,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction;
 import org.talend.daikon.avro.AvroUtils;
@@ -80,6 +82,7 @@ public class SnowflakeWriterTest {
         properties.table.tableName.setValue("Table");
         properties.connection.schemaName.setValue("dbSchema");
         properties.connection.db.setValue("db");
+        properties.outputAction.setValue(OutputAction.INSERT);
 
         PowerMockito.mockStatic(LoaderFactory.class);
         loader = Mockito.mock(StreamLoader.class);
@@ -125,7 +128,6 @@ public class SnowflakeWriterTest {
         Schema schema = SchemaBuilder.record("record").fields().requiredString("column").requiredString("field").endRecord();
         AvroUtils.setIncludeAllFields(schema, true);
         properties.table.main.schema.setValue(schema);
-        properties.outputAction.setValue(OutputAction.INSERT);
         Schema schemaDB = SchemaBuilder.record("record").fields().requiredString("id").requiredString("column")
                 .requiredString("field").endRecord();
         Mockito.when(sink.getSchema(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class), Mockito.anyString()))
@@ -184,6 +186,101 @@ public class SnowflakeWriterTest {
         // Need to check if specific array came to loader
         Mockito.verify(loader, Mockito.times(1)).submitRow(Mockito.eq(expectedRow));
 
+    }
+
+    @Test
+    public void testWriteDynamicFieldsCaseInsensitive() throws IOException {
+        Schema schema = Schema.createRecord("records", null, null, false, new ArrayList<Schema.Field>());
+        schema.addProp(SchemaConstants.INCLUDE_ALL_FIELDS, "true");
+        properties.table.main.schema.setValue(schema);
+
+        Schema snowflakeRuntimeSchema = SchemaBuilder.record("runtime").fields().requiredString("NAME")
+                .requiredString("ORGANIZATION").endRecord();
+        Mockito.when(sink.getSchema(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class), Mockito.anyString()))
+                .thenReturn(snowflakeRuntimeSchema);
+
+        Object[] row = new Object[] { "my_name", "talend" };
+
+        Schema incomingSchema = SchemaBuilder.record("incoming").fields().requiredString("name").requiredString("organization")
+                .endRecord();
+        IndexedRecord record = new GenericRecordBuilder(incomingSchema).set("name", "my_name").set("organization", "talend")
+                .build();
+
+        writer.open("");
+        writer.write(record);
+
+        Mockito.verify(loader, Mockito.times(1)).submitRow(Mockito.eq(row));
+    }
+
+    @Test
+    public void testWriteDynamicFieldsMoreFields() throws IOException {
+        Schema schema = Schema.createRecord("records", null, null, false, new ArrayList<Schema.Field>());
+        schema.addProp(SchemaConstants.INCLUDE_ALL_FIELDS, "true");
+        properties.table.main.schema.setValue(schema);
+
+        Schema snowflakeRuntimeSchema = SchemaBuilder.record("runtime").fields().requiredString("name")
+                .requiredString("organization").endRecord();
+        Mockito.when(sink.getSchema(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class), Mockito.anyString()))
+                .thenReturn(snowflakeRuntimeSchema);
+
+        Object[] row = new Object[] { "my_name", "talend" };
+
+        Schema incomingSchema = SchemaBuilder.record("incoming").fields().requiredInt("age").requiredString("name")
+                .requiredString("organization").endRecord();
+        IndexedRecord record = new GenericRecordBuilder(incomingSchema).set("age", 10).set("name", "my_name")
+                .set("organization", "talend").build();
+
+        writer.open("");
+        writer.write(record);
+
+        Mockito.verify(loader, Mockito.times(1)).submitRow(Mockito.eq(row));
+    }
+
+    @Test
+    public void testWriteDynamicFieldsLessFields() throws IOException {
+        Schema schema = Schema.createRecord("records", null, null, false, new ArrayList<Schema.Field>());
+        schema.addProp(SchemaConstants.INCLUDE_ALL_FIELDS, "true");
+        properties.table.main.schema.setValue(schema);
+        Schema snowflakeRuntimeSchema = SchemaBuilder.record("runtime").fields()
+                .name("age").type().intType().intDefault(0)
+                .requiredString("name")
+                .requiredString("organization").endRecord();
+        Mockito.when(sink.getSchema(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class), Mockito.anyString()))
+                .thenReturn(snowflakeRuntimeSchema);
+
+        Object[] row = new Object[] { 0, "my_name", "talend" };
+
+        Schema incomingSchema = SchemaBuilder.record("incoming").fields().requiredString("name")
+                .requiredString("organization").endRecord();
+        IndexedRecord record = new GenericRecordBuilder(incomingSchema).set("name", "my_name")
+                .set("organization", "talend").build();
+
+        writer.open("");
+        writer.write(record);
+
+        Mockito.verify(loader, Mockito.times(1)).submitRow(Mockito.eq(row));
+    }
+
+    @Test(expected = ComponentException.class)
+    public void testWriteDynamicFieldsWithDifferentFields() throws IOException {
+        Schema schema = Schema.createRecord("records", null, null, false, new ArrayList<Schema.Field>());
+        schema.addProp(SchemaConstants.INCLUDE_ALL_FIELDS, "true");
+        properties.table.main.schema.setValue(schema);
+
+        Schema snowflakeRuntimeSchema = SchemaBuilder.record("runtime").fields()
+                .name("ageDifferent").type().intType().intDefault(0)
+                .requiredString("nameDifferent")
+                .requiredString("organizationDifferent").endRecord();
+        Mockito.when(sink.getSchema(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class), Mockito.anyString()))
+                .thenReturn(snowflakeRuntimeSchema);
+
+        Schema incomingSchema = SchemaBuilder.record("incoming").fields().requiredString("name")
+                .requiredString("organization").endRecord();
+        IndexedRecord record = new GenericRecordBuilder(incomingSchema).set("name", "my_name")
+                .set("organization", "talend").build();
+
+        writer.open("");
+        writer.write(record);
     }
 
     /**

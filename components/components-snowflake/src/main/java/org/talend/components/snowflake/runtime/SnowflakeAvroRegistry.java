@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
+import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
@@ -42,7 +43,7 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
         case java.sql.Types.LONGVARCHAR:
         case java.sql.Types.CHAR:
             schema = AvroUtils._string();
-            field = wrap(nullable, schema, name);
+            field = wrap(name, schema, nullable, defaultValue);
             field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, size);
             break;
         case java.sql.Types.INTEGER:
@@ -52,7 +53,7 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
         case java.sql.Types.TINYINT:
         case java.sql.Types.SMALLINT:
             schema = AvroUtils._decimal();
-            field = wrap(nullable, schema, name);
+            field = wrap(name, schema, nullable, defaultValue);
             field.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, size);
             field.addProp(SchemaConstants.TALEND_COLUMN_SCALE, scale);
             break;
@@ -60,32 +61,32 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
         case java.sql.Types.FLOAT:
         case java.sql.Types.REAL:
             schema = AvroUtils._double();
-            field = wrap(nullable, schema, name);
+            field = wrap(name, schema, nullable, defaultValue);
             break;
         case java.sql.Types.DATE:
             schema = AvroUtils._int();
             LogicalTypes.date().addToSchema(schema);
-            field = wrap(nullable, schema, name);
+            field = wrap(name, schema, nullable, defaultValue);
             field.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, SnowflakeConstants.TALEND_DEFAULT_DATE_PATTERN);
             break;
         case java.sql.Types.TIME:
             schema = AvroUtils._int();
             LogicalTypes.timeMillis().addToSchema(schema);
-            field = wrap(nullable, schema, name);
+            field = wrap(name, schema, nullable, defaultValue);
             break;
         case java.sql.Types.TIMESTAMP:
             schema = AvroUtils._long();
             LogicalTypes.timestampMillis().addToSchema(schema);
-            field = wrap(nullable, schema, name);
+            field = wrap(name, schema, nullable, defaultValue);
             field.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, SnowflakeConstants.TALEND_DAFEULT_TIMESTAMP_PATTERN);
             break;
         case java.sql.Types.BOOLEAN:
             schema = AvroUtils._boolean();
-            field = wrap(nullable, schema, name);
+            field = wrap(name, schema, nullable, defaultValue);
             break;
         default:
             schema = AvroUtils._string();
-            field = wrap(nullable, schema, name);
+            field = wrap(name, schema, nullable, defaultValue);
             break;
         }
 
@@ -97,6 +98,11 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
         }
 
         return field;
+    }
+
+    protected Field wrap(String name, Schema base, boolean nullable, Object defaultValue) {
+        Schema schema = nullable ? SchemaBuilder.builder().nullable().type(base) : base;
+        return new Field(name, schema, null, defaultValue);
     }
 
     @Override
