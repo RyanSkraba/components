@@ -39,7 +39,7 @@ public class SnowflakeFamilyDefinition extends AbstractComponentFamilyDefinition
                 new TSnowflakeConnectionDefinition(), new TSnowflakeInputDefinition(), new TSnowflakeOutputDefinition(),
                 new TSnowflakeCloseDefinition(),
                 // Component wizards
-                new SnowflakeConnectionWizardDefinition(), new SnowflakeConnectionEditWizardDefinition(),
+                new SnowflakeConnectionWizardDefinition(),
                 new SnowflakeTableWizardDefinition());
     }
 

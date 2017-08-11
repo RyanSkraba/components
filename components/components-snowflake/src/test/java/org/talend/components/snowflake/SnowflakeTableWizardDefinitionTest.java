@@ -56,4 +56,12 @@ public class SnowflakeTableWizardDefinitionTest {
         Assert.assertNull(definition.getImagePath(DefinitionImageType.SVG_ICON));
     }
 
+    /**
+     * Checks {@link SnowflakeTableWizardDefinition#getMenuItemName()} returns "Snowflake Tables" for en_US locale
+     */
+    @Test
+    public void testGetMenuItemName() {
+        SnowflakeTableWizardDefinition definition = new SnowflakeTableWizardDefinition();
+        Assert.assertEquals("Snowflake Tables", definition.getMenuItemName());
+    }
 }

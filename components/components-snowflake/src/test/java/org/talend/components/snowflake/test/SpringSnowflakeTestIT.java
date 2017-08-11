@@ -40,7 +40,6 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardNameComparator;
 import org.talend.components.service.spring.SpringTestApp;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
-import org.talend.components.snowflake.SnowflakeConnectionWizard;
 import org.talend.components.snowflake.SnowflakeConnectionWizardDefinition;
 import org.talend.components.snowflake.SnowflakeTableListProperties;
 import org.talend.components.snowflake.SnowflakeTableProperties;
@@ -80,22 +79,21 @@ public class SpringSnowflakeTestIT extends SnowflakeRuntimeIT {
         getComponentService().setRepository(repo);
 
         Set<ComponentWizardDefinition> wizards = getComponentService().getTopLevelComponentWizards();
-        int count = 0;
+        int connectionWizardNumber = 0;
         ComponentWizardDefinition wizardDef = null;
         for (ComponentWizardDefinition wizardDefinition : wizards) {
             if (wizardDefinition instanceof SnowflakeConnectionWizardDefinition) {
                 wizardDef = wizardDefinition;
-                count++;
+                connectionWizardNumber++;
             }
         }
-        assertEquals(1, count);
-        assertEquals("Create Snowflake Connection", wizardDef.getMenuItemName());
-        ComponentWizard wiz = getComponentService().getComponentWizard(SnowflakeConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
+        assertEquals(1, connectionWizardNumber);
+        assertEquals("Snowflake Connection", wizardDef.getMenuItemName());
+        ComponentWizard connectionWizard = getComponentService().getComponentWizard(SnowflakeConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
                 "nodeSnowflake");
-        assertNotNull(wiz);
-        assertEquals("nodeSnowflake", wiz.getRepositoryLocation());
-        SnowflakeConnectionWizard swiz = (SnowflakeConnectionWizard) wiz;
-        List<Form> forms = wiz.getForms();
+        assertNotNull(connectionWizard);
+        assertEquals("nodeSnowflake", connectionWizard.getRepositoryLocation());
+        List<Form> forms = connectionWizard.getForms();
         Form connFormWizard = forms.get(0);
         assertEquals("Wizard", connFormWizard.getName());
         assertFalse(connFormWizard.isAllowBack());
@@ -108,10 +106,10 @@ public class SpringSnowflakeTestIT extends SnowflakeRuntimeIT {
 
         SnowflakeConnectionProperties connProps = (SnowflakeConnectionProperties) connFormWizard.getProperties();
 
-        Form af = connProps.getForm(Form.ADVANCED);
+        Form advancedForm = connProps.getForm(Form.ADVANCED);
         assertTrue(
-                ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() + " should be == to " + af,
-                ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() == af);
+                ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() + " should be == to " + advancedForm,
+                ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() == advancedForm);
 
         assertEquals("Name", connProps.getProperty("name").getDisplayName());
         connProps.name.setValue("connName");
@@ -168,29 +166,27 @@ public class SpringSnowflakeTestIT extends SnowflakeRuntimeIT {
 
     @Test
     public void testModuleWizard() throws Throwable {
-        ComponentWizard wiz = getComponentService().getComponentWizard(SnowflakeConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
+        ComponentWizard connectionWizard = getComponentService().getComponentWizard(SnowflakeConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
                 "nodeSnowflake");
-        List<Form> forms = wiz.getForms();
+        List<Form> forms = connectionWizard.getForms();
         Form connFormWizard = forms.get(0);
         SnowflakeConnectionProperties connProps = (SnowflakeConnectionProperties) connFormWizard.getProperties();
 
         ComponentWizard[] subWizards = getComponentService().getComponentWizardsForProperties(connProps, "location")
-                .toArray(new ComponentWizard[3]);
+                .toArray(new ComponentWizard[2]);
         Arrays.sort(subWizards, new WizardNameComparator());
-        assertEquals(3, subWizards.length);
+        assertEquals(2, subWizards.length);
         // Edit connection wizard - we copy the connection properties, as we present the UI, so we use the
         // connection properties object created by the new wizard
         assertFalse(connProps == subWizards[1].getForms().get(0).getProperties());
         // Add module wizard - we refer to the existing connection properties as we don't present the UI
         // for them.
-        assertTrue(connProps == ((SnowflakeTableListProperties) subWizards[2].getForms().get(0).getProperties())
+        assertTrue(connProps == ((SnowflakeTableListProperties) subWizards[1].getForms().get(0).getProperties())
                 .getConnectionProperties());
-        assertFalse(subWizards[1].getDefinition().isTopLevel());
-        assertEquals("Edit Snowflake Connection", subWizards[1].getDefinition().getMenuItemName());
         assertTrue(subWizards[0].getDefinition().isTopLevel());
-        assertEquals("Create Snowflake Connection", subWizards[0].getDefinition().getMenuItemName());
-        assertFalse(subWizards[2].getDefinition().isTopLevel());
-        assertEquals("Add Snowflake Tables", subWizards[2].getDefinition().getMenuItemName());
+        assertEquals("Snowflake Connection", subWizards[0].getDefinition().getMenuItemName());
+        assertFalse(subWizards[1].getDefinition().isTopLevel());
+        assertEquals("Snowflake Tables", subWizards[1].getDefinition().getMenuItemName());
     }
 
     @Test

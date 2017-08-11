@@ -53,4 +53,13 @@ public class SnowflakeConnectionWizardDefinitionTest {
         Assert.assertEquals(definition.getPngImagePath(WizardImageType.WIZARD_BANNER_75X66), definition.getImagePath(DefinitionImageType.WIZARD_BANNER_75X66));
         Assert.assertNull(definition.getImagePath(DefinitionImageType.SVG_ICON));
     }
+    
+    /**
+     * Checks {@link SnowflakeConnectionWizardDefinition#getMenuItemName()} returns "Snowflake Connection" for en_US locale
+     */
+    @Test
+    public void testGetMenuItemName() {
+        SnowflakeConnectionWizardDefinition definition = new SnowflakeConnectionWizardDefinition();
+        Assert.assertEquals("Snowflake Connection", definition.getMenuItemName());
+    }
 }
