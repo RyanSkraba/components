@@ -34,13 +34,13 @@ public class SalesforceModuleWizardDefinition extends AbstractComponentWizardDef
 
     @Override
     public boolean supportsProperties(Class<? extends ComponentProperties> propertiesClass) {
-        return propertiesClass.isAssignableFrom(SalesforceModuleListProperties.class);
+        return propertiesClass.isAssignableFrom(SalesforceConnectionProperties.class);
     }
 
     @Override
     public ComponentWizard createWizard(ComponentProperties properties, String location) {
         SalesforceModuleWizard wizard = (SalesforceModuleWizard) createWizard(location);
-        wizard.setupProperties((SalesforceModuleListProperties) properties);
+        wizard.setupProperties((SalesforceConnectionProperties) properties);
         return wizard;
     }
 

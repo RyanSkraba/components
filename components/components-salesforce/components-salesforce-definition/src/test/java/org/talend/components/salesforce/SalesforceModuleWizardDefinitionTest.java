@@ -46,13 +46,13 @@ public class SalesforceModuleWizardDefinitionTest {
 
     @Test
     public void testSupportsProperties() {
-        assertTrue(definition.supportsProperties(SalesforceModuleListProperties.class));
-        assertFalse(definition.supportsProperties(SalesforceConnectionProperties.class));
+        assertTrue(definition.supportsProperties(SalesforceConnectionProperties.class));
+        assertFalse(definition.supportsProperties(SalesforceModuleListProperties.class));
     }
 
     @Test
     public void testCreateWizard() {
-        ComponentWizard wizard = definition.createWizard(properties, repoLocation);
+        ComponentWizard wizard = definition.createWizard(properties.getConnectionProperties(), repoLocation);
 
         assertThat(wizard, instanceOf(SalesforceModuleWizard.class));
         assertEquals(definition, wizard.getDefinition());
@@ -64,5 +64,11 @@ public class SalesforceModuleWizardDefinitionTest {
         assertNotNull(definition.getImagePath(DefinitionImageType.TREE_ICON_16X16));
         assertNotNull(definition.getImagePath(DefinitionImageType.WIZARD_BANNER_75X66));
         assertNull(definition.getImagePath(DefinitionImageType.SVG_ICON));
+    }
+    
+    @Test
+    public void testGetMenuItemName() {
+        SalesforceModuleWizardDefinition definition = new SalesforceModuleWizardDefinition();
+        assertEquals("Salesforce Modules", definition.getMenuItemName());
     }
 }

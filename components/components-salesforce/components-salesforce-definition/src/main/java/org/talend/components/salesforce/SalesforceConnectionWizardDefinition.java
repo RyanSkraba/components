@@ -12,14 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import org.talend.components.api.Constants;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
-import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
-
-import aQute.bnd.annotation.component.Component;
 import org.talend.daikon.definition.DefinitionImageType;
 
 public class SalesforceConnectionWizardDefinition extends AbstractComponentWizardDefintion {

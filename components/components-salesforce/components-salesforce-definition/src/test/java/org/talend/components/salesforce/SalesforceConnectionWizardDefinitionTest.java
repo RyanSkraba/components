@@ -70,4 +70,10 @@ public class SalesforceConnectionWizardDefinitionTest {
     public void testIsTopLevel() {
         assertTrue(definition.isTopLevel());
     }
+    
+    @Test
+    public void testGetMenuItemName() {
+        SalesforceConnectionWizardDefinition definition = new SalesforceConnectionWizardDefinition();
+        assertEquals("Salesforce Connection", definition.getMenuItemName());
+    }
 }

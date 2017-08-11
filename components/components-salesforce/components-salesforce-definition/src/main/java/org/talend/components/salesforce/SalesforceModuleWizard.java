@@ -35,11 +35,11 @@ public class SalesforceModuleWizard extends ComponentWizard {
     }
 
     public boolean supportsProperties(ComponentProperties properties) {
-        return properties instanceof SalesforceModuleListProperties;
+        return properties instanceof SalesforceConnectionProperties;
     }
 
-    public void setupProperties(SalesforceModuleListProperties salesforceModuleListProperties) {
-        this.salesforceModuleListProperties.copyValuesFrom(salesforceModuleListProperties);
+    public void setupProperties(SalesforceConnectionProperties connectionProperties) {
+        salesforceModuleListProperties.setConnection(connectionProperties);
     }
 
 }
