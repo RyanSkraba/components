@@ -17,7 +17,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
@@ -25,9 +24,8 @@ import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.sandbox.SandboxControl;
 
 /**
- * {@link RuntimeInfo} for JDBC components. {@link ClassLoader} for JDBC components should not be reusable, because component
- * support different databases,
- * which requires different set of classes loaded
+ * {@link RuntimeInfo} for JDBC components. {@link ClassLoader} for JDBC components should not be reusable, because
+ * component support different databases, which requires different set of classes loaded
  */
 public class JdbcRuntimeInfo extends JarRuntimeInfo {
 
@@ -101,33 +99,6 @@ public class JdbcRuntimeInfo extends JarRuntimeInfo {
         }
 
         return content;
-    }
-
-    /**
-     * Computes hash code taking into account also {@link #driverClassName}
-     */
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(super.hashCode()).append(driverClassName).toHashCode();
-    }
-
-    /**
-     * Checks whether this instance equals to <code>obj</code>.
-     * {@link #driverClassName} also is taken into account during comparison
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof JdbcRuntimeInfo)) {
-            return false;
-        }
-        JdbcRuntimeInfo other = (JdbcRuntimeInfo) obj;
-        return super.equals(obj) && this.driverClassName.equals(other.driverClassName);
     }
 
     @Override

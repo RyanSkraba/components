@@ -15,8 +15,10 @@ package org.talend.components.api.component.runtime;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
+import java.util.Arrays;
 import java.util.List;
 import java.util.jar.JarInputStream;
 
@@ -131,8 +134,8 @@ public class JarRuntimeInfoTest {
     }
 
     /**
-     * Checks {@link JarRuntimeInfo#isClassLoaderReusable()} returns <code>true</code> if <code>reusable</code> argument is not
-     * passed to Constructor
+     * Checks {@link JarRuntimeInfo#isClassLoaderReusable()} returns <code>true</code> if <code>reusable</code> argument
+     * is not passed to Constructor
      */
     @Test
     public void testIsClassLoaderReusableDefault() {
@@ -141,9 +144,8 @@ public class JarRuntimeInfoTest {
     }
 
     /**
-     * Checks {@link JarRuntimeInfo#isClassLoaderReusable()} returns <code>true</code> if <code>true</code> was passed to
-     * Constructor
-     * as value of <code>reusable</code> argument
+     * Checks {@link JarRuntimeInfo#isClassLoaderReusable()} returns <code>true</code> if <code>true</code> was passed
+     * to Constructor as value of <code>reusable</code> argument
      */
     @Test
     public void testIsClassLoaderReusableTrue() {
@@ -152,13 +154,99 @@ public class JarRuntimeInfoTest {
     }
 
     /**
-     * Checks {@link JarRuntimeInfo#isClassLoaderReusable()} returns <code>true</code> if <code>true</code> was passed to
-     * Constructor
-     * as value of <code>reusable</code> argument
+     * Checks {@link JarRuntimeInfo#isClassLoaderReusable()} returns <code>true</code> if <code>true</code> was passed
+     * to Constructor as value of <code>reusable</code> argument
      */
     @Test
     public void testIsClassLoaderReusableFalse() {
         JarRuntimeInfo jarRuntimeInfo = new JarRuntimeInfo("http://dummyurl", "dummyString", "dummyString", false);
         assertFalse(jarRuntimeInfo.isClassLoaderReusable());
     }
+
+    @Test
+    public void testEquals() {
+        // not equals with != dependencies
+        JarRuntimeInfo fooJarRuntimeInfo = createJarRuntimeInfo("mvn:dummyJarUrl", "dummyDepPath", "dummyClass", "mvn:foo");
+        JarRuntimeInfo barJarRuntimeInfo = createJarRuntimeInfo("mvn:dummyJarUrl", "dummyDepPath", "dummyClass", "mvn:bar");
+        assertNotEquals(fooJarRuntimeInfo, barJarRuntimeInfo);
+
+        // not equals with != runtime class
+        fooJarRuntimeInfo = createJarRuntimeInfo("mvn:dummyJarUrl", "dummyDepPath", "fooClass", "mvn:dummyDep");
+        barJarRuntimeInfo = createJarRuntimeInfo("mvn:dummyJarUrl", "dummyDepPath", "barClass", "mvn:dummyDep");
+        assertNotEquals(fooJarRuntimeInfo, barJarRuntimeInfo);
+
+        // not equals with different deps order
+        fooJarRuntimeInfo = createJarRuntimeInfo("mvn:fooJarUrl", "fooDepPath", "dummyClass", "mvn:Dep1", "mvn:Dep2");
+        barJarRuntimeInfo = createJarRuntimeInfo("mvn:barJarUrl", "barDepPath", "dummyClass", "mvn:Dep2", "mvn:Dep1");
+        assertNotEquals(fooJarRuntimeInfo, barJarRuntimeInfo);
+
+        // equals with same runtime class and same deps
+        fooJarRuntimeInfo = createJarRuntimeInfo("mvn:fooJarUrl", "fooDepPath", "dummyClass", "mvn:dummyDep");
+        barJarRuntimeInfo = createJarRuntimeInfo("mvn:barJarUrl", "barDepPath", "dummyClass", "mvn:dummyDep");
+
+        // test equals symetric
+        assertTrue(fooJarRuntimeInfo.equals(barJarRuntimeInfo));
+        assertTrue(barJarRuntimeInfo.equals(fooJarRuntimeInfo));
+
+        // test equals reflexive
+        assertTrue(fooJarRuntimeInfo.equals(fooJarRuntimeInfo));
+
+        // test equals transitive
+        JarRuntimeInfo totoJarRuntimeInfo = createJarRuntimeInfo("mvn:totoJarUrl", "totoDepPath", "dummyClass", "mvn:dummyDep");
+        assertTrue(fooJarRuntimeInfo.equals(barJarRuntimeInfo));
+        assertTrue(barJarRuntimeInfo.equals(totoJarRuntimeInfo));
+        assertTrue(fooJarRuntimeInfo.equals(totoJarRuntimeInfo));
+
+        // test not equals null
+        assertFalse(fooJarRuntimeInfo.equals(null));
+
+    }
+
+    /**
+     * Checks 2 {@link JdbcRuntimeInfo}s have different value of {@link JdbcRuntimeInfo#hashCode()} if they have
+     * different driver class names
+     */
+    @Test
+    public void testHashCodeDifferent() {
+        JarRuntimeInfo fooJarRuntimeInfo = createJarRuntimeInfo("mvn:dummyJarUrl", "dummyDepPath", "dummyClass", "mvn:foo");
+        JarRuntimeInfo barJarRuntimeInfo = createJarRuntimeInfo("mvn:dummyJarUrl", "dummyDepPath", "dummyClass", "mvn:bar");
+
+        assertNotEquals(fooJarRuntimeInfo.hashCode(), barJarRuntimeInfo.hashCode());
+    }
+
+    /**
+     * Checks 2 {@link JdbcRuntimeInfo}s have same value of {@link JdbcRuntimeInfo#hashCode()} if they have same driver
+     * class names
+     */
+    @Test
+    public void testHashCodeSame() {
+        // equals with same runtime class and same deps
+        JarRuntimeInfo fooJarRuntimeInfo = createJarRuntimeInfo("mvn:fooJarUrl", "fooDepPath", "dummyClass", "mvn:dummyDep");
+        JarRuntimeInfo barJarRuntimeInfo = createJarRuntimeInfo("mvn:barJarUrl", "barDepPath", "dummyClass", "mvn:dummyDep");
+
+        assertEquals(fooJarRuntimeInfo, barJarRuntimeInfo);
+        assertEquals(fooJarRuntimeInfo.hashCode(), barJarRuntimeInfo.hashCode());
+    }
+
+    public JarRuntimeInfo createJarRuntimeInfo(String jarUrlString, String depTxtPath, String runtimeClassName,
+            String depStringURL) {
+        return createJarRuntimeInfo(jarUrlString, depTxtPath, runtimeClassName, depStringURL, "mvn:foo");
+    }
+
+    public JarRuntimeInfo createJarRuntimeInfo(String jarUrlString, String depTxtPath, String runtimeClassName,
+            final String depStringURL1, final String depStringURL2) {
+        return new JarRuntimeInfo(jarUrlString, depTxtPath, runtimeClassName, false) {
+
+            @Override
+            public List<URL> getMavenUrlDependencies() {
+                try {
+                    return Arrays.asList(new URL(depStringURL1), new URL(depStringURL2));
+                } catch (MalformedURLException e) {
+                    fail(e.getMessage());
+                }
+                return null;// added cause the compiler does not understand the fail() as a RuntimeException.
+            }
+        };
+    }
+
 }
