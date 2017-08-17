@@ -43,13 +43,11 @@ public class PythonRowPropertiesTest {
     public void testDefaultProperties() {
         PythonRowProperties properties = new PythonRowProperties("test");
         assertNull(properties.main.schema.getValue());
-        assertNull(properties.schemaFlow.schema.getValue());
         assertNull(properties.mapType.getValue());
         assertNull(properties.pythonCode.getValue());
 
         properties.init();
         assertEquals("EmptyRecord", properties.main.schema.getValue().getName());
-        assertEquals("EmptyRecord", properties.schemaFlow.schema.getValue().getName());
         assertEquals(MapType.MAP, properties.mapType.getValue());
         assertTrue(properties.pythonCode.getValue().contains("custom MAP transformation"));
         assertFalse(properties.pythonCode.getValue().contains("custom FLATMAP transformation"));
@@ -70,12 +68,7 @@ public class PythonRowPropertiesTest {
                 Arrays.asList(inputValue1Field, inputValue2Field));
         properties.main.schema.setValue(inputSchema);
 
-        Schema.Field outputValue1Field = new Schema.Field("outputValue1", stringSchema, null, null, Order.ASCENDING);
-        Schema outputSchema = Schema.createRecord("outputSchema", null, null, false, Arrays.asList(outputValue1Field));
-        properties.schemaFlow.schema.setValue(outputSchema);
-
         assertThat(inputSchema, equalTo(properties.main.schema.getValue()));
-        assertThat(outputSchema, equalTo(properties.schemaFlow.schema.getValue()));
     }
 
     @Test
@@ -90,14 +83,9 @@ public class PythonRowPropertiesTest {
                 Arrays.asList(inputValue1Field, inputValue2Field));
         properties.main.schema.setValue(inputSchema);
 
-        Schema.Field outputValue1Field = new Schema.Field("outputValue1", stringSchema, null, null, Order.ASCENDING);
-        Schema outputSchema = Schema.createRecord("outputSchema", null, null, false, Arrays.asList(outputValue1Field));
-        properties.schemaFlow.schema.setValue(outputSchema);
-
         properties = Helper.fromSerializedPersistent(properties.toSerialized(), PythonRowProperties.class).object;
 
         assertThat(inputSchema, equalTo(properties.main.schema.getValue()));
-        assertThat(outputSchema, equalTo(properties.schemaFlow.schema.getValue()));
     }
 
     /**
@@ -112,15 +100,8 @@ public class PythonRowPropertiesTest {
         Form form = properties.getForm(Form.MAIN);
 
         properties.refreshLayout(form);
-        assertFalse(form.getWidget(properties.schemaFlow).isVisible());
-
-        properties.changeOutputSchema.setValue(true);
-        properties.refreshLayout(form);
-        assertTrue(form.getWidget(properties.schemaFlow).isVisible());
-
-        properties.changeOutputSchema.setValue(false);
-        properties.refreshLayout(form);
-        assertFalse(form.getWidget(properties.schemaFlow).isVisible());
+        assertTrue(form.getWidget(properties.mapType).isVisible());
+        assertTrue(form.getWidget(properties.pythonCode).isVisible());
     }
 
     @Test
@@ -158,7 +139,6 @@ public class PythonRowPropertiesTest {
     @Test
     public void testSetupLayout() {
         PythonRowProperties properties = new PythonRowProperties("test");
-        properties.schemaFlow.init();
         properties.main.init();
 
         properties.setupLayout();
@@ -167,17 +147,13 @@ public class PythonRowPropertiesTest {
         assertThat(main, notNullValue());
 
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(5));
+        assertThat(mainWidgets, hasSize(3));
         Widget mainWidget = main.getWidget("main");
         assertThat(mainWidget, notNullValue());
         Widget columnNameWidget = main.getWidget("mapType");
         assertThat(columnNameWidget, notNullValue());
         Widget function = main.getWidget("pythonCode");
         assertThat(function, notNullValue());
-        Widget changeOutputSchema = main.getWidget("changeOutputSchema");
-        assertThat(changeOutputSchema, notNullValue());
-        Widget schemaFlow = main.getWidget("schemaFlow");
-        assertThat(schemaFlow, notNullValue());
     }
 
     /**
