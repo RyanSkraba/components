@@ -21,6 +21,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -28,12 +30,14 @@ import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field.Order;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.serialize.jsonschema.JsonSchemaUtil;
 
 public class FilterRowPropertiesTest {
 
@@ -46,20 +50,18 @@ public class FilterRowPropertiesTest {
         assertNull(properties.main.schema.getValue());
         assertNull(properties.schemaFlow.schema.getValue());
         assertNull(properties.schemaReject.schema.getValue());
-
-        assertEquals("", properties.columnName.getValue());
-        assertEquals("EMPTY", properties.function.getValue());
-        assertEquals("==", properties.operator.getValue());
-        assertNull(properties.value.getValue());
+        assertEquals(properties.filters.subProperties.size(), 0);
         properties.init();
         assertEquals("EmptyRecord", properties.main.schema.getValue().getName());
         assertEquals("EmptyRecord", properties.schemaFlow.schema.getValue().getName());
         assertEquals("EmptyRecord", properties.schemaReject.schema.getValue().getName());
-
-        assertEquals("", properties.columnName.getValue());
-        assertEquals("EMPTY", properties.function.getValue());
-        assertEquals("==", properties.operator.getValue());
-        assertNull(properties.value.getValue());
+        assertEquals(1, properties.filters.subProperties.size());
+        properties.filters.createAndAddRow();
+        assertEquals(2, properties.filters.subProperties.size());
+        FilterRowCriteriaProperties row2 = new FilterRowCriteriaProperties("row2");
+        row2.init();
+        properties.filters.addRow(row2);
+        assertEquals(3, properties.filters.subProperties.size());
     }
 
     /**
@@ -78,10 +80,13 @@ public class FilterRowPropertiesTest {
                 Arrays.asList(inputValue1Field, inputValue2Field));
         properties.main.schema.setValue(inputSchema);
 
-        properties.columnName.setValue("invalid");
-        properties.function.setValue("invalid");
-        properties.operator.setValue("invalid");
-        properties.value.setValue("valid");
+        FilterRowCriteriaProperties filterProperties = new FilterRowCriteriaProperties("filter1");
+        filterProperties.init();
+
+        filterProperties.columnName.setValue("invalid");
+        filterProperties.function.setValue("invalid");
+        filterProperties.operator.setValue("invalid");
+        filterProperties.value.setValue("valid");
 
         // Direct call since we are directly using the component property
         // instead of using PropertiesDynamicMethodHelper
@@ -92,10 +97,10 @@ public class FilterRowPropertiesTest {
         assertThat(properties.schemaReject.schema.getValue(), equalTo(inputSchema));
 
         // the afterScheam trigger an update to the columnName
-        assertEquals("inputValue1", properties.columnName.getValue());
-        assertEquals("EMPTY", properties.function.getValue());
-        assertEquals("==", properties.operator.getValue());
-        assertEquals("valid", properties.value.getValue());
+        assertEquals("inputValue1", filterProperties.columnName.getValue());
+        assertEquals("EMPTY", filterProperties.function.getValue());
+        assertEquals("==", filterProperties.operator.getValue());
+        assertEquals("valid", filterProperties.value.getValue());
     }
 
     /**
@@ -106,6 +111,9 @@ public class FilterRowPropertiesTest {
     public void testConditions() {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
+        FilterRowCriteriaProperties filterProperties = new FilterRowCriteriaProperties("filter1");
+        filterProperties.init();
+        
         AvroRegistry registry = new AvroRegistry();
         Schema stringSchema = registry.getConverter(String.class).getSchema();
         Schema.Field inputValue1Field = new Schema.Field("inputValue1", stringSchema, null, null, Order.ASCENDING);
@@ -117,61 +125,61 @@ public class FilterRowPropertiesTest {
         // default value, "columName" will change
         properties.schemaListener.afterSchema();
 
-        assertEquals("inputValue1", properties.columnName.getValue());
-        assertEquals("EMPTY", properties.function.getValue());
-        assertEquals("==", properties.operator.getValue());
-        assertNull(properties.value.getValue());
+         assertEquals("inputValue1", filterProperties.columnName.getValue());
+         assertEquals("EMPTY", filterProperties.function.getValue());
+         assertEquals("==", filterProperties.operator.getValue());
+         assertNull(filterProperties.value.getValue());
 
-        // specific value, "function" will change cause inputValue1's type is
-        // not a compatible with "ABS_VALUE"
-        properties.columnName.setValue("inputValue1");
-        properties.function.setValue("ABS_VALUE");
-        properties.operator.setValue("!=");
-        properties.value.setValue("1111");
-        properties.schemaListener.afterSchema();
+//         specific value, "function" will change cause inputValue1's type is
+//         not a compatible with "ABS_VALUE"
+         filterProperties.columnName.setValue("inputValue1");
+         filterProperties.function.setValue("ABS_VALUE");
+         filterProperties.operator.setValue("!=");
+         filterProperties.value.setValue("1111");
+         properties.schemaListener.afterSchema();
 
-        assertEquals("inputValue1", properties.columnName.getValue());
-        assertEquals("EMPTY", properties.function.getValue());
-        assertEquals("!=", properties.operator.getValue());
-        assertEquals("1111", properties.value.getValue());
+         assertEquals("inputValue1", filterProperties.columnName.getValue());
+         assertEquals("EMPTY", filterProperties.function.getValue());
+         assertEquals("!=", filterProperties.operator.getValue());
+         assertEquals("1111", filterProperties.value.getValue());
 
         // specific value, will not change
-        properties.columnName.setValue("inputValue2");
-        properties.function.setValue("LC");
-        properties.operator.setValue("==");
-        properties.value.setValue("2222");
-        properties.schemaListener.afterSchema();
+         filterProperties.columnName.setValue("inputValue2");
+         filterProperties.function.setValue("LC");
+         filterProperties.operator.setValue("==");
+         filterProperties.value.setValue("2222");
+         properties.schemaListener.afterSchema();
 
-        assertEquals("inputValue2", properties.columnName.getValue());
-        assertEquals("LC", properties.function.getValue());
-        assertEquals("==", properties.operator.getValue());
-        assertEquals("2222", properties.value.getValue());
+         assertEquals("inputValue2", filterProperties.columnName.getValue());
+         assertEquals("LC", filterProperties.function.getValue());
+         assertEquals("==", filterProperties.operator.getValue());
+         assertEquals("2222", filterProperties.value.getValue());
 
         // specific value, "operator" will change cause the function "MATCH" is
         // not a compatible with "<"
-        properties.columnName.setValue("inputValue1");
-        properties.function.setValue("MATCH");
-        properties.operator.setValue("<");
-        properties.value.setValue("3333");
+        filterProperties.columnName.setValue("INPUTVALUE1");
+        filterProperties.function.setValue("MATCH");
+        filterProperties.operator.setValue("<");
+        filterProperties.value.setValue("3333");
         properties.schemaListener.afterSchema();
 
-        assertEquals("inputValue1", properties.columnName.getValue());
-        assertEquals("MATCH", properties.function.getValue());
-        assertEquals("==", properties.operator.getValue());
-        assertEquals("3333", properties.value.getValue());
+         assertEquals("inputValue1", filterProperties.columnName.getValue());
+         assertEquals("MATCH", filterProperties.function.getValue());
+         assertEquals("==", filterProperties.operator.getValue());
+         assertEquals("3333", filterProperties.value.getValue());
 
         // specific value, "operator" will change cause the function "CONTAINS" is
         // not a compatible with "<"
-        properties.columnName.setValue("inputValue1");
-        properties.function.setValue("CONTAINS");
-        properties.operator.setValue("<");
-        properties.value.setValue("4444");
-        properties.schemaListener.afterSchema();
+         filterProperties.columnName.setValue("inputValue1");
+         filterProperties.function.setValue("CONTAINS");
+         filterProperties.operator.setValue("<");
+         filterProperties.value.setValue("4444");
+         properties.schemaListener.afterSchema();
 
-        assertEquals("inputValue1", properties.columnName.getValue());
-        assertEquals("CONTAINS", properties.function.getValue());
-        assertEquals("==", properties.operator.getValue());
-        assertEquals("4444", properties.value.getValue());
+         assertEquals("inputValue1", filterProperties.columnName.getValue());
+         assertEquals("CONTAINS", filterProperties.function.getValue());
+         assertEquals("==", filterProperties.operator.getValue());
+         assertEquals("4444", filterProperties.value.getValue());
     }
 
     /**
@@ -182,6 +190,9 @@ public class FilterRowPropertiesTest {
     public void testRefreshLayoutMainInitial() {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
+        FilterRowCriteriaProperties filterProperties = new FilterRowCriteriaProperties("filter1");
+        filterProperties.init();
+
         AvroRegistry registry = new AvroRegistry();
         Schema stringSchema = registry.getConverter(String.class).getSchema();
         Schema.Field inputValue1Field = new Schema.Field("inputValue1", stringSchema, null, null, Order.ASCENDING);
@@ -196,10 +207,10 @@ public class FilterRowPropertiesTest {
         assertTrue(properties.getForm(Form.MAIN).getWidget("operator").isVisible());
         assertTrue(properties.getForm(Form.MAIN).getWidget("value").isVisible());
         // The refreshLayout will change the columnName
-        assertEquals("inputValue1", properties.columnName.getValue());
-        assertEquals("EMPTY", properties.function.getValue());
-        assertEquals("==", properties.operator.getValue());
-        assertNull(properties.value.getValue());
+        assertEquals("inputValue1", filterProperties.columnName.getValue());
+        assertEquals("EMPTY", filterProperties.function.getValue());
+        assertEquals("==", filterProperties.operator.getValue());
+        assertNull(filterProperties.value.getValue());
 
         properties.refreshLayout(properties.getForm(Form.MAIN));
         assertTrue(properties.getForm(Form.MAIN).getWidget("columnName").isVisible());
@@ -207,10 +218,10 @@ public class FilterRowPropertiesTest {
         assertTrue(properties.getForm(Form.MAIN).getWidget("operator").isVisible());
         assertTrue(properties.getForm(Form.MAIN).getWidget("value").isVisible());
         // The refreshLayout will change the columnName
-        assertEquals("inputValue1", properties.columnName.getValue());
-        assertEquals("EMPTY", properties.function.getValue());
-        assertEquals("==", properties.operator.getValue());
-        assertNull(properties.value.getValue());
+        assertEquals("inputValue1", filterProperties.columnName.getValue());
+        assertEquals("EMPTY", filterProperties.function.getValue());
+        assertEquals("==", filterProperties.operator.getValue());
+        assertNull(filterProperties.value.getValue());
     }
 
     @Test
@@ -225,15 +236,9 @@ public class FilterRowPropertiesTest {
         assertThat(main, notNullValue());
 
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(4));
-        Widget columnNameWidget = main.getWidget("columnName");
-        assertThat(columnNameWidget, notNullValue());
-        Widget function = main.getWidget("function");
-        assertThat(function, notNullValue());
-        Widget operator = main.getWidget("operator");
-        assertThat(operator, notNullValue());
-        Widget value = main.getWidget("value");
-        assertThat(value, notNullValue());
+        assertThat(mainWidgets, hasSize(1));
+        Widget filtersWidget = main.getWidget("filters");
+        assertThat(filtersWidget, notNullValue());
     }
 
     /**
@@ -275,19 +280,23 @@ public class FilterRowPropertiesTest {
         // default value, "columName" will change
         FilterRowProperties properties = new FilterRowProperties("condition0");
         properties.init();
+        FilterRowCriteriaProperties filterProperties = new FilterRowCriteriaProperties("filter1");
+        filterProperties.init();
+
         properties.main.schema.setValue(inputSchema);
         properties.updateOutputSchemas();
 
         properties.updateConditionsRow();
 
-        assertEquals("inputValue1", properties.columnName.getValue());
-        assertEquals(ConditionsRowConstant.Function.EMPTY, properties.function.getValue());
-        assertEquals(ConditionsRowConstant.Operator.EQUAL, properties.operator.getValue());
-        assertNull(properties.value.getValue());
+        assertEquals("inputValue1", filterProperties.columnName.getValue());
+        assertEquals(ConditionsRowConstant.Function.EMPTY, filterProperties.function.getValue());
+        assertEquals(ConditionsRowConstant.Operator.EQUAL, filterProperties.operator.getValue());
+        assertNull(filterProperties.value.getValue());
 
-        assertThat((List<String>) properties.columnName.getPossibleValues(), is(Arrays.asList("inputValue1", "inputValue2")));
-        assertThat((List<String>) properties.function.getPossibleValues(), is(ConditionsRowConstant.STRING_FUNCTIONS));
-        assertThat((List<String>) properties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
+        assertThat((List<String>) filterProperties.columnName.getPossibleValues(),
+                is(Arrays.asList("inputValue1", "inputValue2")));
+        assertThat((List<String>) filterProperties.function.getPossibleValues(), is(ConditionsRowConstant.STRING_FUNCTIONS));
+        assertThat((List<String>) filterProperties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
     }
 
     @Ignore("Need to be able to check the column type in order to provide a function checking.")
@@ -304,24 +313,28 @@ public class FilterRowPropertiesTest {
         // not a compatible with ConditionsRow.ABS_VALUE
         FilterRowProperties properties = new FilterRowProperties("condition1");
         properties.init();
+        FilterRowCriteriaProperties filterProperties = new FilterRowCriteriaProperties("filter1");
+        filterProperties.init();
+
         properties.main.schema.setValue(inputSchema);
         properties.updateOutputSchemas();
 
-        properties.columnName.setValue("inputValue1");
-        properties.function.setValue(ConditionsRowConstant.Function.ABS_VALUE);
-        properties.operator.setValue(ConditionsRowConstant.Operator.NOT_EQUAL);
-        properties.value.setValue("1111");
+        filterProperties.columnName.setValue("inputValue1");
+        filterProperties.function.setValue(ConditionsRowConstant.Function.ABS_VALUE);
+        filterProperties.operator.setValue(ConditionsRowConstant.Operator.NOT_EQUAL);
+        filterProperties.value.setValue("1111");
 
         properties.updateConditionsRow();
 
-        assertEquals("inputValue1", properties.columnName.getValue());
-        assertEquals(ConditionsRowConstant.Function.EMPTY, properties.function.getValue());
-        assertEquals(ConditionsRowConstant.Operator.NOT_EQUAL, properties.operator.getValue());
-        assertEquals("1111", properties.value.getValue());
+        assertEquals("inputValue1", filterProperties.columnName.getValue());
+        assertEquals(ConditionsRowConstant.Function.EMPTY, filterProperties.function.getValue());
+        assertEquals(ConditionsRowConstant.Operator.NOT_EQUAL, filterProperties.operator.getValue());
+        assertEquals("1111", filterProperties.value.getValue());
 
-        assertThat((List<String>) properties.columnName.getPossibleValues(), is(Arrays.asList("inputValue1", "inputValue2")));
-        assertThat((List<String>) properties.function.getPossibleValues(), is(ConditionsRowConstant.STRING_FUNCTIONS));
-        assertThat((List<String>) properties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
+        assertThat((List<String>) filterProperties.columnName.getPossibleValues(),
+                is(Arrays.asList("inputValue1", "inputValue2")));
+        assertThat((List<String>) filterProperties.function.getPossibleValues(), is(ConditionsRowConstant.STRING_FUNCTIONS));
+        assertThat((List<String>) filterProperties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
     }
 
     @Ignore("Need to be able to have a schema in order to provide a column name checking.")
@@ -337,24 +350,28 @@ public class FilterRowPropertiesTest {
         // specific value, will not change
         FilterRowProperties properties = new FilterRowProperties("condition2");
         properties.init();
+        FilterRowCriteriaProperties filterProperties = new FilterRowCriteriaProperties("filter1");
+        filterProperties.init();
+
         properties.main.schema.setValue(inputSchema);
         properties.updateOutputSchemas();
 
-        properties.columnName.setValue("inputValue2");
-        properties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
-        properties.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
-        properties.value.setValue("2222");
+        filterProperties.columnName.setValue("inputValue2");
+        filterProperties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
+        filterProperties.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
+        filterProperties.value.setValue("2222");
 
         properties.updateConditionsRow();
 
-        assertEquals("inputValue2", properties.columnName.getValue());
-        assertEquals(ConditionsRowConstant.Function.LOWER_CASE, properties.function.getValue());
-        assertEquals(ConditionsRowConstant.Operator.EQUAL, properties.operator.getValue());
-        assertEquals("2222", properties.value.getValue());
+        assertEquals("inputValue2", filterProperties.columnName.getValue());
+        assertEquals(ConditionsRowConstant.Function.LOWER_CASE, filterProperties.function.getValue());
+        assertEquals(ConditionsRowConstant.Operator.EQUAL, filterProperties.operator.getValue());
+        assertEquals("2222", filterProperties.value.getValue());
 
-        assertThat((List<String>) properties.columnName.getPossibleValues(), is(Arrays.asList("inputValue1", "inputValue2")));
-        assertThat((List<String>) properties.function.getPossibleValues(), is(ConditionsRowConstant.STRING_FUNCTIONS));
-        assertThat((List<String>) properties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
+        assertThat((List<String>) filterProperties.columnName.getPossibleValues(),
+                is(Arrays.asList("inputValue1", "inputValue2")));
+        assertThat((List<String>) filterProperties.function.getPossibleValues(), is(ConditionsRowConstant.STRING_FUNCTIONS));
+        assertThat((List<String>) filterProperties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
     }
 
     @Test
@@ -370,24 +387,28 @@ public class FilterRowPropertiesTest {
         // specific value, will change due to type compatibility
         FilterRowProperties properties = new FilterRowProperties("condition4");
         properties.init();
+        FilterRowCriteriaProperties filterProperties = new FilterRowCriteriaProperties("filter1");
+        filterProperties.init();
+
         properties.main.schema.setValue(inputSchema);
         properties.updateOutputSchemas();
 
-        properties.columnName.setValue("inputValue2");
-        properties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
-        properties.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
-        properties.value.setValue("2222");
+        filterProperties.columnName.setValue("inputValue2");
+        filterProperties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
+        filterProperties.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
+        filterProperties.value.setValue("2222");
 
         properties.updateConditionsRow();
 
-        assertEquals("inputValue2", properties.columnName.getValue());
-        assertEquals(ConditionsRowConstant.Function.EMPTY, properties.function.getValue());
-        assertEquals(ConditionsRowConstant.Operator.EQUAL, properties.operator.getValue());
-        assertEquals("2222", properties.value.getValue());
+        assertEquals("inputValue2", filterProperties.columnName.getValue());
+        assertEquals(ConditionsRowConstant.Function.EMPTY, filterProperties.function.getValue());
+        assertEquals(ConditionsRowConstant.Operator.EQUAL, filterProperties.operator.getValue());
+        assertEquals("2222", filterProperties.value.getValue());
 
-        assertThat((List<String>) properties.columnName.getPossibleValues(), is(Arrays.asList("inputValue1", "inputValue2")));
-        assertThat((List<String>) properties.function.getPossibleValues(), is(ConditionsRowConstant.NUMERICAL_FUNCTIONS));
-        assertThat((List<String>) properties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
+        assertThat((List<String>) filterProperties.columnName.getPossibleValues(),
+                is(Arrays.asList("inputValue1", "inputValue2")));
+        assertThat((List<String>) filterProperties.function.getPossibleValues(), is(ConditionsRowConstant.NUMERICAL_FUNCTIONS));
+        assertThat((List<String>) filterProperties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
     }
 
     @Ignore("Need to be able to check the column type in order to provide a function checking.")
@@ -403,24 +424,28 @@ public class FilterRowPropertiesTest {
         // specific value, will change due to type compatibility
         FilterRowProperties properties = new FilterRowProperties("condition4");
         properties.init();
+        FilterRowCriteriaProperties filterProperties = new FilterRowCriteriaProperties("filter1");
+        filterProperties.init();
+
         properties.main.schema.setValue(inputSchema);
         properties.updateOutputSchemas();
 
-        properties.columnName.setValue("inputValue2");
-        properties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
-        properties.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
-        properties.value.setValue("2222");
+        filterProperties.columnName.setValue("inputValue2");
+        filterProperties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
+        filterProperties.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
+        filterProperties.value.setValue("2222");
 
         properties.updateConditionsRow();
 
-        assertEquals("inputValue2", properties.columnName.getValue());
-        assertEquals(ConditionsRowConstant.Function.EMPTY, properties.function.getValue());
-        assertEquals(ConditionsRowConstant.Operator.EQUAL, properties.operator.getValue());
-        assertEquals("2222", properties.value.getValue());
+        assertEquals("inputValue2", filterProperties.columnName.getValue());
+        assertEquals(ConditionsRowConstant.Function.EMPTY, filterProperties.function.getValue());
+        assertEquals(ConditionsRowConstant.Operator.EQUAL, filterProperties.operator.getValue());
+        assertEquals("2222", filterProperties.value.getValue());
 
-        assertThat((List<String>) properties.columnName.getPossibleValues(), is(Arrays.asList("inputValue1", "inputValue2")));
-        assertThat((List<String>) properties.function.getPossibleValues(), is(ConditionsRowConstant.NUMERICAL_FUNCTIONS));
-        assertThat((List<String>) properties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
+        assertThat((List<String>) filterProperties.columnName.getPossibleValues(),
+                is(Arrays.asList("inputValue1", "inputValue2")));
+        assertThat((List<String>) filterProperties.function.getPossibleValues(), is(ConditionsRowConstant.NUMERICAL_FUNCTIONS));
+        assertThat((List<String>) filterProperties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
     }
 
     @Ignore("Need to be able to check the column type in order to provide a function checking.")
@@ -436,24 +461,28 @@ public class FilterRowPropertiesTest {
         // specific value, will change due to type compatibility
         FilterRowProperties properties = new FilterRowProperties("condition4");
         properties.init();
+        FilterRowCriteriaProperties filterProperties = new FilterRowCriteriaProperties("filter1");
+        filterProperties.init();
+
         properties.main.schema.setValue(inputSchema);
         properties.updateOutputSchemas();
 
-        properties.columnName.setValue("inputValue2");
-        properties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
-        properties.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
-        properties.value.setValue("2222");
+        filterProperties.columnName.setValue("inputValue2");
+        filterProperties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
+        filterProperties.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
+        filterProperties.value.setValue("2222");
 
         properties.updateConditionsRow();
 
-        assertEquals("inputValue2", properties.columnName.getValue());
-        assertEquals(ConditionsRowConstant.Function.EMPTY, properties.function.getValue());
-        assertEquals(ConditionsRowConstant.Operator.EQUAL, properties.operator.getValue());
-        assertEquals("2222", properties.value.getValue());
+        assertEquals("inputValue2", filterProperties.columnName.getValue());
+        assertEquals(ConditionsRowConstant.Function.EMPTY, filterProperties.function.getValue());
+        assertEquals(ConditionsRowConstant.Operator.EQUAL, filterProperties.operator.getValue());
+        assertEquals("2222", filterProperties.value.getValue());
 
-        assertThat((List<String>) properties.columnName.getPossibleValues(), is(Arrays.asList("inputValue1", "inputValue2")));
-        assertThat((List<String>) properties.function.getPossibleValues(), is(ConditionsRowConstant.NUMERICAL_FUNCTIONS));
-        assertThat((List<String>) properties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
+        assertThat((List<String>) filterProperties.columnName.getPossibleValues(),
+                is(Arrays.asList("inputValue1", "inputValue2")));
+        assertThat((List<String>) filterProperties.function.getPossibleValues(), is(ConditionsRowConstant.NUMERICAL_FUNCTIONS));
+        assertThat((List<String>) filterProperties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
     }
 
     @Ignore("Need to be able to check the column type in order to provide a function checking.")
@@ -469,24 +498,28 @@ public class FilterRowPropertiesTest {
         // specific value, will change due to type compatibility
         FilterRowProperties properties = new FilterRowProperties("condition4");
         properties.init();
+        FilterRowCriteriaProperties filterProperties = new FilterRowCriteriaProperties("filter1");
+        filterProperties.init();
+
         properties.main.schema.setValue(inputSchema);
         properties.updateOutputSchemas();
 
-        properties.columnName.setValue("inputValue2");
-        properties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
-        properties.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
-        properties.value.setValue("2222");
+        filterProperties.columnName.setValue("inputValue2");
+        filterProperties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
+        filterProperties.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
+        filterProperties.value.setValue("2222");
 
         properties.updateConditionsRow();
 
-        assertEquals("inputValue2", properties.columnName.getValue());
-        assertEquals(ConditionsRowConstant.Function.EMPTY, properties.function.getValue());
-        assertEquals(ConditionsRowConstant.Operator.EQUAL, properties.operator.getValue());
-        assertEquals("2222", properties.value.getValue());
+        assertEquals("inputValue2", filterProperties.columnName.getValue());
+        assertEquals(ConditionsRowConstant.Function.EMPTY, filterProperties.function.getValue());
+        assertEquals(ConditionsRowConstant.Operator.EQUAL, filterProperties.operator.getValue());
+        assertEquals("2222", filterProperties.value.getValue());
 
-        assertThat((List<String>) properties.columnName.getPossibleValues(), is(Arrays.asList("inputValue1", "inputValue2")));
-        assertThat((List<String>) properties.function.getPossibleValues(), is(ConditionsRowConstant.NUMERICAL_FUNCTIONS));
-        assertThat((List<String>) properties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
+        assertThat((List<String>) filterProperties.columnName.getPossibleValues(),
+                is(Arrays.asList("inputValue1", "inputValue2")));
+        assertThat((List<String>) filterProperties.function.getPossibleValues(), is(ConditionsRowConstant.NUMERICAL_FUNCTIONS));
+        assertThat((List<String>) filterProperties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
     }
 
     @Ignore("Need to be able to check the column type in order to provide a function checking.")
@@ -502,24 +535,44 @@ public class FilterRowPropertiesTest {
         // specific value, will change due to type compatibility
         FilterRowProperties properties = new FilterRowProperties("condition5");
         properties.init();
+        FilterRowCriteriaProperties filterProperties = new FilterRowCriteriaProperties("filter1");
+        filterProperties.init();
+
         properties.main.schema.setValue(inputSchema);
         properties.updateOutputSchemas();
 
-        properties.columnName.setValue("inputValue2");
-        properties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
-        properties.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
-        properties.value.setValue("2222");
+        filterProperties.columnName.setValue("inputValue2");
+        filterProperties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
+        filterProperties.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
+        filterProperties.value.setValue("2222");
 
         properties.updateConditionsRow();
 
-        assertEquals("inputValue2", properties.columnName.getValue());
-        assertEquals(ConditionsRowConstant.Function.EMPTY, properties.function.getValue());
-        assertEquals(ConditionsRowConstant.Operator.EQUAL, properties.operator.getValue());
-        assertEquals("2222", properties.value.getValue());
+        assertEquals("inputValue2", filterProperties.columnName.getValue());
+        assertEquals(ConditionsRowConstant.Function.EMPTY, filterProperties.function.getValue());
+        assertEquals(ConditionsRowConstant.Operator.EQUAL, filterProperties.operator.getValue());
+        assertEquals("2222", filterProperties.value.getValue());
 
-        assertThat((List<String>) properties.columnName.getPossibleValues(), is(Arrays.asList("inputValue1", "inputValue2")));
-        assertThat((List<String>) properties.function.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_FUNCTIONS));
-        assertThat((List<String>) properties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
+        assertThat((List<String>) filterProperties.columnName.getPossibleValues(),
+                is(Arrays.asList("inputValue1", "inputValue2")));
+        assertThat((List<String>) filterProperties.function.getPossibleValues(),
+                is(ConditionsRowConstant.DEFAULT_FUNCTIONS));
+        assertThat((List<String>) filterProperties.operator.getPossibleValues(), is(ConditionsRowConstant.DEFAULT_OPERATORS));
+    }
+
+    public static String readJson(String path) throws URISyntaxException, IOException {
+        java.net.URL url = FilterRowPropertiesTest.class.getResource(path);
+        java.nio.file.Path resPath = java.nio.file.Paths.get(url.toURI());
+        return new String(java.nio.file.Files.readAllBytes(resPath), "UTF8").trim();
+    }
+
+    @Test
+    public void testGeneratedJson() throws URISyntaxException, IOException {
+        String expectedJson = FilterRowPropertiesTest.readJson("FilterRowProperties.json");
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        String jsonValue = JsonSchemaUtil.toJson(properties, Form.MAIN, FilterRowDefinition.COMPONENT_NAME);
+        Assert.assertEquals(expectedJson, jsonValue);
     }
 
 }
