@@ -101,6 +101,33 @@ public class PythonRowDoFnTest {
     }
 
     @Test
+    public void test_Map_GenerateSchemaFromScratch() throws Exception {
+
+        PythonRowProperties properties = new PythonRowProperties("test");
+        properties.init();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("output['a1'] = \"rootdata2\"\n");
+        sb.append("output['B'] = json.loads(\"{}\", object_pairs_hook=collections.OrderedDict)\n");
+        sb.append("output['B']['b1'] = \"subdatabefore\"\n");
+        sb.append("output['B']['C'] = json.loads(\"{}\", object_pairs_hook=collections.OrderedDict)\n");
+        sb.append("output['B']['C']['c1'] = \"subsubdatabefore\"\n");
+        sb.append("output['B']['C']['c2'] = 33\n");
+        sb.append("output['B']['C']['c3'] = 55l\n");
+        sb.append("output['B']['b2'] = \"subdataend\"\n");
+        properties.pythonCode.setValue(sb.toString());
+        PythonRowDoFn function = new PythonRowDoFn();
+        assertEquals(ValidationResult.OK, function.initialize(null, properties));
+        DoFnTester<Object, Object> fnTester = DoFnTester.of(function);
+        List<Object> outputs = fnTester.processBundle(inputIndexedRecord);
+        assertEquals(1, outputs.size());
+
+        GenericRecord outputRecord = (GenericRecord) outputs.get(0);
+        System.out.println(outputRecord);
+        compareRecords(outputIndexedRecord, outputRecord);
+    }
+
+    @Test
     public void test_FlatMap_doNothing() throws Exception {
 
         PythonRowProperties properties = new PythonRowProperties("test");
@@ -204,16 +231,20 @@ public class PythonRowDoFnTest {
      * Compare Avro record field values.
      */
     public void compareRecords(final IndexedRecord expectedRecord, final GenericRecord outputRecord) {
+        // a1
+        assertEquals(expectedRecord.get(0).toString(), outputRecord.get(0).toString());
 
-        assertEquals(expectedRecord.get(0).toString(), outputRecord.get("a1").toString());
-
-        GenericRecord outputRecordB = (GenericRecord) outputRecord.get("B");
+        // B
+        GenericRecord outputRecordB = (GenericRecord) outputRecord.get(1);
         GenericRecord expectedRecordB = (GenericRecord) expectedRecord.get(1);
-        assertEquals(expectedRecordB.get("b1").toString(), outputRecordB.get("b1").toString());
-        assertEquals(expectedRecordB.get("b2").toString(), outputRecordB.get("b2").toString());
+        // B.b1
+        assertEquals(expectedRecordB.get("b1").toString(), outputRecordB.get(0).toString());
+        // B.b2
+        assertEquals(expectedRecordB.get("b2").toString(), outputRecordB.get(2).toString());
 
-        GenericRecord outputRecordC = (GenericRecord) outputRecordB.get("C");
-        GenericRecord expectedRecordC = (GenericRecord) expectedRecordB.get("C");
+        // C
+        GenericRecord outputRecordC = (GenericRecord) outputRecordB.get(1);
+        GenericRecord expectedRecordC = (GenericRecord) expectedRecordB.get(1);
         assertEquals(expectedRecordC.toString(), outputRecordC.toString());
     }
 }

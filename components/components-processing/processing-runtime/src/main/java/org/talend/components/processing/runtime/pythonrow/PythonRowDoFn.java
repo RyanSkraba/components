@@ -77,8 +77,9 @@ public class PythonRowDoFn extends DoFn<Object, Object> implements RuntimableRun
     private void map(IndexedRecord input, ProcessContext context) throws IOException {
         // Prepare Python environment
         python.set("inputJSON", new PyString(input.toString()));
-        python.exec("input = json.loads(inputJSON)");
-        python.exec("output = json.loads(\"{}\")");
+        python.exec("import collections");
+        python.exec("input = json.loads(inputJSON, object_pairs_hook=collections.OrderedDict)");
+        python.exec("output = json.loads(\"{}\", object_pairs_hook=collections.OrderedDict)");
 
         // Execute user command
         python.exec(properties.pythonCode.getValue());
@@ -100,7 +101,8 @@ public class PythonRowDoFn extends DoFn<Object, Object> implements RuntimableRun
     private void flatMap(IndexedRecord input, ProcessContext context) throws IOException {
         // Prepare Python environment
         python.set("inputJSON", new PyString(input.toString()));
-        python.exec("input = json.loads(inputJSON)");
+        python.exec("import collections");
+        python.exec("input = json.loads(inputJSON, object_pairs_hook=collections.OrderedDict)");
         python.exec("outputList = []");
 
         // Execute user command
