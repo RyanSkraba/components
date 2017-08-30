@@ -13,5 +13,7 @@
 package org.talend.components.processing.definition.filterrow;
 
 public enum LogicalOpType {
-	OR, AND;
+    ALL,
+    ANY,
+    NONE;
 }

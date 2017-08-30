@@ -26,6 +26,8 @@ import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.properties.PropertiesList;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 /**
  * Contains a nested list of {@link FilterRowCriteriaProperties} so that we can combine several filtering criterias
@@ -56,6 +58,10 @@ public class FilterRowProperties extends FixedConnectorsComponentProperties {
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject");
 
+    // how to combine filters
+    public Property<LogicalOpType> logicalOp = PropertyFactory.newEnum("logicalOp",
+            LogicalOpType.class);
+
     // list of filters
     public PropertiesList<FilterRowCriteriaProperties> filters = new PropertiesList<>("filters",
             new PropertiesList.NestedPropertiesFactory<FilterRowCriteriaProperties>() {
@@ -80,12 +86,15 @@ public class FilterRowProperties extends FixedConnectorsComponentProperties {
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(Widget.widget(filters).setWidgetType(Widget.NESTED_PROPERTIES)
                 .setConfigurationValue(Widget.NESTED_PROPERTIES_TYPE_OPTION, "filter"));
+        mainForm.addRow(Widget.widget(logicalOp).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
     }
 
     @Override
     public void setupProperties() {
         super.setupProperties();
         setupLayout();
+        // all conditions required
+        logicalOp.setValue(LogicalOpType.ALL);
         // Add a default filter criteria
         filters.createAndAddRow();
 

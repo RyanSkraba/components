@@ -26,10 +26,9 @@ import org.talend.components.processing.definition.ProcessingErrorCode;
 import org.talend.components.processing.definition.filterrow.ConditionsRowConstant;
 import org.talend.components.processing.definition.filterrow.FilterRowCriteriaProperties;
 import org.talend.components.processing.definition.filterrow.FilterRowProperties;
+import org.talend.components.processing.definition.filterrow.LogicalOpType;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-import org.talend.daikon.exception.TalendRuntimeException;
-import org.talend.daikon.exception.error.CommonErrorCodes;
 
 public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
 
@@ -53,11 +52,15 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
         }
         IndexedRecord inputRecord = (IndexedRecord) converter.convertToAvro(context.element());
 
-        boolean conditionsSatisfied = true;
+        // init to false with ANY logical operator
+        // Init to true otherwise
+        boolean conditionsSatisfied = !LogicalOpType.ANY.equals(properties.logicalOp.getValue());
+        // Used to avoid useless conditions evaluation
+        boolean stopEvaluation = false;
         // Extract filters to be applied
         Iterator<FilterRowCriteriaProperties> filtersIterator = properties.filters.subProperties.iterator();
         FilterRowCriteriaProperties currentFilter = null;
-        while (conditionsSatisfied && filtersIterator.hasNext()) {
+        while (!stopEvaluation && filtersIterator.hasNext()) {
             currentFilter = filtersIterator.next();
 
             String columnName = currentFilter.columnName.getValue();
@@ -72,12 +75,28 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
 
                 // TODO handle null with multiples values
                 for (Object inputValue : inputValues) {
-                    conditionsSatisfied = conditionsSatisfied && checkCondition(inputValue, currentFilter);
+                    switch (properties.logicalOp.getValue()) {
+                    case ANY:
+                        conditionsSatisfied = conditionsSatisfied || checkCondition(inputValue, currentFilter);
+                        // Stop on first satisfied condition
+                        stopEvaluation = conditionsSatisfied;
+                        break;
+                    case NONE:
+                        conditionsSatisfied = conditionsSatisfied && !checkCondition(inputValue, currentFilter);
+                        // Stop on first non satisfied condition
+                        stopEvaluation = !conditionsSatisfied;
+                        break;
+                    default:
+                        // ALL case
+                        conditionsSatisfied = conditionsSatisfied && checkCondition(inputValue, currentFilter);
+                        // Stop on first non satisfied condition
+                        stopEvaluation = !conditionsSatisfied;
+                        break;
+                    }
                 }
             }
 
         }
-
 
         if (conditionsSatisfied) {
             if (hasOutputSchema) {

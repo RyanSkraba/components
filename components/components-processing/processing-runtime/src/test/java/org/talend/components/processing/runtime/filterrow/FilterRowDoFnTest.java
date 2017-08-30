@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.talend.components.processing.definition.filterrow.ConditionsRowConstant;
 import org.talend.components.processing.definition.filterrow.FilterRowCriteriaProperties;
 import org.talend.components.processing.definition.filterrow.FilterRowProperties;
+import org.talend.components.processing.definition.filterrow.LogicalOpType;
 import org.talend.daikon.exception.TalendRuntimeException;
 
 
@@ -58,19 +59,19 @@ public class FilterRowDoFnTest {
             .set("c", 1000) //
             .build();
     
-    private final GenericRecord inputa10Record = new GenericRecordBuilder(inputSimpleSchema) //
+    private final GenericRecord input_10_100_1000_Record = new GenericRecordBuilder(inputSimpleSchema) //
             .set("a", 10) //
             .set("b", 100) //
             .set("c", 1000) //
             .build();
 
-    private final GenericRecord inputa20Record = new GenericRecordBuilder(inputSimpleSchema) //
+    private final GenericRecord input_20_200_2000_Record = new GenericRecordBuilder(inputSimpleSchema) //
             .set("a", 20) //
             .set("b", 200) //
             .set("c", 2000) //
             .build();
 
-    private final GenericRecord input30Record = new GenericRecordBuilder(inputSimpleSchema) //
+    private final GenericRecord input_30_300_3000_Record = new GenericRecordBuilder(inputSimpleSchema) //
             .set("a", 30) //
             .set("b", 300) //
             .set("c", 3000) //
@@ -689,7 +690,7 @@ public class FilterRowDoFnTest {
                 .withOutputSchema(true).withRejectSchema(true);
         DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
 
-        List<IndexedRecord> outputs = fnTester.processBundle(input30Record, inputa10Record, inputa20Record);
+        List<IndexedRecord> outputs = fnTester.processBundle(input_30_300_3000_Record, input_10_100_1000_Record, input_20_200_2000_Record);
         List<IndexedRecord> rejects = fnTester.peekOutputElements(FilterRowRuntime.rejectOutput);
 
         assertEquals(1, outputs.size());
@@ -810,6 +811,76 @@ public class FilterRowDoFnTest {
         filterProp.value.setValue("aa");
         properties.filters.addRow(filterProp);
         runSimpleTestInvalidSession(properties);
+    }
+
+    @Test
+    public void test_FilterLogicalOpAny() throws Exception {
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        properties.logicalOp.setValue(LogicalOpType.ANY);
+        FilterRowCriteriaProperties condition1 = new FilterRowCriteriaProperties("filter1");
+        condition1.init();
+        condition1.columnName.setValue("a");
+        condition1.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
+        condition1.value.setValue("10");
+        properties.filters.addRow(condition1);
+        FilterRowCriteriaProperties condition2 = new FilterRowCriteriaProperties("filter2");
+        condition2.init();
+        condition2.columnName.setValue("b");
+        condition2.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
+        condition2.value.setValue("300");
+        properties.filters.addRow(condition2);
+
+        FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
+                .withOutputSchema(true).withRejectSchema(true);
+        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
+
+        List<IndexedRecord> outputs = fnTester.processBundle(input_30_300_3000_Record, input_10_100_1000_Record,
+                input_20_200_2000_Record);
+        List<IndexedRecord> rejects = fnTester.peekOutputElements(FilterRowRuntime.rejectOutput);
+
+        assertEquals(2, outputs.size());
+        assertEquals(30, outputs.get(0).get(0));
+        assertEquals(10, outputs.get(1).get(0));
+        assertEquals(1, rejects.size());
+        assertEquals(20, rejects.get(0).get(0));
+    }
+
+    @Test
+    public void test_FilterLogicalOpNone() throws Exception {
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        properties.logicalOp.setValue(LogicalOpType.NONE);
+        FilterRowCriteriaProperties condition1 = new FilterRowCriteriaProperties("filter1");
+        condition1.init();
+        condition1.columnName.setValue("a");
+        condition1.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
+        condition1.value.setValue("10");
+        properties.filters.addRow(condition1);
+        FilterRowCriteriaProperties condition2 = new FilterRowCriteriaProperties("filter2");
+        condition2.init();
+        condition2.columnName.setValue("b");
+        condition2.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
+        condition2.value.setValue("100");
+        properties.filters.addRow(condition2);
+        FilterRowCriteriaProperties condition3 = new FilterRowCriteriaProperties("filter3");
+        condition3.init();
+        condition3.columnName.setValue("a");
+        condition3.operator.setValue(ConditionsRowConstant.Operator.EQUAL);
+        condition3.value.setValue("20");
+        properties.filters.addRow(condition3);
+
+        FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
+                .withOutputSchema(true).withRejectSchema(true);
+        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
+
+        List<IndexedRecord> outputs = fnTester.processBundle(input_30_300_3000_Record, input_10_100_1000_Record,
+                input_20_200_2000_Record);
+        List<IndexedRecord> rejects = fnTester.peekOutputElements(FilterRowRuntime.rejectOutput);
+
+        assertEquals(1, outputs.size());
+        assertEquals(2, rejects.size());
+
     }
 
     // TODO test function and operator on every single type

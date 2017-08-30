@@ -236,9 +236,11 @@ public class FilterRowPropertiesTest {
         assertThat(main, notNullValue());
 
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(1));
+        assertThat(mainWidgets, hasSize(2));
         Widget filtersWidget = main.getWidget("filters");
         assertThat(filtersWidget, notNullValue());
+        Widget logicalOpWidget = main.getWidget("logicalOp");
+        assertThat(logicalOpWidget, notNullValue());
     }
 
     /**
