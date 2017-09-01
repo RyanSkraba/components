@@ -14,10 +14,15 @@ package org.talend.components.elasticsearch.runtime_2_4;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.io.elasticsearch.ElasticsearchIO;
+import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.PTransform;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
 import org.slf4j.Logger;
@@ -28,6 +33,8 @@ import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.elasticsearch.ElasticsearchDatasetProperties;
 import org.talend.components.elasticsearch.input.ElasticsearchInputProperties;
+import org.talend.daikon.avro.converter.JsonGenericRecordConverter;
+import org.talend.daikon.avro.inferrer.JsonSchemaInferrer;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -40,6 +47,8 @@ public class ElasticsearchInputRuntime extends PTransform<PBegin, PCollection<In
      * The component instance that this runtime is configured for.
      */
     private ElasticsearchInputProperties properties = null;
+
+    private JsonGenericRecordConverter jsonGenericRecordConverter = null;
 
     private static String[] resolveAddresses(String nodes) {
         String[] addresses = nodes.split(",");
@@ -80,8 +89,19 @@ public class ElasticsearchInputRuntime extends PTransform<PBegin, PCollection<In
             esRead = esRead.withQuery(properties.query.getValue());
         }
         PCollection<String> readFromElasticsearch = in.apply("ReadFromElasticsearch", esRead);
-        //TODO(bchen) String data is a json format, convert json to avro is better than string to avro
-        return readFromElasticsearch.apply(ConvertToIndexedRecord.<String> of());
+        PCollection<IndexedRecord> elasticsearchDataAsAvro = readFromElasticsearch.apply("ElasticsearchDataAsAvro", ParDo.of(new DoFn<String, IndexedRecord>() {
+            @ProcessElement
+            public void processElement(ProcessContext c) {
+                if (jsonGenericRecordConverter == null) {
+                    JsonSchemaInferrer jsonSchemaInferrer = new JsonSchemaInferrer(new ObjectMapper());
+                    Schema jsonSchema = jsonSchemaInferrer.inferSchema(c.element().toString());
+                    jsonGenericRecordConverter = new JsonGenericRecordConverter(jsonSchema);
+                }
+                GenericRecord outputRecord = jsonGenericRecordConverter.convertToAvro(c.element().toString());
+                c.output(outputRecord);
+            }
+        }));
+        return elasticsearchDataAsAvro;
     }
 
     @Override

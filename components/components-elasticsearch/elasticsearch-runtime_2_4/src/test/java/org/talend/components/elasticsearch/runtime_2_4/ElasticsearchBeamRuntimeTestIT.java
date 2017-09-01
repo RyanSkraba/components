@@ -14,6 +14,9 @@
 package org.talend.components.elasticsearch.runtime_2_4;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
@@ -37,6 +40,10 @@ import org.apache.http.message.BasicHeader;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.index.translog.Translog;
+import org.hamcrest.Matcher;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -119,18 +126,64 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
 
         ElasticsearchDatasetRuntime datasetRuntime = new ElasticsearchDatasetRuntime();
         datasetRuntime.initialize(null, datasetProperties);
-        final List<String> samples = new ArrayList<>();
+        final List<IndexedRecord> samples = new ArrayList<>();
         datasetRuntime.getSample(3, new Consumer<IndexedRecord>() {
-
-            ExtractJson parse = new ExtractJson();
 
             @Override
             public void accept(IndexedRecord indexedRecord) {
-                samples.add(parse.apply(indexedRecord));
+                samples.add(indexedRecord);
             }
         });
-        assertThat(samples, containsInAnyOrder(records.toArray()));
 
+        compareListIndexedRecord(samples, avroRecords);
+        assertThat(samples.size(), is(3));
+    }
+
+    @Test
+    public void getSampleNumericalTest() {
+        final String TYPE_NAME = "getsamplenumericaltest";
+
+        List<Integer> records = Arrays.asList(1, 5, 50, 555);
+
+        List<IndexedRecord> avroRecords = new ArrayList<>();
+        for (Integer record : records) {
+            avroRecords.add(ConvertToIndexedRecord.convertToAvro(record));
+        }
+
+        ElasticsearchDatasetProperties datasetProperties = new ElasticsearchDatasetProperties("datasetProperties");
+        datasetProperties.init();
+        datasetProperties.setDatastoreProperties(datastoreProperties);
+        datasetProperties.index.setValue(INDEX_NAME);
+        datasetProperties.type.setValue(TYPE_NAME);
+
+        ElasticsearchOutputProperties outputProperties = new ElasticsearchOutputProperties("outputProperties");
+        outputProperties.init();
+        outputProperties.setDatasetProperties(datasetProperties);
+
+        ElasticsearchOutputRuntime outputRuntime = new ElasticsearchOutputRuntime();
+        outputRuntime.initialize(null, outputProperties);
+
+        PCollection<IndexedRecord> inputRecords = (PCollection<IndexedRecord>) pipeline
+                .apply(Create.of(avroRecords).withCoder(LazyAvroCoder.of()));
+        inputRecords.apply(outputRuntime);
+
+        pipeline.run();
+
+        ElasticsearchTestUtils.upgradeIndexAndGetCurrentNumDocs(INDEX_NAME, TYPE_NAME, client);
+
+        ElasticsearchDatasetRuntime datasetRuntime = new ElasticsearchDatasetRuntime();
+        datasetRuntime.initialize(null, datasetProperties);
+        final List<IndexedRecord> samples = new ArrayList<>();
+        datasetRuntime.getSample(4, new Consumer<IndexedRecord>() {
+
+            @Override
+            public void accept(IndexedRecord indexedRecord) {
+                samples.add(indexedRecord);
+            }
+        });
+
+        compareListIndexedRecord(samples, avroRecords);
+        assertThat(samples.size(), is(4));
     }
 
     @Test
@@ -174,9 +227,8 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
         inputRuntime.initialize(null, inputProperties);
 
         PCollection<IndexedRecord> outputRecords = pipeline.apply(inputRuntime);
-        PCollection<String> out = outputRecords.apply(MapElements.via(new ExtractJson()));
 
-        PAssert.that(out).containsInAnyOrder(records);
+        PAssert.that(outputRecords).containsInAnyOrder(avroRecords);
         pipeline.run();
 
     }
@@ -185,8 +237,13 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
     public void filterTest() throws MalformedURLException {
         final String TYPE_NAME = "filtertest";
 
-        List<String> expectedRecords = Arrays.asList("r1", "r2", "r3");
         List<String> records = Arrays.asList("r1", "r2", "r3", "q1", "q2");
+        List<String> expectedRecords = Arrays.asList("r1", "r2", "r3");
+
+        List<IndexedRecord> expectedRecord = new ArrayList<>();
+        for (String record : expectedRecords) {
+            expectedRecord.add(ConvertToIndexedRecord.convertToAvro(record));
+        }
 
         List<IndexedRecord> avroRecords = new ArrayList<>();
         for (String record : records) {
@@ -224,9 +281,8 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
         inputRuntime.initialize(null, inputProperties);
 
         PCollection<IndexedRecord> outputRecords = pipeline.apply(inputRuntime);
-        PCollection<String> out = outputRecords.apply(MapElements.via(new ExtractJson()));
 
-        PAssert.that(out).containsInAnyOrder(expectedRecords);
+        PAssert.that(outputRecords).containsInAnyOrder(expectedRecord);
         pipeline.run();
 
     }
@@ -244,5 +300,17 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
                 return null;
             }
         }
+    }
+
+    private void compareListIndexedRecord(List<IndexedRecord> expectedRecord, List<IndexedRecord> outputRecord) {
+        List<String> expectedRecordList = new ArrayList<>();
+        List<String> outputRecordList = new ArrayList<>();
+        for (IndexedRecord value : expectedRecord) {
+            expectedRecordList.add(value.toString());
+        }
+        for (IndexedRecord value : outputRecord) {
+            outputRecordList.add(value.toString());
+        }
+        assertThat(expectedRecordList, containsInAnyOrder(outputRecordList.toArray()));
     }
 }
