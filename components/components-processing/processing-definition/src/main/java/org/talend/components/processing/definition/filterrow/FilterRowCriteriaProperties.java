@@ -16,7 +16,7 @@ public class FilterRowCriteriaProperties extends PropertiesImpl {
     /**
      * This enum will be filled with the name of the input columns.
      */
-    public Property<String> columnName = PropertyFactory.newString("columnName", "");
+    public Property<String> columnName = PropertyFactory.newString("columnName", "").setRequired();
 
     /**
      * This enum represent the function applicable to the input value before making the comparison. The functions
