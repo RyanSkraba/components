@@ -23,16 +23,17 @@ import org.apache.oltu.oauth2.client.response.OAuthAccessTokenResponse;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
-import org.talend.components.common.oauth.util.AuthorizationCodeCallBackHandler;
-import org.talend.components.common.oauth.util.HttpsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.talend.components.common.oauth.server.OAuth2ImplicitGrantServer;
 
 /**
  * created by bchen on Sep 11, 2015 Detailled comment
  *
  */
-public class OauthClient {
+public class Oauth2ImplicitClient {
 
-    private static final String HTTPS = "https"; //$NON-NLS-1$
+    private static final Logger logger = LoggerFactory.getLogger(Oauth2ImplicitClient.class);
 
     private final URL tokenLocation;
 
@@ -50,7 +51,7 @@ public class OauthClient {
 
     private GrantType grantType;
 
-    private OauthClient(Builder builder) {
+    private Oauth2ImplicitClient(Builder builder) {
         this.tokenLocation = builder.tokenLocation;
         this.clientID = builder.clientID;
         this.clientSecret = builder.clientSecret;
@@ -81,47 +82,41 @@ public class OauthClient {
                 builder.setResponseType(responseType);
             }
             OAuthClientRequest request = builder.buildQueryMessage();
-            System.out.println("Paste this URL into a web browser to authorize Salesforce Access:");
-            System.out.println(request.getLocationUri());
-        } catch (OAuthSystemException e) {
-            e.printStackTrace();
+            logger.info("Paste this URL into a web browser to authorize access:");
+            logger.info(request.getLocationUri());
+            OAuth2ImplicitGrantServer service = new OAuth2ImplicitGrantServer(callbackURL.getHost(), callbackURL.getPort(),
+                    10 * 60 * 1000);
+            service.run();// <--- this method wait for 10 minutes maximum to grab authorization code
+            String code = service.getAuthorizationCode();
+            service.stop();
+            return code;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        String code = null;
-        if (callbackURL.getProtocol().equalsIgnoreCase(HTTPS)) {
-            HttpsService service;
-            try {
-                AuthorizationCodeCallBackHandler handler = new AuthorizationCodeCallBackHandler();
-                service = new HttpsService(callbackURL.getHost(), callbackURL.getPort(), handler);
-                while ((code = handler.getCode()) == null) {
-                    Thread.sleep(2 * 1000);
-                }
-                service.stop();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return code;
     }
 
     public <T extends OAuthAccessTokenResponse> T getToken(Class<T> tokenResponseClass) {
         try {
-            OAuthClientRequest request = null;
-            TokenRequestBuilder builder = OAuthClientRequest.tokenLocation(tokenLocation.toString()).setGrantType(grantType)
-                    .setClientId(clientID).setClientSecret(clientSecret);
+            TokenRequestBuilder builder = OAuthClientRequest//
+                    .tokenLocation(tokenLocation.toString())//
+                    .setGrantType(grantType)//
+                    .setClientId(clientID)//
+                    .setClientSecret(clientSecret);
+
             if (GrantType.AUTHORIZATION_CODE == grantType) {
-                builder = builder.setRedirectURI(callbackURL.toString()).setCode(getAuthorizationCode());
+                builder = builder.setRedirectURI(callbackURL.toString())//
+                        .setCode(getAuthorizationCode());
             } else if (GrantType.REFRESH_TOKEN == grantType) {
                 builder = builder.setRefreshToken(refreshToken);
             }
-            request = builder.buildQueryMessage();
+            OAuthClientRequest request = builder.buildQueryMessage();
             OAuthClient oauthClient = new OAuthClient(new URLConnectionClient());
             return oauthClient.accessToken(request, tokenResponseClass);
         } catch (OAuthSystemException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         } catch (OAuthProblemException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     protected abstract static class Builder {
@@ -138,8 +133,8 @@ public class OauthClient {
             this.clientSecret = clientSecret;
         }
 
-        public OauthClient build() {
-            return new OauthClient(this);
+        public Oauth2ImplicitClient build() {
+            return new Oauth2ImplicitClient(this);
         }
 
         protected abstract GrantType getGrantType();
@@ -173,8 +168,8 @@ public class OauthClient {
         }
 
         @Override
-        public OauthClient build() {
-            OauthClient oauthClient = new OauthClient(this);
+        public Oauth2ImplicitClient build() {
+            Oauth2ImplicitClient oauthClient = new Oauth2ImplicitClient(this);
             oauthClient.setAuthorizationLocation(authorizationLocation);
             oauthClient.setCallbackURL(callbackURL);
             oauthClient.setResponseType(responseType);
@@ -201,8 +196,8 @@ public class OauthClient {
         }
 
         @Override
-        public OauthClient build() {
-            OauthClient oauthClient = new OauthClient(this);
+        public Oauth2ImplicitClient build() {
+            Oauth2ImplicitClient oauthClient = new Oauth2ImplicitClient(this);
             oauthClient.setRefreshToken(refreshToken);
             return oauthClient;
         }

@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.talend.components</groupId>
@@ -16,11 +17,6 @@
 			<groupId>org.apache.oltu.oauth2</groupId>
 			<artifactId>org.apache.oltu.oauth2.client</artifactId>
 			<version>1.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>9.2.19.v20160908</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -81,11 +77,11 @@
 							<classifier>bundle</classifier>
 							<instructions>
 								<Bundle-SymbolicName>org.talend.components.common-oauth</Bundle-SymbolicName>
-								<Import-Package>org.talend*,javax.net.ssl*</Import-Package>
+								<Import-Package>org.talend*,javax.net.ssl*,org.slf4j*</Import-Package>
 								<Service-Component>*</Service-Component>
 								<Embed-Transitive>true</Embed-Transitive><!-- We need to embed oauth.common 
 									this is why we set this to true -->
-								<Embed-Dependency>artifactId=org.apache.oltu.oauth2*|jetty*|javax.servlet*;inline=false</Embed-Dependency>
+								<Embed-Dependency>artifactId=org.apache.oltu.oauth2*|javax.servlet*inline=false</Embed-Dependency>
 								<Export-Package>org.talend.components.common.oauth*</Export-Package>
 								<_exportcontents>org.apache.oltu.oauth2*</_exportcontents>
 							</instructions>

@@ -14,17 +14,9 @@
 package org.talend.components.salesforce.test;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -68,7 +60,6 @@ public class SalesforceConnectionPropertiesTest extends SalesforceTestBase {
         Form mainForm = properties.getForm(Form.MAIN);
         assertNotNull(mainForm);
         assertTrue(mainForm.getWidget(properties.userPassword.getName()).isVisible());
-        assertFalse(mainForm.getWidget(properties.oauth.getName()).isVisible());
 
         Form advForm = properties.getForm(Form.ADVANCED);
         assertNotNull(advForm);
@@ -141,7 +132,6 @@ public class SalesforceConnectionPropertiesTest extends SalesforceTestBase {
 
         Form mainForm = properties.getForm(Form.MAIN);
         assertFalse(mainForm.getWidget(properties.loginType.getName()).isVisible());
-        assertFalse(mainForm.getWidget(properties.oauth.getName()).isVisible());
         assertFalse(mainForm.getWidget(properties.userPassword.getName()).isVisible());
 
         Form advForm = properties.getForm(Form.ADVANCED);
@@ -156,8 +146,8 @@ public class SalesforceConnectionPropertiesTest extends SalesforceTestBase {
 
         Form wizardForm = properties.getForm(SalesforceConnectionProperties.FORM_WIZARD);
 
-        try (MockRuntimeSourceOrSinkTestFixture testFixture = new MockRuntimeSourceOrSinkTestFixture(
-                equalTo(properties), createDefaultTestDataset())) {
+        try (MockRuntimeSourceOrSinkTestFixture testFixture = new MockRuntimeSourceOrSinkTestFixture(equalTo(properties),
+                createDefaultTestDataset())) {
             testFixture.setUp();
 
             // Valid
@@ -177,7 +167,6 @@ public class SalesforceConnectionPropertiesTest extends SalesforceTestBase {
     }
 
     private void testLoginTypeWidgets(Form form) {
-        assertTrue(form.getWidget(properties.oauth.getName()).isVisible());
         assertFalse(form.getWidget(properties.userPassword.getName()).isVisible());
 
     }

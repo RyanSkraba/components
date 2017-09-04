@@ -24,7 +24,7 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.common.oauth.OauthProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
 
 @RunWith(PaxExam.class)
@@ -43,8 +43,8 @@ public class OAthDepsTestIT {
     public void setupComponentService() {
         try {
             // this the only checks that all import and export for OAuth ahtentication are correctly set for OSGI.
-            SalesforceOAuthConnection salesforceOAuthConnection = new SalesforceOAuthConnection(new OauthProperties("foo"),
-                    "http://localhost", null);
+            SalesforceOAuthConnection salesforceOAuthConnection = new SalesforceOAuthConnection(
+                    new SalesforceConnectionProperties("foo"), "http://localhost", null);
             salesforceOAuthConnection.login(null);// this should not throw ClassNotFoundException
         } catch (Exception e) {
             if (e instanceof ClassNotFoundException) {

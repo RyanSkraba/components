@@ -167,7 +167,7 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
             String endpoint = connProps.endpoint.getStringValue();
             endpoint = StringUtils.strip(endpoint, "\"");
             if (SalesforceConnectionProperties.LoginType.OAuth.equals(connProps.loginType.getValue())) {
-                SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps.oauth, endpoint,
+                SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps, endpoint,
                         connProps.apiVersion.getValue());
                 oauthConnection.login(config);
             } else {
@@ -232,7 +232,7 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
                         ch.connection = (PartnerConnection) sharedConn;
                     } else if (sharedConn instanceof BulkConnection) {
                         ch.bulkConnection = (BulkConnection) sharedConn;
-                    } else if (sharedConn instanceof ConnectionHolder){
+                    } else if (sharedConn instanceof ConnectionHolder) {
                         return (ConnectionHolder) sharedConn;
                     }
                     return ch;

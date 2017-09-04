@@ -25,7 +25,9 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.common.ProxyProperties;
-import org.talend.components.common.oauth.OauthProperties;
+import org.talend.components.common.oauth.OAuth2FlowType;
+import org.talend.components.common.oauth.properties.Oauth2ImplicitFlowProperties;
+import org.talend.components.common.oauth.properties.Oauth2JwtFlowProperties;
 import org.talend.components.salesforce.common.SalesforceRuntimeSourceOrSink;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.daikon.i18n.GlobalI18N;
@@ -96,15 +98,17 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
     //
     // Nested property collections
     //
-    private static final String OAUTH = "oauth";
 
-    public OauthProperties oauth = new OauthProperties(OAUTH);
+    // Oauth 2
+    public Property<OAuth2FlowType> oauth2FlowType = newEnum("oauth2FlowType", OAuth2FlowType.class).setRequired(); // $NON-NLS-0$
+
+    public Oauth2ImplicitFlowProperties oauth = new Oauth2ImplicitFlowProperties("oauth");
+
+    public Oauth2JwtFlowProperties oauth2JwtFlow = new Oauth2JwtFlowProperties("oauth2JwtFlow");
 
     public Property<String> apiVersion = newString("apiVersion");
 
-    private static final String USERPASSWORD = "userPassword";
-
-    public SalesforceUserPasswordProperties userPassword = new SalesforceUserPasswordProperties(USERPASSWORD);
+    public SalesforceUserPasswordProperties userPassword = new SalesforceUserPasswordProperties("userPassword");
 
     public ProxyProperties proxy = new ProxyProperties("proxy");
 
@@ -118,8 +122,8 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
     @Override
     public void setupProperties() {
         super.setupProperties();
-
         loginType.setValue(LoginType.Basic);
+        oauth2FlowType.setValue(OAuth2FlowType.JWT_Flow);
         endpoint.setValue(URL);
         apiVersion.setValue(DEFAULT_API_VERSION);
         timeout.setValue(60000);
@@ -133,6 +137,8 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         Form wizardForm = Form.create(this, FORM_WIZARD);
         wizardForm.addRow(name);
         wizardForm.addRow(widget(loginType).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE).setDeemphasize(true));
+        wizardForm.addColumn(Widget.widget(oauth2FlowType).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        wizardForm.addRow(oauth2JwtFlow.getForm(Form.MAIN));
         wizardForm.addRow(oauth.getForm(Form.MAIN));
         wizardForm.addRow(userPassword.getForm(Form.MAIN));
         wizardForm.addRow(widget(advanced).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
@@ -140,6 +146,8 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
 
         Form mainForm = Form.create(this, Form.MAIN);
         mainForm.addRow(widget(loginType).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        mainForm.addColumn(Widget.widget(oauth2FlowType).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        mainForm.addRow(oauth2JwtFlow.getForm(Form.MAIN));
         mainForm.addRow(oauth.getForm(Form.MAIN));
         mainForm.addRow(userPassword.getForm(Form.MAIN));
 
@@ -184,6 +192,10 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         refreshLayout(getForm(Form.ADVANCED));
     }
 
+    public void afterOauth2FlowType() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
     public ValidationResult validateTestConnection() throws Exception {
         try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             SalesforceRuntimeSourceOrSink ss = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
@@ -209,27 +221,20 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
             if (useOtherConnection) {
                 form.getWidget(loginType.getName()).setHidden(true);
-                form.getWidget(OAUTH).setHidden(true);
-                form.getWidget(USERPASSWORD).setHidden(true);
+                hideOauth2Properties(form, true);
+                form.getWidget(userPassword).setHidden(true);
             } else {
+                updateEndpoint();
                 form.getWidget(loginType.getName()).setHidden(false);
-                String endpointValue = endpoint.getValue();
                 switch (loginType.getValue()) {
                 case Basic:
-                    form.getWidget(OAUTH).setHidden(true);
-                    form.getWidget(USERPASSWORD).setHidden(false);
-                    if (endpointValue == null || endpointValue.contains(OAUTH_URL)) {
-                        endpoint.setValue(URL);
-                    }
+                    hideOauth2Properties(form, true);
+                    form.getWidget(userPassword).setHidden(false);
                     break;
                 case OAuth:
-                    form.getWidget(OAUTH).setHidden(false);
-                    form.getWidget(USERPASSWORD).setHidden(true);
-                    if (endpointValue == null || endpointValue.contains(URL)) {
-                        endpoint.setValue(OAUTH_URL);
-                    }
+                    refreshOauth2Properties(form);
+                    form.getWidget(userPassword).setHidden(true);
                     break;
-
                 default:
                     throw new ComponentException(new Throwable("Enum value should be handled :" + loginType.getValue()));
                 }
@@ -261,6 +266,28 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         }
     }
 
+    private void refreshOauth2Properties(Form form) {
+        hideOauth2Properties(form, true);
+        form.getWidget(oauth2FlowType).setVisible();
+        if (Form.MAIN.equals(form.getName()) || form.getName().equals(FORM_WIZARD)) {
+            switch (oauth2FlowType.getValue()) {
+            case Implicit_Flow:
+                form.getWidget(oauth).setVisible();
+                break;
+            case JWT_Flow:
+            default:
+                form.getWidget(oauth2JwtFlow).setVisible();
+                break;
+            }
+        }
+    }
+
+    private void hideOauth2Properties(Form form, boolean hide) {
+        form.getWidget(oauth2FlowType).setHidden(hide);
+        form.getWidget(oauth2JwtFlow).setHidden(hide);
+        form.getWidget(oauth).setHidden(hide);
+    }
+
     @Override
     public SalesforceConnectionProperties getConnectionProperties() {
         return this;
@@ -280,7 +307,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
 
     @Override
     public int getVersionNumber() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -291,8 +318,24 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
                 apiVersion.setValue("\"34.0\"");
                 migrated = true;
             }
+
+            if (oauth2FlowType.getValue() == null) {
+                oauth2FlowType.setValue(OAuth2FlowType.Implicit_Flow);
+                migrated = true;
+            }
         }
+
         return migrated;
+    }
+
+    public void updateEndpoint() {
+        boolean isBasicLogin = LoginType.Basic.equals(loginType.getValue());
+        String endpointValue = endpoint.getValue();
+        if (isBasicLogin && (endpointValue == null || endpointValue.contains(OAUTH_URL))) {
+            endpoint.setValue(URL);
+        } else if (!isBasicLogin && (endpointValue == null || endpointValue.contains(URL))) {
+            endpoint.setValue(OAUTH_URL);
+        }
     }
 
 }

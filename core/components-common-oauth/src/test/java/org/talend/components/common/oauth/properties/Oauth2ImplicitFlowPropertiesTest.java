@@ -10,21 +10,27 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.common.oauth;
+package org.talend.components.common.oauth.properties;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
-import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.PropertiesImpl;
+import org.talend.daikon.properties.test.PropertiesTestUtils;
 
-public class AllPropertiesTest {
+public class Oauth2ImplicitFlowPropertiesTest {
 
     @Rule
     public ErrorCollector errorCollector = new ErrorCollector();
 
     @Test
-    public void testAlli18n() {
-        ComponentTestUtils.checkAllI18N(new OauthProperties(null).init(), errorCollector);
+    public void i18nTest() {
+
+        Class propertiesClass = Oauth2ImplicitFlowProperties.class;
+        Properties props = PropertiesImpl.createNewInstance(propertiesClass, "root").init();
+        // check all properties
+        PropertiesTestUtils.checkAllI18N(props, errorCollector);
     }
 
 }

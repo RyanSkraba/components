@@ -10,10 +10,11 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.common.oauth;
+package org.talend.components.common.oauth.properties;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.util.EnumSet;
 
@@ -22,7 +23,9 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
-public class OauthProperties extends ComponentPropertiesImpl {
+public class Oauth2ImplicitFlowProperties extends ComponentPropertiesImpl {
+
+    private static final long serialVersionUID = -769837076726950637L;
 
     public Property<String> clientId = newProperty("clientId").setRequired(); //$NON-NLS-1$
 
@@ -35,7 +38,7 @@ public class OauthProperties extends ComponentPropertiesImpl {
 
     public Property<String> tokenFile = newProperty("tokenFile").setRequired(); //$NON-NLS-1$
 
-    public OauthProperties(String name) {
+    public Oauth2ImplicitFlowProperties(String name) {
         super(name);
     }
 

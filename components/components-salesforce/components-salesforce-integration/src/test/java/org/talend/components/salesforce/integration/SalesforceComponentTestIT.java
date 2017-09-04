@@ -13,13 +13,7 @@
 package org.talend.components.salesforce.integration;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,14 +43,9 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.api.wizard.WizardNameComparator;
 import org.talend.components.common.CommonTestUtils;
-import org.talend.components.common.oauth.OauthProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.*;
 import org.talend.components.salesforce.SalesforceConnectionProperties.LoginType;
-import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
-import org.talend.components.salesforce.SalesforceModuleListProperties;
-import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
-import org.talend.components.salesforce.SalesforceUserPasswordProperties;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
@@ -108,7 +97,6 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         Form mainForm = props.getForm(Form.MAIN);
         assertEquals("Salesforce Connection Settings", mainForm.getTitle());
         assertFalse(mainForm.getWidget(SalesforceUserPasswordProperties.class).isHidden());
-        assertTrue(mainForm.getWidget(OauthProperties.class).isHidden());
 
         loginType.setValue(SalesforceConnectionProperties.LoginType.OAuth);
         props = checkAndAfter(mainForm, "loginType", props);
@@ -116,7 +104,6 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         assertTrue(mainForm.isRefreshUI());
 
         assertTrue(mainForm.getWidget(SalesforceUserPasswordProperties.class).isHidden());
-        assertFalse(mainForm.getWidget(OauthProperties.class).isHidden());
     }
 
     @Test
@@ -280,8 +267,8 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         }
         assertEquals(1, connectionWizardDefinitionNumber);
         assertEquals("Salesforce Connection", wizardDef.getMenuItemName());
-        ComponentWizard connectionWizard = getComponentService().getComponentWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
-                "nodeSalesforce");
+        ComponentWizard connectionWizard = getComponentService()
+                .getComponentWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, "nodeSalesforce");
         assertNotNull(connectionWizard);
         assertEquals("nodeSalesforce", connectionWizard.getRepositoryLocation());
         List<Form> forms = connectionWizard.getForms();
@@ -299,7 +286,8 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
 
         Form advancedForm = connProps.getForm(Form.ADVANCED);
         assertTrue(
-                ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() + " should be == to " + advancedForm,
+                ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() + " should be == to "
+                        + advancedForm,
                 ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() == advancedForm);
 
         Object image = getComponentService().getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
