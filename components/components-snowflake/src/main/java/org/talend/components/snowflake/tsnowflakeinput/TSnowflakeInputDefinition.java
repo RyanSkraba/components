@@ -12,17 +12,16 @@
 // ============================================================================
 package org.talend.components.snowflake.tsnowflakeinput;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.snowflake.SnowflakeDefinition;
 import org.talend.components.snowflake.SnowflakeTableProperties;
 import org.talend.components.snowflake.runtime.SnowflakeSource;
-import org.talend.daikon.properties.Properties;
 import org.talend.daikon.runtime.RuntimeInfo;
-
-import java.util.EnumSet;
-import java.util.Set;
 
 /**
  * Component that can connect to a snowflake system and get some data out of it.
@@ -44,8 +43,6 @@ public class TSnowflakeInputDefinition extends SnowflakeDefinition {
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TSnowflakeInputProperties.class;
-
-        /* return SnowflakeConnectionProperties.class; //TODO: remove this */
     }
 
     @SuppressWarnings("unchecked")

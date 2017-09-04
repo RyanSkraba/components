@@ -68,7 +68,7 @@ public class SnowflakeReaderTest {
         Connection connectionMock = Mockito.mock(Connection.class);
         ResultSet resultSetMock = Mockito.mock(ResultSet.class);
 
-        Mockito.when((snowflakeSourceMock).connect(runtimeContainerMock)).thenReturn(connectionMock);
+        Mockito.when((snowflakeSourceMock).createConnection(runtimeContainerMock)).thenReturn(connectionMock);
         Mockito.when(connectionMock.createStatement()).thenReturn(statementMock);
         Mockito.when(statementMock.executeQuery(TEST_QUERY)).thenReturn(resultSetMock);
 
@@ -82,8 +82,8 @@ public class SnowflakeReaderTest {
     public void testStartErrorInStatement() throws Exception {
         Connection connectionMock = Mockito.mock(Connection.class);
 
-        Mockito.when((snowflakeSourceMock).connect(runtimeContainerMock)).thenReturn(connectionMock);
-        Mockito.when((snowflakeSourceMock).connect(runtimeContainerMock)).thenReturn(connectionMock);
+        Mockito.when((snowflakeSourceMock).createConnection(runtimeContainerMock)).thenReturn(connectionMock);
+        Mockito.when((snowflakeSourceMock).createConnection(runtimeContainerMock)).thenReturn(connectionMock);
         Mockito.when(connectionMock.createStatement()).thenThrow(new SQLException("Failed to create statement"));
 
         Assert.assertFalse(snowflakeReader.start());
@@ -92,7 +92,7 @@ public class SnowflakeReaderTest {
     @Test
     public void testClose() throws Exception {
         Connection connection = Mockito.mock(Connection.class);
-        Mockito.when(snowflakeSourceMock.connect(runtimeContainerMock)).thenReturn(connection);
+        Mockito.when(snowflakeSourceMock.createConnection(runtimeContainerMock)).thenReturn(connection);
 
         snowflakeReader.getConnection();
         snowflakeReader.close();
@@ -103,7 +103,7 @@ public class SnowflakeReaderTest {
     @Test(expected = IOException.class)
     public void testCloseFailed() throws Exception {
         Connection connection = Mockito.mock(Connection.class);
-        Mockito.when(snowflakeSourceMock.connect(runtimeContainerMock)).thenReturn(connection);
+        Mockito.when(snowflakeSourceMock.createConnection(runtimeContainerMock)).thenReturn(connection);
         Mockito.doThrow(new SQLException("Failed to close connection")).when(snowflakeSourceMock).closeConnection(runtimeContainerMock, connection);
         snowflakeReader.getConnection();
         snowflakeReader.close();
@@ -122,7 +122,7 @@ public class SnowflakeReaderTest {
         Mockito.when(resultSetMock.getMetaData()).thenReturn(Mockito.mock(ResultSetMetaData.class));
         Mockito.when(resultSetMock.getMetaData().getColumnCount()).thenReturn(2);
         Mockito.when(resultSetMock.getString(0)).thenReturn("row1field", "row1column", "row2field", "row2column", "row3field", "row3column");
-        Mockito.when((snowflakeSourceMock).connect(runtimeContainerMock)).thenReturn(connectionMock);
+        Mockito.when((snowflakeSourceMock).createConnection(runtimeContainerMock)).thenReturn(connectionMock);
         Mockito.when(connectionMock.createStatement()).thenReturn(statementMock);
         Mockito.when(statementMock.executeQuery(WHERE_TEST_QUERY)).thenReturn(resultSetMock);
 
@@ -158,7 +158,7 @@ public class SnowflakeReaderTest {
         Mockito.when(resultSetMock.getMetaData()).thenReturn(Mockito.mock(ResultSetMetaData.class));
         Mockito.when(resultSetMock.getMetaData().getColumnCount()).thenReturn(2);
         Mockito.when(resultSetMock.getString(0)).thenReturn("row1field", "row1column");
-        Mockito.when((snowflakeSourceMock).connect(runtimeContainerMock)).thenReturn(connectionMock);
+        Mockito.when((snowflakeSourceMock).createConnection(runtimeContainerMock)).thenReturn(connectionMock);
         Mockito.when(connectionMock.createStatement()).thenReturn(statementMock);
         Mockito.when(statementMock.executeQuery(TEST_QUERY)).thenReturn(resultSetMock);
         snowflakeReader.start();
@@ -175,7 +175,7 @@ public class SnowflakeReaderTest {
         Mockito.when(resultSetMock.getMetaData()).thenReturn(Mockito.mock(ResultSetMetaData.class));
         Mockito.when(resultSetMock.getMetaData().getColumnCount()).thenReturn(3);
         Mockito.when(resultSetMock.getString(0)).thenReturn("row1field", "row1column");
-        Mockito.when((snowflakeSourceMock).connect(runtimeContainerMock)).thenReturn(connectionMock);
+        Mockito.when((snowflakeSourceMock).createConnection(runtimeContainerMock)).thenReturn(connectionMock);
         Mockito.when(connectionMock.createStatement()).thenReturn(statementMock);
         Mockito.when(statementMock.executeQuery(TEST_QUERY)).thenReturn(resultSetMock);
         snowflakeReader.start();

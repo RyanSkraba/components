@@ -40,7 +40,6 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction;
-import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
 import net.snowflake.client.jdbc.internal.joda.time.DateTime;
@@ -77,7 +76,8 @@ public class SnowflakeWriterTest {
         Schema schema = SchemaBuilder.record("record").fields().name("id")
                 .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, Boolean.TRUE.toString()).type().stringType().noDefault()
                 .requiredString("column").requiredString("field").endRecord();
-        Mockito.when(sink.connect(null)).thenReturn(Mockito.mock(Connection.class));
+        Mockito.when(sink.createConnection(null)).thenReturn(Mockito.mock(Connection.class));
+        Mockito.when(sink.getRuntimeSchema(null)).thenReturn(schema);
         properties.table.main.schema.setValue(schema);
         properties.table.tableName.setValue("Table");
         properties.connection.schemaName.setValue("dbSchema");
@@ -124,23 +124,6 @@ public class SnowflakeWriterTest {
     }
 
     @Test
-    public void testOpenInsert() throws Exception {
-        Schema schema = SchemaBuilder.record("record").fields().requiredString("column").requiredString("field").endRecord();
-        AvroUtils.setIncludeAllFields(schema, true);
-        properties.table.main.schema.setValue(schema);
-        Schema schemaDB = SchemaBuilder.record("record").fields().requiredString("id").requiredString("column")
-                .requiredString("field").endRecord();
-        Mockito.when(sink.getSchema(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class), Mockito.anyString()))
-                .thenReturn(schemaDB);
-
-        writer.open("uId");
-
-        Mockito.verify(sink, Mockito.times(1)).getSchema(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class),
-                Mockito.anyString());
-        Mockito.verify(loader, Mockito.times(1)).start();
-    }
-
-    @Test
     public void testWrite() throws Exception {
         int daysFrom1970 = 17337;
         DateTime dateTime = new DateTime(0).plusDays(daysFrom1970);
@@ -173,6 +156,7 @@ public class SnowflakeWriterTest {
         field = registry.sqlType2Avro(18, 10, Types.ARRAY, true, "eighthColumn", "eighth_column", "");
         fields.add(field);
         Schema schema = Schema.createRecord("records", null, null, false, fields);
+        Mockito.when(sink.getRuntimeSchema(null)).thenReturn(schema);
         properties.table.main.schema.setValue(schema);
         properties.outputAction.setValue(OutputAction.INSERT);
         IndexedRecord record = Mockito.mock(IndexedRecord.class);
@@ -196,8 +180,7 @@ public class SnowflakeWriterTest {
 
         Schema snowflakeRuntimeSchema = SchemaBuilder.record("runtime").fields().requiredString("NAME")
                 .requiredString("ORGANIZATION").endRecord();
-        Mockito.when(sink.getSchema(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class), Mockito.anyString()))
-                .thenReturn(snowflakeRuntimeSchema);
+        Mockito.when(sink.getRuntimeSchema(Mockito.any(RuntimeContainer.class))).thenReturn(snowflakeRuntimeSchema);
 
         Object[] row = new Object[] { "my_name", "talend" };
 
@@ -220,8 +203,7 @@ public class SnowflakeWriterTest {
 
         Schema snowflakeRuntimeSchema = SchemaBuilder.record("runtime").fields().requiredString("name")
                 .requiredString("organization").endRecord();
-        Mockito.when(sink.getSchema(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class), Mockito.anyString()))
-                .thenReturn(snowflakeRuntimeSchema);
+        Mockito.when(sink.getRuntimeSchema(Mockito.any(RuntimeContainer.class))).thenReturn(snowflakeRuntimeSchema);
 
         Object[] row = new Object[] { "my_name", "talend" };
 
@@ -245,8 +227,7 @@ public class SnowflakeWriterTest {
                 .name("age").type().intType().intDefault(0)
                 .requiredString("name")
                 .requiredString("organization").endRecord();
-        Mockito.when(sink.getSchema(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class), Mockito.anyString()))
-                .thenReturn(snowflakeRuntimeSchema);
+        Mockito.when(sink.getRuntimeSchema(Mockito.any(RuntimeContainer.class))).thenReturn(snowflakeRuntimeSchema);
 
         Object[] row = new Object[] { 0, "my_name", "talend" };
 
@@ -271,8 +252,7 @@ public class SnowflakeWriterTest {
                 .name("ageDifferent").type().intType().intDefault(0)
                 .requiredString("nameDifferent")
                 .requiredString("organizationDifferent").endRecord();
-        Mockito.when(sink.getSchema(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class), Mockito.anyString()))
-                .thenReturn(snowflakeRuntimeSchema);
+        Mockito.when(sink.getRuntimeSchema(Mockito.any(RuntimeContainer.class))).thenReturn(snowflakeRuntimeSchema);
 
         Schema incomingSchema = SchemaBuilder.record("incoming").fields().requiredString("name")
                 .requiredString("organization").endRecord();

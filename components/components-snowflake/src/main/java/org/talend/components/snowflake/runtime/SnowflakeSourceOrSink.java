@@ -18,7 +18,6 @@ package org.talend.components.snowflake.runtime;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Driver;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,9 +32,11 @@ import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
+import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.SnowflakeProvideConnectionProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -43,7 +44,7 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.ValidationResultMutable;
 
-public class SnowflakeSourceOrSink implements SourceOrSink {
+public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrSink {
 
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(SnowflakeSourceOrSink.class);
@@ -54,10 +55,6 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
 
     protected SnowflakeProvideConnectionProperties properties;
 
-    protected static final String KEY_CONNECTION = "Connection";
-
-    protected static final String KEY_CONNECTION_PROPERTIES = "ConnectionProperties";
-
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         this.properties = (SnowflakeProvideConnectionProperties) properties;
@@ -67,7 +64,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
     @Override
     public ValidationResult validate(RuntimeContainer container) {
         try {
-            connect(container);
+            createConnection(container);
         } catch (IllegalArgumentException e) {
             ValidationResultMutable vr = new ValidationResultMutable();
             vr.setMessage(e.getMessage().concat(SnowflakeConstants.INCORRECT_SNOWFLAKE_ACCOUNT_MESSAGE));
@@ -96,7 +93,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             SnowflakeSourceOrSink sss = new SnowflakeSourceOrSink();
             sss.initialize(null, (ComponentProperties) properties);
             try {
-                sss.connect(null);
+                sss.createConnection(null);
                 // Make sure we can get the schema names, as that tests that all of the connection parameters are really OK
                 sss.getSchemaNames((RuntimeContainer) null);
             } catch (Exception ex) {
@@ -143,67 +140,13 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
         if (refComponentId != null) {
             // In a runtime container
             if (container != null) {
-                return (SnowflakeConnectionProperties) container.getComponentData(refComponentId, KEY_CONNECTION_PROPERTIES);
+                return (SnowflakeConnectionProperties) container.getComponentData(refComponentId,
+                        SnowflakeRuntime.KEY_CONNECTION_PROPERTIES);
             }
             // Design time
             return connProps.getReferencedConnectionProperties();
         }
         return connProps;
-    }
-
-    protected void closeConnection(RuntimeContainer container, Connection conn) throws SQLException {
-        SnowflakeConnectionProperties connProps = properties.getConnectionProperties();
-        String refComponentId = connProps.getReferencedComponentId();
-        if ((refComponentId == null || container == null) && (conn != null && !conn.isClosed())) {
-            conn.close();
-        }
-    }
-
-    protected Connection connect(RuntimeContainer container) throws IOException {
-
-        Connection conn = null;
-
-        SnowflakeConnectionProperties connProps = properties.getConnectionProperties();
-        String refComponentId = connProps.getReferencedComponentId();
-        // Using another component's connection
-        if (refComponentId != null) {
-            // In a runtime container
-            if (container != null) {
-                conn = (Connection) container.getComponentData(refComponentId, KEY_CONNECTION);
-                try {
-                    if (conn != null && !conn.isClosed()) {
-                        return conn;
-                    }
-                } catch (SQLException ex) {
-                    throw new IOException(ex);
-                }
-                throw new IOException(i18nMessages.getMessage("error.refComponentNotConnected", refComponentId));
-            }
-            // Design time
-            connProps = connProps.getReferencedConnectionProperties();
-            // FIXME This should not happen - but does as of now
-            if (connProps == null)
-                throw new IOException(i18nMessages.getMessage("error.refComponentWithoutProperties", refComponentId));
-        }
-
-        try {
-            Driver driver = (Driver) Class.forName(SnowflakeConstants.SNOWFLAKE_DRIVER).newInstance();
-
-            conn = SnowflakeRuntimeHelper.getConnection(connProps, driver);
-        } catch (Exception e) {
-            if (e.getMessage().contains("HTTP status=403")) {
-                throw new IllegalArgumentException(e.getMessage());
-            } else {
-                throw new IOException(e);
-            }
-        }
-
-        if (container != null) {
-            container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, conn);
-            container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION_PROPERTIES, connProps);
-        }
-
-        return conn;
     }
 
     public static List<NamedThing> getSchemaNames(RuntimeContainer container, SnowflakeConnectionProperties properties)
@@ -215,7 +158,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
 
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
-        return getSchemaNames(container, connect(container));
+        return getSchemaNames(container, createConnection(container));
     }
 
     protected String getCatalog(SnowflakeConnectionProperties connProps) {
@@ -257,8 +200,18 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
 
     @Override
     public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
-        return getSchema(container, connect(container), schemaName);
+        return getSchema(container, createConnection(container), schemaName);
     }
+
+    protected Schema getRuntimeSchema(RuntimeContainer container) throws IOException {
+        SnowflakeConnectionTableProperties connectionTableProperties = ((SnowflakeConnectionTableProperties) properties);
+        Schema schema = connectionTableProperties.getSchema();
+        if (AvroUtils.isIncludeAllFields(schema)) {
+            schema = getEndpointSchema(container, connectionTableProperties.getTableName());
+        }
+        return schema;
+    }
+
 
     protected SnowflakeAvroRegistry getSnowflakeAvroRegistry() {
         return SnowflakeAvroRegistry.get();
@@ -273,8 +226,9 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
 
             ResultSet resultSet = metaData.getColumns(getCatalog(connProps), getDbSchema(connProps), tableName, null);
             tableSchema = getSnowflakeAvroRegistry().inferSchema(resultSet);
-            if (tableSchema == null)
+            if (tableSchema == null) {
                 throw new IOException(i18nMessages.getMessage("error.tableNotFound", tableName));
+            }
 
             // Update the schema with Primary Key details
             // FIXME - move this into the inferSchema stuff
@@ -297,6 +251,11 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
 
         return tableSchema;
 
+    }
+
+    @Override
+    public SnowflakeConnectionProperties getConnectionProperties() {
+        return properties.getConnectionProperties();
     }
 
 }

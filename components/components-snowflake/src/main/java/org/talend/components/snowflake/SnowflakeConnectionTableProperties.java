@@ -14,6 +14,7 @@ package org.talend.components.snowflake;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.daikon.properties.presentation.Form;
@@ -36,9 +37,15 @@ public abstract class SnowflakeConnectionTableProperties extends FixedConnectors
     @Override
     public void setupProperties() {
         super.setupProperties();
-        // Allow for subclassing
         table = new SnowflakeTableProperties("table");
         table.connection = getConnectionProperties();
+        table.setSchemaListener(new ISchemaListener() {
+
+            @Override
+            public void afterSchema() {
+                afterMainSchema();
+            }
+        });
     }
 
     public Schema getSchema() {
@@ -54,6 +61,18 @@ public abstract class SnowflakeConnectionTableProperties extends FixedConnectors
 
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(connection.getForm(Form.ADVANCED));
+    }
+
+    /**
+     * This methods serves to update reject schema or/and schema flow after main schema(table.main.schema) was changed.
+     */
+    public void afterMainSchema() {
+        // Implement in subclasses.
+    };
+
+
+    public String getTableName() {
+        return table.tableName.getValue();
     }
 
     @Override

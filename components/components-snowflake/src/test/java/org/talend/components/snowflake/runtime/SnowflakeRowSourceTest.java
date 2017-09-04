@@ -12,23 +12,24 @@
 // ============================================================================
 package org.talend.components.snowflake.runtime;
 
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.talend.components.api.component.runtime.Source;
+import org.talend.components.snowflake.tsnowflakerow.TSnowflakeRowProperties;
 
-import org.talend.components.snowflake.SnowflakeConnectionProperties;
+public class SnowflakeRowSourceTest {
 
-/**
- * Contains only runtime helper classes, mainly to do with logging.
- */
-public class SnowflakeRuntimeHelper {
+    private Source source;
 
-    private SnowflakeRuntimeHelper() {
+    @Before
+    public void setup() {
+        source = new SnowflakeRowSource();
+        source.initialize(null, new TSnowflakeRowProperties("rowProperties"));
     }
 
-    public static Connection getConnection(SnowflakeConnectionProperties connProps, Driver driver) throws Exception{
-        DriverManager.registerDriver(driver);
-        return DriverManager.getConnection(connProps.getConnectionUrl(), connProps.getJdbcProperties());
+    @Test
+    public void testCreateReader() {
+        Assert.assertTrue(source.createReader(null) instanceof SnowflakeRowReader);
     }
-
 }

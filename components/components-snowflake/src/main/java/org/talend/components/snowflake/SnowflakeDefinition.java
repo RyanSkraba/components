@@ -15,8 +15,8 @@ package org.talend.components.snowflake;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.ExecutionEngine;
+import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
-import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -48,7 +48,7 @@ public abstract class SnowflakeDefinition extends AbstractComponentDefinition {
         return new Property[]{RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP};
     }
 
-    public static RuntimeInfo getCommonRuntimeInfo(ClassLoader classLoader, Class<? extends SourceOrSink> clazz) {
+    public static RuntimeInfo getCommonRuntimeInfo(ClassLoader classLoader, Class<? extends RuntimableRuntime<ComponentProperties>> clazz) {
         return new SimpleRuntimeInfo(classLoader,
                 DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-snowflake"),
                 clazz.getCanonicalName());

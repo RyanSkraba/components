@@ -92,19 +92,25 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         super.setupProperties();
 
         outputAction.setValue(OutputAction.INSERT);
+        ISchemaListener listener;
+
+        //This condition was added due to some strange behaviour of serialization.
+        if (table != null) {
+            listener = table.schemaListener;
+        } else {
+            listener = new ISchemaListener() {
+
+                @Override
+                public void afterSchema() {
+                    afterMainSchema();
+                }
+            };
+        }
 
         table = new TableSubclass("table");
         table.connection = connection;
+        table.setSchemaListener(listener);
         table.setupProperties();
-
-        table.setSchemaListener(new ISchemaListener() {
-
-            @Override
-            public void afterSchema() {
-                updateOutputSchemas();
-                beforeUpsertKeyColumn();
-            }
-        });
     }
 
     @Override
@@ -145,8 +151,9 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     }
 
     public void beforeUpsertKeyColumn() {
-        if (getSchema() != null)
+        if (getSchema() != null) {
             upsertKeyColumn.setPossibleValues(getFieldNames(table.main.schema));
+        }
     }
 
 
@@ -192,6 +199,12 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
             connectors.add(MAIN_CONNECTOR);
         }
         return connectors;
+    }
+
+    @Override
+    public void afterMainSchema() {
+        updateOutputSchemas();
+        beforeUpsertKeyColumn();
     }
 
 
