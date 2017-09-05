@@ -42,8 +42,6 @@ public class JmsOutputPTransformRuntime extends PTransform<PCollection<Object>, 
 
     private JmsMessageType messageType;
 
-    private String id = UUID.randomUUID().toString();
-
     @Override
     public PDone expand(PCollection<Object> objectPCollection) {
         PCollection<IndexedRecord> indexedCollection = objectPCollection.apply("ExtractIndexedRecord",
@@ -62,7 +60,7 @@ public class JmsOutputPTransformRuntime extends PTransform<PCollection<Object>, 
                         c.output((IndexedRecord) converter.convertToAvro(c.element()));
                     }
                 }));
-        indexedCollection.setCoder(LazyAvroCoder.<IndexedRecord> of(id));
+        indexedCollection.setCoder(LazyAvroCoder.of());
 
         PCollection<String> jmsCollection = indexedCollection.apply("ExtractString", ParDo.of(new DoFn<IndexedRecord, String>() {
 

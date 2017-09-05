@@ -56,12 +56,33 @@ public class ConvertToIndexedRecord<DatumT> extends
      * @return its representation as an Avro {@link IndexedRecord}.
      */
     public static <DatumT> IndexedRecord convertToAvro(DatumT datum) {
-        IndexedRecordConverter c = new AvroRegistry().createIndexedRecordConverter(datum.getClass());
+        IndexedRecordConverter<DatumT, IndexedRecord> c = getConverter(datum);
         if (c == null) {
-            throw new Pipeline.PipelineExecutionException(new RuntimeException("Cannot convert " + datum.getClass()
-                    + " to IndexedRecord."));
+            throw new Pipeline.PipelineExecutionException(
+                    new RuntimeException("Cannot convert " + datum.getClass() + " to IndexedRecord."));
         }
         return (IndexedRecord) c.convertToAvro(datum);
+    }
+
+    /**
+     * Return a converter that can any datum to an {@link IndexedRecord} representation as if it were passed in the
+     * transformation. This might be an expensive call, so the converter should be cached if possible.
+     *
+     * @param datum the datum to convert.
+     * @return a converter that can turn it into an Avro {@link IndexedRecord}.
+     */
+    public static <DatumT> IndexedRecordConverter<DatumT, IndexedRecord> getConverter(DatumT datum) {
+        @SuppressWarnings("unchecked")
+        IndexedRecordConverter<DatumT, IndexedRecord> converter = (IndexedRecordConverter<DatumT, IndexedRecord>) new AvroRegistry()
+                .createIndexedRecordConverter(datum.getClass());
+        if (datum instanceof IndexedRecord) {
+            converter.setSchema(((IndexedRecord) datum).getSchema());
+        }
+        if (converter == null) {
+            throw new Pipeline.PipelineExecutionException(
+                    new RuntimeException("Cannot convert " + datum.getClass() + " to IndexedRecord."));
+        }
+        return converter;
     }
 
     @Override
@@ -69,7 +90,7 @@ public class ConvertToIndexedRecord<DatumT> extends
         return input.apply(ParDo.of(new DoFn<DatumT, IndexedRecord>() {
 
             /** The converter is cached for performance. */
-            private transient IndexedRecordConverter<? super DatumT, IndexedRecord> converter;
+            private transient IndexedRecordConverter<? super DatumT, ? extends IndexedRecord> converter;
 
             @DoFn.ProcessElement
             public void processElement(ProcessContext c) throws Exception {
@@ -78,13 +99,7 @@ public class ConvertToIndexedRecord<DatumT> extends
                     return;
                 }
                 if (converter == null) {
-                    converter = (IndexedRecordConverter<? super DatumT, IndexedRecord>) new AvroRegistry()
-                            .createIndexedRecordConverter(in.getClass());
-                    // If the converter was still not successful, the pipeline should fail.
-                    if (converter == null) {
-                        // TODO: talend exception
-                        throw new RuntimeException("Cannot find converter for " + in.getClass());
-                    }
+                    converter = getConverter(in);
                 }
                 LOG.debug("Converter's schema is {}", converter.getSchema());
                 LOG.debug("Process element is {}", in);
