@@ -156,7 +156,9 @@ public class SnowflakeRowWriter implements WriterWithFeedback<Result, IndexedRec
         try {
             if (rowProperties.connection.getReferencedComponentId() == null
                     && commitCount == rowProperties.commitCount.getValue()) {
-                statement.executeBatch();
+                if (!rowProperties.propagateQueryResultSet()) {
+                    statement.executeBatch();
+                }
                 connection.commit();
                 commitCount = 0;
             }
@@ -295,7 +297,9 @@ public class SnowflakeRowWriter implements WriterWithFeedback<Result, IndexedRec
             rejectedWrites.clear();
 
             if (commitCount > 0 && connection != null && statement != null) {
-                statement.executeBatch();
+                if (!rowProperties.usePreparedStatement()) {
+                    statement.executeBatch();
+                }
                 connection.commit();
                 commitCount = 0;
             }
