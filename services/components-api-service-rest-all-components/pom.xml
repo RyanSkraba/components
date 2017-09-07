@@ -1,332 +1,342 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.1.RELEASE</version>
-	</parent>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.1.RELEASE</version>
+    </parent>
 
-	<groupId>org.talend.components</groupId>
-	<version>0.20.0-SNAPSHOT</version>
+    <groupId>org.talend.components</groupId>
+    <version>0.20.0-SNAPSHOT</version>
 
-	<artifactId>components-api-service-rest-all-components</artifactId>
+    <artifactId>components-api-service-rest-all-components</artifactId>
 
-	<name>Component REST API packaged with all components</name>
+    <name>Component REST API packaged with all components</name>
 
-	<properties>
-		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
-		<java.version>1.8</java.version>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- Used for Docker images name -->
-		<git_branch>local</git_branch>
-		<docker_tag_suffix>${maven.build.timestamp}</docker_tag_suffix>
-		<talend_docker_registry>registry.datapwn.com</talend_docker_registry>
-	</properties>
-	<dependencies>
-		<!-- rest service -->
-		<!-- used by the assembly to place it at the root -->
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api-service-rest</artifactId>
-			<type>jar</type>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-		</dependency>
+    <properties>
+        <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Used for Docker images name -->
+        <git_branch>local</git_branch>
+        <docker_tag_suffix>${maven.build.timestamp}</docker_tag_suffix>
+        <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
+    </properties>
+    <dependencies>
+        <!-- rest service -->
+        <!-- used by the assembly to place it at the root -->
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api-service-rest</artifactId>
+            <type>jar</type>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
 
-		<dependency>
-			<!-- only there for running test app in the IDE for now -->
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-maven-repo</artifactId>
-			<version>${project.version}</version>
-			<type>pom</type>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-maven-repo</artifactId>
-			<version>${project.version}</version>
-			<type>zip</type>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-maven-repo</artifactId>
-			<version>${project.version}</version>
-			<type>zip</type>
-			<classifier>config</classifier>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <!-- only there for running test app in the IDE for now -->
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-maven-repo</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-maven-repo</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-maven-repo</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>config</classifier>
+            <scope>test</scope>
+        </dependency>
 
-		<!-- test dependencies -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api-service-rest</artifactId>
-			<type>test-jar</type>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api</artifactId>
-			<classifier>tests</classifier>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.daikon</groupId>
-			<artifactId>daikon</artifactId>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-			<version>0.18.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.daikon</groupId>
-			<artifactId>daikon-spring-utils</artifactId>
-			<version>0.18.0-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api-service-rest</artifactId>
+            <type>test-jar</type>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api</artifactId>
+            <classifier>tests</classifier>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.daikon</groupId>
+            <artifactId>daikon</artifactId>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+            <version>0.18.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.daikon</groupId>
+            <artifactId>daikon-spring-utils</artifactId>
+            <version>0.18.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-	<dependencyManagement>
-		<dependencies>
-			<!-- Lock guava to the Beam dependency -->
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>20.0</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+    <dependencyManagement>
+        <dependencies>
+            <!-- Lock guava to the Beam dependency -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>20.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-	<repositories>
-		<repository>
-			<id>releases</id>
-			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
-			<releases>
+    <repositories>
+        <repository>
+            <id>releases</id>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+            <releases>
                 <enabled>true</enabled>
             </releases>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-		</repository>
-		<repository>
-			<id>talend_nexus</id>
-			<name>snapshots</name>
-			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
-			<releases>
+        </repository>
+        <repository>
+            <id>talend_nexus</id>
+            <name>snapshots</name>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
+            <releases>
                 <enabled>false</enabled>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-		</repository>
-		<repository>
-			<id>talend-update</id>
-			<url>https://talend-update.talend.com/nexus/content/repositories/libraries/</url>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>spring-releases</id>
-			<url>https://repo.spring.io/libs-release</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>releases</id>
-			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
-		</pluginRepository>
-	</pluginRepositories>
-	<distributionManagement>
-		<repository>
-			<id>talend_nexus_deployment</id>
-			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
-		</repository>
-		<snapshotRepository>
-			<id>talend_nexus_deployment</id>
-			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
-		</snapshotRepository>
-	</distributionManagement>
+        </repository>
+        <repository>
+            <id>talend-update</id>
+            <url>https://talend-update.talend.com/nexus/content/repositories/libraries/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>releases</id>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+        </pluginRepository>
+    </pluginRepositories>
+    <distributionManagement>
+        <repository>
+            <id>talend_nexus_deployment</id>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+        </repository>
+        <snapshotRepository>
+            <id>talend_nexus_deployment</id>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>package</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<!-- import the components maven repo -->
-								<artifactItem>
-									<groupId>org.talend.components</groupId>
-									<artifactId>components-maven-repo</artifactId>
-									<type>zip</type>
-									<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
-								</artifactItem>
-								<!-- import the components list and binary dependencies -->
-								<artifactItem>
-									<groupId>org.talend.components</groupId>
-									<artifactId>components-maven-repo</artifactId>
-									<classifier>config</classifier>
-									<type>zip</type>
-									<outputDirectory>${project.build.directory}/external-resources/config</outputDirectory>
-									<excludes>META-INF/**</excludes>
-								</artifactItem>
-								<!-- import the service scripts and configuration files -->
-								<artifactItem>
-									<groupId>org.talend.components</groupId>
-									<artifactId>components-api-service-rest</artifactId>
-									<version>${project.version}</version>
-									<classifier>config</classifier>
-									<type>zip</type>
-									<outputDirectory>${project.build.directory}/external-resources</outputDirectory>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <!-- import the components maven repo -->
+                                <artifactItem>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>components-maven-repo</artifactId>
+                                    <type>zip</type>
+                                    <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+                                </artifactItem>
+                                <!-- import the components list and binary 
+                                    dependencies -->
+                                <artifactItem>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>components-maven-repo</artifactId>
+                                    <classifier>config</classifier>
+                                    <type>zip</type>
+                                    <outputDirectory>${project.build.directory}/external-resources/config</outputDirectory>
+                                    <excludes>META-INF/**</excludes>
+                                </artifactItem>
+                                <!-- import the service scripts and configuration 
+                                    files -->
+                                <artifactItem>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>components-api-service-rest</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>config</classifier>
+                                    <type>zip</type>
+                                    <outputDirectory>${project.build.directory}/external-resources</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<!-- this will add the Rest service artifacts to the local maven repo -->
-				<artifactId>maven-invoker-plugin</artifactId>
-				<version>2.0.1-TALEND</version>
-				<configuration>
-					<localRepositoryPath>target/mvn-repo/.m2</localRepositoryPath>
-					<skipTestScopeForExtraArtifacts>true</skipTestScopeForExtraArtifacts>
-					<projectsDirectory>src/it</projectsDirectory>
-					<cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-					<onlyResolveDependencies>true</onlyResolveDependencies>
-				</configuration>
-				<executions>
-					<execution>
-						<id>generate-app-maven-repo</id>
-						<phase>package</phase>
-						<goals>
-							<goal>install</goal>
-						</goals>
-						<configuration>
-							<pomIncludes>
-								<pomInclude>*/pom.xml</pomInclude>
-							</pomIncludes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<id>no-arch-package</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>assembly/no-arch.xml</descriptor>
-							</descriptors>
-							<appendAssemblyId>false</appendAssemblyId>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>integration test</id>
-						<goals>
-							<goal>integration-test</goal>
-						</goals>
-						<configuration>
-							<argLine>-Dorg.ops4j.pax.url.mvn.localRepository=${project.basedir}/target/mvn-repo/.m2</argLine>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+            <plugin>
+                <!-- this will add the Rest service artifacts to the local 
+                    maven repo -->
+                <artifactId>maven-invoker-plugin</artifactId>
+                <version>2.0.1-TALEND</version>
+                <configuration>
+                    <localRepositoryPath>target/mvn-repo/.m2</localRepositoryPath>
+                    <skipTestScopeForExtraArtifacts>true</skipTestScopeForExtraArtifacts>
+                    <projectsDirectory>src/it</projectsDirectory>
+                    <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+                    <onlyResolveDependencies>true</onlyResolveDependencies>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-app-maven-repo</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install</goal>
+                        </goals>
+                        <configuration>
+                            <pomIncludes>
+                                <pomInclude>*/pom.xml</pomInclude>
+                            </pomIncludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>no-arch-package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly/no-arch.xml</descriptor>
+                            </descriptors>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>integration test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <argLine>-Dorg.ops4j.pax.url.mvn.localRepository=${project.basedir}/target/mvn-repo/.m2</argLine>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
-	<profiles>
-		<profile>
-			<id>docker</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>io.fabric8</groupId>
-						<artifactId>docker-maven-plugin</artifactId>
-						<version>0.20.1</version>
-						<executions>
-							<execution>
-								<id>start</id>
-								<phase>package</phase>
-								<goals>
-									<goal>build</goal>
-								</goals>
-								<configuration>
-									<autoPull>once</autoPull>
-									<images>
-										<image>
-											<name>${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}</name>
-											<build>
-												<from>${talend_docker_registry}/talend/microservices-base:1.latest</from>
-												<tags>
-													<tag>${project.version}-${docker_tag_suffix}</tag>
-												</tags>
-												<ports>
-													<port>8989</port>
-												</ports>
-												<volumes>
-													<volume>/maven/.m2</volume>
-												</volumes>
-												<cmd>
-													<exec>
-														<arg>/maven/start.sh</arg>
-													</exec>
-												</cmd>
-												<runCmds>
-													<run>apk add --no-cache libc6-compat</run>
-													<run>chmod +x /maven/start.sh</run>
-												</runCmds>
-												<assembly><!-- includes the artifact generated by the current 
-														pom -->
-													<descriptor>${project.basedir}/assembly/no-arch.xml</descriptor>
-												</assembly>
-											</build>
-										</image>
-									</images>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.20.1</version>
+                        <executions>
+                            <execution>
+                                <id>start</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <autoPull>once</autoPull>
+                                    <images>
+                                        <image>
+                                            <name>${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}</name>
+                                            <build>
+                                                <from>${talend_docker_registry}/talend/microservices-base:1.latest</from>
+                                                <tags>
+                                                    <tag>${project.version}-${docker_tag_suffix}</tag>
+                                                </tags>
+                                                <ports>
+                                                    <port>8989</port>
+                                                </ports>
+                                                <volumes>
+                                                    <volume>/maven/.m2</volume>
+                                                </volumes>
+                                                <cmd>
+                                                    <exec>
+                                                        <arg>/maven/start.sh</arg>
+                                                    </exec>
+                                                </cmd>
+                                                <runCmds>
+                                                    <run>apk add
+                                                        --no-cache
+                                                        libc6-compat</run>
+                                                    <run>chmod +x
+                                                        /maven/start.sh</run>
+                                                </runCmds>
+                                                <assembly><!-- includes the 
+                                                        artifact generated by the current pom -->
+                                                    <descriptor>${project.basedir}/assembly/no-arch.xml</descriptor>
+                                                </assembly>
+                                                <!-- add filebeat log variable -->
+                                                <env>
+                                                    <LOG_PATH>/maven/logs</LOG_PATH>
+                                                </env>
+                                            </build>
+                                        </image>
+                                    </images>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 
 </project>
