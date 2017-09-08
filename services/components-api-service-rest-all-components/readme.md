@@ -92,7 +92,7 @@ For instance,
 
 Then calls `http://192.168.99.100:8989/tcomp/definitions/components` will produce some logs
 
-### Change the jdbc configation to add a new driver
+### Change the jdbc configuration to add a new driver
 
 The service is packaged with some start and stop scripts along with a **config** and **.m2** folder.
 
