@@ -41,7 +41,11 @@ public class SnowflakeFamilyDefinition extends AbstractComponentFamilyDefinition
                 new TSnowflakeOutputDefinition(), new TSnowflakeCloseDefinition(),
                 // Component wizards
                 new SnowflakeConnectionWizardDefinition(),
-                new SnowflakeTableWizardDefinition());
+                // TODO remove the edit one
+                new SnowflakeConnectionEditWizardDefinition()
+        // TODO not sure it works, so comment it, keep like before
+        // new SnowflakeTableWizardDefinition()
+        );
     }
 
     @Override

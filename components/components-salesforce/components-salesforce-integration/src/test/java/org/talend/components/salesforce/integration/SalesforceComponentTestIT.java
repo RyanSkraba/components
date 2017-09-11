@@ -13,7 +13,13 @@
 package org.talend.components.salesforce.integration;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,9 +49,13 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.api.wizard.WizardNameComparator;
 import org.talend.components.common.CommonTestUtils;
-import org.talend.components.salesforce.*;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties.LoginType;
+import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
+import org.talend.components.salesforce.SalesforceModuleListProperties;
+import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
+import org.talend.components.salesforce.SalesforceUserPasswordProperties;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
@@ -367,14 +377,18 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connectionWizardForm.getProperties();
 
         ComponentWizard[] subWizards = getComponentService().getComponentWizardsForProperties(connProps, "location")
-                .toArray(new ComponentWizard[2]);
+                .toArray(new ComponentWizard[3]);
         Arrays.sort(subWizards, new WizardNameComparator());
-        assertEquals(2, subWizards.length);
+        assertEquals(3, subWizards.length);
 
         assertTrue(subWizards[0].getDefinition().isTopLevel());
         assertEquals("Salesforce Connection", subWizards[0].getDefinition().getMenuItemName());
+        
         assertFalse(subWizards[1].getDefinition().isTopLevel());
-        assertEquals("Salesforce Modules", subWizards[1].getDefinition().getMenuItemName());
+        assertEquals("Edit Salesforce", subWizards[1].getDefinition().getMenuItemName());
+        
+        assertFalse(subWizards[2].getDefinition().isTopLevel());
+        assertEquals("Salesforce Modules", subWizards[2].getDefinition().getMenuItemName());
     }
 
     @Test
