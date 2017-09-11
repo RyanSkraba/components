@@ -77,11 +77,15 @@
 							<classifier>bundle</classifier>
 							<instructions>
 								<Bundle-SymbolicName>org.talend.components.common-oauth</Bundle-SymbolicName>
-								<Import-Package>org.talend*,javax.net.ssl*,org.slf4j*</Import-Package>
+								<Import-Package>org.talend*,
+									org.slf4j*,
+									org.codehaus.jackson*
+								</Import-Package>
 								<Service-Component>*</Service-Component>
 								<Embed-Transitive>true</Embed-Transitive><!-- We need to embed oauth.common 
-									this is why we set this to true -->
-								<Embed-Dependency>artifactId=org.apache.oltu.oauth2*|javax.servlet*inline=false</Embed-Dependency>
+									this is why we set this to true and the json is a transitive dep of 3 level, 
+									need to be embedded explicitly -->
+								<Embed-Dependency>artifactId=org.apache.oltu.oauth2*|json;inline=false</Embed-Dependency>
 								<Export-Package>org.talend.components.common.oauth*</Export-Package>
 								<_exportcontents>org.apache.oltu.oauth2*</_exportcontents>
 							</instructions>

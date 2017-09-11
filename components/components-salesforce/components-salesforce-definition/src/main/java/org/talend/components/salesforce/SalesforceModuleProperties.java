@@ -86,8 +86,7 @@ public class SalesforceModuleProperties extends ComponentPropertiesImpl implemen
     public ValidationResult beforeModuleName() throws Exception {
         try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             SalesforceRuntimeSourceOrSink ss = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
-            connection.updateEndpoint();
-            ss.initialize(null, connection);
+            ss.initialize(null, getEffectiveConnection());
             ValidationResult vr = ss.validate(null);
             if (vr.getStatus() == ValidationResult.Result.OK) {
                 try {
@@ -107,8 +106,7 @@ public class SalesforceModuleProperties extends ComponentPropertiesImpl implemen
     public ValidationResult afterModuleName() throws Exception {
         try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             SalesforceRuntimeSourceOrSink ss = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
-            connection.updateEndpoint();
-            ss.initialize(null, connection);
+            ss.initialize(null, getEffectiveConnection());
             ValidationResult vr = ss.validate(null);
             if (vr.getStatus() == ValidationResult.Result.OK) {
                 try {
@@ -123,6 +121,14 @@ public class SalesforceModuleProperties extends ComponentPropertiesImpl implemen
 
             return ValidationResult.OK;
         }
+    }
+
+    private SalesforceConnectionProperties getEffectiveConnection() {
+        if (getConnectionProperties().getReferencedConnectionProperties() != null) {
+            return getConnectionProperties().getReferencedConnectionProperties();
+        }
+
+        return getConnectionProperties();
     }
 
     @Override

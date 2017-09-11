@@ -18,17 +18,17 @@ import java.security.cert.CertificateEncodingException;
 import java.util.*;
 
 import org.codehaus.jackson.JsonNode;
-import org.junit.Ignore;
+import org.junit.Test;
 import org.talend.components.common.oauth.Jwt.ClaimsSet;
 import org.talend.components.common.oauth.Jwt.JwsHeader;
 import org.talend.components.common.oauth.Jwt.JwsHeader.Algorithm;
 
-@Ignore
+
 public class AzureOauth2JwtExample {
 
     final static int JWT_TOKEN_LIFETIME_SECONDS = 10 * 60;
 
-    @Ignore
+    @Test
     public void azureUsageExample() throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
 
         // Certificate

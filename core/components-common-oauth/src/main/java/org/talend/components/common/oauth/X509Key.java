@@ -21,11 +21,15 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import org.apache.commons.codec.binary.Base64;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * A 509 certificate handler to load certificate from a key store and use it to sign data
  */
 public class X509Key {
+
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(X509Key.class);
 
     public enum Algorithm {
 
@@ -46,11 +50,12 @@ public class X509Key {
 
             KeyStore keystore = KeyStore.getInstance(storeTypeKJS);
             keystore.load(keyStoreIS, b.keyStorePassword.toCharArray());
+
             this.privateKey = (PrivateKey) keystore.getKey(b.certificateAlias, b.keyStorePassword.toCharArray());
             this.publicKey = (X509Certificate) keystore.getCertificate(b.certificateAlias);
 
             if (privateKey == null || publicKey == null) {
-                throw new RuntimeException("Certificate " + b.certificateAlias + " can't be found in the store" + b.keyStorePath);
+                throw new RuntimeException(messages.getMessage("msg.err.notFoundCert", b.certificateAlias, b.keyStorePath));
             }
 
         } catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException

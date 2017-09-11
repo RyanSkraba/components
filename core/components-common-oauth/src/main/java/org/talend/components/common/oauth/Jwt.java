@@ -15,10 +15,10 @@ package org.talend.components.common.oauth;
 import java.text.ParseException;
 import java.util.*;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
 
 /**
  * Light JWT (Json web Token) / JWS (Json Web signature) Builder
@@ -65,7 +65,7 @@ public class Jwt {
                             for (String aud : audList) {
                                 audArray.add(aud);
                             }
-                            o.set(CLAIM_AUDIENCE, audArray);
+                            o.put(CLAIM_AUDIENCE, audArray);
                         }
                     }
 

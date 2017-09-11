@@ -21,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.common.oauth.Oauth2ImplicitClient;
 import org.talend.components.common.oauth.properties.Oauth2ImplicitFlowProperties;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * This use the Oauth2 implicit flow that need a user interaction.
@@ -30,6 +32,9 @@ import org.talend.components.common.oauth.properties.Oauth2ImplicitFlowPropertie
 public class SalesforceImplicitConnection {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceImplicitConnection.class.getName());
+
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(SalesforceImplicitConnection.class);
 
     private static final String REFRESHTOKEN_KEY = "refreshtoken"; //$NON-NLS-1$
 
@@ -88,9 +93,9 @@ public class SalesforceImplicitConnection {
                 }
 
             } catch (FileNotFoundException e) {// ignored exception
-                LOGGER.warn("We can't refresh the token, The token file doesn't exist.", e);
+                LOGGER.warn(messages.getMessage("warn.notFoundRefreshToken"), e);
             } catch (IOException e) {// ignored exception
-                LOGGER.warn("We can't refresh the token, an unexpected error occurred.", e);
+                LOGGER.warn(messages.getMessage("warn.cantRefreshToken"), e);
             }
         }
 
@@ -117,7 +122,7 @@ public class SalesforceImplicitConnection {
                             .build();
             SalesforceOAuthAccessTokenResponse token = oauthClient.getToken(SalesforceOAuthAccessTokenResponse.class);
             if (token == null) {
-                throw new RuntimeException("The returned authentication Token is null, please check your login settings");
+                throw new RuntimeException(messages.getMessage("err.nullToken"));
             }
 
             return token;
@@ -141,7 +146,7 @@ public class SalesforceImplicitConnection {
                 tokenFile.getParentFile().mkdirs();
                 tokenFile.createNewFile();
             } catch (IOException e) {
-                throw new RuntimeException("The token file creation failed, the refresh token can't be stored correctly.", e);
+                throw new RuntimeException(messages.getMessage("err.tokenFileCreationFailed"), e);
             }
         }
 
@@ -150,7 +155,7 @@ public class SalesforceImplicitConnection {
             prop.setProperty(REFRESHTOKEN_KEY, token.getRefreshToken());
             prop.store(outputStream, null);
         } catch (IOException e) {
-            throw new RuntimeException("Unexpected error, the refresh token can't be stored correctly.", e);
+            throw new RuntimeException(messages.getMessage("err.unexpectedTokenFileCreationError"), e);
         }
 
     }

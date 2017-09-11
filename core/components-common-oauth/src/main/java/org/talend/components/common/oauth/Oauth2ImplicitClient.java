@@ -26,6 +26,8 @@ import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.common.oauth.server.OAuth2ImplicitGrantServer;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * created by bchen on Sep 11, 2015 Detailled comment
@@ -34,6 +36,8 @@ import org.talend.components.common.oauth.server.OAuth2ImplicitGrantServer;
 public class Oauth2ImplicitClient {
 
     private static final Logger logger = LoggerFactory.getLogger(Oauth2ImplicitClient.class);
+
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(Oauth2ImplicitClient.class);
 
     private final URL tokenLocation;
 
@@ -82,7 +86,12 @@ public class Oauth2ImplicitClient {
                 builder.setResponseType(responseType);
             }
             OAuthClientRequest request = builder.buildQueryMessage();
-            logger.info("Paste this URL into a web browser to authorize access:");
+
+            // FIXME : remove those Syso when the studio activate the INFO log by default
+            System.out.println(messages.getMessage("msg.info.showAuthorizUrl"));
+            System.out.println(request.getLocationUri());
+            // --
+            logger.info(messages.getMessage("msg.info.showAuthorizUrl"));
             logger.info(request.getLocationUri());
             OAuth2ImplicitGrantServer service = new OAuth2ImplicitGrantServer(callbackURL.getHost(), callbackURL.getPort(),
                     10 * 60 * 1000);

@@ -173,6 +173,8 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
     }
 
     public void afterLoginType() {
+        updateEndpoint();
+
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(FORM_WIZARD));
         refreshLayout(getForm(Form.ADVANCED));
@@ -224,7 +226,6 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
                 hideOauth2Properties(form, true);
                 form.getWidget(userPassword).setHidden(true);
             } else {
-                updateEndpoint();
                 form.getWidget(loginType.getName()).setHidden(false);
                 switch (loginType.getValue()) {
                 case Basic:
@@ -328,7 +329,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         return migrated;
     }
 
-    public void updateEndpoint() {
+    private void updateEndpoint() {
         boolean isBasicLogin = LoginType.Basic.equals(loginType.getValue());
         String endpointValue = endpoint.getValue();
         if (isBasicLogin && (endpointValue == null || endpointValue.contains(OAUTH_URL))) {

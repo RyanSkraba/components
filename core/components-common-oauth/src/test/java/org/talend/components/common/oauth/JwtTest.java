@@ -22,12 +22,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 import org.talend.components.common.oauth.Jwt.ClaimsSet;
 import org.talend.components.common.oauth.Jwt.JwsHeader;
 import org.talend.components.common.oauth.Jwt.JwsHeader.Algorithm;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 public class JwtTest {
 

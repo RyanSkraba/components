@@ -26,6 +26,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.talend.components.common.oauth.Jwt.ClaimsSet;
 import org.talend.components.common.oauth.Jwt.JwsHeader;
 import org.talend.components.common.oauth.X509Key.Algorithm;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * 
@@ -51,6 +53,8 @@ import org.talend.components.common.oauth.X509Key.Algorithm;
  * 
  */
 public class Oauth2JwtClient {
+
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(Oauth2JwtClient.class);
 
     private static final String UTF8 = "utf-8";
 
@@ -105,7 +109,7 @@ public class Oauth2JwtClient {
 
         JsonNode json = new ObjectMapper().readTree(response);
         if (!json.has("access_token")) {
-            throw new RuntimeException("failed to get access token from server response: " + response);
+            throw new RuntimeException(messages.getMessage("msg.err.failedGetToken", response));
         }
 
         return json;

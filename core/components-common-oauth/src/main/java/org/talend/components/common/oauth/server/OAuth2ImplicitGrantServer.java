@@ -21,6 +21,8 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * A simple socket server to retrieve authorization code in OAuth 2 implicit flow.<br/>
@@ -32,6 +34,9 @@ import org.slf4j.LoggerFactory;
 public class OAuth2ImplicitGrantServer implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(OAuth2ImplicitGrantServer.class.getCanonicalName());
+
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(OAuth2ImplicitGrantServer.class);
 
     private static final String serverName = "Talend/Oauth2/0.0.1";
 
@@ -69,7 +74,7 @@ public class OAuth2ImplicitGrantServer implements Runnable {
         try {
             InetAddress addr = InetAddress.getByName(host);
             server = new ServerSocket(port, backlog, addr);
-            logger.info("Talend Socket Server started and listening on " + getLocalPort());
+            logger.info(messages.getMessage("msg.info.serverStarted", getLocalPort()));
             while (true) {
                 authorizationCode = null;
                 server.setSoTimeout(timeout);
@@ -104,7 +109,7 @@ public class OAuth2ImplicitGrantServer implements Runnable {
                     osw.write("\r\n");
                     osw.write(response);
                     osw.flush();
-                    logger.info("Talend Socket Server stopped listening for incoming connections");
+                    logger.info(messages.getMessage("msg.info.serverStoppedListening"));
                     break; // stop listening for connection
                 }
             }
@@ -169,7 +174,7 @@ public class OAuth2ImplicitGrantServer implements Runnable {
     public synchronized void stop() throws IOException {
         if (server != null && !server.isClosed()) {
             server.close();
-            logger.info("Talend http server have closed properly");
+            logger.info(messages.getMessage("msg.info.serverStopped"));
         }
     }
 }

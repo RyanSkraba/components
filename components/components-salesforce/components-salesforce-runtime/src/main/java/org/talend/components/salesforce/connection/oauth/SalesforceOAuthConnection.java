@@ -19,18 +19,15 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.oauth.Oauth2JwtClient;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sforce.ws.ConnectorConfig;
 
 public class SalesforceOAuthConnection {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceOAuthConnection.class.getName());
 
     private SalesforceConnectionProperties connection;
 
@@ -46,10 +43,9 @@ public class SalesforceOAuthConnection {
 
     public void login(ConnectorConfig connect) {
 
-        org.codehaus.jackson.JsonNode accessToken;
         switch (connection.oauth2FlowType.getValue()) {
         case JWT_Flow:
-            accessToken = new SalesforceJwtConnection(connection.oauth2JwtFlow, url).getAccessToken();
+            JsonNode accessToken = new SalesforceJwtConnection(connection.oauth2JwtFlow, url).getAccessToken();
             connect.setServiceEndpoint(getSOAPEndpoint(accessToken.get(Oauth2JwtClient.KEY_ID).asText(), //
                     accessToken.get(Oauth2JwtClient.KEY_TOKEN_TYPE).asText(), //
                     accessToken.get(Oauth2JwtClient.KEY_ACCESS_TOKEN).asText(), //
@@ -81,8 +77,7 @@ public class SalesforceOAuthConnection {
             endpointURL = urls.get("partner").toString().replace("{version}", version);
             endpointURL = StringUtils.strip(endpointURL, "\"");
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ComponentException(e);
         } finally {
             if (reader != null) {
                 try {
