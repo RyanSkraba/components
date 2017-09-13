@@ -28,7 +28,7 @@ public class LazyAvroCoderTest {
     @After
     public void teardown() {
         // Always clean up the LazyAvroCoder static methods.
-        LazyAvroCoder.resetSchemaRegistry();
+        LazyAvroCoder.resetSchemaSupplier();
     }
 
     /**
@@ -62,8 +62,8 @@ public class LazyAvroCoderTest {
         assertThat(LazyAvroCoder.StaticSchemaHolderSupplier.getSchemas(),
                 contains(SampleSchemas.recordSimple(), SampleSchemas.recordSimple()));
 
-        // Check that the reset cleans the registry.
-        LazyAvroCoder.resetSchemaRegistry();
+        // Check that the reset cleans the supplier.
+        LazyAvroCoder.resetSchemaSupplier();
         assertThat(LazyAvroCoder.StaticSchemaHolderSupplier.getSchemas(), emptyIterable());
     }
 

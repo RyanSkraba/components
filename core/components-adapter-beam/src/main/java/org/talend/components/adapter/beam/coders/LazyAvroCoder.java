@@ -58,7 +58,7 @@ public class LazyAvroCoder<T> extends AtomicCoder<Object> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LazyAvroCoder.class);
 
-    private transient static Supplier<AvroSchemaHolder> schemaRegistryFactory;
+    private transient static ThreadLocal<Supplier<AvroSchemaHolder>> threadSchemaSupplierFactory;
 
     private final AvroSchemaHolder avroSchemaHolder;
 
@@ -67,28 +67,33 @@ public class LazyAvroCoder<T> extends AtomicCoder<Object> {
     private transient AvroCoder<IndexedRecord> internalAvroCoder;
 
     protected LazyAvroCoder() {
-        this.avroSchemaHolder = getSchemaRegistry().get();
+        this.avroSchemaHolder = getSchemaSupplier().get();
     }
 
-    public static void resetSchemaRegistry() {
-        if (schemaRegistryFactory instanceof StaticSchemaHolderSupplier) {
-            ((StaticSchemaHolderSupplier) schemaRegistryFactory).reset();
+    public static void resetSchemaSupplier() {
+        Supplier<AvroSchemaHolder> schemaSupplierFactory = threadSchemaSupplierFactory.get();
+        if (schemaSupplierFactory instanceof StaticSchemaHolderSupplier) {
+            ((StaticSchemaHolderSupplier) schemaSupplierFactory).reset();
         }
-        schemaRegistryFactory = null;
+        threadSchemaSupplierFactory.remove();
     }
 
-    public static void setSchemaRegistry(Supplier<AvroSchemaHolder> factory) {
-        // Ensure that the schema registry has not already been set.
-        if (LazyAvroCoder.schemaRegistryFactory != null)
-            throw BeamAdapterErrorCode.createSchemaRegistryAlreadyExists(null, schemaRegistryFactory.toString());
-        schemaRegistryFactory = factory;
+    public static void setSchemaSupplier(Supplier<AvroSchemaHolder> factory) {
+        // Ensure that the schema supplier has not already been set.
+        if (LazyAvroCoder.threadSchemaSupplierFactory != null)
+            throw BeamAdapterErrorCode.createSchemaSupplierAlreadyExists(null, threadSchemaSupplierFactory.get().toString());
+        threadSchemaSupplierFactory = new ThreadLocal<Supplier<AvroSchemaHolder>>();
+        threadSchemaSupplierFactory.set(factory);
     }
 
-    public static Supplier<AvroSchemaHolder> getSchemaRegistry() {
-        if (schemaRegistryFactory == null) {
-            schemaRegistryFactory = new StaticSchemaHolderSupplier();
+    public static Supplier<AvroSchemaHolder> getSchemaSupplier() {
+        if (threadSchemaSupplierFactory == null) {
+            threadSchemaSupplierFactory = new ThreadLocal<Supplier<AvroSchemaHolder>>();
         }
-        return schemaRegistryFactory;
+        if (threadSchemaSupplierFactory.get() == null){
+            threadSchemaSupplierFactory.set(new StaticSchemaHolderSupplier());
+        }
+        return threadSchemaSupplierFactory.get();
     }
 
     /**

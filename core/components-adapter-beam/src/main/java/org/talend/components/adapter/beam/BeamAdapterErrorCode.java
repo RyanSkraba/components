@@ -30,7 +30,7 @@ public enum BeamAdapterErrorCode implements ErrorCode {
      * The framework attempted to set a {@link org.talend.components.adapter.beam.coders.AvroSchemaHolder} supplier in a
      * {@link org.talend.components.adapter.beam.coders.LazyAvroCoder} when one was already set.
      */
-    SCHEMA_REGISTRY_ALREADY_EXISTS("SCHEMA_REGISTRY_ALREADY_EXISTS", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "existing");
+    SCHEMA_SUPPLIER_ALREADY_EXISTS("SCHEMA_SUPPLIER_ALREADY_EXISTS", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "existing");
 
     private final String code;
 
@@ -70,17 +70,17 @@ public enum BeamAdapterErrorCode implements ErrorCode {
     }
 
     /**
-     * Create an exception with the error code and context for {@link #SCHEMA_REGISTRY_ALREADY_EXISTS}. This should not
+     * Create an exception with the error code and context for {@link #SCHEMA_SUPPLIER_ALREADY_EXISTS}. This should not
      * normally occur during normal construction of Beam Pipelines, but indicates a non-recoverable error when it does.
      *
      * @param cause The technical exception that was caught when the error occurred.
-     * @param existing The current SchemaRegistrySupplier.
+     * @param existing The current SchemaSupplierFactory.
      * @return An exception corresponding to the error code.
      */
-    public static TalendRuntimeException createSchemaRegistryAlreadyExists(Throwable cause, String existing) {
-        return new TalendMsgRuntimeException(cause, SCHEMA_REGISTRY_ALREADY_EXISTS,
+    public static TalendRuntimeException createSchemaSupplierAlreadyExists(Throwable cause, String existing) {
+        return new TalendMsgRuntimeException(cause, SCHEMA_SUPPLIER_ALREADY_EXISTS,
                 ExceptionContext.withBuilder().put("existing", existing).build(),
-                "A schema registry supplier of type '" + existing + "' was already set.");
+                "A schema supplier factory of type '" + existing + "' was already set.");
     }
 
     /**
