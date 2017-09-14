@@ -297,7 +297,7 @@ public class SnowflakeRowWriter implements WriterWithFeedback<Result, IndexedRec
             rejectedWrites.clear();
 
             if (commitCount > 0 && connection != null && statement != null) {
-                if (!rowProperties.usePreparedStatement()) {
+                if (!rowProperties.propagateQueryResultSet()) {
                     statement.executeBatch();
                 }
                 connection.commit();
