@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
+import org.apache.avro.Schema.Type;
 
 public class MarketoUtils {
 
@@ -95,6 +96,60 @@ public class MarketoUtils {
 
         newSchema.setFields(copyFieldList);
         for (Map.Entry<String, Object> entry : metadataSchema.getObjectProps().entrySet()) {
+            newSchema.addProp(entry.getKey(), entry.getValue());
+        }
+
+        return newSchema;
+    }
+
+    /**
+     * Get easyly the Avro field type from its schema
+     *
+     * @param field concerned
+     * @return Avro.Type
+     */
+    public static Type getFieldType(Field field) {
+        Schema convSchema = field.schema();
+        Type type = field.schema().getType();
+        if (convSchema.getType().equals(Type.UNION)) {
+            for (Schema s : field.schema().getTypes()) {
+                if (s.getType() != Type.NULL) {
+                    type = s.getType();
+                    break;
+                }
+            }
+        }
+        return type;
+    }
+
+    /**
+     * Modify some fields in the provided schema with new fields definitions
+     *
+     * @param schema original schema
+     * @param changedFields fields to change
+     * @return modified schema
+     */
+    public static Schema modifySchemaFields(Schema schema, List<Schema.Field> changedFields) {
+        Schema newSchema = Schema.createRecord(schema.getName(), schema.getDoc(), schema.getNamespace(), schema.isError());
+        List<Schema.Field> fields = new ArrayList<>();
+        for (Schema.Field se : schema.getFields()) {
+            Schema.Field field = null;
+            for (Field cf : changedFields) {
+                if (cf.name().equals(se.name())) {
+                    field = cf;
+                    break;
+                }
+            }
+            if (field == null) {
+                field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
+                for (Map.Entry<String, Object> entry : se.getObjectProps().entrySet()) {
+                    field.addProp(entry.getKey(), entry.getValue());
+                }
+            }
+            fields.add(field);
+        }
+        newSchema.setFields(fields);
+        for (Map.Entry<String, Object> entry : schema.getObjectProps().entrySet()) {
             newSchema.addProp(entry.getKey(), entry.getValue());
         }
 

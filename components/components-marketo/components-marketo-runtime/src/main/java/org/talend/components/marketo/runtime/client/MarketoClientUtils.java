@@ -17,7 +17,6 @@ import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PA
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
 import org.apache.commons.lang3.StringUtils;
@@ -25,31 +24,12 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.marketo.MarketoUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
-public class MarketoClientUtils {
+public class MarketoClientUtils extends MarketoUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(MarketoClientUtils.class);
-
-    /**
-     * Get The Avro field type from its schema
-     * 
-     * @param field
-     * @return
-     */
-    public static Type getFieldType(Field field) {
-        Schema convSchema = field.schema();
-        Type type = field.schema().getType();
-        if (convSchema.getType().equals(Type.UNION)) {
-            for (Schema s : field.schema().getTypes()) {
-                if (s.getType() != Type.NULL) {
-                    type = s.getType();
-                    break;
-                }
-            }
-        }
-        return type;
-    }
 
     /**
      * Check if the Avro field is of Date type

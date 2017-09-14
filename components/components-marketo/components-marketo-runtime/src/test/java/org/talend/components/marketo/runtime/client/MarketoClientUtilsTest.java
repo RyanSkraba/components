@@ -52,13 +52,6 @@ public class MarketoClientUtilsTest {
     }
 
     @Test
-    public void testGetFieldType() throws Exception {
-        assertEquals(Type.STRING, MarketoClientUtils.getFieldType(generateFieldType(Type.STRING)));
-        assertEquals(Type.INT, MarketoClientUtils.getFieldType(generateFieldType(Type.INT)));
-        assertEquals(Type.LONG, MarketoClientUtils.getFieldType(generateFieldType(Type.LONG)));
-    }
-
-    @Test
     public void testIsDateTypeField() throws Exception {
         assertTrue(MarketoClientUtils.isDateTypeField(fValidDate));
         assertFalse(MarketoClientUtils.isDateTypeField(null));

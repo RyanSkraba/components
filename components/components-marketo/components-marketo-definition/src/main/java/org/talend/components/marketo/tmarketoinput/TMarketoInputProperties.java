@@ -14,7 +14,9 @@ package org.talend.components.marketo.tmarketoinput;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PARAM;
+import static org.talend.components.marketo.MarketoConstants.getRESTSchemaForGetLeadActivity;
 import static org.talend.components.marketo.MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads;
+import static org.talend.components.marketo.MarketoConstants.getSOAPSchemaForGetLeadActivity;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction.describe;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.CustomObject;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLead;
@@ -38,10 +40,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
+import org.apache.avro.Schema.Type;
 import org.slf4j.Logger;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoConstants;
+import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.helpers.CompoundKeyTable;
 import org.talend.components.marketo.helpers.IncludeExcludeTypesTable;
 import org.talend.components.marketo.helpers.MarketoColumnMappingsTable;
@@ -52,8 +57,8 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
-import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.ValidationResultMutable;
+import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -773,7 +778,19 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
 
     @Override
     public int getVersionNumber() {
-        return 1;
+        return 2;
+    }
+
+    private Field getMigratedField(Field origin, Schema expectedSchema, String expectedDIType) {
+        Field expectedField = new Schema.Field(origin.name(), expectedSchema, origin.doc(), origin.defaultVal(), origin.order());
+        for (Map.Entry<String, Object> entry : origin.getObjectProps().entrySet()) {
+            if ("di.column.talendType".equals(entry.getKey())) {
+                expectedField.addProp("di.column.talendType", expectedDIType);
+            } else {
+                expectedField.addProp(entry.getKey(), entry.getValue());
+            }
+        }
+        return expectedField;
     }
 
     @Override
@@ -805,6 +822,53 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                     listParamListId.setValue(listid);
                 } catch (NumberFormatException e) {
                     LOG.warn("Couldn't migrate ListId : {}", e.getMessage());
+                }
+                migrated = true;
+            }
+            //
+            if (getLeadActivity.equals(inputOperation.getValue()) || getLeadChanges.equals(inputOperation.getValue())) {
+                List<Field> fieldsToMigrate = new ArrayList<>();
+                String fieldName;
+                Field checkedField;
+                Type expectedType;
+                String expectedDIType;
+                Schema expectedFieldSchema;
+                // Id || id aren't correctly mapped to API in 631.
+                fieldName = isApiSOAP() ? "Id" : "id";
+                checkedField = schemaInput.schema.getValue().getField(fieldName);
+                if (checkedField != null) {
+                    expectedType = isApiSOAP() ? Type.LONG : Type.INT;
+                    expectedDIType = isApiSOAP() ? "id_Long" : "id_Integer";
+                    LOG.info("Checking Migration for `{}`'s type: expected is {} and actual is {}.", fieldName, expectedType,
+                            MarketoUtils.getFieldType(checkedField));
+                    if (!expectedType.equals(MarketoUtils.getFieldType(checkedField))) {
+                        expectedFieldSchema = isApiSOAP() ? getSOAPSchemaForGetLeadActivity().getField(fieldName).schema()
+                                : getRESTSchemaForGetLeadActivity().getField(fieldName).schema();
+                        fieldsToMigrate.add(getMigratedField(checkedField, expectedFieldSchema, expectedDIType));
+                    }
+                }
+                // primaryAttributeValueId isn't mapped correctly in 631 (631: Long; 64+: Integer)
+                if (isApiREST()) {
+                    fieldName = "primaryAttributeValueId";
+                    checkedField = schemaInput.schema.getValue().getField(fieldName);
+                    if (checkedField != null) {
+                        expectedType = Type.INT;
+                        expectedDIType = "id_Integer";
+                        LOG.info("Checking Migration for `{}`'s type: expected is {} and actual is {}.", fieldName, expectedType,
+                                MarketoUtils.getFieldType(checkedField));
+                        if (!expectedType.equals(MarketoUtils.getFieldType(checkedField))) {
+                            expectedFieldSchema = getRESTSchemaForGetLeadActivity().getField(fieldName).schema();
+                            fieldsToMigrate.add(getMigratedField(checkedField, expectedFieldSchema, expectedDIType));
+                        }
+                    }
+                }
+                if (fieldsToMigrate.size() > 0) {
+                    Schema correctedSchema = MarketoUtils.modifySchemaFields(schemaInput.schema.getValue(), fieldsToMigrate);
+                    schemaInput.schema.setValue(correctedSchema);
+                    schemaFlow.schema.setValue(correctedSchema);
+                    for (Field f : fieldsToMigrate) {
+                        LOG.info("Migrated `{}` to type {}.", f.name(), MarketoUtils.getFieldType(f));
+                    }
                 }
                 migrated = true;
             }
