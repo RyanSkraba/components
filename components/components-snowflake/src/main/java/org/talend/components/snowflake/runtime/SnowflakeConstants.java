@@ -31,7 +31,7 @@ public final class SnowflakeConstants {
 
     public static final String CONNECTION_SUCCESSFUL_MESSAGE = i18nMessages.getMessage("messages.success");
 
-    public static final String SNOWFLAKE_DRIVER = "com.snowflake.client.jdbc.SnowflakeDriver";
+    public static final String SNOWFLAKE_DRIVER = "net.snowflake.client.jdbc.SnowflakeDriver";
 
     private SnowflakeConstants() {
         throw new AssertionError();
