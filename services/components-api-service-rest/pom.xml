@@ -407,6 +407,7 @@
                                                 <!-- add filebeat log variable -->
                                                 <env>
                                                     <LOG_PATH>/maven/logs</LOG_PATH>
+                                                    <FILEBEAT_CONSOLE_OUTPUT>false</FILEBEAT_CONSOLE_OUTPUT>
                                                 </env>
                                             </build>
                                         </image>

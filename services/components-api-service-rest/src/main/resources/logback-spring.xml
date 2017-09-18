@@ -10,6 +10,7 @@
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <layout class="org.talend.daikon.logging.event.layout.LogbackJSONLayout">
+            <param name="UserFields" value="service:tcomp" />
             <param name="LocationInfo" value="false" />
         </layout>
     </appender>
