@@ -57,8 +57,8 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
-import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -811,6 +811,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
             customObjectAction.setPossibleValues(CustomObjectAction.values());
             customObjectAction.setValue(CustomObjectAction.valueOf(io));
         }
+        checkForInvalidStoredProperties();
         if (version < this.getVersionNumber()) {
             if (getMultipleLeads.equals(inputOperation.getValue())
                     && ((LeadSelector.StaticListSelector.equals(leadSelectorREST.getValue()) && isApiREST())
@@ -874,5 +875,37 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
             }
         }
         return migrated;
+    }
+
+    /*
+     * Some jobs were corrupted between 6.4 and 6.5 (Class name changes). This fixes thoses jobs in error with a
+     * ClassCastException : LinkedHashMap cannot be cast to Enum.
+     */
+    private void checkForInvalidStoredProperties() {
+        Object o;
+        String ov;
+        LinkedHashMap value;
+        if (inputOperation.getStoredValue() instanceof LinkedHashMap) {
+            o = inputOperation.getStoredValue();
+            value = (LinkedHashMap) o;
+            ov = String.valueOf(value.get("name"));
+            try {
+                inputOperation.setValue(InputOperation.valueOf(ov));
+                inputOperation.setStoredValue(InputOperation.valueOf(ov));
+            } catch (Exception e) {
+                LOG.error("Error during inputOperation fix: {}.", e);
+            }
+        }
+        if (customObjectAction.getStoredValue() instanceof LinkedHashMap) {
+            o = customObjectAction.getStoredValue();
+            value = (LinkedHashMap) o;
+            ov = String.valueOf(value.get("name"));
+            try {
+                customObjectAction.setValue(CustomObjectAction.valueOf(ov));
+                customObjectAction.setStoredValue(CustomObjectAction.valueOf(ov));
+            } catch (Exception e) {
+                LOG.error("Error during customObjectAction fix: {}.", e);
+            }
+        }
     }
 }

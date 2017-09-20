@@ -421,7 +421,41 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
             customObjectSyncAction.setPossibleValues(CustomObjectSyncAction.values());
             customObjectSyncAction.setValue(CustomObjectSyncAction.valueOf(io));
         }
+        checkForInvalidStoredProperties();
+
         return migrated;
+    }
+
+    /*
+     * Some jobs were corrupted between 6.4 and 6.5 (Class name changes). This fixes thoses jobs in error with a
+     * ClassCastException : LinkedHashMap cannot be cast to Enum.
+     */
+    private void checkForInvalidStoredProperties() {
+        Object o;
+        String ov;
+        LinkedHashMap value;
+        if (outputOperation.getStoredValue() instanceof LinkedHashMap) {
+            o = outputOperation.getStoredValue();
+            value = (LinkedHashMap) o;
+            ov = String.valueOf(value.get("name"));
+            try {
+                outputOperation.setValue(OutputOperation.valueOf(ov));
+                outputOperation.setStoredValue(OutputOperation.valueOf(ov));
+            } catch (Exception e) {
+                LOG.error("Error during outputOperation fix: {}.", e);
+            }
+        }
+        if (customObjectSyncAction.getStoredValue() instanceof LinkedHashMap) {
+            o = customObjectSyncAction.getStoredValue();
+            value = (LinkedHashMap) o;
+            ov = String.valueOf(value.get("name"));
+            try {
+                customObjectSyncAction.setValue(CustomObjectSyncAction.valueOf(ov));
+                customObjectSyncAction.setStoredValue(CustomObjectSyncAction.valueOf(ov));
+            } catch (Exception e) {
+                LOG.error("Error during customObjectSyncAction fix: {}.", e);
+            }
+        }
     }
 
 }

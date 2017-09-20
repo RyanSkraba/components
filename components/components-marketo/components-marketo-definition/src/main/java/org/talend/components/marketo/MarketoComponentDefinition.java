@@ -16,7 +16,6 @@ import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.JarRuntimeInfo;
-import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.daikon.properties.property.Property;
@@ -75,11 +74,6 @@ public abstract class MarketoComponentDefinition extends AbstractComponentDefini
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return new Class[] { TMarketoConnectionProperties.class };
-    }
-
-    public static RuntimeInfo getCommonRuntimeInfo(ClassLoader classLoader, String clazz) {
-        return new SimpleRuntimeInfo(classLoader,
-                DependenciesReader.computeDependenciesFilePath(MAVEN_GROUP_ID, MAVEN_RUNTIME_ARTIFACT_ID), clazz);
     }
 
     public static RuntimeInfo getCommonRuntimeInfo(String clazz) {
