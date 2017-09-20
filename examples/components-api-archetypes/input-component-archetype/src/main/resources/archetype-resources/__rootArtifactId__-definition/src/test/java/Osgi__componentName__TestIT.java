@@ -33,7 +33,7 @@ public class Osgi${componentName}TestIT extends ${componentName}TestBase {
 
         return options(composite(ComponentsPaxExamOptions.getOptions()), //
                 linkBundle("org.talend.components-components-common-bundle"), //
-                linkBundle("${groupId}-${artifactId}"));
+                linkBundle("${groupId}-${artifactId}-bundle"));
     }
 
 }

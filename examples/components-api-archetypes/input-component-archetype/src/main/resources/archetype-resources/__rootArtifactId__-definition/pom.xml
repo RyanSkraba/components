@@ -133,7 +133,7 @@
 								<artifact>
 									<groupId>\${project.groupId}</groupId>
 									<artifactId>\${project.artifactId}</artifactId>
-									<classifier></classifier>	
+									<classifier>bundle</classifier>
 									<version>\${project.version}</version>
 								</artifact>
 							</artifacts>
@@ -153,15 +153,16 @@
 							<goal>bundle</goal>
 						</goals>
 						<configuration>
+							<classifier>bundle</classifier>
 							<instructions>
-								<Bundle-SymbolicName>org.talend.components.table</Bundle-SymbolicName>
+								<Bundle-SymbolicName>\${groupId}.\${artifactId}</Bundle-SymbolicName>
 								<Service-Component>*</Service-Component>
 								<Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|auto-service|pax-url-aether</Embed-Dependency>
 								<Include-Resource>{maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/\${project.groupId}/\${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/\${project.groupId}/\${project.artifactId}/dependencies.txt</Include-Resource>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 							</instructions>
 						</configuration>
-					</execution>					
+					</execution>
 				</executions>
 			</plugin>
 			<!-- The following plugins are there to make sure they are launched after 
