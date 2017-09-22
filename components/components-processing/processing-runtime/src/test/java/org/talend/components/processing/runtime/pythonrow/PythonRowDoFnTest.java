@@ -64,6 +64,7 @@ public class PythonRowDoFnTest {
 
         PythonRowProperties properties = new PythonRowProperties("test");
         properties.init();
+        properties.mapType.setValue(MapType.MAP);
         properties.pythonCode.setValue("output = input");
         PythonRowDoFn function = new PythonRowDoFn();
         assertEquals(ValidationResult.OK, function.initialize(null, properties));
@@ -80,6 +81,7 @@ public class PythonRowDoFnTest {
 
         PythonRowProperties properties = new PythonRowProperties("test");
         properties.init();
+        properties.mapType.setValue(MapType.MAP);
 
         StringBuilder sb = new StringBuilder();
         sb.append("output = input\n");
@@ -105,6 +107,7 @@ public class PythonRowDoFnTest {
 
         PythonRowProperties properties = new PythonRowProperties("test");
         properties.init();
+        properties.mapType.setValue(MapType.MAP);
 
         StringBuilder sb = new StringBuilder();
         sb.append("output['a1'] = \"rootdata2\"\n");
@@ -145,7 +148,7 @@ public class PythonRowDoFnTest {
     }
 
     @Test
-    public void test_FlatMap_DupplicateInput() throws Exception {
+    public void test_FlatMap_DuplicateInput() throws Exception {
 
         PythonRowProperties properties = new PythonRowProperties("test");
         properties.init();

@@ -33,6 +33,7 @@ public class ConditionsRowConstant {
 
         public static String LENGTH = "LENGTH";
 
+        public static String COUNT = "COUNT";
     }
 
     public static class Operator {
@@ -73,7 +74,8 @@ public class ConditionsRowConstant {
 
     /** List containing all the function, currently used until we provide the schema to the component **/
     public static final List<String> ALL_FUNCTIONS = Arrays.asList(Function.EMPTY, Function.ABS_VALUE, Function.LOWER_CASE,
-            Function.UPPER_CASE, Function.FIRST_CHARACTER_LOWER_CASE, Function.FIRST_CHARACTER_UPPER_CASE, Function.LENGTH);
+            Function.UPPER_CASE, Function.FIRST_CHARACTER_LOWER_CASE, Function.FIRST_CHARACTER_UPPER_CASE, Function.LENGTH,
+            Function.COUNT);
 
     /** Default list of operators that can be used to compare data **/
     public static final List<String> DEFAULT_OPERATORS = Arrays.asList(Operator.EQUAL, Operator.NOT_EQUAL, Operator.LOWER,

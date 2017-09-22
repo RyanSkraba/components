@@ -48,9 +48,9 @@ public class PythonRowPropertiesTest {
 
         properties.init();
         assertEquals("EmptyRecord", properties.main.schema.getValue().getName());
-        assertEquals(MapType.MAP, properties.mapType.getValue());
-        assertTrue(properties.pythonCode.getValue().contains("custom MAP transformation"));
-        assertFalse(properties.pythonCode.getValue().contains("custom FLATMAP transformation"));
+        assertEquals(MapType.FLATMAP, properties.mapType.getValue());
+        assertTrue(properties.pythonCode.getValue().contains("custom FLATMAP transformation"));
+        assertFalse(properties.pythonCode.getValue().contains("custom MAP transformation"));
     }
 
     /**
@@ -111,13 +111,6 @@ public class PythonRowPropertiesTest {
         properties.pythonCode.setValue("invalid");
 
         properties.afterMapType();
-        assertEquals(MapType.MAP, properties.mapType.getValue());
-        assertTrue(properties.pythonCode.getValue().contains("custom MAP transformation"));
-        assertFalse(properties.pythonCode.getValue().contains("custom FLATMAP transformation"));
-
-        properties.pythonCode.setValue("invalid");
-        properties.mapType.setValue(MapType.FLATMAP);
-        properties.afterMapType();
         assertEquals(MapType.FLATMAP, properties.mapType.getValue());
         assertTrue(properties.pythonCode.getValue().contains("custom FLATMAP transformation"));
         assertFalse(properties.pythonCode.getValue().contains("custom MAP transformation"));
@@ -128,6 +121,13 @@ public class PythonRowPropertiesTest {
         assertEquals(MapType.MAP, properties.mapType.getValue());
         assertTrue(properties.pythonCode.getValue().contains("custom MAP transformation"));
         assertFalse(properties.pythonCode.getValue().contains("custom FLATMAP transformation"));
+
+        properties.pythonCode.setValue("invalid");
+        properties.mapType.setValue(MapType.FLATMAP);
+        properties.afterMapType();
+        assertEquals(MapType.FLATMAP, properties.mapType.getValue());
+        assertTrue(properties.pythonCode.getValue().contains("custom FLATMAP transformation"));
+        assertFalse(properties.pythonCode.getValue().contains("custom MAP transformation"));
     }
 
     /**

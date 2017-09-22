@@ -27,7 +27,9 @@ import org.talend.daikon.exception.error.ErrorCode;
 public enum ProcessingErrorCode implements ErrorCode {
 
     /** The user attempted to access a field that was not found in the record. */
-    FIELD_NOT_FOUND("FIELD_NOT_FOUND", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "field");
+    FIELD_NOT_FOUND("FIELD_NOT_FOUND", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "field"),
+
+    AVPATH_SYNTAX_ERROR("AVPATH_SYNTAX_ERROR", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "query", "position");
 
     private final String code;
 
@@ -74,11 +76,28 @@ public enum ProcessingErrorCode implements ErrorCode {
      * @return An exception corresponding to the error code.
      */
     public static TalendRuntimeException createFieldNotFoundException(Throwable cause, String field) {
-        return new TalendMsgRuntimeException(cause, FIELD_NOT_FOUND,
-                ExceptionContext.withBuilder().put("field", field).build(),
+        return new TalendMsgRuntimeException(cause, FIELD_NOT_FOUND, ExceptionContext.withBuilder().put("field", field).build(),
                 "The field '" + field + "' was not found.");
     }
-    
+
+    /**
+     * Create a {@link #AVPATH_SYNTAX_ERROR} exception for when the user entered a bad avpath expression.
+     *
+     * @param cause The technical exception that was caught when the error occurred.
+     * @param query The avpath query that failed.
+     * @return An exception corresponding to the error code.
+     */
+    public static TalendRuntimeException createAvpathSyntaxError(Throwable cause, String query, int position) {
+        String msg;
+        if (position == -1) {
+            msg = "The avpath query '" + query + "' is invalid.";
+        } else {
+            msg = "The avpath '" + query + "' is invalid at position " + position + ".";
+        }
+        return new TalendMsgRuntimeException(cause, AVPATH_SYNTAX_ERROR,
+                ExceptionContext.withBuilder().put("query", query).put("position", position).build(), msg);
+    }
+
     /**
      * {@link TalendRuntimeException} with a reasonable user-friendly message in English.
      */

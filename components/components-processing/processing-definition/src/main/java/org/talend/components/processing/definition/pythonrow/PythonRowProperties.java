@@ -55,7 +55,7 @@ public class PythonRowProperties extends FixedConnectorsComponentProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
-        mapType.setValue(MapType.MAP);
+        mapType.setValue(MapType.FLATMAP);
         afterMapType();
     }
 

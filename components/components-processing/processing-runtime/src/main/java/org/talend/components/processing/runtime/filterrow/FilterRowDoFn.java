@@ -13,12 +13,9 @@
 package org.talend.components.processing.runtime.filterrow;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Type;
-import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +26,11 @@ import org.talend.components.processing.definition.filterrow.FilterRowProperties
 import org.talend.components.processing.definition.filterrow.LogicalOpType;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
+
+import scala.collection.JavaConversions;
+import scala.util.Try;
+import wandou.avpath.Evaluator;
+import wandou.avpath.Parser;
 
 public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
 
@@ -50,63 +52,80 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
             AvroRegistry registry = new AvroRegistry();
             converter = registry.createIndexedRecordConverter(context.element().getClass());
         }
-        IndexedRecord inputRecord = (IndexedRecord) converter.convertToAvro(context.element());
+        // TODO(inputRecord->record);
+        IndexedRecord record = (IndexedRecord) converter.convertToAvro(context.element());
 
-        // init to false with ANY logical operator
-        // Init to true otherwise
-        boolean conditionsSatisfied = !LogicalOpType.ANY.equals(properties.logicalOp.getValue());
-        // Used to avoid useless conditions evaluation
-        boolean stopEvaluation = false;
-        // Extract filters to be applied
-        Iterator<FilterRowCriteriaProperties> filtersIterator = properties.filters.subProperties.iterator();
-        FilterRowCriteriaProperties currentFilter = null;
-        while (!stopEvaluation && filtersIterator.hasNext()) {
-            currentFilter = filtersIterator.next();
-
-            String columnName = currentFilter.columnName.getValue();
-
-            // If there is no defined input, we filter nothing
-            if (!StringUtils.isEmpty(columnName)) {
-                List<Object> inputValues = getInputFields(inputRecord, columnName);
-                if (inputValues.size() == 0) {
-                    // no valid field: reject the input
-                    conditionsSatisfied = false;
-                }
-
-                // TODO handle null with multiples values
-                for (Object inputValue : inputValues) {
-                    switch (properties.logicalOp.getValue()) {
-                    case ANY:
-                        conditionsSatisfied = conditionsSatisfied || checkCondition(inputValue, currentFilter);
-                        // Stop on first satisfied condition
-                        stopEvaluation = conditionsSatisfied;
-                        break;
-                    case NONE:
-                        conditionsSatisfied = conditionsSatisfied && !checkCondition(inputValue, currentFilter);
-                        // Stop on first non satisfied condition
-                        stopEvaluation = !conditionsSatisfied;
-                        break;
-                    default:
-                        // ALL case
-                        conditionsSatisfied = conditionsSatisfied && checkCondition(inputValue, currentFilter);
-                        // Stop on first non satisfied condition
-                        stopEvaluation = !conditionsSatisfied;
-                        break;
-                    }
-                }
+        // If there are no properties, then short-circuit this DoFn to send directly to the output.
+        if (properties.filters.subProperties.size() == 0) {
+            if (hasOutputSchema) {
+                context.output(record);
             }
-
+            return;
         }
 
-        if (conditionsSatisfied) {
+        // This is the logical operation applied to the set of filter criteria in this component.
+        // (i.e. ALL means that all criteria must evaluate to true.)
+        LogicalOpType criteriaLogicalOp = properties.logicalOp.getValue();
+
+        // Starting point for aggregating the logical operations.
+        boolean aggregate = criteriaLogicalOp.createAggregate();
+
+        // Apply all of the criteria.
+        for (FilterRowCriteriaProperties criteria : properties.filters.subProperties) {
+            aggregate = criteriaLogicalOp.combineAggregate(aggregate, evaluateCriteria(criteria, record));
+            if (criteriaLogicalOp.canShortCircuit(aggregate))
+                break;
+        }
+
+        if (aggregate) {
             if (hasOutputSchema) {
-                context.output(inputRecord);
+                context.output(record);
             }
         } else {
             if (hasRejectSchema) {
-                context.output(FilterRowRuntime.rejectOutput, inputRecord);
+                context.output(FilterRowRuntime.rejectOutput, record);
             }
         }
+    }
+
+    /**
+     * Evaluate one specific criteria against the given indexed record.
+     * 
+     * @param criteria the criteria to evaluate.
+     * @param record the value to evaluate against the criteria.
+     * @return whether the record should be selected for this specific criteria.
+     */
+    private boolean evaluateCriteria(FilterRowCriteriaProperties criteria, IndexedRecord record) {
+        // This is the logical operation applied to multiple values applied inside ONE specific filter criteria.
+        // When using a complex av expression, one accessor can read multiple values.
+        // (i.e. ALL means that all values must evaluate to true.)
+        LogicalOpType fieldOp = LogicalOpType.ALL;
+
+        // Starting point for aggregating the logical operations.
+        boolean aggregate = fieldOp.createAggregate();
+
+        String accessor = criteria.columnName.getStringValue();
+        if (StringUtils.isEmpty(accessor)) {
+            return false;
+        }
+
+        List<Object> values = getInputFields(record, accessor);
+
+        if (ConditionsRowConstant.Function.COUNT.equals(criteria.function.getStringValue())) {
+            values = Arrays.asList((Object) values.size());
+        } else if (values.size() == 0) {
+            // If the function is not COUNT and no values are returned, then consider the criteria not matched.
+            return false;
+        }
+
+        // Apply all of the criteria.
+        for (Object value : values) {
+            aggregate = fieldOp.combineAggregate(aggregate, checkCondition(value, criteria));
+            if (fieldOp.canShortCircuit(aggregate))
+                break;
+        }
+
+        return aggregate;
     }
 
     private <T extends Comparable<T>> Boolean checkCondition(Object inputValue, FilterRowCriteriaProperties filter) {
@@ -136,48 +155,23 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
     }
 
     private List<Object> getInputFields(IndexedRecord inputRecord, String columnName) {
-        // TODO current implementation will only extract one element, but
-        // further implementation may
-        ArrayList<Object> inputFields = new ArrayList<Object>();
-        String[] path = columnName.split("\\.");
-        Schema schema = inputRecord.getSchema();
-
-        for (Integer i = 0; i < path.length; i++) {
-            // The column was existing on the input record, we forward it to the
-            // output record.
-            if (schema.getField(path[i]) == null) {
-                throw ProcessingErrorCode.createFieldNotFoundException(null, columnName);
+        // Adapt non-avpath syntax to avpath.
+        // TODO: This should probably not be automatic, use the actual syntax.
+        if (!columnName.startsWith("."))
+            columnName = "." + columnName;
+        Try<scala.collection.immutable.List<Evaluator.Ctx>> result = wandou.avpath.package$.MODULE$.select(inputRecord,
+                columnName);
+        List<Object> values = new ArrayList<Object>();
+        if (result.isSuccess()) {
+            for (Evaluator.Ctx ctx : JavaConversions.asJavaCollection(result.get())) {
+                values.add(ctx.value());
             }
-            Object inputValue = inputRecord.get(schema.getField(path[i]).pos());
-
-            // The current column can be a Record (an hierarchical sub-object)
-            // or directly a value.
-            if (inputValue instanceof Record) {
-                // If we are on a record, we need to recursively do the process
-                inputRecord = (IndexedRecord) inputValue;
-
-                // The sub-schema at this level is a union of "empty" and a
-                // record, so we need to get the true
-                // sub-schema
-                for (Schema childSchema : schema.getField(path[i]).schema().getTypes()) {
-                    if (childSchema.getType().equals(Type.RECORD)) {
-                        schema = childSchema;
-                        break;
-                    }
-                }
-            } else {
-                // if we are on a object, then this is or the expected value of
-                // an error.
-                if (i == path.length - 1) {
-                    inputFields.add(inputValue);
-                } else {
-                    // No need to go further, return an empty list
-                    break;
-                }
-            }
+        } else {
+            // Evaluating the expression failed, and we can handle the exception.
+            Throwable t = result.failed().get();
+            throw ProcessingErrorCode.createAvpathSyntaxError(t, columnName, -1);
         }
-
-        return inputFields;
+        return values;
     }
 
     public FilterRowDoFn withOutputSchema(boolean hasSchema) {
@@ -192,6 +186,15 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
 
     public FilterRowDoFn withProperties(FilterRowProperties properties) {
         this.properties = properties;
+        // Remove any filter criteria that have not been initialized by the user. These elements are ignored.
+        List<FilterRowCriteriaProperties> filters = this.properties.filters.subProperties;
+        this.properties.filters.subProperties = new ArrayList<>();
+        for (FilterRowCriteriaProperties criteria : filters) {
+            if (!StringUtils.isEmpty(criteria.columnName.getStringValue())
+                    || !StringUtils.isEmpty(criteria.value.getStringValue())) {
+                this.properties.filters.subProperties.add(criteria);
+            }
+        }
         return this;
     }
 }

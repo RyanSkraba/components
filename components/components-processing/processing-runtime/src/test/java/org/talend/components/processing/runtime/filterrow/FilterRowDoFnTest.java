@@ -12,7 +12,10 @@
 // ============================================================================
 package org.talend.components.processing.runtime.filterrow;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
@@ -23,13 +26,13 @@ import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.util.Utf8;
 import org.apache.beam.sdk.transforms.DoFnTester;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.processing.definition.filterrow.ConditionsRowConstant;
 import org.talend.components.processing.definition.filterrow.FilterRowCriteriaProperties;
 import org.talend.components.processing.definition.filterrow.FilterRowProperties;
 import org.talend.components.processing.definition.filterrow.LogicalOpType;
 import org.talend.daikon.exception.TalendRuntimeException;
-
 
 public class FilterRowDoFnTest {
 
@@ -58,7 +61,7 @@ public class FilterRowDoFnTest {
             .set("b", -100) //
             .set("c", 1000) //
             .build();
-    
+
     private final GenericRecord input_10_100_1000_Record = new GenericRecordBuilder(inputSimpleSchema) //
             .set("a", 10) //
             .set("b", 100) //
@@ -76,6 +79,47 @@ public class FilterRowDoFnTest {
             .set("b", 300) //
             .set("c", 3000) //
             .build();
+
+    /**
+     * Creates and returns {@link FilterRowProperties} by adding a new criteria.
+     *
+     * TODO: most of the tests below use the default property with empty columnName and value, PLUS the criteria under test.
+     * This method can ensure that only the requested criteria are in the properties.
+     *
+     * @param frp The properties to modify by adding a new {@link FilterRowCriteriaProperties} instance. If this is null, a
+     * new instance is created.
+     * @param columnName If non-null, sets the columnName of the criteria.
+     * @param function If non-null, sets the function of the criteria.
+     * @param operator If non-null, sets the operator of the criteria.
+     * @param value If non-null, sets the value of the criteria.
+     * @return a properties with the specified criteria added.
+     */
+    protected static FilterRowProperties addCriteria(FilterRowProperties frp, String columnName, String function, String operator,
+            String value) {
+        // Create a new properties if one wasn't passed in.
+        if (frp == null) {
+            frp = new FilterRowProperties("test");
+            frp.init();
+            // Remove the default critera.
+            frp.filters.subProperties.clear();
+        }
+
+        // Create and add a new criteria with the requested properties.
+        FilterRowCriteriaProperties criteria = new FilterRowCriteriaProperties("filter");
+        criteria.init();
+        frp.filters.addRow(criteria);
+
+        if (columnName != null)
+            criteria.columnName.setValue(columnName);
+        if (function != null)
+            criteria.function.setValue(function);
+        if (operator != null)
+            criteria.operator.setValue(operator);
+        if (value != null)
+            criteria.value.setValue(value);
+
+        return frp;
+    }
 
     private void checkSimpleInputNoOutput(DoFnTester<Object, IndexedRecord> fnTester) throws Exception {
         List<IndexedRecord> outputs = fnTester.processBundle(inputSimpleRecord);
@@ -218,14 +262,20 @@ public class FilterRowDoFnTest {
         checkNumericInputInvalidOutput(fnTester);
     }
 
+    /**
+     * Check that any filter row that contains an "empty" or "default" criteria passes all records.
+     */
     @Test
-    public void test_FilterWithNullValue() throws Exception {
-        FilterRowProperties properties = new FilterRowProperties("test");
-        properties.init();
-        properties.schemaListener.afterSchema();
-        FilterRowCriteriaProperties filterProp = new FilterRowCriteriaProperties("filter");
-        filterProp.init();
-        properties.filters.addRow(filterProp);
+    public void test_FilterWithDefaultValue() throws Exception {
+        // Create a filter row with exactly one criteria that hasn't been filled by the user.
+        FilterRowProperties properties = addCriteria(null, null, null, null, null);
+        assertThat(properties.filters.getPropertiesList(), hasSize(1));
+
+        FilterRowCriteriaProperties criteria = properties.filters.getPropertiesList().iterator().next();
+        assertThat(criteria.columnName.getStringValue(), is(""));
+        assertThat(criteria.function.getStringValue(), is("EMPTY"));
+        assertThat(criteria.operator.getStringValue(), is("=="));
+        assertThat(criteria.value.getStringValue(), is(""));
 
         FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
                 .withOutputSchema(false).withRejectSchema(false);
@@ -250,14 +300,10 @@ public class FilterRowDoFnTest {
 
     @Test
     public void test_FilterSimple_Valid() throws Exception {
-        FilterRowProperties properties = new FilterRowProperties("test");
-        properties.init();
-        FilterRowCriteriaProperties filterProp = new FilterRowCriteriaProperties("filter");
-        filterProp.init();
-        properties.schemaListener.afterSchema();
-        filterProp.columnName.setValue("a");
-        filterProp.value.setValue("aaa");
-        properties.filters.addRow(filterProp);
+        FilterRowProperties properties = addCriteria(null, "a", ConditionsRowConstant.Function.EMPTY,
+                ConditionsRowConstant.Operator.EQUAL, "aaa");
+        assertThat(properties.filters.getPropertiesList(), hasSize(1));
+
         runSimpleTestValidSession(properties);
     }
 
@@ -271,9 +317,13 @@ public class FilterRowDoFnTest {
         filterProp.columnName.setValue("a");
         filterProp.value.setValue("c");
         properties.filters.addRow(filterProp);
+
+        // TODO: this should only have one criteria, use addCriteria to sip
+        assertThat(properties.filters.getPropertiesList(), hasSize(2));
         runSimpleTestInvalidSession(properties);
     }
 
+    @Ignore("TODO: handle unknown or invalid columns.")
     @Test(expected = TalendRuntimeException.class)
     public void test_invalidColumnName() throws Exception {
         FilterRowProperties properties = new FilterRowProperties("test");
@@ -690,14 +740,15 @@ public class FilterRowDoFnTest {
                 .withOutputSchema(true).withRejectSchema(true);
         DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
 
-        List<IndexedRecord> outputs = fnTester.processBundle(input_30_300_3000_Record, input_10_100_1000_Record, input_20_200_2000_Record);
+        List<IndexedRecord> outputs = fnTester.processBundle(input_30_300_3000_Record, input_10_100_1000_Record,
+                input_20_200_2000_Record);
         List<IndexedRecord> rejects = fnTester.peekOutputElements(FilterRowRuntime.rejectOutput);
 
         assertEquals(1, outputs.size());
         assertEquals(2, rejects.size());
 
     }
-    
+
     @Test
     public void test_FilterMatch_Valid() throws Exception {
 
@@ -882,10 +933,4 @@ public class FilterRowDoFnTest {
         assertEquals(2, rejects.size());
 
     }
-
-    // TODO test function and operator on every single type
-
-    // TODO need to test hierarchical => waiting for the definition of the columnName path
-    // TODO need to test invalid columnName => waiting for the definition of the columnName path
-
 }
