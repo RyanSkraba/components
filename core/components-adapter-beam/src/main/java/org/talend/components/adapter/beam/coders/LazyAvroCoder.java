@@ -80,9 +80,11 @@ public class LazyAvroCoder<T> extends AtomicCoder<Object> {
 
     public static void setSchemaSupplier(Supplier<AvroSchemaHolder> factory) {
         // Ensure that the schema supplier has not already been set.
-        if (LazyAvroCoder.threadSchemaSupplierFactory != null)
+        if (threadSchemaSupplierFactory == null) {
+            threadSchemaSupplierFactory = new ThreadLocal<Supplier<AvroSchemaHolder>>();
+        } else if (LazyAvroCoder.threadSchemaSupplierFactory.get() != null) {
             throw BeamAdapterErrorCode.createSchemaSupplierAlreadyExists(null, threadSchemaSupplierFactory.get().toString());
-        threadSchemaSupplierFactory = new ThreadLocal<Supplier<AvroSchemaHolder>>();
+        }
         threadSchemaSupplierFactory.set(factory);
     }
 
@@ -90,7 +92,7 @@ public class LazyAvroCoder<T> extends AtomicCoder<Object> {
         if (threadSchemaSupplierFactory == null) {
             threadSchemaSupplierFactory = new ThreadLocal<Supplier<AvroSchemaHolder>>();
         }
-        if (threadSchemaSupplierFactory.get() == null){
+        if (threadSchemaSupplierFactory.get() == null) {
             threadSchemaSupplierFactory.set(new StaticSchemaHolderSupplier());
         }
         return threadSchemaSupplierFactory.get();
