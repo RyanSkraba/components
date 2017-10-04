@@ -22,12 +22,15 @@ import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.EnumProperty;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
+
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +68,8 @@ public class PubSubDatasetProperties extends PropertiesImpl implements DatasetPr
         mainForm.addRow(subscription);
         mainForm.addRow(valueFormat);
         mainForm.addRow(fieldDelimiter);
-        mainForm.addRow(avroSchema);
+        mainForm.addRow(widget(avroSchema).setWidgetType(Widget.CODE_WIDGET_TYPE)
+                .setConfigurationValue(Widget.CODE_SYNTAX_WIDGET_CONF, "json"));
         // mainForm.addRow(main.getForm(Form.MAIN));
     }
 

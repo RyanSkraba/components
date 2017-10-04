@@ -65,7 +65,9 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
         mainForm.addRow(widget(topic).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
         mainForm.addRow(valueFormat);
         mainForm.addRow(fieldDelimiter);
-        mainForm.addRow(isHierarchy).addColumn(avroSchema);
+        mainForm.addRow(isHierarchy);
+        mainForm.addRow(widget(avroSchema).setWidgetType(Widget.CODE_WIDGET_TYPE)
+                .setConfigurationValue(Widget.CODE_SYNTAX_WIDGET_CONF, "json"));
         mainForm.addRow(main.getForm(Form.MAIN));
 
     }
