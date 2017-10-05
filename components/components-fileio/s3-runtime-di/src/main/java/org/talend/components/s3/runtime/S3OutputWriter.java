@@ -73,7 +73,6 @@ public class S3OutputWriter implements Writer<Result> {
 
         // prepare the local target, will upload it to s3 and clear it in the close method
         data_file = File.createTempFile("s3-", ".csv");
-        data_file.deleteOnExit();
 
         OutputStream outputStream = new FileOutputStream(data_file);
         writer = new CsvWriter(new OutputStreamWriter(outputStream), ';');
