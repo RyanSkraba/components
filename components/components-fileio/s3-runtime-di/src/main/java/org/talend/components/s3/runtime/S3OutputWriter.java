@@ -72,9 +72,7 @@ public class S3OutputWriter implements Writer<Result> {
         }
 
         // prepare the local target, will upload it to s3 and clear it in the close method
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        data_file = new File(tmpDir, "data.csv");
-
+        data_file = File.createTempFile("s3-", ".csv");
         data_file.deleteOnExit();
 
         OutputStream outputStream = new FileOutputStream(data_file);
