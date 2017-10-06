@@ -23,6 +23,7 @@ import org.talend.components.api.component.runtime.ComponentDriverInitialization
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.simplefileio.SimpleFileIOErrorCode;
+import org.talend.components.simplefileio.runtime.ExtraHadoopConfiguration;
 import org.talend.components.simplefileio.runtime.SimpleFileIOAvroRegistry;
 import org.talend.components.simplefileio.runtime.SimpleRecordFormatAvroIO;
 import org.talend.components.simplefileio.runtime.SimpleRecordFormatBase;
@@ -96,7 +97,14 @@ public class S3OutputRuntime extends PTransform<PCollection<IndexedRecord>, PDon
         if (properties.overwrite.getValue()) {
             try {
                 Path p = new Path(S3Connection.getUriPath(properties.getDatasetProperties()));
-                FileSystem fs = p.getFileSystem(new Configuration());
+
+                // Add the AWS configuration to the Hadoop filesystem.
+                ExtraHadoopConfiguration awsConf = new ExtraHadoopConfiguration();
+                S3Connection.setS3Configuration(awsConf, properties.getDatasetProperties());
+                Configuration hadoopConf = new Configuration();
+                awsConf.addTo(hadoopConf);
+                FileSystem fs = p.getFileSystem(hadoopConf);
+
                 if (fs.exists(p)) {
                     boolean deleted = fs.delete(p, true);
                     if (!deleted)
