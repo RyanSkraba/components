@@ -56,8 +56,8 @@ public class BigQueryOutputPropertiesTest {
      */
     @Test
     public void testDefaultProperties() {
-        assertEquals(BigQueryOutputProperties.TableOperation.CREATE_IF_NOT_EXISTS, properties.tableOperation.getValue());
-        assertEquals(BigQueryOutputProperties.WriteOperation.WRITE_TO_EMPTY, properties.writeOperation.getValue());
+        assertEquals(BigQueryOutputProperties.TableOperation.NONE, properties.tableOperation.getValue());
+        assertEquals(BigQueryOutputProperties.WriteOperation.APPEND, properties.writeOperation.getValue());
     }
 
     /**

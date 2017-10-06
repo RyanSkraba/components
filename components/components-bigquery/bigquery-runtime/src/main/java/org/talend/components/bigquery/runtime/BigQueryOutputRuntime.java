@@ -90,9 +90,7 @@ public class BigQueryOutputRuntime extends PTransform<PCollection<IndexedRecord>
         bigQueryIOPTransform = setTableOperation(bigQueryIOPTransform);
         bigQueryIOPTransform = setWriteOperation(bigQueryIOPTransform);
 
-        // When the BigQueryOutput specify schema, use it for create table and construct converter,
-        // else use incoming data's schema for construct converter, and do not support create table
-        in.apply(ParDo.of(new IndexedRecordToTableRowFn(dataset.main.schema.getValue()))).apply(bigQueryIOPTransform);
+        in.apply(ParDo.of(new IndexedRecordToTableRowFn())).apply(bigQueryIOPTransform);
         return PDone.in(in.getPipeline());
     }
 
@@ -157,10 +155,7 @@ public class BigQueryOutputRuntime extends PTransform<PCollection<IndexedRecord>
 
         private transient IndexedRecordConverter<TableRow, IndexedRecord> converter;
 
-        private String schemaStr;
-
-        public IndexedRecordToTableRowFn(Schema schema) {
-            schemaStr = schema.toString();
+        public IndexedRecordToTableRowFn() {
         }
 
         @DoFn.ProcessElement
@@ -171,9 +166,8 @@ public class BigQueryOutputRuntime extends PTransform<PCollection<IndexedRecord>
             }
             if (converter == null) {
                 converter = new BigQueryTableRowIndexedRecordConverter();
-                Schema schema = new Schema.Parser().parse(schemaStr);
-                if (schema != null && !AvroUtils.isSchemaEmpty(schema) && !AvroUtils.isIncludeAllFields(schema)) {
-                    converter.setSchema(schema);
+                if (!AvroUtils.isSchemaEmpty(row.getSchema()) && !AvroUtils.isIncludeAllFields(row.getSchema())) {
+                    converter.setSchema(row.getSchema());
                 }
             }
             c.output(converter.convertToDatum(row));

@@ -207,7 +207,7 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
         inputRuntime.initialize(runtimeContainer, inputProperties);
 
         PCollection<TableRow> tableRowPCollection = pipeline.apply(inputRuntime)
-                .apply(ParDo.of(new BigQueryOutputRuntime.IndexedRecordToTableRowFn(schema))).setCoder(TableRowJsonCoder.of());
+                .apply(ParDo.of(new BigQueryOutputRuntime.IndexedRecordToTableRowFn())).setCoder(TableRowJsonCoder.of());
 
         PAssert.that(tableRowPCollection).containsInAnyOrder(rows);
 

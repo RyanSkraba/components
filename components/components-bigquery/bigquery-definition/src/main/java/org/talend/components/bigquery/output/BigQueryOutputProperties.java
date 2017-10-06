@@ -59,8 +59,8 @@ public class BigQueryOutputProperties extends FixedConnectorsComponentProperties
     @Override
     public void setupProperties() {
         super.setupProperties();
-        tableOperation.setValue(TableOperation.CREATE_IF_NOT_EXISTS);
-        writeOperation.setValue(WriteOperation.WRITE_TO_EMPTY);
+        tableOperation.setValue(TableOperation.NONE);
+        writeOperation.setValue(WriteOperation.APPEND);
     }
 
     @Override
