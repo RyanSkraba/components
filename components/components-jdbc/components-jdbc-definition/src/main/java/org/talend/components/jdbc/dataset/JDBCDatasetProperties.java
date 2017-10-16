@@ -54,13 +54,13 @@ public class JDBCDatasetProperties extends PropertiesImpl
 
     private transient AllSetting setting;
 
-    public void afterSourceType() {
-        refreshLayout(getForm(Form.MAIN));
-    }
-
     public JDBCDatasetProperties(String name) {
         super(name);
         setting = new AllSetting();
+    }
+
+    public void afterSourceType() {
+        refreshLayout(getForm(Form.MAIN));
     }
 
     public void updateSchema() {
@@ -85,7 +85,8 @@ public class JDBCDatasetProperties extends PropertiesImpl
         Form mainForm = CommonUtils.addForm(this, Form.MAIN);
         mainForm.addRow(sourceType);
         mainForm.addRow(tableName);
-        mainForm.addRow(Widget.widget(sql).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
+        mainForm.addRow(Widget.widget(sql).setWidgetType(Widget.CODE_WIDGET_TYPE)
+                .setConfigurationValue(Widget.CODE_SYNTAX_WIDGET_CONF, "sql"));
 
         Form citizenUserForm = CommonUtils.addForm(this, Form.CITIZEN_USER);
         citizenUserForm.addRow(Widget.widget(sql).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
