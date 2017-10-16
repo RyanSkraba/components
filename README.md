@@ -60,7 +60,7 @@ see the readme here : [services/components-api-service-rest-all-components](/ser
 
 
 ## IDE Setup
-See the [tooling](/tooling/) folder.
+See the Talend tools repo [tools-java-formatter](https://github.com/Talend/tools/tree/master/tools-java-formatter).
 
 ## Tests Associated with Maven Build 
 There are 2 kinds of tests, Unit tests and Integration tests.
