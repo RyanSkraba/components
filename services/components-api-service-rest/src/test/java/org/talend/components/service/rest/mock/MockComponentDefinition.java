@@ -43,7 +43,7 @@ public class MockComponentDefinition extends AbstractComponentDefinition {
     }
 
     public MockComponentDefinition(String name, ConnectorTopology... topologies) {
-        this(name, (String) null, ExecutionEngine.DI, topologies);
+        this(name, null, ExecutionEngine.DI, topologies);
     }
 
     public MockComponentDefinition(String name, ExecutionEngine engine, ConnectorTopology... topologies) {
