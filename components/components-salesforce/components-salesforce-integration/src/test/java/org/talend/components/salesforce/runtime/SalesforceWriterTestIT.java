@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.avro.Schema;
@@ -116,6 +117,15 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             .name("Body").type().stringType().noDefault() //
             .name("ContentType").type().stringType().noDefault() //
             .name("ParentId").type().stringType().noDefault() //
+            .name("Id").type().stringType().noDefault() //
+            .endRecord();
+
+    /** Test schema for inserting Attachment. */
+    public static Schema SCHEMA_STATIC_RESOURCE = SchemaBuilder.builder().record("Schema").fields() //
+            .name("Name").type().stringType().noDefault() //
+            .name("ContentType").type().stringType().noDefault() //
+            .name("Body").type().stringType().noDefault() //
+            .name("Description").type().stringType().noDefault() //
             .name("Id").type().stringType().noDefault() //
             .endRecord();
 
@@ -1255,6 +1265,55 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         }
     }
 
+    @Test
+    public void testNillableBase64Field() throws Throwable {
+
+        String moduleName = "StaticResource";
+
+        ComponentDefinition sfDef = new TSalesforceOutputDefinition();
+        TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
+        SalesforceTestBase.setupProps(sfProps.connection, false);
+        sfProps.module.setValue("moduleName", moduleName);
+        sfProps.module.main.schema.setValue(SCHEMA_STATIC_RESOURCE);
+        sfProps.ceaseForError.setValue(true);
+        sfProps.module.schemaListener.afterSchema();
+        List records = new ArrayList<IndexedRecord>();
+        String randomName = getRandomString(10);
+        IndexedRecord record = new GenericData.Record(SCHEMA_STATIC_RESOURCE);
+        record.put(0, randomName);
+        record.put(1, "text/plain");
+        record.put(2, "dGhpcyBpcyBiYXNlNjQgIHRlc3QgZmlsZS4g");
+        record.put(3, "this is base64 test file.");
+
+        records.add(record);
+
+        SalesforceSink salesforceSink = new SalesforceSink();
+        salesforceSink.initialize(adaptor, sfProps);
+        salesforceSink.validate(adaptor);
+        Writer<Result> batchWriter = salesforceSink.createWriteOperation().createWriter(adaptor);
+
+        writeRows(batchWriter, records);
+
+        TSalesforceInputProperties sfInputProps = getSalesforceInputProperties();
+        sfInputProps.copyValuesFrom(sfProps);
+        sfInputProps.condition.setValue("Name = '" + randomName + "'");
+
+        sfProps.module.setValue("moduleName", moduleName);
+        sfProps.module.main.schema.setValue(SCHEMA_STATIC_RESOURCE);
+        List<IndexedRecord> inpuRecords = readRows(sfInputProps);
+        try {
+            assertEquals(1, inpuRecords.size());
+            IndexedRecord r = inpuRecords.get(0);
+            assertEquals(randomName, r.get(0));
+            assertEquals("text/plain", r.get(1));
+            assertEquals("dGhpcyBpcyBiYXNlNjQgIHRlc3QgZmlsZS4g", r.get(2));
+            assertEquals("this is base64 test file.", r.get(3));
+            assertNotNull(r.get(4));
+        } finally {
+            deleteRows(inpuRecords, sfInputProps);
+        }
+    }
+
     public String getFirstCreatedAccountRecordId() throws Exception {
         TSalesforceInputProperties sfInputProps = getSalesforceInputProperties();
         SalesforceTestBase.setupProps(sfInputProps.connection, false);
@@ -1278,6 +1337,26 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
     protected static TSalesforceInputProperties getSalesforceInputProperties() {
         ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
         return (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
+    }
+
+    /**
+     * Return a randomly generated String (Only include upper case)
+     */
+    public static String getRandomString(int length) {
+        Random random = new Random();
+        int cnt = 0;
+        StringBuffer buffer = new StringBuffer();
+        char ch;
+        int end = 'Z' + 1;
+        int start = 'A';
+        while (cnt < length) {
+            ch = (char) (random.nextInt(end - start) + start);
+            if (Character.isLetterOrDigit(ch)) {
+                buffer.append(ch);
+                cnt++;
+            }
+        }
+        return buffer.toString();
     }
 
 }

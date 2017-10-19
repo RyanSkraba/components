@@ -208,7 +208,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                 Schema.Field se = moduleSchema.getField(f.name());
                 if (se != null) {
                     if (value != null && !value.toString().isEmpty()) {
-                        addSObjectField(so, se.schema().getType(), se.name(), value);
+                        addSObjectField(so, se.schema(), se.name(), value);
                     } else {
                         if (UPDATE.equals(sprops.outputAction.getValue())) {
                             nullValueFields.add(f.name());
@@ -241,7 +241,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                     so.setField(lookupRelationshipFieldName, null);
                     so.getChild(lookupRelationshipFieldName).setField("type", relationMap.get("lookupFieldModuleName"));
                     // No need get the real type. Because of the External IDs should not be special type in addSObjectField()
-                    addSObjectField(so.getChild(lookupRelationshipFieldName), se.schema().getType(),
+                    addSObjectField(so.getChild(lookupRelationshipFieldName), se.schema(),
                             relationMap.get("lookupFieldExternalIdName"), value);
                 } else {
                     // Skip column "Id" for upsert, when "Id" is not specified as "upsertKeyColumn"
@@ -249,11 +249,11 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                         Schema.Field fieldInModule = moduleSchema.getField(se.name());
                         if (fieldInModule != null) {
                             // The real type is need in addSObjectField()
-                            addSObjectField(so, fieldInModule.schema().getType(), se.name(), value);
+                            addSObjectField(so, fieldInModule.schema(), se.name(), value);
                         } else {
                             // This is keep old behavior, when set a field which is not exist.
                             // It would throw a exception for this.
-                            addSObjectField(so, se.schema().getType(), se.name(), value);
+                            addSObjectField(so, se.schema(), se.name(), value);
                         }
                     }
                 }
@@ -275,10 +275,13 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         return so;
     }
 
-    private void addSObjectField(XmlObject xmlObject, Schema.Type expected, String fieldName, Object value) {
+    private void addSObjectField(XmlObject xmlObject, Schema expected, String fieldName, Object value) {
         Object valueToAdd = null;
         // Convert stuff here
-        switch (expected) {
+        // For Nillable base64 type field, we retrieve it as UNION type:[bytes,null]
+        // So need to unwrap it and get its real type
+        Schema unwrapSchema = AvroUtils.unwrapIfNullable(expected);
+        switch (unwrapSchema.getType()) {
         case BYTES:
             if ((value instanceof String) || (value instanceof byte[])) {
                 byte[] base64Data = null;
