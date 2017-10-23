@@ -19,13 +19,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 import static org.talend.components.service.rest.PropertiesController.IMAGE_SVG_VALUE;
+import static org.talend.components.service.rest.configuration.RequestParameterLocaleResolver.LANGUAGE_QUERY_PARAMETER_NAME;
 
 import java.io.IOException;
 import java.util.Locale;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.springframework.http.HttpHeaders;
 import org.talend.components.service.rest.AbstractSpringIntegrationTests;
 import org.talend.daikon.definition.DefinitionImageType;
 
@@ -160,9 +160,10 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
     public void testGetProperties_internationalized() throws Exception {
         Locale.setDefault(Locale.US);
         assertEquals("Database dataset ENGLISH display name", getDataStoreDefinitionPropertiesTitle(Locale.ENGLISH));
-        assertEquals("Database dataset ENGLISH display name", getDataStoreDefinitionPropertiesTitle(Locale.CHINA));
+        assertEquals("Database dataset ENGLISH display name", getDataStoreDefinitionPropertiesTitle(Locale.ITALY));
         assertEquals("Database dataset FRENCH display name", getDataStoreDefinitionPropertiesTitle(Locale.FRENCH));
         assertEquals("Database dataset FRENCH display name", getDataStoreDefinitionPropertiesTitle(Locale.FRANCE));
+        assertEquals("ñóǹ äŝçíì 汉语/漢語  华语/華語 Huáyǔ; 中文 Zhōngwén 漢字仮名交じり文 Lech Wałęsa æøå", getDataStoreDefinitionPropertiesTitle(Locale.CHINA));
     }
 
     private String getDataStoreDefinitionPropertiesTitle(Locale locale) throws IOException {
@@ -170,7 +171,7 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
                 .expect() //
                 .statusCode(200).log().ifError() //
                 .with().port(localServerPort) //
-                .header(HttpHeaders.ACCEPT_LANGUAGE, locale.toLanguageTag())
+                .param(LANGUAGE_QUERY_PARAMETER_NAME, locale.toLanguageTag())
                 .get("/properties/{name}", DATA_STORE_DEFINITION_NAME);
 
         JsonNode jsonNode = mapper.readTree(response.asInputStream());
