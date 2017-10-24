@@ -14,7 +14,7 @@ import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.io.DecoderFactory;
-import org.talend.components.service.rest.dto.PropertiesDto;
+import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Allow parsing as much object-mapping oriented as possible the streamed payload to write a dataset.
- * The payload must have to parts: one is the {@code configuration} structured as {@link PropertiesDto}, and the {@code data} itself.
+ * The payload must have to parts: one is the {@code configuration} structured as {@link UiSpecsPropertiesDto}, and the {@code data} itself.
  * It can then be read as an iteration of values.
  *
  */
@@ -35,13 +35,13 @@ public class DatasetWritePayload implements AutoCloseable {
 
     private static final String DATA_FIELD_NAME = "data";
 
-    private final PropertiesDto configuration;
+    private final UiSpecsPropertiesDto configuration;
     
     private final Iterator<IndexedRecord> data;
 
     private final Closeable resource;
 
-    public DatasetWritePayload(PropertiesDto configuration, Iterator<IndexedRecord> data, Closeable resource) {
+    public DatasetWritePayload(UiSpecsPropertiesDto configuration, Iterator<IndexedRecord> data, Closeable resource) {
         this.configuration = configuration;
         this.data = data;
         this.resource = resource;
@@ -53,7 +53,7 @@ public class DatasetWritePayload implements AutoCloseable {
         JsonToken objectStartToken = parser.nextToken();
         isTrue(START_OBJECT == objectStartToken, invalidInputMessage(START_OBJECT, objectStartToken));
 
-        PropertiesDto configuration = readConfiguration(parser);
+        UiSpecsPropertiesDto configuration = readConfiguration(parser);
         Schema schema = readAvroSchema(parser);
         Iterator<IndexedRecord> streamToReadData = createStreamToReadData(parser, mapper, schema, input);
 
@@ -106,7 +106,7 @@ public class DatasetWritePayload implements AutoCloseable {
         return avroSchemaParser.parse(new ObjectMapper().writeValueAsString(schemaAsJson));
     }
 
-    private static PropertiesDto readConfiguration(JsonParser parser) throws IOException {
+    private static UiSpecsPropertiesDto readConfiguration(JsonParser parser) throws IOException {
         JsonToken configFieldToken = parser.nextToken();
         isTrue(FIELD_NAME == configFieldToken, invalidInputMessage(FIELD_NAME,configFieldToken));
         isTrue(Objects.equals(CONFIGURATION_FIELD_NAME, parser.getText()), invalidInputMessage(CONFIGURATION_FIELD_NAME,parser.getText()));
@@ -114,7 +114,7 @@ public class DatasetWritePayload implements AutoCloseable {
         JsonToken avroSchemaFieldObjectStartToken = parser.nextToken();
         isTrue(START_OBJECT == avroSchemaFieldObjectStartToken, invalidInputMessage(START_OBJECT,avroSchemaFieldObjectStartToken));
 
-        return parser.readValueAs(PropertiesDto.class);
+        return parser.readValueAs(UiSpecsPropertiesDto.class);
     }
     
     private static String invalidInputMessage(JsonToken expected, JsonToken actual) {
@@ -126,7 +126,7 @@ public class DatasetWritePayload implements AutoCloseable {
         return "Invalid input, expected " + expected + " but got " + actual;
     }
 
-    public PropertiesDto getConfiguration() {
+    public UiSpecsPropertiesDto getConfiguration() {
         return configuration;
     }
 

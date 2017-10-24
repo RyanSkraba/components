@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ==============================================================================
-package org.talend.components.service.rest;
+package org.talend.components.service.rest.impl;
 
 import static com.jayway.restassured.RestAssured.when;
 import static java.util.Arrays.asList;
@@ -41,6 +41,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.common.datastore.DatastoreDefinition;
+import org.talend.components.service.rest.AbstractSpringIntegrationTests;
+import org.talend.components.service.rest.ServiceConstants;
+import org.talend.components.service.rest.DefinitionType;
+import org.talend.components.service.rest.DefinitionsController;
 import org.talend.components.service.rest.dto.ConnectorTypology;
 import org.talend.components.service.rest.dto.DefinitionDTO;
 import org.talend.components.service.rest.mock.MockComponentDefinition;
@@ -62,6 +66,10 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    protected String getVersionPrefix() {
+        return ServiceConstants.V0;
+    }
 
     @Test
     public void shouldListDatastoreDefinitions() throws Exception {
@@ -91,7 +99,7 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
                 .willReturn(provider.apply(names));
 
         // when
-        final Response response = when().get("/definitions/" + wantedType).andReturn();
+        final Response response = when().get(getVersionPrefix() + "/definitions/" + wantedType).andReturn();
 
         // then
         assertEquals(OK.value(), response.getStatusCode());
@@ -174,7 +182,7 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
                 .willReturn(definitions);
 
         // then
-        when().get("/definitions/components").then() //
+        when().get(getVersionPrefix() + "/definitions/components").then() //
                 .statusCode(OK.value()) //
                 .body("iconKey", hasSize(14)) // total including nulls
                 .body("iconKey.findAll { iconKey -> iconKey != null }", hasSize(5)); // total non-null
@@ -189,7 +197,7 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
                 .willReturn(definitions);
 
         // when
-        final Response response = when().get("/definitions/components").andReturn();
+        final Response response = when().get(getVersionPrefix() + "/definitions/components").andReturn();
 
         // then
         assertEquals(OK.value(), response.getStatusCode());
@@ -211,7 +219,8 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
                 .willReturn(definitions);
 
         // when
-        final Response response = when().get("/definitions/components?typology=" + wantedTypology.name()).andReturn();
+        final Response response = when().get(getVersionPrefix() + "/definitions/components?typology=" + wantedTypology.name())
+                .andReturn();
 
         // then
         assertEquals(OK.value(), response.getStatusCode());
@@ -232,7 +241,7 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
                 .willReturn(definitions);
 
         // when
-        final Response response = when().get("/definitions/" + COMPONENT + "?tag=" + tag).andReturn();
+        final Response response = when().get(getVersionPrefix() + "/definitions/" + COMPONENT + "?tag=" + tag).andReturn();
 
         // then
         assertEquals(OK.value(), response.getStatusCode());
@@ -249,7 +258,8 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
                 .willReturn(definitions);
 
         // when
-        final Response response = when().get("/definitions/components?executionEngine=" + executionEngine.name()).andReturn();
+        final Response response = when()
+                .get(getVersionPrefix() + "/definitions/components?executionEngine=" + executionEngine.name()).andReturn();
 
         // then
         assertEquals(OK.value(), response.getStatusCode());
@@ -269,9 +279,8 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
                 .willReturn(definitions);
 
         // when
-        final Response response = when()
-                .get("/definitions/components?typology=" + wantedTypology + "&executionEngine=" + executionEngine.name())
-                .andReturn();
+        final Response response = when().get(getVersionPrefix() + "/definitions/components?typology=" + wantedTypology
+                + "&executionEngine=" + executionEngine.name()).andReturn();
 
         // then
         assertEquals(OK.value(), response.getStatusCode());

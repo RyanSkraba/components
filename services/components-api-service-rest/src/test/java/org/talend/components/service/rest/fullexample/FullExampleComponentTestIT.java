@@ -13,13 +13,12 @@
 package org.talend.components.service.rest.fullexample;
 
 import static com.jayway.restassured.RestAssured.given;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
-import org.apache.commons.io.IOUtils;
+import java.util.Collections;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -29,7 +28,11 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.talend.components.service.rest.dto.PropertiesDto;
+import org.talend.components.service.rest.ServiceConstants;
+import org.talend.components.service.rest.dto.SerPropertiesDto;
+import org.talend.components.service.rest.fullexample.dataset.FullExampleDatasetProperties;
+import org.talend.components.service.rest.fullexample.dataset.FullExampleDatasetProperties.SourceType;
+import org.talend.components.service.rest.fullexample.datastore.FullExampleDatastoreProperties;
 import org.talend.components.service.spring.SpringTestApp;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
@@ -64,21 +67,20 @@ public class FullExampleComponentTestIT {
 
     }
 
-    private ObjectNode getFullExampleDataStoreProperties() throws java.io.IOException {
-        return mapper.readValue(IOUtils.toString(getClass().getResourceAsStream("fullexample_data_store_properties.json")),
-                ObjectNode.class);
+    protected String getVersionPrefix() {
+        return ServiceConstants.V0;
     }
 
     @Test
     public void initializeFullExampleDatastoreProperties() throws java.io.IOException {
-        PropertiesDto properties = new PropertiesDto();
-        properties.setProperties(getFullExampleDataStoreProperties());
+        SerPropertiesDto serProperties = new SerPropertiesDto();
+        serProperties.setProperties(new FullExampleDatastoreProperties("").init().toSerialized());
 
-        given().content(properties).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(APPLICATION_JSON_UTF8_VALUE) //
+        given().content(serProperties).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+                .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect().statusCode(200).log().ifError() //
                 .when()//
-                .post("properties/{definitionName}", DATA_STORE_DEFINITION_NAME)//
+                .post(getVersionPrefix() + "/properties/uispec")//
                 .then()//
                 .body("jsonSchema", notNullValue())//
                 .body("properties", notNullValue())//
@@ -89,16 +91,13 @@ public class FullExampleComponentTestIT {
 
     @Test
     public void initializeFullExampleDatasetProperties() throws java.io.IOException {
-        PropertiesDto propertiesDto = new PropertiesDto();
-        propertiesDto.setProperties(getFileAsObjectNode("fullexample_dataset_properties.json"));
-        propertiesDto.setDependencies(singletonList(getFullExampleDataStoreProperties()));
-        String dataSetDefinitionName = "FullExampleDataset";
+        SerPropertiesDto serPropertiesDto = createDatasetDatastoreSerPropertiesDto();
 
-        given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(APPLICATION_JSON_UTF8_VALUE) //
+        given().content(serPropertiesDto).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+                .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect().statusCode(200).log().ifError() //
                 .when()//
-                .post("properties/{definitionName}", dataSetDefinitionName)//
+                .post(getVersionPrefix() + "/properties/uispec")//
                 .then()//
                 .body("jsonSchema", notNullValue())//
                 .body("properties", notNullValue())//
@@ -115,22 +114,33 @@ public class FullExampleComponentTestIT {
 
     @Test
     public void testAfterDatastoreCalled() throws java.io.IOException {
-        PropertiesDto propertiesDto = new PropertiesDto();
-        propertiesDto.setProperties(getFileAsObjectNode("fullexample_dataset_properties.json"));
-        propertiesDto.setDependencies(singletonList(getFullExampleDataStoreProperties()));
-        String dataSetDefinitionName = "FullExampleDataset";
-
-        given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(APPLICATION_JSON_UTF8_VALUE) //
+        SerPropertiesDto serPropertiesDto = createDatasetDatastoreSerPropertiesDto();
+        given().content(serPropertiesDto).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+                .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect().statusCode(200).log().ifError() //
                 .when()//
-                .post("properties/{definitionName}", dataSetDefinitionName)//
+                .post(getVersionPrefix() + "/properties/uispec")//
                 .then()//
                 .body("jsonSchema", notNullValue())//
                 .body("properties", notNullValue())//
                 .body("uiSchema", notNullValue())//
                 .body("properties.testAfterDatastoreTrigger", equalTo("bar"))//
         ;
+    }
+
+    private SerPropertiesDto createDatasetDatastoreSerPropertiesDto() {
+        FullExampleDatastoreProperties datastoreProperties = new FullExampleDatastoreProperties("foo");
+        datastoreProperties.init();
+        datastoreProperties.tag.setValue("DERBY");
+        FullExampleDatasetProperties datasetProperties = new FullExampleDatasetProperties("bar");
+        datasetProperties.init();
+        datasetProperties.sourceType.setValue(SourceType.SOQL_QUERY);
+        datasetProperties.moduleName.setValue("Account");
+        datasetProperties.query.setValue("SELECT * FROM users");
+        SerPropertiesDto serPropertiesDto = new SerPropertiesDto();
+        serPropertiesDto.setProperties(datasetProperties.toSerialized());
+        serPropertiesDto.setDependencies(Collections.singletonList(datastoreProperties.toSerialized()));
+        return serPropertiesDto;
     }
 
 }

@@ -16,18 +16,22 @@ package org.talend.components.service.rest.impl;
 import static com.jayway.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 import static org.talend.components.service.rest.PropertiesController.IMAGE_SVG_VALUE;
 import static org.talend.components.service.rest.configuration.RequestParameterLocaleResolver.LANGUAGE_QUERY_PARAMETER_NAME;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.util.Locale;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.talend.components.service.rest.AbstractSpringIntegrationTests;
+import org.talend.components.service.rest.ServiceConstants;
+import org.talend.components.service.rest.mock.MockDatasetProperties;
 import org.talend.daikon.definition.DefinitionImageType;
+import org.talend.daikon.properties.Properties;
+import org.talend.daikon.serialize.SerializerDeserializer.Deserialized;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -35,13 +39,17 @@ import com.jayway.restassured.response.Response;
 
 public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests {
 
+    protected String getVersionPrefix() {
+        return ServiceConstants.V0;
+    }
+
     @Test
     public void testGetProperties() throws Exception {
-        given().accept(APPLICATION_JSON_UTF8_VALUE) //
+        given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect() //
                 .statusCode(200).log().ifError() //
                 .with().port(localServerPort) //
-                .get("/properties/{name}", DATA_STORE_DEFINITION_NAME);
+                .get(getVersionPrefix() + "/properties/{name}", DATA_STORE_DEFINITION_NAME);
     }
 
     @Test
@@ -49,7 +57,8 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
         given().expect() //
                 .statusCode(404) //
                 .log().ifValidationFails() //
-                .get("/properties/{name}/icon/{type}", DATA_STORE_DEFINITION_NAME, DefinitionImageType.SVG_ICON);
+                .get(getVersionPrefix() + "/properties/{name}/icon/{type}", DATA_STORE_DEFINITION_NAME,
+                        DefinitionImageType.SVG_ICON);
     }
 
     @Test
@@ -58,7 +67,8 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
                 .contentType(IMAGE_PNG_VALUE) //
                 .body(Matchers.startsWith("\uFFFDPNG")) // Magic header for PNG files.
                 .statusCode(200).log().ifError() //
-                .get("/properties/{name}/icon/{type}", DATA_STORE_DEFINITION_NAME, DefinitionImageType.PALETTE_ICON_32X32);
+                .get(getVersionPrefix() + "/properties/{name}/icon/{type}", DATA_STORE_DEFINITION_NAME,
+                        DefinitionImageType.PALETTE_ICON_32X32);
     }
 
     @Test
@@ -67,7 +77,8 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
                 .statusCode(200).log().ifError() //
                 .body(Matchers.containsString("</svg>")) //
                 .contentType(IMAGE_SVG_VALUE) //
-                .get("/properties/{name}/icon/{type}", DATA_SET_DEFINITION_NAME, DefinitionImageType.SVG_ICON);
+                .get(getVersionPrefix() + "/properties/{name}/icon/{type}", DATA_SET_DEFINITION_NAME,
+                        DefinitionImageType.SVG_ICON);
     }
 
     @Test
@@ -77,18 +88,31 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
                 .log().ifValidationFails() //
                 // TODO: check returned error
                 .body(Matchers.containsString("definitionClass")) //
-                .get("/properties/{name}/connectors", DATA_SET_DEFINITION_NAME);
+                .get(getVersionPrefix() + "/properties/{name}/connectors", DATA_SET_DEFINITION_NAME);
     }
 
     @Test
     public void testValidateProperties() throws Exception {
-        ObjectNode validationResult = given().accept(APPLICATION_JSON_UTF8_VALUE) //
+        ObjectNode validationResult = given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect() //
                 .statusCode(200).log().ifError() //
                 .with() //
                 .content(buildTestDataStoreFormData()) //
-                .contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .post("/properties/{name}/validate", DATA_STORE_DEFINITION_NAME).as(ObjectNode.class);
+                .contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .post(getVersionPrefix() + "/properties/validate").as(ObjectNode.class);
+        assertNotNull(validationResult);
+        assertEquals("OK", validationResult.get("status").textValue());
+    }
+
+    @Test
+    public void testValidatePropertiesJsonio() throws Exception {
+        ObjectNode validationResult = given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .expect() //
+                .statusCode(200).log().ifError() //
+                .with() //
+                .content(buildTestDataStoreSerProps()) //
+                .contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+                .post(getVersionPrefix() + "/properties/validate").as(ObjectNode.class);
         assertNotNull(validationResult);
         assertEquals("OK", validationResult.get("status").textValue());
     }
@@ -97,13 +121,13 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
     public void testTriggerOnProperty() throws Exception {
         String callback = "validate";
         String propName = "tagId";
-        Response response = given().accept(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect() //
                 .statusCode(200).log().ifError() //
                 .with() //
                 .content(buildTestDataStoreFormData()) //
-                .contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .post("/properties/{name}/{callback}/{propName}", DATA_STORE_DEFINITION_NAME, callback, propName);
+                .contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .post(getVersionPrefix() + "/properties/trigger/{callback}/{propName}", callback, propName);
         assertNotNull(response);
         String content = response.asString();
         assertNotNull(content);
@@ -113,15 +137,13 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
     public void testTriggerOnProperty_nonExistentTrigger() throws Exception {
         String callback = "toto";
         String propName = "tagId";
-        ApiError errorContainer = given().accept(APPLICATION_JSON_UTF8_VALUE) //
+        ApiError errorContainer = given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect() //
-                .statusCode(400)
-                .log().ifValidationFails() //
+                .statusCode(400).log().ifValidationFails() //
                 .with() //
                 .content(buildTestDataStoreFormData()) //
-                .contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .post("/properties/{name}/{callback}/{propName}", DATA_STORE_DEFINITION_NAME, callback, propName)
-                .as(ApiError.class);
+                .contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .post(getVersionPrefix() + "/properties/trigger/{callback}/{propName}", callback, propName).as(ApiError.class);
 
         assertEquals("Talend_ALL_UNEXPECTED_ARGUMENT", errorContainer.getCode());
         assertNotNull(errorContainer.getMessageTitle());
@@ -129,33 +151,28 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
     }
 
     @Test
-    public void testGetDatasetProperties() throws Exception {
-        given().accept(APPLICATION_JSON_UTF8_VALUE) //
+    public void testGetDatasetPropertiesFromUiSpecs() throws Exception {
+        given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect() //
                 .statusCode(200).log().ifError() //
                 .with() //
                 .content(buildTestDataStoreFormData()) //
-                .contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .post("/properties/{name}/dataset", DATA_STORE_DEFINITION_NAME);
+                .contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .post(getVersionPrefix() + "/properties/dataset");
     }
 
     @Test
-    public void testGetDatasetProperties_wrongDataStoreName() throws Exception {
-        String dataStoreName = "toto";
-        ApiError errorContainer = given().accept(APPLICATION_JSON_UTF8_VALUE) //
+    public void testGetDatasetPropertiesFromSer() throws Exception {
+        given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect() //
-                .statusCode(500) //
-                .log().ifValidationFails() //
+                .statusCode(200).log().ifError() //
                 .with() //
-                .content(buildTestDataStoreFormData()) //
-                .contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .post("/properties/{name}/dataset", dataStoreName).as(ApiError.class);
-
-        assertEquals("Talend_ALL_UNEXPECTED_EXCEPTION", errorContainer.getCode());
-        assertNotNull(errorContainer.getMessageTitle());
-        assertNotNull(errorContainer.getMessage());
+                .content(buildTestDataStoreSerProps()) //
+                .contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+                .post(getVersionPrefix() + "/properties/dataset");
     }
 
+    
     @Test
     public void testGetProperties_internationalized() throws Exception {
         Locale.setDefault(Locale.US);
@@ -167,14 +184,91 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
     }
 
     private String getDataStoreDefinitionPropertiesTitle(Locale locale) throws IOException {
-        Response response = given().accept(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect() //
                 .statusCode(200).log().ifError() //
                 .with().port(localServerPort) //
                 .param(LANGUAGE_QUERY_PARAMETER_NAME, locale.toLanguageTag())
-                .get("/properties/{name}", DATA_STORE_DEFINITION_NAME);
+                .get(getVersionPrefix() + "/properties/{name}", DATA_STORE_DEFINITION_NAME);
 
         JsonNode jsonNode = mapper.readTree(response.asInputStream());
         return jsonNode.get("jsonSchema").get("title").asText();
     }
+    
+    @Test
+    public void testInitializePropertiesJsonio() throws Exception {
+        Response response = given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .expect() //
+                .statusCode(200).log().ifError() //
+                .with() //
+                .content(buildTestDataSetSerProps()) //
+                .contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+                .post(getVersionPrefix() + "/properties/uispec");
+        assertNotNull(response);
+        String content = response.asString();
+        assertEquals(getMockDatasetMainFormUISpecs(), content);
+    }
+
+    @Test
+    public void testInitializePropertiesUiSpecs() throws Exception {
+        Response response = given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .expect() //
+                .statusCode(200).log().ifError() //
+                .with() //
+                .content(buildTestDataSetFormData()) //
+                .contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .post(getVersionPrefix() + "/properties/uispec");
+        assertNotNull(response);
+        String content = response.asString();
+        assertEquals(getMockDatasetMainFormUISpecs(), content);
+    }
+
+    @Test
+    public void testSerializeProperties() throws Exception {
+        Response response = given().accept(ServiceConstants.JSONIO_CONTENT_TYPE) //
+                .expect() //
+                .statusCode(200).log().ifError() //
+                .with().port(localServerPort) //
+                .content(buildTestDataSetFormData()) //
+                .contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .post(getVersionPrefix() + "/properties/serialize");
+        assertNotNull(response);
+        String content = response.asString();
+        assertNotNull(content);
+        //take the jsonIO
+        JsonNode jsonNode = mapper.readTree(content);
+        String jsonioProperties = jsonNode.get("properties").asText();
+
+        Deserialized<MockDatasetProperties> fromSerializedPersistent = Properties.Helper.fromSerializedPersistent(
+                jsonioProperties, MockDatasetProperties.class);
+        assertNotNull(fromSerializedPersistent);
+        assertNotNull(fromSerializedPersistent.object);
+        MockDatasetProperties deserializedProps = fromSerializedPersistent.object;
+        assertEquals("tata", deserializedProps.tag.getValue());
+    }
+
+
+    @Test
+    public void testSerializeDeserializeProperties() throws Exception {
+        Response response = given().accept(ServiceConstants.JSONIO_CONTENT_TYPE) //
+                .expect() //
+                .statusCode(200).log().ifError() //
+                .with().port(localServerPort) //
+                .content(buildTestDataSetFormData()) //
+                .contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .post(getVersionPrefix() + "/properties/serialize");
+        assertNotNull(response);
+        String content = response.asString();
+        assertNotNull(content);
+        response = given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .expect() //
+                .statusCode(200).log().ifError() //
+                .with() //
+                .content(content) //
+                .contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+                .post(getVersionPrefix() + "/properties/uispec");
+        assertNotNull(response);
+        assertEquals(getMockDatasetMainFormUISpecs(), response.asString());
+    }
+
 }

@@ -1,4 +1,4 @@
-//==============================================================================
+// ==============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
@@ -9,17 +9,23 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ==============================================================================
 
 package org.talend.components.service.rest;
 
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jayway.restassured.RestAssured;
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.boot.context.embedded.LocalServerPort;
@@ -29,22 +35,24 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.common.datastore.DatastoreDefinition;
-import org.talend.components.service.rest.dto.PropertiesDto;
+import org.talend.components.service.rest.dto.SerPropertiesDto;
+import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
+import org.talend.components.service.rest.impl.PropertiesHelpers;
 import org.talend.components.service.rest.mock.MockDatasetDefinition;
 import org.talend.components.service.rest.mock.MockDatasetProperties;
 import org.talend.components.service.rest.mock.MockDatastoreDefinition;
 import org.talend.components.service.rest.mock.MockDatastoreProperties;
+import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.PropertiesImpl;
+import org.talend.daikon.properties.presentation.Form;
 
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.jayway.restassured.RestAssured;
 
 /**
  * Created so that integration tests shares the same spring context instead of recreating it each time.
@@ -60,15 +68,21 @@ public abstract class AbstractSpringIntegrationTests {
     @MockBean
     protected DefinitionRegistryService delegate;
 
+    @Inject
+    JsonSerializationHelper jsonHelper;
+
+    @Inject
+    PropertiesHelpers propsHelper;
+
     protected static final String DATA_STORE_DEFINITION_NAME = "MockDatastore";
 
     protected static final String DATA_SET_DEFINITION_NAME = "MockDataset";
 
-    public static final String TEST_DATA_STORE_PROPERTIES =
-            "{\"@definitionName\":\"" + DATA_STORE_DEFINITION_NAME + "\",\"tag\":\"tata\", \"tagId\":\"256\"}";
+    public static final String TEST_DATA_STORE_PROPERTIES = "{\"@definitionName\":\"" + DATA_STORE_DEFINITION_NAME
+            + "\",\"tag\":\"tata\", \"tagId\":256}";
 
-    public static final String TEST_DATA_SET_PROPERTIES =
-            "{\"@definitionName\":\"" + DATA_SET_DEFINITION_NAME + "\",\"tag\":\"tata\", \"tagId\":\"256\"}";
+    public static final String TEST_DATA_SET_PROPERTIES = "{\"@definitionName\":\"" + DATA_SET_DEFINITION_NAME
+            + "\",\"tag\":\"tata\", \"tagId\":256}";
 
     protected ObjectMapper mapper = new ObjectMapper();
 
@@ -95,13 +109,13 @@ public abstract class AbstractSpringIntegrationTests {
         when(delegate.getDefinitionsMapByType(Definition.class)) //
                 .thenReturn(runtimablesMap);
         when(delegate.getDefinitionsMapByType(Definition.class)) //
-                .thenReturn((Map) runtimablesMap);
+                .thenReturn(runtimablesMap);
 
         // TODO: map the dataset definition on the correct name
 
         when(delegate.getDefinitionForPropertiesType(MockDatasetProperties.class)).thenReturn(singletonList(datasetDefinition));
-        when(delegate.getDefinitionForPropertiesType(MockDatastoreProperties.class)).thenReturn(
-                singletonList(datastoreDefinition));
+        when(delegate.getDefinitionForPropertiesType(MockDatastoreProperties.class))
+                .thenReturn(singletonList(datastoreDefinition));
 
         when(delegate.createProperties(any(Definition.class), anyString())).thenAnswer(i -> {
             Properties properties = PropertiesImpl.createNewInstance(
@@ -111,18 +125,40 @@ public abstract class AbstractSpringIntegrationTests {
         });
     }
 
-    protected PropertiesDto buildTestDataSetFormData() throws java.io.IOException {
-        PropertiesDto formDataContainer = new PropertiesDto();
+    protected UiSpecsPropertiesDto buildTestDataSetFormData() throws java.io.IOException {
+        UiSpecsPropertiesDto formDataContainer = new UiSpecsPropertiesDto();
         ObjectReader reader = mapper.readerFor(ObjectNode.class);
         formDataContainer.setDependencies(singletonList(reader.readValue(TEST_DATA_STORE_PROPERTIES)));
         formDataContainer.setProperties(reader.readValue(TEST_DATA_SET_PROPERTIES));
         return formDataContainer;
     }
 
-    protected PropertiesDto buildTestDataStoreFormData() throws java.io.IOException {
-        PropertiesDto formDataContainer = new PropertiesDto();
+    protected UiSpecsPropertiesDto buildTestDataStoreFormData() throws java.io.IOException {
+        UiSpecsPropertiesDto formDataContainer = new UiSpecsPropertiesDto();
         formDataContainer.setProperties(mapper.readerFor(ObjectNode.class).readValue(TEST_DATA_STORE_PROPERTIES));
         return formDataContainer;
+    }
+
+    protected SerPropertiesDto buildTestDataStoreSerProps() throws java.io.IOException {
+        SerPropertiesDto formDataContainer = new SerPropertiesDto();
+        formDataContainer.setProperties(new MockDatastoreProperties("").init().toSerialized());
+        return formDataContainer;
+    }
+
+    protected SerPropertiesDto buildTestDataSetSerProps() throws java.io.IOException {
+        SerPropertiesDto formDataContainer = new SerPropertiesDto();
+        MockDatasetProperties mockDatasetProperties = new MockDatasetProperties("foo");
+        mockDatasetProperties.tag.setValue("tata");
+        mockDatasetProperties.tagId.setValue(256);
+        MockDatastoreProperties mockDatastoreProperties = new MockDatastoreProperties("bar");
+        formDataContainer.setDependencies(singletonList(mockDatastoreProperties.toSerialized()));
+        formDataContainer.setProperties(mockDatasetProperties.toSerialized());
+        return formDataContainer;
+    }
+
+    protected String getMockDatasetMainFormUISpecs() throws IOException {
+        Properties properties = propsHelper.propertiesFromDto(buildTestDataSetFormData());
+        return jsonHelper.toJson(Form.MAIN, properties);
     }
 
 }

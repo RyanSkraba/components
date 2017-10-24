@@ -1,6 +1,0 @@
-{
-  "sourceType": "SOQL_QUERY",
-  "moduleName": "Account",
-  "query": "SELECT * FROM users",
-  "@definitionName": "FullExampleDataset"
-}

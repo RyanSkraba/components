@@ -19,12 +19,14 @@ import static org.apache.commons.io.IOUtils.toInputStream;
 
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.common.datastore.DatastoreDefinition;
-import org.talend.components.service.rest.dto.PropertiesDto;
+import org.talend.components.service.rest.dto.SerPropertiesDto;
+import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
@@ -47,13 +49,28 @@ public class PropertiesHelpers {
     @Autowired
     private ComponentService componentService;
 
-    public <T extends Properties> T propertiesFromDto(PropertiesDto propertiesContainer) {
+    public <T extends Properties> T propertiesFromDto(UiSpecsPropertiesDto propertiesContainer) {
         T properties = (T) jsonSerializationHelper
                 .toProperties(toInputStream(propertiesContainer.getProperties().toString(), UTF_8));
         List<ObjectNode> dependencies = propertiesContainer.getDependencies();
         if (dependencies != null && !dependencies.isEmpty()) {
             List<Properties> props = dependencies.stream() //
                     .map(on -> jsonSerializationHelper.toProperties(toInputStream(on.toString(), UTF_8))) //
+                    .collect(toList());
+            props.add(properties);
+            ReferenceProperties.resolveReferenceProperties(props, definitionServiceDelegate, CALL_TRIGGERS);
+        }
+        return properties;
+    }
+
+    public <T extends Properties> T propertiesFromDto(SerPropertiesDto propertiesContainer) {
+
+        T properties = (T) Properties.Helper.fromSerializedPersistent(propertiesContainer.getProperties(),
+                Properties.class).object;
+        List<String> dependencies = propertiesContainer.getDependencies();
+        if (dependencies != null && !dependencies.isEmpty()) {
+            List<Properties> props = dependencies.stream() //
+                    .map(propString -> Properties.Helper.fromSerializedPersistent(propString, Properties.class).object) //
                     .collect(toList());
             props.add(properties);
             ReferenceProperties.resolveReferenceProperties(props, definitionServiceDelegate, CALL_TRIGGERS);
@@ -75,6 +92,15 @@ public class PropertiesHelpers {
 
     public DatasetDefinition getDataSetDefinition(String definitionName) {
         return getDefinition(DatasetDefinition.class, definitionName);
+    }
+
+    public <T extends Definition> T getFirstDefinitionFromProperties(Properties properties) {
+        Iterable<Definition> definitionForPropertiesType = definitionServiceDelegate
+                .getDefinitionForPropertiesType(properties.getClass());
+        Validate.isTrue(definitionForPropertiesType.iterator().hasNext(),
+                "Could not find a definition for the datastore properties %s", properties.getClass().getName());
+        T datastoreDefinition = (T) definitionForPropertiesType.iterator().next();
+        return datastoreDefinition;
     }
 
 }

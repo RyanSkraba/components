@@ -50,8 +50,11 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
+import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
 import org.talend.components.service.rest.dto.DefinitionDTO;
-import org.talend.components.service.rest.dto.PropertiesDto;
+import org.talend.components.service.rest.dto.SerPropertiesDto;
+import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.impl.ApiError;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
@@ -78,6 +81,10 @@ public class JdbcComponentTestIT {
     protected String dbUrl;
 
     private ObjectMapper mapper = new ObjectMapper();
+
+    protected String getVersionPrefix() {
+        return ServiceConstants.V0;
+    }
 
     @BeforeClass
     public static void registerPaxUrlMavenHandler() {
@@ -107,25 +114,23 @@ public class JdbcComponentTestIT {
     @Test
     public void setDatasetData_DiRuntime() throws Exception {
         // given
-        String payload = IOUtils
-                .toString(getClass().getResourceAsStream("jdbc_component_write_properties_on_DI.json"))
+        String payload = IOUtils.toString(getClass().getResourceAsStream("jdbc_component_write_properties_on_DI.json"))
                 .replace("{jdbc_url}", dbUrl);
 
         // when
-        given().content(payload)
-                .contentType(APPLICATION_JSON_UTF8_VALUE) //
+        given().content(payload).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .expect().statusCode(200).log().ifError() //
-                .put("runtimes/data");
+                .put(getVersionPrefix() + "/runtimes/data");
 
         // then
         Statement statement = db.getConnection().createStatement();
         ResultSet countRS = statement.executeQuery("SELECT COUNT(*) AS count FROM users");
         countRS.next();
         assertEquals(101, countRS.getInt("count"));
-        
+
         ResultSet resultSet = statement.executeQuery("SELECT * FROM users WHERE email='david.bowie@awesome.uk'");
 
-        while (resultSet.next()) {  
+        while (resultSet.next()) {
             assertEquals("1", resultSet.getString("id"));
             assertEquals("David", resultSet.getString("first_name"));
             assertEquals("Bowie", resultSet.getString("last_name"));
@@ -138,7 +143,7 @@ public class JdbcComponentTestIT {
     @Test
     public void testGetDataBinary() throws java.io.IOException {
         // given
-        PropertiesDto propertiesDto = new PropertiesDto();
+        UiSpecsPropertiesDto propertiesDto = new UiSpecsPropertiesDto();
         propertiesDto.setProperties(getFileAsObjectNode("jdbc_data_set_properties_with_schema.json"));
         propertiesDto.setDependencies(singletonList(getJdbcDataStoreProperties()));
 
@@ -148,14 +153,14 @@ public class JdbcComponentTestIT {
         Response schemaResponse = given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect().statusCode(200).log().ifError() //
-                .post("runtimes/{definitionName}/schema", dataSetDefinitionName);
+                .post(getVersionPrefix() + "/runtimes/schema");
 
         Schema schema = new Schema.Parser().parse(schemaResponse.asInputStream());
 
         Response response = given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(RuntimesController.AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID) //
                 .expect().statusCode(200).log().ifError() //
-                .post("runtimes/{definitionName}/data", dataSetDefinitionName);
+                .post(getVersionPrefix() + "/runtimes/data");
 
         // then
         GenericDatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
@@ -167,7 +172,7 @@ public class JdbcComponentTestIT {
     @Test
     public void testGetData() throws java.io.IOException {
         // given
-        PropertiesDto propertiesDto = new PropertiesDto();
+        UiSpecsPropertiesDto propertiesDto = new UiSpecsPropertiesDto();
         propertiesDto.setProperties(getFileAsObjectNode("jdbc_data_set_properties_with_schema.json"));
         propertiesDto.setDependencies(singletonList(getJdbcDataStoreProperties()));
 
@@ -176,7 +181,7 @@ public class JdbcComponentTestIT {
         Response schemaResponse = given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect().statusCode(200).log().ifError() //
-                .post("runtimes/{definitionName}/schema", dataSetDefinitionName);
+                .post(getVersionPrefix() + "/runtimes/schema");
 
         Schema schema = new Schema.Parser().parse(schemaResponse.asInputStream());
 
@@ -184,7 +189,7 @@ public class JdbcComponentTestIT {
         Response response = given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(RuntimesController.AVRO_JSON_MIME_TYPE_OFFICIAL_INVALID) //
                 .expect().statusCode(200).log().ifError() //
-                .post("runtimes/{definitionName}/data", dataSetDefinitionName);
+                .post(getVersionPrefix() + "/runtimes/data");
 
         // then
         GenericDatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
@@ -230,7 +235,7 @@ public class JdbcComponentTestIT {
     @Test
     public void testGetSchema() throws java.io.IOException {
         // given
-        PropertiesDto propertiesDto = new PropertiesDto();
+        UiSpecsPropertiesDto propertiesDto = new UiSpecsPropertiesDto();
         propertiesDto.setProperties(getFileAsObjectNode("jdbc_data_set_properties_no_schema.json"));
         propertiesDto.setDependencies(singletonList(getJdbcDataStoreProperties()));
         String dataSetDefinitionName = "JDBCDataset";
@@ -239,7 +244,7 @@ public class JdbcComponentTestIT {
         Response response = given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect().statusCode(200).log().ifError() //
-                .post("runtimes/{definitionName}/schema", dataSetDefinitionName);
+                .post(getVersionPrefix() + "/runtimes/schema");
 
         // then
         ObjectNode result = getResponseAsObjectNode(response);
@@ -251,7 +256,7 @@ public class JdbcComponentTestIT {
     public void testGetSchema_wrongSql() throws java.io.IOException {
         // given
 
-        PropertiesDto datasetConnectionInfo = new PropertiesDto();
+        UiSpecsPropertiesDto datasetConnectionInfo = new UiSpecsPropertiesDto();
         datasetConnectionInfo.setProperties(mapper.readValue(
                 getClass().getResourceAsStream("jdbc_data_set_properties_no_schema_wrong_table_name.json"), ObjectNode.class));
         datasetConnectionInfo.setDependencies(singletonList(getJdbcDataStoreProperties()));
@@ -261,7 +266,7 @@ public class JdbcComponentTestIT {
         ApiError response = given().content(datasetConnectionInfo).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect().statusCode(400).log().ifValidationFails() //
-                .post("runtimes/{definitionName}/schema", dataSetDefinitionName).as(ApiError.class);
+                .post(getVersionPrefix() + "/runtimes/schema").as(ApiError.class);
 
         // then
         assertEquals("TCOMP_JDBC_SQL_SYNTAX_ERROR", response.getCode());
@@ -271,14 +276,14 @@ public class JdbcComponentTestIT {
     @Test
     public void getJdbcDataSetProperties() throws java.io.IOException {
         // given
-        PropertiesDto properties = new PropertiesDto();
+        UiSpecsPropertiesDto properties = new UiSpecsPropertiesDto();
         properties.setProperties(getJdbcDataStoreProperties());
 
         // when
-        Response response = given().content(properties).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().content(properties).contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect().statusCode(200).log().ifError() //
-                .post("properties/{definitionName}/dataset", DATA_STORE_DEFINITION_NAME);
+                .post(getVersionPrefix() + "/properties/dataset");
 
         // then
         ObjectNode dataSetProperties = mapper.readerFor(ObjectNode.class).readValue(response.asInputStream());
@@ -288,14 +293,14 @@ public class JdbcComponentTestIT {
     @Test
     public void validateDataStoreConnection() throws java.io.IOException {
         // given
-        PropertiesDto properties = new PropertiesDto();
+        UiSpecsPropertiesDto properties = new UiSpecsPropertiesDto();
         properties.setProperties(getJdbcDataStoreProperties());
 
         // when
         given().content(properties).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect().statusCode(200).log().ifError() //
-                .post("runtimes/{definitionName}", DATA_STORE_DEFINITION_NAME);
+                .post(getVersionPrefix() + "/runtimes/check");
     }
 
     private ObjectNode getJdbcDataStoreProperties() throws java.io.IOException {
@@ -310,14 +315,14 @@ public class JdbcComponentTestIT {
         String triggerName = "after";
         String triggerProperty = "dbTypes";
 
-        PropertiesDto properties = new PropertiesDto();
+        UiSpecsPropertiesDto properties = new UiSpecsPropertiesDto();
         properties.setProperties(getFileAsObjectNode("jdbc_data_store_properties.json"));
 
         // when
-        Response response = given().content(properties).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().content(properties).contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect().statusCode(200).log().ifError() //
-                .post("properties/{definition}/{trigger}/{property}", DATA_STORE_DEFINITION_NAME, triggerName, triggerProperty);
+                .post(getVersionPrefix() + "/properties/trigger/{trigger}/{property}", triggerName, triggerProperty);
 
         ObjectNode jdbcPropertiesAfterTrigger = getResponseAsObjectNode(response);
 
@@ -332,9 +337,9 @@ public class JdbcComponentTestIT {
     @Test
     public void getJdbcProperties() throws java.io.IOException {
         // when
-        Response response = given().accept(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect().statusCode(200).log().ifError() //
-                .get("properties/{definitionName}", DATA_STORE_DEFINITION_NAME);
+                .get(getVersionPrefix() + "/properties/{definitionName}", DATA_STORE_DEFINITION_NAME);
 
         // then
         ObjectNode jdbcProperties = mapper.readerFor(ObjectNode.class).readValue(response.asInputStream());
@@ -348,14 +353,14 @@ public class JdbcComponentTestIT {
     @Test
     public void initializeJDBCDatastoreProperties() throws java.io.IOException {
         // given
-        PropertiesDto properties = new PropertiesDto();
-        properties.setProperties(getJdbcDataStoreProperties());
+        SerPropertiesDto propDto = new SerPropertiesDto();
+        propDto.setProperties(new JDBCDatastoreProperties("").init().toSerialized());
 
         // when
-        Response response = given().content(properties).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().content(propDto).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+                .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect().statusCode(200).log().ifError() //
-                .post("properties/{definitionName}", DATA_STORE_DEFINITION_NAME);
+                .post(getVersionPrefix() + "/properties/uispec");
 
         // then
         ObjectNode jdbcProperties = mapper.readerFor(ObjectNode.class).readValue(response.asInputStream());
@@ -369,16 +374,15 @@ public class JdbcComponentTestIT {
     @Test
     public void initializeJDBCDatasetProperties() throws java.io.IOException {
         // given
-        PropertiesDto propertiesDto = new PropertiesDto();
-        propertiesDto.setProperties(getFileAsObjectNode("jdbc_data_set_properties_no_schema.json"));
-        propertiesDto.setDependencies(singletonList(getJdbcDataStoreProperties()));
-        String dataSetDefinitionName = "JDBCDataset";
+        SerPropertiesDto propDto = new SerPropertiesDto();
+        propDto.setProperties(new JDBCDatasetProperties("").init().toSerialized());
+        propDto.setDependencies(singletonList(new JDBCDatastoreProperties("").init().toSerialized()));
 
         // when
-        Response response = given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().content(propDto).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+                .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect().statusCode(200).log().ifError() //
-                .post("properties/{definitionName}", dataSetDefinitionName);
+                .post(getVersionPrefix() + "/properties/uispec");
 
         // then
         ObjectNode jdbcProperties = mapper.readerFor(ObjectNode.class).readValue(response.asInputStream());
@@ -394,7 +398,7 @@ public class JdbcComponentTestIT {
         Response response = given().accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect() //
                 .statusCode(200).log().ifError() //
-                .get("/definitions/DATA_STORE");
+                .get(getVersionPrefix() + "/definitions/DATA_STORE");
 
         // then
         List<DefinitionDTO> definitions = mapper

@@ -23,12 +23,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.service.rest.dto.ConnectorTypology;
 import org.talend.components.service.rest.dto.DefinitionDTO;
+import org.talend.daikon.annotation.ApiVersion;
 import org.talend.daikon.annotation.Service;
 
 /**
  * Definition controller..
  */
 @Service(name = "DefinitionsController")
+@RequestMapping("definitions")
+@ApiVersion(ServiceConstants.V0)
 public interface DefinitionsController {
 
     /**
@@ -38,7 +41,7 @@ public interface DefinitionsController {
      * @return all known definitions that match the given type.
      * @returnWrapped java.lang.Iterable<org.talend.components.service.rest.dto.DefinitionDTO>
      */
-    @RequestMapping(value = "/definitions/{type}", method = GET)
+    @RequestMapping(value = "/{type}", method = GET)
     List<DefinitionDTO> listDefinitions(@PathVariable("type") DefinitionType type,
             @RequestParam(value = "tag", required = false) String tag);
 
@@ -50,7 +53,7 @@ public interface DefinitionsController {
      * @return the list of all definitions that match the wanted typology.
      * @returnWrapped java.lang.Iterable<org.talend.components.service.rest.dto.DefinitionDTO>
      */
-    @RequestMapping(value = "/definitions/components", method = GET)
+    @RequestMapping(value = "/components", method = GET)
     List<DefinitionDTO> listComponentDefinitions(@RequestParam(value = "typology", required = false) ConnectorTypology typology,
             @RequestParam(value = "executionEngine", required = false) ExecutionEngine executionEngine);
 

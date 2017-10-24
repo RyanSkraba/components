@@ -4,7 +4,7 @@
     <parent>
         <artifactId>components-parent</artifactId>
         <groupId>org.talend.components</groupId>
-        <version>0.20.0-SNAPSHOT</version>
+        <version>0.21.0-SNAPSHOT</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 

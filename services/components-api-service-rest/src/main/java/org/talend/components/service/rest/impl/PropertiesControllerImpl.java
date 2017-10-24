@@ -37,7 +37,8 @@ import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.service.rest.PropertiesController;
 import org.talend.components.service.rest.dto.ConnectorDto;
-import org.talend.components.service.rest.dto.PropertiesDto;
+import org.talend.components.service.rest.dto.SerPropertiesDto;
+import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.annotation.ServiceImplementation;
@@ -79,8 +80,19 @@ public class PropertiesControllerImpl implements PropertiesController {
 
     @Override
     // TODO: Verify it is really what's wanted and not just the ValidationResult.Result.(OK|ERROR)
-    public ResponseEntity<ValidationResultsDto> validateProperties(PropertiesDto propertiesContainer) {
+    public ResponseEntity<ValidationResultsDto> validateProperties(UiSpecsPropertiesDto propertiesContainer) {
         Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
+        return doValidateProperties(properties);
+    }
+
+    @Override
+    // TODO: Verify it is really what's wanted and not just the ValidationResult.Result.(OK|ERROR)
+    public ResponseEntity<ValidationResultsDto> validateProperties(SerPropertiesDto propertiesContainer) {
+        Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
+        return doValidateProperties(properties);
+    }
+
+    private ResponseEntity<ValidationResultsDto> doValidateProperties(Properties properties) {
         ValidationResult validationResult = properties.getValidationResult();
         // TODO: I really would prefer return 200 status code any time it process correctly and that the payload
         // determine the
@@ -152,11 +164,10 @@ public class PropertiesControllerImpl implements PropertiesController {
     }
 
     @Override
-    public ResponseEntity<String> triggerOnProperty(String definition, //
-            PropertyTrigger trigger, //
+    public ResponseEntity<String> triggerOnProperty(PropertyTrigger trigger, //
             String property, //
             String formName, //
-            PropertiesDto propertiesContainer) {
+            UiSpecsPropertiesDto propertiesContainer) {
         Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
 
         String response;
@@ -178,11 +189,11 @@ public class PropertiesControllerImpl implements PropertiesController {
             default:
                 throw new IllegalArgumentException("This enum does not contain this value: " + trigger);
             }
-            response = jsonSerializationHelper.toJson(updatedProperties, formName, definition);
+            response = jsonSerializationHelper.toJson(updatedProperties, formName, propertiesContainer.getDefinitionName());
         } catch (IllegalStateException e) {
             log.info("Tried to execute an undefined trigger. It show either a bug in the calling client or the definition"
                     + " properties advertised a non-existent trigger", e);
-            throw new UndefinedTriggerException(definition, property, trigger);
+            throw new UndefinedTriggerException(propertiesContainer.getDefinitionName(), property, trigger);
         } catch (Throwable throwable) {
             Exception exception = handleErrors(throwable);
             log.warn("Error validating property.", exception);
@@ -193,8 +204,29 @@ public class PropertiesControllerImpl implements PropertiesController {
     }
 
     @Override
-    public String initializeProperties(String formName, PropertiesDto propertiesContainer) {
+    public String initializeProperties(String formName, SerPropertiesDto propertiesContainer) {
         Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
+        return generateUiSpecs(formName, properties);
+    }
+
+    @Override
+    public String initializeProperties(String formName, UiSpecsPropertiesDto propertiesContainer) {
+        Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
+        return generateUiSpecs(formName, properties);
+    }
+
+    @Override
+    public SerPropertiesDto serialize(UiSpecsPropertiesDto propertiesContainer) {
+        Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
+        if (properties == null) {
+            return new SerPropertiesDto();
+        }
+        SerPropertiesDto serPropertiesDto = new SerPropertiesDto();
+        serPropertiesDto.setProperties(properties.toSerialized());
+        return serPropertiesDto;
+    }
+
+    public String generateUiSpecs(String formName, Properties properties) {
         if (properties == null) {
             return "{}";
         }
@@ -203,11 +235,21 @@ public class PropertiesControllerImpl implements PropertiesController {
     }
 
     @Override
-    public String getDatasetProperties(String definitionName, String formName, PropertiesDto propertiesContainer) {
+    public String getDatasetProperties(String formName, UiSpecsPropertiesDto propertiesContainer) {
+        String definitionName = propertiesContainer.getDefinitionName();
         DatastoreDefinition<DatastoreProperties> datastoreDefinition = propertiesHelpers.getDataStoreDefinition(definitionName);
         notNull(datastoreDefinition, "Could not find connection definition of name %s", definitionName);
         DatastoreProperties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
-        DatasetProperties datasetProperties = datastoreDefinition.createDatasetProperties(properties);
+        DatasetProperties<?> datasetProperties = datastoreDefinition.createDatasetProperties(properties);
+        return datasetProperties == null ? "{}" : jsonSerializationHelper.toJson(formName, datasetProperties);
+    }
+
+    @Override
+    public String getDatasetProperties(String formName, SerPropertiesDto propertiesContainer) {
+        DatastoreProperties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
+        DatastoreDefinition<DatastoreProperties> datastoreDefinition = propertiesHelpers
+                .getFirstDefinitionFromProperties(properties);
+        DatasetProperties<?> datasetProperties = datastoreDefinition.createDatasetProperties(properties);
         return datasetProperties == null ? "{}" : jsonSerializationHelper.toJson(formName, datasetProperties);
     }
 

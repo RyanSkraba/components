@@ -15,7 +15,6 @@ package org.talend.components.service.rest.impl;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.emptyList;
-import static org.apache.commons.lang3.Validate.notNull;
 import static org.talend.components.api.component.ConnectorTopology.INCOMING;
 import static org.talend.components.api.component.runtime.ExecutionEngine.BEAM;
 import static org.talend.components.api.component.runtime.ExecutionEngine.DI;
@@ -45,7 +44,8 @@ import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.common.datastore.runtime.DatastoreRuntime;
 import org.talend.components.service.rest.RuntimesController;
-import org.talend.components.service.rest.dto.PropertiesDto;
+import org.talend.components.service.rest.dto.SerPropertiesDto;
+import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.exception.TalendRuntimeException;
@@ -70,13 +70,19 @@ public class RuntimeControllerImpl implements RuntimesController {
     private ObjectMapper mapper;
 
     @Override
-    public ResponseEntity<ValidationResultsDto> validateDataStoreConnection(String dataStoreDefinitionName,
-            PropertiesDto propertiesContainer) {
-        final DatastoreDefinition<DatastoreProperties> definition = propertiesHelpers
-                .getDataStoreDefinition(dataStoreDefinitionName);
-        notNull(definition, "Could not find connection definition of name %s", dataStoreDefinitionName);
+    public ResponseEntity<ValidationResultsDto> validateDataStoreConnection(UiSpecsPropertiesDto propertiesContainer) {
         DatastoreProperties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
+        return doValidateDatastoreConnection(properties);
+    }
 
+    @Override
+    public ResponseEntity<ValidationResultsDto> validateDataStoreConnection(SerPropertiesDto propertiesContainer) {
+        DatastoreProperties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
+        return doValidateDatastoreConnection(properties);
+    }
+
+    private ResponseEntity<ValidationResultsDto> doValidateDatastoreConnection(DatastoreProperties properties) {
+        DatastoreDefinition<DatastoreProperties> definition = propertiesHelpers.getFirstDefinitionFromProperties(properties);
         try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(definition.getRuntimeInfo(properties),
                 properties.getClass().getClassLoader())) {
             DatastoreRuntime<DatastoreProperties> datastoreRuntime = (DatastoreRuntime) instance.getInstance();
@@ -92,26 +98,63 @@ public class RuntimeControllerImpl implements RuntimesController {
     }
 
     @Override
-    public String getDatasetSchema(String datasetDefinitionName, PropertiesDto connectionInfo) throws IOException {
-        return useDatasetRuntime(datasetDefinitionName, connectionInfo, runtime -> runtime.getSchema().toString(false));
+    public String getDatasetSchema(UiSpecsPropertiesDto connectionInfo) throws IOException {
+        DatasetProperties<?> properties = propertiesHelpers.propertiesFromDto(connectionInfo);
+        DatasetDefinition<DatasetProperties<DatastoreProperties>> definition = propertiesHelpers
+                .getFirstDefinitionFromProperties(properties);
+        return useDatasetRuntime(definition, properties, runtime -> runtime.getSchema().toString(false));
     }
 
     @Override
-    public Void getDatasetData(String datasetDefinitionName, //
-            PropertiesDto connectionInfo, //
-            Integer from, //
-            Integer limit, //
-            OutputStream response) {
-        return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(response, limit, true));
+    public String getDatasetSchema(SerPropertiesDto connectionInfo) throws IOException {
+        DatasetProperties<?> properties = propertiesHelpers.propertiesFromDto(connectionInfo);
+        DatasetDefinition<DatasetProperties<DatastoreProperties>> definition = propertiesHelpers
+                .getFirstDefinitionFromProperties(properties);
+        return useDatasetRuntime(definition, properties, runtime -> runtime.getSchema().toString(false));
     }
 
     @Override
-    public Void getDatasetDataAsBinary(String datasetDefinitionName, //
-            PropertiesDto connectionInfo, //
+    public Void getDatasetData(UiSpecsPropertiesDto connectionInfo, //
             Integer from, //
             Integer limit, //
             OutputStream response) {
-        return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(response, limit, false));
+        DatasetProperties<?> properties = propertiesHelpers.propertiesFromDto(connectionInfo);
+        DatasetDefinition<DatasetProperties<DatastoreProperties>> definition = propertiesHelpers
+                .getFirstDefinitionFromProperties(properties);
+        return useDatasetRuntime(definition, properties, new DatasetContentWriter(response, limit, true));
+    }
+
+    @Override
+    public Void getDatasetData(SerPropertiesDto connectionInfo, //
+            Integer from, //
+            Integer limit, //
+            OutputStream response) {
+        DatasetProperties<?> properties = propertiesHelpers.propertiesFromDto(connectionInfo);
+        DatasetDefinition<DatasetProperties<DatastoreProperties>> definition = propertiesHelpers
+                .getFirstDefinitionFromProperties(properties);
+        return useDatasetRuntime(definition, properties, new DatasetContentWriter(response, limit, true));
+    }
+
+    @Override
+    public Void getDatasetDataAsBinary(UiSpecsPropertiesDto connectionInfo, //
+            Integer from, //
+            Integer limit, //
+            OutputStream response) {
+        DatasetProperties<?> properties = propertiesHelpers.propertiesFromDto(connectionInfo);
+        DatasetDefinition<DatasetProperties<DatastoreProperties>> definition = propertiesHelpers
+                .getFirstDefinitionFromProperties(properties);
+        return useDatasetRuntime(definition, properties, new DatasetContentWriter(response, limit, false));
+    }
+
+    @Override
+    public Void getDatasetDataAsBinary(SerPropertiesDto connectionInfo, //
+            Integer from, //
+            Integer limit, //
+            OutputStream response) {
+        DatasetProperties<?> properties = propertiesHelpers.propertiesFromDto(connectionInfo);
+        DatasetDefinition<DatasetProperties<DatastoreProperties>> definition = propertiesHelpers
+                .getFirstDefinitionFromProperties(properties);
+        return useDatasetRuntime(definition, properties, new DatasetContentWriter(response, limit, false));
     }
 
     @Override
@@ -159,18 +202,10 @@ public class RuntimeControllerImpl implements RuntimesController {
         }
     }
 
-    private <T> T useDatasetRuntime(String datasetDefinitionName, //
-            PropertiesDto formData, //
+    private <T> T useDatasetRuntime(final DatasetDefinition<DatasetProperties<DatastoreProperties>> datasetDefinition, //
+            DatasetProperties datasetProperties, //
             Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, T> consumer) {
 
-        // 1) get dataset properties from supplied data
-        DatasetProperties datasetProperties = propertiesHelpers.propertiesFromDto(formData);
-
-        // 2) Retrieve data set definition to be able to create the runtime
-        final DatasetDefinition<DatasetProperties<DatastoreProperties>> datasetDefinition = //
-                propertiesHelpers.getDataSetDefinition(datasetDefinitionName);
-
-        // 3) create the runtime
         try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(datasetDefinition.getRuntimeInfo(datasetProperties),
                 datasetProperties.getClass().getClassLoader())) {
             DatasetRuntime<DatasetProperties<DatastoreProperties>> datasetRuntimeInstance = (DatasetRuntime<DatasetProperties<DatastoreProperties>>) instance
@@ -178,7 +213,6 @@ public class RuntimeControllerImpl implements RuntimesController {
 
             datasetRuntimeInstance.initialize(null, datasetProperties);
 
-            // 4) Consume the data set runtime
             return consumer.apply(datasetRuntimeInstance);
         }
     }

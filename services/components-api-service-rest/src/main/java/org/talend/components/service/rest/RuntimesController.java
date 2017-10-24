@@ -1,4 +1,4 @@
-//==============================================================================
+// ==============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
@@ -9,7 +9,7 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ==============================================================================
 
 package org.talend.components.service.rest;
 
@@ -22,59 +22,88 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.talend.components.service.rest.dto.PropertiesDto;
+import org.talend.components.service.rest.dto.SerPropertiesDto;
+import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
+import org.talend.daikon.annotation.ApiVersion;
 import org.talend.daikon.annotation.Service;
 
 @Service(name = "RuntimesController")
-@RequestMapping(value = "runtimes")
+@RequestMapping("runtimes")
+@ApiVersion(ServiceConstants.V0)
 public interface RuntimesController {
 
     /**
-     * Avro mime types as specified at <a href="http://avro.apache.org/docs/current/spec.html#HTTP+as+Transport>http://avro.apache.org/docs/current/spec.html#HTTP+as+Transport</a>
-     * and discussed at <a href="https://issues.apache.org/jira/browse/AVRO-488>https://issues.apache.org/jira/browse/AVRO-488</a>
+     * Avro mime types as specified at <a
+     * href="http://avro.apache.org/docs/current/spec.html#HTTP+as+Transport>http://avro.apache.org/docs/current/spec.html#HTTP+as+Transport</a>
+     * and discussed at <a
+     * href="https://issues.apache.org/jira/browse/AVRO-488>https://issues.apache.org/jira/browse/AVRO-488</a>
      */
     String AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID = "avro/binary";
+
     String AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID = "application/x-avro-binary";
+
     String AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED = "application/avro-binary";
 
     String AVRO_JSON_MIME_TYPE_OFFICIAL_INVALID = "avro/json";
+
     String AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID = "application/x-avro-json";
+
     String AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED = "application/avro-json";
 
-    /** Validate connection to datastore */
-    @RequestMapping(value = "{dataStoreDefinitionName}", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE)
-    ResponseEntity<ValidationResultsDto> validateDataStoreConnection(
-            @PathVariable("dataStoreDefinitionName") String dataStoreDefinitionName,
-            @RequestBody PropertiesDto propertiesContainer);
+    /** Validate connection to datastore from ui-specs */
+    @RequestMapping(value = "check", method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE,
+            ServiceConstants.UI_SPEC_CONTENT_TYPE })
+    ResponseEntity<ValidationResultsDto> validateDataStoreConnection(@RequestBody UiSpecsPropertiesDto propertiesContainer);
 
-    /** Validate connection to datastore. Should it be GET method? */
-    @RequestMapping(value = "{datasetDefinitionName}/schema", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
-    String getDatasetSchema(@PathVariable("datasetDefinitionName") String datasetDefinitionName,
-                            @RequestBody PropertiesDto connectionInfo) throws IOException;
+    /** Validate connection to datastore from jsonio */
+    @RequestMapping(value = "check", method = POST, consumes = ServiceConstants.JSONIO_CONTENT_TYPE)
+    ResponseEntity<ValidationResultsDto> validateDataStoreConnection(@RequestBody SerPropertiesDto propertiesContainer);
 
-    /** Get dataset content. Should it be GET method? */
-    @RequestMapping(value = "{datasetDefinitionName}/data", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = {
+    /** return the schema associated to a given dataset from ui-specs. */
+    @RequestMapping(value = "schema", method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE,
+            ServiceConstants.UI_SPEC_CONTENT_TYPE }, produces = APPLICATION_JSON_UTF8_VALUE)
+    String getDatasetSchema(@RequestBody UiSpecsPropertiesDto connectionInfo) throws IOException;
+
+    /** return the schema associated to a given dataset from json-io. */
+    @RequestMapping(value = "schema", method = POST, consumes = ServiceConstants.JSONIO_CONTENT_TYPE, produces = APPLICATION_JSON_UTF8_VALUE)
+    String getDatasetSchema(@RequestBody SerPropertiesDto connectionInfo) throws IOException;
+
+    /** Get dataset content from ui-specs */
+    @RequestMapping(value = "data", method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE,
+            ServiceConstants.UI_SPEC_CONTENT_TYPE }, produces = { APPLICATION_JSON_UTF8_VALUE,
+                    AVRO_JSON_MIME_TYPE_OFFICIAL_INVALID, AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID,
+                    AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED })
+    Void getDatasetData(@RequestBody UiSpecsPropertiesDto connectionInfo,
+            @RequestParam(value = "from", required = false) Integer from,
+            @RequestParam(value = "limit", required = false) Integer limit, OutputStream response);
+
+    /** Get dataset content from json-io */
+    @RequestMapping(value = "data", method = POST, consumes = ServiceConstants.JSONIO_CONTENT_TYPE, produces = {
             APPLICATION_JSON_UTF8_VALUE, AVRO_JSON_MIME_TYPE_OFFICIAL_INVALID, AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID,
             AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED })
-    Void getDatasetData(@PathVariable("datasetDefinitionName") String datasetDefinitionName,
-                                         @RequestBody PropertiesDto connectionInfo,
-                                         @RequestParam(value = "from", required = false) Integer from,
-                                         @RequestParam(value = "limit", required = false) Integer limit,
-                                         OutputStream response);
+    Void getDatasetData(@RequestBody SerPropertiesDto connectionInfo,
+            @RequestParam(value = "from", required = false) Integer from,
+            @RequestParam(value = "limit", required = false) Integer limit, OutputStream response);
 
-    @RequestMapping(value = "{datasetDefinitionName}/data", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = {
+    /** get dataset content in binary form from ui-specs */
+    @RequestMapping(value = "data", method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE,
+            ServiceConstants.UI_SPEC_CONTENT_TYPE }, produces = { AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID,
+                    AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID, AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED })
+    Void getDatasetDataAsBinary(@RequestBody UiSpecsPropertiesDto connectionInfo,
+            @RequestParam(value = "from", required = false) Integer from,
+            @RequestParam(value = "limit", required = false) Integer limit, OutputStream response);
+
+    /** get dataset content in binary form from json-io */
+    @RequestMapping(value = "data", method = POST, consumes = ServiceConstants.JSONIO_CONTENT_TYPE, produces = {
             AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID, AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID,
             AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED })
-    Void getDatasetDataAsBinary(@PathVariable("datasetDefinitionName") String datasetDefinitionName,
-                                                 @RequestBody PropertiesDto connectionInfo,
-                                                 @RequestParam(value = "from", required = false) Integer from,
-                                                 @RequestParam(value = "limit", required = false) Integer limit,
-                                                 OutputStream response);
+    Void getDatasetDataAsBinary(@RequestBody SerPropertiesDto connectionInfo,
+            @RequestParam(value = "from", required = false) Integer from,
+            @RequestParam(value = "limit", required = false) Integer limit, OutputStream response);
 
     /**
      * Write Data using a Talend component.

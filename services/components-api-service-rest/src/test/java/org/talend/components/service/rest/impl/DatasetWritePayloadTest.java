@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Test;
+import org.talend.components.service.rest.impl.DatasetWritePayload;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

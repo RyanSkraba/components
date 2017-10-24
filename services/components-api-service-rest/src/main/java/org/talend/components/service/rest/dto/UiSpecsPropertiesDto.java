@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PropertiesDto {
+public class UiSpecsPropertiesDto {
 
     @JsonProperty("dependencies")
     private List<ObjectNode> dependencies = emptyList();
