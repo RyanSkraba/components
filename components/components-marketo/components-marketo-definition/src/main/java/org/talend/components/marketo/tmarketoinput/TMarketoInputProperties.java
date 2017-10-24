@@ -778,7 +778,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
 
     @Override
     public int getVersionNumber() {
-        return 2;
+        return 3;
     }
 
     private Field getMigratedField(Field origin, Schema expectedSchema, String expectedDIType) {
@@ -873,8 +873,35 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                 }
                 migrated = true;
             }
+            // manage include/exclude types in REST
+            if (isApiREST()) {
+                if (setIncludeTypes.getValue()) {
+                    includeTypes.type.setValue(getFixedIncludeExcludeList(includeTypes.type.getValue()));
+                }
+                if (setExcludeTypes.getValue()) {
+                    excludeTypes.type.setValue(getFixedIncludeExcludeList(excludeTypes.type.getValue()));
+                }
+                migrated = true;
+            }
         }
         return migrated;
+    }
+
+    /*
+     * translate int ids to include/exclude strings not translated be studio's migration
+     * 
+     */
+    private List<String> getFixedIncludeExcludeList(List<String> list) {
+        if (list == null) {
+            return Collections.emptyList();
+        }
+        for (int i = 0; i < list.size(); i++) {
+            String s = list.get(i);
+            if (s.matches("^\\d+$")) {
+                list.set(i, IncludeExcludeFieldsREST.valueOf(Integer.parseInt(s)).name());
+            }
+        }
+        return list;
     }
 
     /*

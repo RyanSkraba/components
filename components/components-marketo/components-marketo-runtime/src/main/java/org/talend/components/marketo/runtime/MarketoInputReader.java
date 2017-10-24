@@ -94,15 +94,19 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
         if (properties.isApiREST() && InputOperation.getLeadActivity.equals(properties.inputOperation.getValue())) {
             useActivitiesList = true;
             // include all activities
+            List<String> tmp;
             if (!properties.setIncludeTypes.getValue()) {
-                List<String> tmp = new ArrayList<>();
+                tmp = new ArrayList<>();
                 for (IncludeExcludeFieldsREST a : IncludeExcludeFieldsREST.values()) {
                     tmp.add(a.name());
                 }
-                activities = splitList(tmp, 10);
             } else {
-                activities = splitList(properties.includeTypes.type.getValue(), 10);
+                tmp = properties.includeTypes.type.getValue();
             }
+            if (properties.setExcludeTypes.getValue()) {
+                tmp.removeAll(properties.excludeTypes.type.getValue());
+            }
+            activities = splitList(tmp, 10);
             LOG.debug("activities to process = {}.", activities);
         }
 

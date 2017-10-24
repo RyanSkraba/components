@@ -472,14 +472,6 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 }
             }
         }
-        // remove unwanted activities
-        if (!excs.isEmpty()) {
-            for (String s : excs) {
-                if (incs.contains(s)) {
-                    incs.remove(s);
-                }
-            }
-        }
         // translate into ids
         for (String i : incs) {
             activityTypeIds.add(IncludeExcludeFieldsREST.valueOf(i).fieldVal);
