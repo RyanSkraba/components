@@ -33,7 +33,10 @@ public class BulkResultSet {
             if ((row = reader.getValues()) != null) {
                 result = new BulkResult();
                 for (int i = 0; i < this.header.size(); i++) {
-                    result.setValue(header.get(i), row[i]);
+                    //We replace the . with _ to add support of relationShip Queries
+                    //The relationShip Queries Use . in Salesforce and we use _ in Talend (Studio)
+                    //So Account.Name in SF will be Account_Name in Talend
+                    result.setValue(header.get(i).replace('.', '_'), row[i]);
                 }
                 return result;
             } else {

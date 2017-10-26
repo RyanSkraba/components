@@ -262,7 +262,7 @@ public class SalesforceDataprepSource
         List<Schema.Field> newFieldList = new ArrayList<>();
 
         for (FieldDescription fieldDescription : fieldDescriptions) {
-            Schema.Field runtimeField = runtimeSchema.getField(fieldDescription.getSimpleName());
+            Schema.Field runtimeField = runtimeSchema.getField(fieldDescription.getFullName());
 
             if (runtimeField != null) {
                 Schema.Field newField = new Schema.Field(runtimeField.name(), runtimeField.schema(), runtimeField.doc(),
@@ -273,7 +273,7 @@ public class SalesforceDataprepSource
                 }
                 newFieldList.add(newField);
             } else {
-                Schema.Field newField = new Schema.Field(fieldDescription.getSimpleName(), AvroUtils._string(), null, (String)null);
+                Schema.Field newField = new Schema.Field(fieldDescription.getFullName(), AvroUtils._string(), null, (String)null);
                 newFieldList.add(newField);
             }
         }

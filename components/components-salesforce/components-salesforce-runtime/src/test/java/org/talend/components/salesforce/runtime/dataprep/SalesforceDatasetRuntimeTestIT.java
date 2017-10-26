@@ -51,6 +51,33 @@ public class SalesforceDatasetRuntimeTestIT {
         getSampleAction(dataset);
     }
 
+    @Test
+    public void testGetSampleWithRelationshipQuery(){
+        SalesforceDatastoreDefinition def = new SalesforceDatastoreDefinition();
+        SalesforceDatastoreProperties datastore = new SalesforceDatastoreProperties("datastore");
+
+        CommonTestUtils.setValueForDatastoreProperties(datastore);
+
+        SalesforceDatasetProperties dataset = (SalesforceDatasetProperties) def.createDatasetProperties(datastore);
+        dataset.sourceType.setValue(SalesforceDatasetProperties.SourceType.SOQL_QUERY);
+        dataset.query.setValue("SELECT Account.Name from Contact");
+
+        SalesforceDatasetRuntime runtime = new SalesforceDatasetRuntime();
+        runtime.initialize(null, dataset);
+        final IndexedRecord[] record = new IndexedRecord[1];
+        Consumer<IndexedRecord> storeTheRecords = new Consumer<IndexedRecord>() {
+
+            @Override
+            public void accept(IndexedRecord data) {
+                record[0] = data;
+            }
+        };
+
+        runtime.getSample(1, storeTheRecords);
+        Assert.assertTrue("empty result", record.length > 0);
+        Assert.assertNotNull(record[0].getSchema().getField("Account_Name"));
+    }
+
     private void getSampleAction(SalesforceDatasetProperties dataset) {
         SalesforceDatasetRuntime runtime = new SalesforceDatasetRuntime();
         runtime.initialize(null, dataset);
@@ -91,4 +118,6 @@ public class SalesforceDatasetRuntimeTestIT {
 
         return dataset;
     }
+
+
 }
