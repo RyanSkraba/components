@@ -2,13 +2,14 @@ package org.talend.components.salesforce.runtime;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class BulkResult {
 
     Map<String, Object> values;
 
     public BulkResult() {
-        values = new HashMap<String, Object>();
+        values = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     }
 
     public void setValue(String field, Object vlaue) {
