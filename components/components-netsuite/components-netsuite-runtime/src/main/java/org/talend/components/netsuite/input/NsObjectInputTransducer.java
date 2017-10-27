@@ -43,6 +43,8 @@ public class NsObjectInputTransducer extends NsObjectTransducer {
 
     /** Descriptor of NetSuite data model object. */
     private TypeDesc typeDesc;
+    
+    private String apiVersion;
 
     public NsObjectInputTransducer(NetSuiteClientService<?> clientService, Schema schema, String typeName) {
         super(clientService);
@@ -111,6 +113,16 @@ public class NsObjectInputTransducer extends NsObjectTransducer {
             // Use design schema as runtime schema
             runtimeSchema = schema;
         }
+    }
+
+    
+    public String getApiVersion() {
+        return apiVersion;
+    }
+
+    
+    public void setApiVersion(String apiVersion) {
+        this.apiVersion = apiVersion;
     }
 
 }

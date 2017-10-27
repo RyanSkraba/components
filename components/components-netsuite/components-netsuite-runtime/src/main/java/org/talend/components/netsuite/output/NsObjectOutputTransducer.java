@@ -60,6 +60,9 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
 
     /** Information about target record type. */
     private RecordTypeInfo recordTypeInfo;
+    
+    /** Information for picklist type*/
+    private String apiVersion;
 
     public NsObjectOutputTransducer(NetSuiteClientService<?> clientService, String typeName) {
         super(clientService);
@@ -200,4 +203,14 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
         return nsObject;
     }
 
+    
+    public String getApiVersion() {
+        return apiVersion;
+    }
+
+    
+    public void setApiVersion(String apiVersion) {
+        this.apiVersion = apiVersion;
+    }
+    
 }

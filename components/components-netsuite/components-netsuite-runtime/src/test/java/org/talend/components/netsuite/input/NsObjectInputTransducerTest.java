@@ -25,6 +25,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.assertNull;
 import org.talend.components.netsuite.NetSuiteDatasetRuntimeImpl;
 import org.talend.components.netsuite.NetSuiteMockTestBase;
 import org.talend.components.netsuite.client.CustomMetaDataSource;
@@ -260,5 +261,21 @@ public class NsObjectInputTransducerTest extends NetSuiteMockTestBase {
             IndexedRecord indexedRecord = transducer.read(record);
             assertIndexedRecord(typeDesc, indexedRecord);
         }
+    }
+    
+    @Test
+    public void testGetApiVersion() throws Exception {
+        
+        TypeDesc typeDesc = clientService.getMetaDataSource().getTypeInfo("Opportunity");
+
+        Schema schema = NetSuiteDatasetRuntimeImpl.inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
+
+        NsObjectInputTransducer transducer = new NsObjectInputTransducer(clientService, schema, typeDesc.getTypeName());
+        
+        transducer.setApiVersion("2016.2");
+        assertNull(transducer.getPicklistClass());
+        
+       
+        
     }
 }

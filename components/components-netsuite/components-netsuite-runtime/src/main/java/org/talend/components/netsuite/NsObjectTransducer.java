@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -438,6 +439,8 @@ public abstract class NsObjectTransducer {
             valueClass = XMLGregorianCalendar.class;
             break;
         case SELECT:
+            valueClass = getPicklistClass();
+            break;
         case MULTI_SELECT:
         default:
             valueClass = null;
@@ -470,6 +473,24 @@ public abstract class NsObjectTransducer {
             converter = new NullConverter(valueClass, null);
         }
         return converter;
+    }
+    
+    protected abstract String getApiVersion();
+    
+    public Class<?> getPicklistClass(){
+        String version = getApiVersion();
+        String pattern = "20\\d{2}\\.\\d+";
+        if(version != null && Pattern.matches(pattern, version)){
+            Class<?> valueClass;
+            try {
+                valueClass = Class.forName("com.netsuite.webservices.v"+version.replace('.', '_')+".platform.core.ListOrRecordRef");
+            } catch (ClassNotFoundException e) {
+                return null;
+                //ignore
+            }
+            return valueClass;
+        }
+        return null;
     }
 
     /**
