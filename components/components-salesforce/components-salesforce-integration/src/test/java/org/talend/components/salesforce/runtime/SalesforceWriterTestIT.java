@@ -32,14 +32,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Random;
-import java.util.TimeZone;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.avro.Schema;
@@ -65,8 +62,6 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 
-import com.sforce.ws.bind.CalendarCodec;
-import com.sforce.ws.bind.DateCodec;
 import com.sforce.ws.util.Base64;
 
 public class SalesforceWriterTestIT extends SalesforceTestBase {

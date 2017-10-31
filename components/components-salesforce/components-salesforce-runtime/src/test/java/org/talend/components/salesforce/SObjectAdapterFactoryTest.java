@@ -27,7 +27,6 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.salesforce.runtime.SObjectAdapterFactory;
 import org.talend.components.salesforce.runtime.SalesforceRuntime;
@@ -149,7 +148,6 @@ public class SObjectAdapterFactoryTest {
         assertEquals("foo|bar", indexedRecord.get(6));
     }
 
-    @Ignore
     @Test
     public void testConvertToAvroForAggregateResult() throws Exception {
 
