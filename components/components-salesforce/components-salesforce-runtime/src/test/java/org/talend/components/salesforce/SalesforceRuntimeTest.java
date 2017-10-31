@@ -31,6 +31,7 @@ import org.talend.components.salesforce.runtime.SalesforceRuntime;
 
 import com.sforce.soap.partner.Error;
 import com.sforce.soap.partner.StatusCode;
+import com.sforce.ws.bind.CalendarCodec;
 
 /**
  *
@@ -71,12 +72,21 @@ public class SalesforceRuntimeTest {
     }
 
     @Test
-    public void testConvertDateToCalendar() throws IOException {
+    public void testConvertDateToCalendar() throws Throwable {
         long timestamp = System.currentTimeMillis();
-        Calendar calendar1 = SalesforceRuntime.convertDateToCalendar(new Date(timestamp));
+        Calendar calendar1 = SalesforceRuntime.convertDateToCalendar(new Date(timestamp),false);
         assertNotNull(calendar1);
         assertEquals(TimeZone.getTimeZone("GMT"), calendar1.getTimeZone());
 
-        assertNull(SalesforceRuntime.convertDateToCalendar(null));
+        assertNull(SalesforceRuntime.convertDateToCalendar(null,false));
+
+        CalendarCodec calCodec = new CalendarCodec();
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        dateFormat.parse("2017-10-24T20:09:14.000Z");
+        Date date = dateFormat.getCalendar().getTime();
+        Calendar calIgnoreTZ = SalesforceRuntime.convertDateToCalendar(date, true);
+
+        assertEquals("2017-10-24T20:09:14.000Z", calCodec.getValueAsString(calIgnoreTZ));
+
     }
 }

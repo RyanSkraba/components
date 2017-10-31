@@ -53,8 +53,8 @@ public abstract class SalesforceGetDeletedUpdatedReader<ResultT> extends Salesfo
         super(container, source);
         this.properties = props;
         module = props.module.moduleName.getStringValue();
-        startDate = SalesforceRuntime.convertDateToCalendar(props.startDate.getValue());
-        endDate = SalesforceRuntime.convertDateToCalendar(props.endDate.getValue());
+        startDate = SalesforceRuntime.convertDateToCalendar(props.startDate.getValue(),false);
+        endDate = SalesforceRuntime.convertDateToCalendar(props.endDate.getValue(),false);
     }
 
     @Override

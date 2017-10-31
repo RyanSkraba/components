@@ -300,7 +300,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             break;
         }
         if (valueToAdd instanceof Date) {
-            xmlObject.setField(fieldName, SalesforceRuntime.convertDateToCalendar((Date) valueToAdd));
+            xmlObject.setField(fieldName, SalesforceRuntime.convertDateToCalendar((Date) valueToAdd,true));
         } else {
             Schema.Field se = moduleSchema.getField(fieldName);
             if (se != null && valueToAdd instanceof String) {

@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
@@ -141,6 +142,7 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         }
     }
 
+    @Ignore
     @Test(expected = ConnectionException.class)
     public void testSalesForcePasswordExpired() throws ConnectionException {
         SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();

@@ -67,7 +67,8 @@ public class SalesforceRuntime {
 
                         logWriter.newLine();
 
-                        logWriter.append("\t--------------------------------------------------------------------------------");
+                        logWriter.append(
+                                "\t--------------------------------------------------------------------------------");
 
                         logWriter.newLine();
                         logWriter.newLine();
@@ -80,11 +81,25 @@ public class SalesforceRuntime {
         return errors;
     }
 
-    public static Calendar convertDateToCalendar(Date date) {
+    /**
+     * Convert date to calendar with timezone "GMT"
+     * 
+     * @param date
+     * @param useLocalTZ whether use local timezone during convert
+     *
+     * @return Calendar instance
+     */
+    public static Calendar convertDateToCalendar(Date date, boolean useLocalTZ) {
         if (date != null) {
             Calendar cal = Calendar.getInstance();
-            cal.setTimeZone(TimeZone.getTimeZone("GMT"));
-            cal.setTime(date);
+            cal.clear();
+            if (useLocalTZ) {
+                TimeZone tz = TimeZone.getDefault();
+                cal.setTimeInMillis(date.getTime() + tz.getRawOffset() + tz.getDSTSavings());
+            } else {
+                cal.setTimeZone(TimeZone.getTimeZone("GMT"));
+                cal.setTime(date);
+            }
             return cal;
         } else {
             return null;
