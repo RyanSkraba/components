@@ -33,6 +33,7 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.runtime.RuntimeContext;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -108,8 +109,18 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
+    public Properties validateProperty(String propName, Properties properties, RuntimeContext context) throws Throwable {
+        return componentServiceDelegate.validateProperty(propName, properties, context);
+    }
+
+    @Override
     public Properties beforePropertyActivate(String propName, Properties properties) throws Throwable {
         return componentServiceDelegate.beforePropertyActivate(propName, properties);
+    }
+
+    @Override
+    public Properties beforePropertyActivate(String propName, Properties properties, RuntimeContext context) throws Throwable {
+        return componentServiceDelegate.beforePropertyActivate(propName, properties, context);
     }
 
     @Override
@@ -118,8 +129,18 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
+    public Properties beforePropertyPresent(String propName, Properties properties, RuntimeContext context) throws Throwable {
+        return componentServiceDelegate.beforePropertyPresent(propName, properties, context);
+    }
+
+    @Override
     public Properties afterProperty(String propName, Properties properties) throws Throwable {
         return componentServiceDelegate.afterProperty(propName, properties);
+    }
+
+    @Override
+    public Properties afterProperty(String propName, Properties properties, RuntimeContext context) throws Throwable {
+        return componentServiceDelegate.afterProperty(propName, properties, context);
     }
 
     @Override
@@ -128,8 +149,18 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
+    public Properties beforeFormPresent(String formName, Properties properties, RuntimeContext context) throws Throwable {
+        return componentServiceDelegate.beforeFormPresent(formName, properties, context);
+    }
+
+    @Override
     public Properties afterFormNext(String formName, Properties properties) throws Throwable {
         return componentServiceDelegate.afterFormNext(formName, properties);
+    }
+
+    @Override
+    public Properties afterFormNext(String formName, Properties properties, RuntimeContext context) throws Throwable {
+        return componentServiceDelegate.afterFormNext(formName, properties, context);
     }
 
     @Override
@@ -138,8 +169,18 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
+    public Properties afterFormBack(String formName, Properties properties, RuntimeContext context) throws Throwable {
+        return componentServiceDelegate.afterFormBack(formName, properties, context);
+    }
+
+    @Override
     public Properties afterFormFinish(String formName, Properties properties) throws Throwable {
         return componentServiceDelegate.afterFormFinish(formName, properties);
+    }
+
+    @Override
+    public Properties afterFormFinish(String formName, Properties properties, RuntimeContext context) throws Throwable {
+        return componentServiceDelegate.afterFormFinish(formName, properties, context);
     }
 
     @Override
