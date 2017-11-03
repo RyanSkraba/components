@@ -35,6 +35,9 @@ public class JmsInputProperties extends FixedConnectorsComponentProperties imple
         super(name);
     }
 
+    /** Hidden property used to specify that this component generates unbounded input. */
+    public Property<Boolean> isStreaming = PropertyFactory.newBoolean("isStreaming", true);
+
     public Property<Integer> timeout = PropertyFactory.newInteger("timeout", -1);
 
     public Property<Integer> max_msg = PropertyFactory.newInteger("max_msg", -1);
@@ -53,6 +56,8 @@ public class JmsInputProperties extends FixedConnectorsComponentProperties imple
         mainForm.addRow(timeout);
         mainForm.addRow(max_msg);
         mainForm.addRow(msg_selector);
+        mainForm.addRow(isStreaming);
+        mainForm.getWidget(isStreaming).setHidden();
     }
 
     @Override

@@ -35,6 +35,7 @@ public class JmsInputPropertiesTest {
         assertEquals(-1, (long) properties.timeout.getValue());
         assertEquals(-1, (long) properties.max_msg.getValue());
         assertEquals("", properties.msg_selector.getValue());
+        assertEquals(true, properties.isStreaming.getValue());
     }
 
     /**
@@ -51,13 +52,15 @@ public class JmsInputPropertiesTest {
         assertThat(main, notNullValue());
 
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(3));
+        assertThat(mainWidgets, hasSize(4));
         Widget timeout = main.getWidget("timeout");
         assertThat(timeout, notNullValue());
         Widget max_msg = main.getWidget("max_msg");
         assertThat(max_msg, notNullValue());
         Widget msg_selector = main.getWidget("msg_selector");
         assertThat(msg_selector, notNullValue());
+        Widget isStreaming = main.getWidget("isStreaming");
+        assertThat(isStreaming, notNullValue());
     }
 
     /**

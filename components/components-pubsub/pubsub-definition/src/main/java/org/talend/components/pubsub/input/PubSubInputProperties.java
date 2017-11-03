@@ -44,6 +44,9 @@ public class PubSubInputProperties extends FixedConnectorsComponentProperties im
     public ReferenceProperties<PubSubDatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
             PubSubDatasetDefinition.NAME);
 
+    /** Hidden property used to specify that this component generates unbounded input. */
+    public Property<Boolean> isStreaming = PropertyFactory.newBoolean("isStreaming", true);
+
     public Property<Boolean> useMaxReadTime = PropertyFactory.newBoolean("useMaxReadTime", false);
 
     // Max duration(Millions) from start receiving
@@ -81,6 +84,8 @@ public class PubSubInputProperties extends FixedConnectorsComponentProperties im
         mainForm.addRow(useMaxNumRecords).addColumn(maxNumRecords);
         mainForm.addRow(idLabel);
         mainForm.addRow(timestampLabel);
+        mainForm.addRow(isStreaming);
+        mainForm.getWidget(isStreaming).setHidden();
     }
 
     public void afterUseMaxReadTime() {

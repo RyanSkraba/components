@@ -99,7 +99,7 @@ public class PubSubInputPropertiesTest {
 
         List<String> ALL = Arrays.asList(properties.useMaxReadTime.getName(), properties.maxReadTime.getName(),
                 properties.useMaxNumRecords.getName(), properties.maxNumRecords.getName(), properties.idLabel.getName(),
-                properties.timestampLabel.getName());
+                properties.timestampLabel.getName(), properties.isStreaming.getName());
 
         Assert.assertThat(main, notNullValue());
         Assert.assertThat(mainWidgets, hasSize(ALL.size()));
@@ -108,6 +108,5 @@ public class PubSubInputPropertiesTest {
             Widget w = main.getWidget(field);
             Assert.assertThat(w, notNullValue());
         }
-        ;
     }
 }

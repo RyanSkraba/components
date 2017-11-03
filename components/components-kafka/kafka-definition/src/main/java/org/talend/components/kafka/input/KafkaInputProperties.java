@@ -26,6 +26,9 @@ import org.talend.daikon.properties.property.PropertyFactory;
 
 public class KafkaInputProperties extends KafkaIOBasedProperties {
 
+    /** Hidden property used to specify that this component generates unbounded input. */
+    public Property<Boolean> isStreaming = PropertyFactory.newBoolean("isStreaming", true);
+
     public Property<String> groupID = PropertyFactory.newString("groupID");
 
     public EnumProperty<OffsetType> autoOffsetReset = PropertyFactory.newEnum("autoOffsetReset", OffsetType.class);
@@ -65,6 +68,8 @@ public class KafkaInputProperties extends KafkaIOBasedProperties {
         main.addRow(useMaxReadTime).addColumn(maxReadTime);
         main.addRow(useMaxNumRecords).addColumn(maxNumRecords);
         main.addRow(Widget.widget(configurations).setWidgetType(Widget.TABLE_WIDGET_TYPE));
+        main.addRow(isStreaming);
+        main.getWidget(isStreaming).setHidden();
     }
 
     public void afterUseMaxReadTime() {
