@@ -21,6 +21,7 @@ import org.talend.components.processing.definition.normalize.NormalizeDefinition
 import org.talend.components.processing.definition.pythonrow.PythonRowDefinition;
 import org.talend.components.processing.definition.replicate.ReplicateDefinition;
 import org.talend.components.processing.definition.window.WindowDefinition;
+import org.talend.components.processing.definition.typeconverter.TypeConverterDefinition;
 
 import com.google.auto.service.AutoService;
 
@@ -43,7 +44,8 @@ public class ProcessingFamilyDefinition extends AbstractComponentFamilyDefinitio
     public ProcessingFamilyDefinition() {
         super(NAME,
                 // Components
-                new WindowDefinition(), new ReplicateDefinition(),new FilterRowDefinition(), new PythonRowDefinition(), new NormalizeDefinition()
+                new FilterRowDefinition(), new PythonRowDefinition(), new ReplicateDefinition(), new TypeConverterDefinition(),
+                new WindowDefinition(),new NormalizeDefinition()
         // Component wizards
         );
     }
