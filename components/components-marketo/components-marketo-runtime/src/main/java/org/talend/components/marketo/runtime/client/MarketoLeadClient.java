@@ -326,7 +326,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
             mkto.setSuccess(result.isSuccess());
             if (mkto.isSuccess()) {
                 mkto.setRecordCount(result.getResult().isEmpty() ? 0 : result.getResult().size());
-                mkto.setRemainCount((result.getNextPageToken() != null && result.isMoreResult()) ? limit : 0);
+                mkto.setRemainCount((result.getNextPageToken() != null) ? limit : 0);
                 mkto.setStreamPosition(result.getNextPageToken());
                 if (mkto.getRecordCount() > 0) {
                     switch (operation) {
