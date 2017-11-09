@@ -372,7 +372,7 @@ public enum RecordTypeEnum implements RecordTypeDesc {
 
     JOB_TYPE("jobType", "JobType", JobType.class, null),
 
-    JOURNAL_ENTRY("journalEntry", "JournalEntry", JournalEntry.class, "transaction"),
+    JOURNAL_ENTRY("journal", "JournalEntry", JournalEntry.class, "transaction"),
 
     KIT_ITEM("kitItem", "KitItem", KitItem.class, "item"),
 
