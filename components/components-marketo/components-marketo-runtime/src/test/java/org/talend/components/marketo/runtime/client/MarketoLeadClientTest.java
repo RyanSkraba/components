@@ -12,11 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -281,9 +277,10 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         larecord.setPrimaryAttributeValueId(123);
         larecord.setActivityDate(new Date());
         larecord.setCampaignId(456);
-        List<Map<String, String>> attributes = new ArrayList<>();
-        Map<String, String> attribute = new HashMap<>();
-        attribute.put("attrName", "attrValue");
+        List<Map<String, Object>> attributes = new ArrayList<>();
+        Map<String, Object> attribute = new HashMap<>();
+        attribute.put("name", "attrName");
+        attribute.put("value", "attrValue");
         attributes.add(attribute);
         larecord.setAttributes(attributes);
         lars.add(larecord);
@@ -345,9 +342,10 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         field.put("field1", "value1");
         fields.add(field);
         lc.setFields(fields);
-        List<Map<String, String>> attributes = new ArrayList<>();
-        Map<String, String> attribute = new HashMap<>();
-        attribute.put("attrName", "attrValue");
+        List<Map<String, Object>> attributes = new ArrayList<>();
+        Map<String, Object> attribute = new HashMap<>();
+        attribute.put("name", "attrName");
+        attribute.put("value", "attrValue");
         attributes.add(attribute);
         lc.setAttributes(attributes);
         lcrs.add(lc);

@@ -230,10 +230,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                     record.put(f.pos(), input.getCampaignId());
                     break;
                 default:
-                    for (Map<String, String> attr : input.getAttributes()) {
-                        if (attr.get(col) != null) {
-                            record.put(f.pos(), attr.get(col));
-                        }
+                    String attr = input.getMktoAttributes().get(col);
+                    if (attr != null) {
+                        record.put(f.pos(), attr);
                     }
                 }
             }
@@ -276,10 +275,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                     record.put(f.pos(), input.getCampaignId());
                     break;
                 default:
-                    for (Map<String, String> attr : input.getAttributes()) {
-                        if (attr.get(col) != null) {
-                            record.put(f.pos(), attr.get(col));
-                        }
+                    String attr = input.getMktoAttributes().get(col);
+                    if (attr != null) {
+                        record.put(f.pos(), attr);
                     }
                 }
             }

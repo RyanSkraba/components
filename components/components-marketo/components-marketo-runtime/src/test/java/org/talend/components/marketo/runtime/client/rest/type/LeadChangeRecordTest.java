@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client.rest.type;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 
@@ -45,15 +43,7 @@ public class LeadChangeRecordTest {
         assertNotNull(r.getActivityDate());
         assertEquals("value", r.getActivityTypeValue());
         assertNull(r.getFields());
-        assertNull(r.getAttributes());
-    }
-
-    @Test
-    public void testToString() throws Exception {
-        r.setActivityDate(null);
-        String s = "LeadChangeRecord [id=1, leadId=2, activityDate=null, activityTypeId=3, activityTypeValue=value, "
-                + "fields=null, attributes=null]";
-        assertEquals(s, r.toString());
+        assertNotNull(r.getAttributes());
     }
 
 }

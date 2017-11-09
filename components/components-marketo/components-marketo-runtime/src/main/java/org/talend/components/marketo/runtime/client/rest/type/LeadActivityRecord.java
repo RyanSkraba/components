@@ -1,10 +1,8 @@
 package org.talend.components.marketo.runtime.client.rest.type;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
-public class LeadActivityRecord {
+public class LeadActivityRecord extends MarketoAttributes {
 
     private Integer id;
 
@@ -19,8 +17,6 @@ public class LeadActivityRecord {
     private Integer primaryAttributeValueId;
 
     private String primaryAttributeValue;
-
-    private List<Map<String, String>> attributes;
 
     private String marketoGUID;
 
@@ -82,14 +78,6 @@ public class LeadActivityRecord {
         this.primaryAttributeValue = primaryAttributeValue;
     }
 
-    public List<Map<String, String>> getAttributes() {
-        return attributes;
-    }
-
-    public void setAttributes(List<Map<String, String>> attributes) {
-        this.attributes = attributes;
-    }
-
     public String getMarketoGUID() {
         return marketoGUID;
     }
@@ -110,7 +98,7 @@ public class LeadActivityRecord {
     public String toString() {
         return "LeadActivityRecord [id=" + id + ", leadId=" + leadId + ", activityDate=" + activityDate + ", activityTypeId="
                 + activityTypeId + ", activityTypeValue=" + activityTypeValue + ", primaryAttributeValueId="
-                + primaryAttributeValueId + ", primaryAttributeValue=" + primaryAttributeValue + ", attributes=" + attributes
+                + primaryAttributeValueId + ", primaryAttributeValue=" + primaryAttributeValue + ", attributes=" + getAttributes()
                 + "]";
     }
 

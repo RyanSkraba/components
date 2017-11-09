@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client.rest.type;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ public class ActivityTypeTest {
         a.setId(1);
         a.setDescription("desc");
         a.setName("name");
-        List<Map<String, String>> attrs = new ArrayList<>();
+        List<Map<String, Object>> attrs = new ArrayList<>();
         a.setAttributes(attrs);
         Map<String, String> pattrs = new HashMap<>();
         a.setPrimaryAttribute(pattrs);
