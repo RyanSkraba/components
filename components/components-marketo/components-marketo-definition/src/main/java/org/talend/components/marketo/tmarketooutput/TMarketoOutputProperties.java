@@ -410,16 +410,6 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
             migrated = super.postDeserialize(version, setup, persistent);
         } catch (ClassCastException cce) {
             migrated = super.postDeserialize(version, setup, false); // don't initLayout
-            LinkedHashMap value = (LinkedHashMap) outputOperation.getStoredValue();
-            String io = String.valueOf(value.get("name"));
-            // re-affect correct values
-            outputOperation.setPossibleValues(OutputOperation.values());
-            outputOperation.setValue(OutputOperation.valueOf(io));
-            value = (LinkedHashMap) customObjectSyncAction.getStoredValue();
-            io = String.valueOf(value.get("name"));
-            // re-affect correct values
-            customObjectSyncAction.setPossibleValues(CustomObjectSyncAction.values());
-            customObjectSyncAction.setValue(CustomObjectSyncAction.valueOf(io));
         }
         checkForInvalidStoredProperties();
 
@@ -439,8 +429,10 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
             value = (LinkedHashMap) o;
             ov = String.valueOf(value.get("name"));
             try {
+                outputOperation = newEnum("outputOperation", OutputOperation.class);
                 outputOperation.setValue(OutputOperation.valueOf(ov));
                 outputOperation.setStoredValue(OutputOperation.valueOf(ov));
+                outputOperation.setPossibleValues(OutputOperation.values());
             } catch (Exception e) {
                 LOG.error("Error during outputOperation fix: {}.", e);
             }
@@ -450,8 +442,10 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
             value = (LinkedHashMap) o;
             ov = String.valueOf(value.get("name"));
             try {
+                customObjectSyncAction = newEnum("customObjectSyncAction", CustomObjectSyncAction.class);
                 customObjectSyncAction.setValue(CustomObjectSyncAction.valueOf(ov));
                 customObjectSyncAction.setStoredValue(CustomObjectSyncAction.valueOf(ov));
+                customObjectSyncAction.setPossibleValues(CustomObjectSyncAction.values());
             } catch (Exception e) {
                 LOG.error("Error during customObjectSyncAction fix: {}.", e);
             }

@@ -800,16 +800,6 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
             migrated = super.postDeserialize(version, setup, persistent);
         } catch (ClassCastException cce) {
             migrated = super.postDeserialize(version, setup, false); // don't initLayout
-            LinkedHashMap value = (LinkedHashMap) inputOperation.getStoredValue();
-            String io = String.valueOf(value.get("name"));
-            // re-affect correct values
-            inputOperation.setPossibleValues(InputOperation.values());
-            inputOperation.setValue(InputOperation.valueOf(io));
-            value = (LinkedHashMap) customObjectAction.getStoredValue();
-            io = String.valueOf(value.get("name"));
-            // re-affect correct values
-            customObjectAction.setPossibleValues(CustomObjectAction.values());
-            customObjectAction.setValue(CustomObjectAction.valueOf(io));
         }
         checkForInvalidStoredProperties();
         if (version < this.getVersionNumber()) {
@@ -917,8 +907,10 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
             value = (LinkedHashMap) o;
             ov = String.valueOf(value.get("name"));
             try {
+                inputOperation = newEnum("inputOperation", InputOperation.class).setRequired();
                 inputOperation.setValue(InputOperation.valueOf(ov));
                 inputOperation.setStoredValue(InputOperation.valueOf(ov));
+                inputOperation.setPossibleValues(InputOperation.values());
             } catch (Exception e) {
                 LOG.error("Error during inputOperation fix: {}.", e);
             }
@@ -928,8 +920,10 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
             value = (LinkedHashMap) o;
             ov = String.valueOf(value.get("name"));
             try {
+                customObjectAction = newEnum("customObjectAction", CustomObjectAction.class);
                 customObjectAction.setValue(CustomObjectAction.valueOf(ov));
                 customObjectAction.setStoredValue(CustomObjectAction.valueOf(ov));
+                customObjectAction.setPossibleValues(CustomObjectAction.values());
             } catch (Exception e) {
                 LOG.error("Error during customObjectAction fix: {}.", e);
             }
