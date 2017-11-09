@@ -15,6 +15,7 @@ package org.talend.components.marketo;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -25,41 +26,35 @@ import org.apache.avro.Schema.Type;
 
 public class MarketoUtils {
 
+    private static final List<SimpleDateFormat> allowedDateFormats = Arrays.asList(
+            new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM),
+            new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM_ALT),
+            new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM_UTC),
+            new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_REST),
+            new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_SOAP));
+
     /**
      * Parse a string amongst date patterns allowed to give back the matching Date object
-     * 
+     *
      * @param datetime string to parse
      * @return java.util.Date parsed
      * @throws ParseException
      */
     public static Date parseDateString(String datetime) throws ParseException {
-        Date result;
-        try {
-            result = new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM).parse(datetime);
-            return result;
-        } catch (ParseException e) {
+        Date result = null;
+        for (SimpleDateFormat sdf : allowedDateFormats) {
+            try {
+                result = sdf.parse(datetime);
+                break;
+            } catch (ParseException e) {
+                // nothing to do
+            }
         }
-        try {
-            result = new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM_ALT).parse(datetime);
-            return result;
-        } catch (ParseException e) {
+        if (result == null) {
+            throw new ParseException(datetime + " don't use a pattern allowed.", 0);
         }
-        try {
-            result = new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM_UTC).parse(datetime);
-            return result;
-        } catch (ParseException e) {
-        }
-        try {
-            result = new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_REST).parse(datetime);
-            return result;
-        } catch (ParseException e) {
-        }
-        try {
-            result = new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_SOAP).parse(datetime);
-            return result;
-        } catch (ParseException e) {
-        }
-        throw new ParseException(datetime + " don't use a pattern allowed.", 0);
+
+        return result;
     }
 
     public static Field generateNewField(Field origin) {
