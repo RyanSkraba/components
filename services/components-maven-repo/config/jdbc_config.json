@@ -53,6 +53,17 @@
 	 		{"path" : "mvn:net.sourceforge.jtds/jtds/1.3.1"}
 	 	]
 	
+	},
+	
+		{
+		"id" : "SNOWFLAKE",
+		"class" : "net.snowflake.client.jdbc.SnowflakeDriver",
+		"url" : "jdbc:snowflake://account.snowflakecomputing.com/?warehouse=warehouse&db=db",
+		"paths" : 
+	 	[
+	 		{"path" : "mvn:net.snowflake/snowflake-jdbc/3.3.1"}
+	 	]
+	
 	}
 
 ]
