@@ -23,6 +23,7 @@ import org.apache.avro.Schema.Field;
 import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.ComponentConstants;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.SnowflakePreparedStatementTableProperties;
@@ -72,7 +73,7 @@ public class TSnowflakeRowProperties extends SnowflakeConnectionTableProperties 
     public TSnowflakeRowProperties(String name) {
         super(name);
     }
-
+    
     @Override
     public void setupLayout() {
         super.setupLayout();
@@ -87,7 +88,16 @@ public class TSnowflakeRowProperties extends SnowflakeConnectionTableProperties 
         advancedForm.addRow(usePreparedStatement);
         advancedForm.addRow(Widget.widget(preparedStatementTable).setWidgetType(Widget.TABLE_WIDGET_TYPE));
         advancedForm.addRow(commitCount);
-
+    }
+    
+    @Override
+    public void setupProperties() {
+      super.setupProperties();
+      //TODO IMHO, the tag and flag should not be stored, they are only status for technical level, not user data.
+      //Now it make the migration a little more complex as we will not call setupProperties when deserialize
+      //Maybe should not call it in setupProperties, need another better place to call it
+      //Solution : a new method : initTechnicalStatus which can set the tag and flag, the method can be called at the end of deserialize method
+      query.setTaggedValue(ComponentConstants.LINE_SEPARATOR_REPLACED_TO, " ");
     }
 
     public void afterUsePreparedStatement() {
