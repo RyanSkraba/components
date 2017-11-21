@@ -47,13 +47,19 @@ public class MarketoBulkExecClient extends MarketoCustomObjectClient {
 
     public static final String API_PATH_BULK_CUSTOMOBJECTS_RESULT = "/v1/customobjects/%s/import/%d/%s.json";
 
-    public static final String API_PATH_BULK_LEADS = "/v1/leads/import.json";
+    public static final String API_PATH_BULK_LEADS = "/v1/leads.json";
 
-    public static final String API_PATH_BULK_LEADS_RESULT = "/v1/leads/import/%d/%s.json";
+    public static final String API_PATH_BULK_LEADS_RESULT_STATUS = "/v1/leads/batch/%d.json";
+
+    public static final String API_PATH_BULK_LEADS_RESULT_FOR = "/v1/leads/batch/%d/%s.json";
 
     public static final String BULK_STATUS_COMPLETE = "Complete";
 
     public static final String BULK_STATUS_FAILED = "Failed";
+
+    public static final String URI_FAILURES = "failures";
+
+    public static final String URI_WARNINGS = "warnings";
 
     private static final Logger LOG = LoggerFactory.getLogger(MarketoBulkExecClient.class);
 
@@ -140,10 +146,10 @@ public class MarketoBulkExecClient extends MarketoCustomObjectClient {
         if (bulk.getNumOfRowsFailed() > 0) {
             current_uri = new StringBuilder(bulkPath);
             if (bulk.isBulkLeadsImport()) {
-                current_uri.append(String.format(API_PATH_BULK_LEADS_RESULT, bulk.getBatchId(), "failures"));
+                current_uri.append(String.format(API_PATH_BULK_LEADS_RESULT_FOR, bulk.getBatchId(), URI_FAILURES));
             } else {
                 current_uri.append(String.format(API_PATH_BULK_CUSTOMOBJECTS_RESULT, bulk.getObjectApiName(), bulk.getBatchId(),
-                        "failures"));
+                        URI_FAILURES));
             }
             current_uri.append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
             LOG.debug("failures = {}.", current_uri);
@@ -154,10 +160,10 @@ public class MarketoBulkExecClient extends MarketoCustomObjectClient {
         if (bulk.getNumOfRowsWithWarning() > 0) {
             current_uri = new StringBuilder(bulkPath);
             if (bulk.isBulkLeadsImport()) {
-                current_uri.append(String.format(API_PATH_BULK_LEADS_RESULT, bulk.getBatchId(), "warnings"));
+                current_uri.append(String.format(API_PATH_BULK_LEADS_RESULT_FOR, bulk.getBatchId(), URI_WARNINGS));
             } else {
                 current_uri.append(String.format(API_PATH_BULK_CUSTOMOBJECTS_RESULT, bulk.getObjectApiName(), bulk.getBatchId(),
-                        "warnings"));
+                        URI_WARNINGS));
             }
             current_uri.append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
             LOG.debug("warnings = {}.", current_uri);
@@ -237,7 +243,7 @@ public class MarketoBulkExecClient extends MarketoCustomObjectClient {
                         Thread.sleep(pollWaitTime * 1000L);
                         current_uri = new StringBuilder(bulkPath);
                         if (bulkResult.isBulkLeadsImport()) {
-                            current_uri.append(String.format(API_PATH_BULK_LEADS_RESULT, bulkResult.getBatchId(), "status"));
+                            current_uri.append(String.format(API_PATH_BULK_LEADS_RESULT_STATUS, bulkResult.getBatchId()));
                         } else {
                             current_uri.append(String.format(API_PATH_BULK_CUSTOMOBJECTS_RESULT, bulkResult.getObjectApiName(),
                                     bulkResult.getBatchId(), "status"));
