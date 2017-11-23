@@ -38,7 +38,7 @@ public class ReplicateProperties extends FixedConnectorsComponentProperties {
     // output schema
     public transient PropertyPathConnector FLOW_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow");
 
-    public transient PropertyPathConnector SECOND_FLOW_CONNECTOR = new PropertyPathConnector(Connector.REJECT_NAME,
+    public transient PropertyPathConnector SECOND_FLOW_CONNECTOR = new ReplicatePropertyPathConnector(Connector.MAIN_NAME,
             "schemaSecondFlow");
 
     public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow");
@@ -90,4 +90,28 @@ public class ReplicateProperties extends FixedConnectorsComponentProperties {
         // Add the "main" schema into the "second flow" schema
         schemaSecondFlow.schema.setValue(inputSchema);
     }
+
+    /**
+     * Internal {@link PropertyPathConnector} that permits more than one MAIN in the output set.
+     *
+     * The default behaviour only hashes on the flow type (aka name).  This implementation prevents
+     * one MAIN_NAME from overwriting another when they are placed in a Set.
+     */
+    private static class ReplicatePropertyPathConnector extends PropertyPathConnector {
+
+        /**
+         * @param name
+         * @param propertyPath
+         */
+        public ReplicatePropertyPathConnector(String name, String propertyPath) {
+            super(name, propertyPath);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            // instances are only equal when they are the same instance.
+            return this == obj;
+        }
+    }
+
 }
