@@ -9,9 +9,9 @@ SET CLASSPATH=.\config;.\config\default;${project.artifactId}-${project.version}
 REM Set env variables which points to hadoop winutils binaries. It is required for S3 component
 REM If PAX_MVN_REPO is set, then it means bare service is used and config is located in default directory
 IF DEFINED PAX_MVN_REPO (
-	SET HADOOP_HOME=%THISDIR%config\default\hadoop
+	SET "HADOOP_HOME=%THISDIR%config\default\hadoop"
 ) ELSE (
-	SET HADOOP_HOME=%THISDIR%config\hadoop
+	SET "HADOOP_HOME=%THISDIR%config\hadoop"
 )
 SET PATH=%PATH%;%HADOOP_HOME%\bin
 
