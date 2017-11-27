@@ -74,7 +74,6 @@ public class TypeConverterProperties extends FixedConnectorsComponentProperties 
         public Converter getConverter(){
             return TypeConverter.as(this.targetClass);
         }
-
     }
 
     /**
@@ -84,8 +83,8 @@ public class TypeConverterProperties extends FixedConnectorsComponentProperties 
 
         public Property<String> field = PropertyFactory.newString("field").setRequired().setValue("");
 
-        public Property<TypeConverterOutputTypes> outputType = PropertyFactory
-                .newEnum("outputType", TypeConverterOutputTypes.class).setRequired();
+        public Property<String> outputType = PropertyFactory.newString("outputType", "String", "String")
+                .setPossibleValues(TypeConverterOutputTypes.values());
 
         public Property<String> outputFormat = PropertyFactory.newString("outputFormat").setValue("");
 

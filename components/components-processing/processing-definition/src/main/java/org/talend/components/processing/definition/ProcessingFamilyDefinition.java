@@ -44,7 +44,9 @@ public class ProcessingFamilyDefinition extends AbstractComponentFamilyDefinitio
     public ProcessingFamilyDefinition() {
         super(NAME,
                 // Components
-                new FilterRowDefinition(), new PythonRowDefinition(), new ReplicateDefinition(), new TypeConverterDefinition(),
+                new FilterRowDefinition(), new PythonRowDefinition(), new ReplicateDefinition(),
+                // TODO: Reactivate TypeConverter
+                // new TypeConverterDefinition(),
                 new WindowDefinition(),new NormalizeDefinition()
         // Component wizards
         );

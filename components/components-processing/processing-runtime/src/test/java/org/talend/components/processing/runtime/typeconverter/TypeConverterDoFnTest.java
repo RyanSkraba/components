@@ -37,32 +37,32 @@ public class TypeConverterDoFnTest {
         TypeConverterProperties.TypeConverterPropertiesInner converter1 = new TypeConverterProperties.TypeConverterPropertiesInner("converter1");
         converter1.init();
         converter1.field.setValue("stringToInt");
-        converter1.outputType.setValue(TypeConverterProperties.TypeConverterOutputTypes.Integer);
+        converter1.outputType.setValue(TypeConverterProperties.TypeConverterOutputTypes.Integer.toString());
         properties.converters.addRow(converter1);
 
         TypeConverterProperties.TypeConverterPropertiesInner converter2 = new TypeConverterProperties.TypeConverterPropertiesInner("converter2");
         converter2.init();
         converter2.field.setValue("stringToBool");
-        converter2.outputType.setValue(TypeConverterProperties.TypeConverterOutputTypes.Boolean);
+        converter2.outputType.setValue(TypeConverterProperties.TypeConverterOutputTypes.Boolean.toString());
         properties.converters.addRow(converter2);
 
         TypeConverterProperties.TypeConverterPropertiesInner converter3 = new TypeConverterProperties.TypeConverterPropertiesInner("converter3");
         converter3.init();
         converter3.field.setValue("stringToDate");
-        converter3.outputType.setValue(TypeConverterProperties.TypeConverterOutputTypes.Date);
+        converter3.outputType.setValue(TypeConverterProperties.TypeConverterOutputTypes.Date.toString());
         properties.converters.addRow(converter3);
 
         TypeConverterProperties.TypeConverterPropertiesInner converter4 = new TypeConverterProperties.TypeConverterPropertiesInner("converter4");
         converter4.init();
         converter4.field.setValue("stringToDateWithFormat");
-        converter4.outputType.setValue(TypeConverterProperties.TypeConverterOutputTypes.Date);
+        converter4.outputType.setValue(TypeConverterProperties.TypeConverterOutputTypes.Date.toString());
         converter4.outputFormat.setValue("dd/MM/yyyy");
         properties.converters.addRow(converter4);
 
         TypeConverterProperties.TypeConverterPropertiesInner converter5 = new TypeConverterProperties.TypeConverterPropertiesInner("converter5");
         converter5.init();
         converter5.field.setValue("stringToDecimal");
-        converter5.outputType.setValue(TypeConverterProperties.TypeConverterOutputTypes.Decimal);
+        converter5.outputType.setValue(TypeConverterProperties.TypeConverterOutputTypes.Decimal.toString());
         converter5.outputFormat.setValue("#,###");
         properties.converters.addRow(converter5);
 

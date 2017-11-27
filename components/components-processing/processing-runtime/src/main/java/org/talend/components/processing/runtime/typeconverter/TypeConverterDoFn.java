@@ -24,7 +24,9 @@ public class TypeConverterDoFn extends DoFn<IndexedRecord, IndexedRecord> {
         for (TypeConverterProperties.TypeConverterPropertiesInner currentPathConverter : properties.converters.subProperties) {
             if (currentPathConverter.field != null && currentPathConverter.field.getValue() != null && !currentPathConverter.field.getValue().isEmpty() && currentPathConverter.outputType != null && currentPathConverter.outputType.getValue() != null) {
                 Stack<String> pathSteps = TypeConverterUtils.getPathSteps(currentPathConverter.field.getValue());
-                outputSchema = TypeConverterUtils.convertSchema(outputSchema, pathSteps, currentPathConverter.outputType.getValue(), currentPathConverter.outputFormat.getValue());
+                outputSchema = TypeConverterUtils.convertSchema(outputSchema, pathSteps,
+                        TypeConverterProperties.TypeConverterOutputTypes.valueOf(currentPathConverter.outputType.getValue()),
+                        currentPathConverter.outputFormat.getValue());
             }
         }
 
@@ -37,7 +39,9 @@ public class TypeConverterDoFn extends DoFn<IndexedRecord, IndexedRecord> {
             // Loop on converters
             if (currentValueConverter.field != null && currentValueConverter.field.getValue() != null && !currentValueConverter.field.getValue().isEmpty() && currentValueConverter.outputType != null && currentValueConverter.outputType.getValue() != null) {
                 Stack<String> pathSteps = TypeConverterUtils.getPathSteps(currentValueConverter.field.getValue());
-                TypeConverterUtils.convertValue(outputRecordBuilder, pathSteps, currentValueConverter.outputType.getValue(), currentValueConverter.outputFormat.getValue());
+                TypeConverterUtils.convertValue(outputRecordBuilder, pathSteps,
+                        TypeConverterProperties.TypeConverterOutputTypes.valueOf(currentValueConverter.outputType.getValue()),
+                        currentValueConverter.outputFormat.getValue());
             }
         }
 
