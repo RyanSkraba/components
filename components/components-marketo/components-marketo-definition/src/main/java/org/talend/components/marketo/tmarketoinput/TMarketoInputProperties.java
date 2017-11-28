@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -899,34 +898,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
      * ClassCastException : LinkedHashMap cannot be cast to Enum.
      */
     private void checkForInvalidStoredProperties() {
-        Object o;
-        String ov;
-        LinkedHashMap value;
-        if (inputOperation.getStoredValue() instanceof LinkedHashMap) {
-            o = inputOperation.getStoredValue();
-            value = (LinkedHashMap) o;
-            ov = String.valueOf(value.get("name"));
-            try {
-                inputOperation = newEnum("inputOperation", InputOperation.class).setRequired();
-                inputOperation.setValue(InputOperation.valueOf(ov));
-                inputOperation.setStoredValue(InputOperation.valueOf(ov));
-                inputOperation.setPossibleValues(InputOperation.values());
-            } catch (Exception e) {
-                LOG.error("Error during inputOperation fix: {}.", e);
-            }
-        }
-        if (customObjectAction.getStoredValue() instanceof LinkedHashMap) {
-            o = customObjectAction.getStoredValue();
-            value = (LinkedHashMap) o;
-            ov = String.valueOf(value.get("name"));
-            try {
-                customObjectAction = newEnum("customObjectAction", CustomObjectAction.class);
-                customObjectAction.setValue(CustomObjectAction.valueOf(ov));
-                customObjectAction.setStoredValue(CustomObjectAction.valueOf(ov));
-                customObjectAction.setPossibleValues(CustomObjectAction.values());
-            } catch (Exception e) {
-                LOG.error("Error during customObjectAction fix: {}.", e);
-            }
-        }
+        inputOperation = checkForInvalidStoredEnumProperty(inputOperation, InputOperation.class);
+        customObjectAction = checkForInvalidStoredEnumProperty(customObjectAction, CustomObjectAction.class);
     }
 }

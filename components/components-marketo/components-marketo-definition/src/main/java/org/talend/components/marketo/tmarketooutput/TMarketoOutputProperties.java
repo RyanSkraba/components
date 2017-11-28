@@ -26,7 +26,6 @@ import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -421,35 +420,8 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
      * ClassCastException : LinkedHashMap cannot be cast to Enum.
      */
     private void checkForInvalidStoredProperties() {
-        Object o;
-        String ov;
-        LinkedHashMap value;
-        if (outputOperation.getStoredValue() instanceof LinkedHashMap) {
-            o = outputOperation.getStoredValue();
-            value = (LinkedHashMap) o;
-            ov = String.valueOf(value.get("name"));
-            try {
-                outputOperation = newEnum("outputOperation", OutputOperation.class);
-                outputOperation.setValue(OutputOperation.valueOf(ov));
-                outputOperation.setStoredValue(OutputOperation.valueOf(ov));
-                outputOperation.setPossibleValues(OutputOperation.values());
-            } catch (Exception e) {
-                LOG.error("Error during outputOperation fix: {}.", e);
-            }
-        }
-        if (customObjectSyncAction.getStoredValue() instanceof LinkedHashMap) {
-            o = customObjectSyncAction.getStoredValue();
-            value = (LinkedHashMap) o;
-            ov = String.valueOf(value.get("name"));
-            try {
-                customObjectSyncAction = newEnum("customObjectSyncAction", CustomObjectSyncAction.class);
-                customObjectSyncAction.setValue(CustomObjectSyncAction.valueOf(ov));
-                customObjectSyncAction.setStoredValue(CustomObjectSyncAction.valueOf(ov));
-                customObjectSyncAction.setPossibleValues(CustomObjectSyncAction.values());
-            } catch (Exception e) {
-                LOG.error("Error during customObjectSyncAction fix: {}.", e);
-            }
-        }
+        outputOperation = checkForInvalidStoredEnumProperty(outputOperation, OutputOperation.class);
+        customObjectSyncAction = checkForInvalidStoredEnumProperty(customObjectSyncAction, CustomObjectSyncAction.class);
     }
 
 }
