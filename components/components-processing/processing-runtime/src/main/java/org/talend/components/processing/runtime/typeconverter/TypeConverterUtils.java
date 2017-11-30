@@ -118,7 +118,7 @@ public class TypeConverterUtils {
                 result = ((LocalDate) convertedValue).toEpochDay();
                 break;
             case Time:
-                result = ((LocalTime) convertedValue).toNanoOfDay();
+                result = ((LocalTime) convertedValue).toNanoOfDay() / 1000000L;
                 break;
             case DateTime:
                 result = ((LocalDateTime) convertedValue).toEpochSecond(ZoneOffset.ofTotalSeconds(0));
