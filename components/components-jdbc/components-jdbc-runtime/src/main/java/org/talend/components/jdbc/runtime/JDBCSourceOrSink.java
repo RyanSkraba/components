@@ -14,16 +14,13 @@
 package org.talend.components.jdbc.runtime;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
@@ -47,6 +44,8 @@ import org.talend.daikon.properties.ValidationResultMutable;
  *
  */
 public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JDBCSourceOrSink.class);
 
     private static final long serialVersionUID = -1730391293657968628L;
 
@@ -143,7 +142,11 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
         // connection component
         Connection conn = JdbcRuntimeUtils.createConnection(setting);
-        conn.setReadOnly(setting.isReadOnly());
+        try {
+            conn.setReadOnly(setting.isReadOnly());
+        } catch (SQLFeatureNotSupportedException e) {
+            LOGGER.warn("JDBC driver '{}' does not support read only mode.", setting.getDriverClass(), e);
+        }
 
         Boolean autoCommit = setting.getUseAutoCommit();
         if (autoCommit != null && autoCommit) {
