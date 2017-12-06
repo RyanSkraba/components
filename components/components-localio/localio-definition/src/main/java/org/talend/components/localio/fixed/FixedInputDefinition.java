@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.localio.fixedflowinput;
+package org.talend.components.localio.fixed;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,22 +28,21 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
- * @deprecated Use FixedInputDefinition
+ * An input component that supplies a fixed dataset without requiring any persistent resources.
  */
-@Deprecated
-public class FixedFlowInputDefinition extends AbstractComponentDefinition {
+public class FixedInputDefinition extends AbstractComponentDefinition {
 
-    public static final String NAME = "FixedFlowInput";
+    public static final String NAME = "FixedInput";
 
-    public static final String RUNTIME = "org.talend.components.localio.runtime.fixedflowinput.FixedFlowInputRuntime";
+    public static final String RUNTIME = "org.talend.components.localio.runtime.fixed.FixedInputRuntime";
 
-    public FixedFlowInputDefinition() {
+    public FixedInputDefinition() {
         super(NAME, ExecutionEngine.BEAM);
     }
 
     @Override
-    public Class<FixedFlowInputProperties> getPropertyClass() {
-        return FixedFlowInputProperties.class;
+    public Class<FixedInputProperties> getPropertyClass() {
+        return FixedInputProperties.class;
     }
 
     @Override
@@ -57,18 +56,25 @@ public class FixedFlowInputDefinition extends AbstractComponentDefinition {
     }
 
     @Override
+    public String getIconKey() {
+        return "flow-source-o";
+    }
+
+    @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
         return ConnectorTopology.OUTGOING_ONLY;
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
+            ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
         assertConnectorTopologyCompatibility(connectorTopology);
         try {
             return new JarRuntimeInfo(new URL(LocalIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
                     DependenciesReader.computeDependenciesFilePath(LocalIOComponentFamilyDefinition.MAVEN_GROUP_ID,
-                            LocalIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID), RUNTIME);
+                            LocalIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID),
+                    RUNTIME);
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }

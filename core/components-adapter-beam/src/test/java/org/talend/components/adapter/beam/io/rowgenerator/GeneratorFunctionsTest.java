@@ -47,9 +47,8 @@ public class GeneratorFunctionsTest {
      * @return A reusable instance to use in creating rows.
      */
     public static GeneratorContext generatorContextOf(int partitionId, long rowId) {
-        GeneratorContext ctx = GeneratorContext.of(partitionId);
+        GeneratorContext ctx = GeneratorContext.of(partitionId, 12345L);
         ctx.setRowId(rowId);
-        ctx.setRandom(new Random(rowId));
         return ctx;
     }
 
@@ -66,7 +65,6 @@ public class GeneratorFunctionsTest {
         IndexedRecord r1 = fn.apply(ctx);
 
         // Verify that reusing the function generator with the same context returns the same record.
-        ctx.setRandom(new Random(0));
         ctx.setRowId(0);
         assertThat(fn.apply(ctx).toString(), equalTo(r1.toString()));
 
@@ -91,7 +89,6 @@ public class GeneratorFunctionsTest {
 
         // Create a second record from the same context.
         ctx.setRowId(1);
-        ctx.setRandom(new Random(1));
         IndexedRecord r2 = fn.apply(ctx);
 
         // The records should be different
@@ -104,17 +101,13 @@ public class GeneratorFunctionsTest {
 
     @Test
     public void testGeneratorContext() {
-        GeneratorContext ctx = GeneratorContext.of(123);
+        GeneratorContext ctx = GeneratorContext.of(123, 0L);
         assertThat(ctx.getPartitionId(), is(123));
         assertThat(ctx.getRowId(), is(0L));
-        assertThat(ctx.getRandom(), nullValue());
 
-        Random random = new Random(0);
-        ctx.setRandom(random);
         ctx.setRowId(234L);
         assertThat(ctx.getPartitionId(), is(123));
         assertThat(ctx.getRowId(), is(234L));
-        assertThat(ctx.getRandom(), sameInstance(random));
     }
 
     @Test

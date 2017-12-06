@@ -302,15 +302,11 @@ public class RowGeneratorIO {
 
         private BoundedRowGeneratorReader(BoundedRowGeneratorSource source) {
             this.source = source;
-            this.ctx = GeneratorFunction.GeneratorContext.of(source.partitionId);
+            this.ctx = GeneratorFunction.GeneratorContext.of(source.partitionId, source.spec.getSeed());
         }
 
         @Override
         public boolean start() {
-            // Set the random seed once if it hasn't already been set.
-            if (source.spec.getSeed() == null) {
-                ctx.setRandom(new Random(System.currentTimeMillis() + source.partitionId));
-            }
             return advance();
         }
 
@@ -324,10 +320,6 @@ public class RowGeneratorIO {
 
             // Update the row generator context for the next row.
             ctx.setRowId(source.startRowId + count);
-            if (source.spec.getSeed() != null) {
-                ctx.setRandom(new Random(source.spec.getSeed() + ctx.getRowId()));
-            }
-
             current = source.generator.apply(ctx);
             count++;
             return true;

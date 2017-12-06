@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.localio.fixedflowinput;
+package org.talend.components.localio.devnull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,56 +19,50 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
+import org.talend.components.common.dataset.DatasetProperties;
+import org.talend.components.common.io.IOProperties;
+import org.talend.components.localio.fixed.FixedDatasetDefinition;
+import org.talend.components.localio.fixed.FixedDatasetProperties;
+import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-/**
- * @deprecated Use FixedInputProperties
- */
-@Deprecated
-public class FixedFlowInputProperties extends FixedConnectorsComponentProperties {
+public class DevNullOutputProperties extends FixedConnectorsComponentProperties implements IOProperties<DatasetProperties> {
 
-    public FixedFlowInputProperties(String name) {
+    public DevNullOutputProperties(String name) {
         super(name);
     }
 
-    public transient PropertyPathConnector FLOW_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow");
+    public transient PropertyPathConnector IN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "incoming");
 
-    public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow");
+    public SchemaProperties incoming = new SchemaProperties("incoming");
 
-    public Property<Integer> nbRows = PropertyFactory.newInteger("nbRows", 1);
-
-    public Property<String> values = PropertyFactory.newString("values", "");
+    public transient ReferenceProperties<FixedDatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
+            FixedDatasetDefinition.NAME);
 
     @Override
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
-        mainForm.addRow(schemaFlow.getForm(Form.REFERENCE));
-        mainForm.addRow(nbRows);
-        mainForm.addRow(values);
     }
 
     @Override
-    public void setupProperties() {
-        super.setupProperties();
-        nbRows.setValue(1);
-        values.setValue("");
+    public DatasetProperties getDatasetProperties() {
+        return datasetRef.getReference();
     }
 
     @Override
-    public void refreshLayout(Form form) {
-        super.refreshLayout(form);
-        // everything is always visible
+    public void setDatasetProperties(DatasetProperties datasetProperties) {
+        datasetRef.setReference(datasetProperties);
     }
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         HashSet<PropertyPathConnector> connectors = new HashSet<PropertyPathConnector>();
-        if (isOutputConnection) {
+        if (!isOutputConnection) {
             // output schema
-            connectors.add(FLOW_CONNECTOR);
+            connectors.add(IN_CONNECTOR);
         }
         return connectors;
     }

@@ -35,6 +35,13 @@
 			<version>${beam.version}</version>
 		</dependency>
 
+		<!-- CSV format-->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.4</version>
+		</dependency>
+
 		<!-- Tests -->
 		<dependency>
 			<groupId>junit</groupId>

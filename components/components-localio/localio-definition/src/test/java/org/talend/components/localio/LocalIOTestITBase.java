@@ -16,11 +16,15 @@ import javax.inject.Inject;
 
 import org.junit.Test;
 import org.talend.components.api.test.AbstractComponentTest2;
-import org.talend.components.localio.fixedflowinput.FixedFlowInputDefinition;
+import org.talend.components.common.dataset.DatasetDefinition;
+import org.talend.components.common.datastore.DatastoreDefinition;
+import org.talend.components.localio.devnull.DevNullOutputDefinition;
+import org.talend.components.localio.fixed.FixedDatasetDefinition;
+import org.talend.components.localio.fixed.FixedDatastoreDefinition;
+import org.talend.components.localio.fixed.FixedInputDefinition;
+import org.talend.components.localio.rowgenerator.RowGeneratorDefinition;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
-
-// import org.talend.components.localio.rowgenerator.RowGeneratorDefinition;
 
 public abstract class LocalIOTestITBase extends AbstractComponentTest2 {
 
@@ -34,7 +38,9 @@ public abstract class LocalIOTestITBase extends AbstractComponentTest2 {
 
     @Test
     public void assertComponentsAreRegistered() {
-        assertComponentIsRegistered(Definition.class, FixedFlowInputDefinition.NAME, FixedFlowInputDefinition.class);
-        // assertComponentIsRegistered(Definition.class, RowGeneratorDefinition.NAME, RowGeneratorDefinition.class)
+        assertComponentIsRegistered(DatastoreDefinition.class, FixedDatastoreDefinition.NAME, FixedDatastoreDefinition.class);
+        assertComponentIsRegistered(DatasetDefinition.class, FixedDatasetDefinition.NAME, FixedDatasetDefinition.class);
+        assertComponentIsRegistered(Definition.class, FixedInputDefinition.NAME, FixedInputDefinition.class);
+        assertComponentIsRegistered(Definition.class, DevNullOutputDefinition.NAME, DevNullOutputDefinition.class);
     }
 }

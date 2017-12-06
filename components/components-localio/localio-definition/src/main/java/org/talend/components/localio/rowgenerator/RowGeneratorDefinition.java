@@ -53,18 +53,25 @@ public class RowGeneratorDefinition extends AbstractComponentDefinition {
     }
 
     @Override
+    public String getIconKey() {
+        return "streams";
+    }
+
+    @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
         return ConnectorTopology.OUTGOING_ONLY;
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
+            ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
         assertConnectorTopologyCompatibility(connectorTopology);
         try {
             return new JarRuntimeInfo(new URL(LocalIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
                     DependenciesReader.computeDependenciesFilePath(LocalIOComponentFamilyDefinition.MAVEN_GROUP_ID,
-                            LocalIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID), RUNTIME);
+                            LocalIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID),
+                    RUNTIME);
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }

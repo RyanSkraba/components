@@ -12,12 +12,17 @@
 // ============================================================================
 package org.talend.components.localio;
 
-import com.google.auto.service.AutoService;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
+import org.talend.components.localio.devnull.DevNullOutputDefinition;
+import org.talend.components.localio.fixed.FixedDatasetDefinition;
+import org.talend.components.localio.fixed.FixedDatastoreDefinition;
+import org.talend.components.localio.fixed.FixedInputDefinition;
 import org.talend.components.localio.fixedflowinput.FixedFlowInputDefinition;
 import org.talend.components.localio.rowgenerator.RowGeneratorDefinition;
+
+import com.google.auto.service.AutoService;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -25,7 +30,8 @@ import aQute.bnd.annotation.component.Component;
  * Install all of the definitions provided for the LocalIO family of components.
  */
 @AutoService(ComponentInstaller.class)
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + LocalIOComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX
+        + LocalIOComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class LocalIOComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "LocalIO";
@@ -37,7 +43,9 @@ public class LocalIOComponentFamilyDefinition extends AbstractComponentFamilyDef
     public static final String MAVEN_DEFAULT_RUNTIME_URI = "mvn:" + MAVEN_GROUP_ID + "/" + MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID;
 
     public LocalIOComponentFamilyDefinition() {
-        super(NAME, new FixedFlowInputDefinition(), new RowGeneratorDefinition());
+        super(NAME,
+                new FixedDatastoreDefinition(), new FixedDatasetDefinition(), new FixedInputDefinition(), new DevNullOutputDefinition(),
+                new FixedFlowInputDefinition());
     }
 
     @Override
