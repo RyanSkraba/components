@@ -14,8 +14,8 @@
     <packaging>bundle</packaging>
 
     <properties>
-        <couchbase-core.version>1.5.1</couchbase-core.version>
-        <couchbase-client.version>2.5.1</couchbase-client.version>
+        <couchbase-core.version>1.5.3</couchbase-core.version>
+        <couchbase-client.version>2.5.3</couchbase-client.version>
         <couchbase-dcp.version>0.12.0</couchbase-dcp.version>
         <rx.version>1.3.3</rx.version>
         <couchbase.docker.image.name>igis/couchbase-server-itest:4.6.2</couchbase.docker.image.name>
@@ -183,7 +183,7 @@
                                 <Bundle-SymbolicName>org.talend.components.couchbase</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>
-                                    !com.couchbase.client.deps.io.netty.internal.tcnative,!org.conscrypt,!com.barchart.udt,!com.barchart.udt.nio,!com.google.protobuf,!com.jcraft.jzlib,!com.sun.*,!sun.*,!gnu.io,!javassist,!org.jboss.*,!org.joda.*,!org.apache.logging.log4j,!org.apache.tomcat,!org.apache.tomcat.jni,!org.bouncycastle.*,!org.eclipse.*,*
+                                    !org.apache.logging.log4j.*,!com.couchbase.client.deps.io.netty.internal.tcnative,!org.conscrypt,!com.barchart.udt,!com.barchart.udt.nio,!com.google.protobuf,!com.jcraft.jzlib,!com.sun.*,!sun.*,!gnu.io,!javassist,!org.jboss.*,!org.joda.*,!org.apache.logging.log4j,!org.apache.tomcat,!org.apache.tomcat.jni,!org.bouncycastle.*,!org.eclipse.*,*
                                 </Import-Package>
                                 <Export-Package>!com.couchbase.client.deps,org.talend.components.couchbase,org.talend.components.couchbase.input,org.talend.components.couchbase.output</Export-Package>
                                 <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*

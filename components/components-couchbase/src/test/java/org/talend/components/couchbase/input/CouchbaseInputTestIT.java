@@ -42,6 +42,8 @@ import com.couchbase.client.java.CouchbaseCluster;
 import com.couchbase.client.java.PersistTo;
 import com.couchbase.client.java.document.JsonDocument;
 import com.couchbase.client.java.document.json.JsonObject;
+import com.couchbase.client.java.env.CouchbaseEnvironment;
+import com.couchbase.client.java.env.DefaultCouchbaseEnvironment;
 
 @Category({RequiresCouchbaseServer.class})
 public class CouchbaseInputTestIT {
@@ -93,7 +95,12 @@ public class CouchbaseInputTestIT {
     }
 
     private void populateBucket() {
-        CouchbaseCluster cluster = CouchbaseCluster.create(bootstrapNodes);
+        CouchbaseEnvironment env = DefaultCouchbaseEnvironment.builder()
+                .socketConnectTimeout(60000)
+                .connectTimeout(60000)
+                .keepAliveInterval(60000)
+                .build();
+        CouchbaseCluster cluster = CouchbaseCluster.create(env, bootstrapNodes);
         Bucket bucket = cluster.openBucket(bucketName, password);
         assertTrue(bucket.bucketManager().flush());
         JsonDocument document = JsonDocument.create("foo", JsonObject.create().put("bar", 42));
