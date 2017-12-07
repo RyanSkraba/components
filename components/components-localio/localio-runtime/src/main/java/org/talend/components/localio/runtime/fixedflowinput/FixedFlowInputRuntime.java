@@ -34,7 +34,7 @@ public class FixedFlowInputRuntime extends PTransform<PBegin, PCollection<Indexe
 
     @Override
     public PCollection<IndexedRecord> expand(PBegin begin) {
-        return begin.apply(properties.getName(), Read.from(new FixedFlowInputBoundedSource() //
+        return begin.apply(Read.from(new FixedFlowInputBoundedSource() //
                 .withSchema(properties.schemaFlow.schema.getValue())//
                 .withValues(properties.values.getValue()) //
                 .withNbRows(properties.nbRows.getValue())));

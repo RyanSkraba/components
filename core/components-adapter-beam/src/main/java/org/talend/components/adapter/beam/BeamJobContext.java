@@ -68,4 +68,8 @@ public interface BeamJobContext {
      */
     BeamJobRuntimeContainer getRuntimeContainer();
 
+    /**
+     * @return The component label, using it for PTransform's name
+     */
+    String getPTransformName();
 }

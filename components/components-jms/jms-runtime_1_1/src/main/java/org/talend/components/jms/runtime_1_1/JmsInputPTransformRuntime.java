@@ -71,10 +71,10 @@ public class JmsInputPTransformRuntime extends PTransform<PBegin, PCollection> i
         } else if (properties.timeout.getValue() != -1) {
             read = read.withMaxReadTime(Duration.millis(properties.timeout.getValue()));
         }
-        PCollection<JmsRecord> jmsCollection = pBegin.apply("ReadFromJms", read);
+        PCollection<JmsRecord> jmsCollection = pBegin.apply(read);
 
         if (jmsCollection != null) {
-            PCollection<String> outputCollection = jmsCollection.apply("ExtractString", ParDo.of(new DoFn<JmsRecord, String>() {
+            PCollection<String> outputCollection = jmsCollection.apply("JmsRecordToIndexedRecord", ParDo.of(new DoFn<JmsRecord, String>() {
 
                 @DoFn.ProcessElement
                 public void processElement(ProcessContext c) throws Exception {

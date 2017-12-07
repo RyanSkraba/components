@@ -55,8 +55,7 @@ public class FilterRowRuntime extends PTransform<PCollection<Object>, PCollectio
 				.withProperties(properties) //
 				.withOutputSchema(hasFlow) //
 				.withRejectSchema(hasReject);
-		return inputPCollection.apply(properties.getName(),
-				ParDo.of(doFn).withOutputTags(flowOutput, TupleTagList.of(rejectOutput)));
+		return inputPCollection.apply(ParDo.of(doFn).withOutputTags(flowOutput, TupleTagList.of(rejectOutput)));
 
 	}
 
@@ -72,7 +71,7 @@ public class FilterRowRuntime extends PTransform<PCollection<Object>, PCollectio
 				hasFlow = !StringUtils.isEmpty(flowLink);
 				hasReject = !StringUtils.isEmpty(rejectLink);
 
-				PCollectionTuple outputTuples = expand(mainPCollection);
+				PCollectionTuple outputTuples = mainPCollection.apply(ctx.getPTransformName(), this);
 
 				if (hasFlow) {
 					ctx.putPCollectionByLinkName(flowLink, outputTuples.get(flowOutput));

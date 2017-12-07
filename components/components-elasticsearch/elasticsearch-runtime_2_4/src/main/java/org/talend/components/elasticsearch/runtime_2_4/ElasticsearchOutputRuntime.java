@@ -42,10 +42,10 @@ public class ElasticsearchOutputRuntime extends PTransform<PCollection<IndexedRe
     public PDone expand(PCollection<IndexedRecord> in) {
         ElasticsearchIO.Write esWrite = ElasticsearchIO.write()
                 .withConnectionConfiguration(ElasticsearchInputRuntime.createConnectionConf(properties.getDatasetProperties()));
-        return in.apply("formatForElasticsearch", ParDo.of(new FormatESRequest())).apply("writeToElasticsearch", esWrite);
+        return in.apply(ParDo.of(new IndexedRecordToDocumentFn())).apply(esWrite);
     }
 
-    public static class FormatESRequest extends DoFn<IndexedRecord, String> {
+    public static class IndexedRecordToDocumentFn extends DoFn<IndexedRecord, String> {
 
         @DoFn.ProcessElement
         public void processElement(ProcessContext c) {

@@ -37,7 +37,7 @@ public class NormalizeRuntime extends PTransform<PCollection<IndexedRecord>, PCo
         NormalizeDoFn doFn = new NormalizeDoFn() //
                 .withProperties(properties);
 
-        PCollection outputCollection = inputPCollection.apply(properties.getName(), ParDo.of(doFn));
+        PCollection outputCollection = inputPCollection.apply(ParDo.of(doFn));
         return outputCollection;
     }
 }

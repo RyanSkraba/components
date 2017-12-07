@@ -29,7 +29,7 @@ public class TypeConverterRuntime extends PTransform<PCollection<IndexedRecord>,
     @Override
     public PCollection<IndexedRecord> expand(PCollection<IndexedRecord> input) {
         TypeConverterDoFn function = new TypeConverterDoFn().withProperties(properties);
-        PCollection<IndexedRecord> output = input.apply("TypeConverter", ParDo.of(function))
+        PCollection<IndexedRecord> output = input.apply(ParDo.of(function))
                 .setCoder(LazyAvroCoder.<IndexedRecord>of());
         return output;
     }

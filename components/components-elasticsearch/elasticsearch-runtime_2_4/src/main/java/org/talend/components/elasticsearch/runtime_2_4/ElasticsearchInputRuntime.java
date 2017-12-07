@@ -88,8 +88,8 @@ public class ElasticsearchInputRuntime extends PTransform<PBegin, PCollection<In
         if (properties.query.getValue() != null) {
             esRead = esRead.withQuery(properties.query.getValue());
         }
-        PCollection<String> readFromElasticsearch = in.apply("ReadFromElasticsearch", esRead);
-        PCollection<IndexedRecord> elasticsearchDataAsAvro = readFromElasticsearch.apply("ElasticsearchDataAsAvro", ParDo.of(new DoFn<String, IndexedRecord>() {
+        PCollection<String> readFromElasticsearch = in.apply(esRead);
+        PCollection<IndexedRecord> elasticsearchDataAsAvro = readFromElasticsearch.apply("DocumentToIndexedRecord", ParDo.of(new DoFn<String, IndexedRecord>() {
             @ProcessElement
             public void processElement(ProcessContext c) {
                 if (jsonGenericRecordConverter == null) {

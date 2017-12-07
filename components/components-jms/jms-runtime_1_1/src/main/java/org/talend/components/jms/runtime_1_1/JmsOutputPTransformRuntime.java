@@ -44,6 +44,7 @@ public class JmsOutputPTransformRuntime extends PTransform<PCollection<Object>, 
 
     @Override
     public PDone expand(PCollection<Object> objectPCollection) {
+        //TODO remove this method from PCollection<Object> to PCollection<IndexedRecord>, as the incoming type always PCollection<IndexedRecord>
         PCollection<IndexedRecord> indexedCollection = objectPCollection.apply("ExtractIndexedRecord",
                 ParDo.of(new DoFn<Object, IndexedRecord>() {
 
@@ -62,7 +63,7 @@ public class JmsOutputPTransformRuntime extends PTransform<PCollection<Object>, 
                 }));
         indexedCollection.setCoder(LazyAvroCoder.of());
 
-        PCollection<String> jmsCollection = indexedCollection.apply("ExtractString", ParDo.of(new DoFn<IndexedRecord, String>() {
+        PCollection<String> jmsCollection = indexedCollection.apply("IndexedRecordToJmsRecord", ParDo.of(new DoFn<IndexedRecord, String>() {
 
             @DoFn.ProcessElement
             public void processElement(ProcessContext c) throws Exception {
@@ -74,12 +75,10 @@ public class JmsOutputPTransformRuntime extends PTransform<PCollection<Object>, 
         datastoreRuntime = new JmsDatastoreRuntime();
         datastoreRuntime.initialize(null, properties.datasetRef.getReference().getDatastoreProperties());
         if (messageType.equals(JmsMessageType.QUEUE)) {
-            // TODO label comes from user
-            return jmsCollection.apply("writeToJms", JmsIO.write().withConnectionFactory(datastoreRuntime.getConnectionFactory())
+            return jmsCollection.apply(JmsIO.write().withConnectionFactory(datastoreRuntime.getConnectionFactory())
                     .withQueue(properties.datasetRef.getReference().queueTopicName.getValue()));
         } else if (messageType.equals(JmsMessageType.TOPIC)) {
-            // TODO label comes from user
-            return jmsCollection.apply("writeToJms", JmsIO.write().withConnectionFactory(datastoreRuntime.getConnectionFactory())
+            return jmsCollection.apply(JmsIO.write().withConnectionFactory(datastoreRuntime.getConnectionFactory())
                     .withTopic(properties.datasetRef.getReference().queueTopicName.getValue()));
 
         } else {

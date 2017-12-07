@@ -49,12 +49,14 @@ public class KafkaOutputPTransformRuntime extends PTransform<PCollection<Indexed
 
     @Override
     public PDone expand(PCollection<IndexedRecord> objectPCollection) {
-        final boolean useAvro = properties.getDatasetProperties().valueFormat
-                .getValue() == KafkaDatasetProperties.ValueFormat.AVRO;
+        final boolean useAvro =
+                properties.getDatasetProperties().valueFormat.getValue() == KafkaDatasetProperties.ValueFormat.AVRO;
 
-        KafkaIO.Write<byte[], byte[]> kafkaWrite = KafkaIO.<byte[], byte[]> write()
+        KafkaIO.Write<byte[], byte[]> kafkaWrite = KafkaIO
+                .<byte[], byte[]> write()
                 .withBootstrapServers(properties.getDatasetProperties().getDatastoreProperties().brokers.getValue())
-                .withTopic(properties.getDatasetProperties().topic.getValue()).withKeySerializer(ByteArraySerializer.class)
+                .withTopic(properties.getDatasetProperties().topic.getValue())
+                .withKeySerializer(ByteArraySerializer.class)
                 .withValueSerializer(ByteArraySerializer.class)
                 .updateProducerProperties(KafkaConnection.createOutputMaps(properties));
 
@@ -63,10 +65,10 @@ public class KafkaOutputPTransformRuntime extends PTransform<PCollection<Indexed
             PCollection pc1 = objectPCollection.apply(WithKeys.of(new ProduceKey(properties.keyColumn.getValue())));
             if (useAvro) {
                 // TODO for now use incoming avro schema directly, do not check configured schema, improvement it.
-                return ((PCollection<KV<byte[], byte[]>>) pc1.apply("avroToByteArray", MapElements.via(new AvroToByteArrayKV())))
+                return ((PCollection<KV<byte[], byte[]>>) pc1.apply(MapElements.via(new AvroToByteArrayKV())))
                         .apply(kafkaWrite);
             } else { // csv
-                return ((PCollection<KV<byte[], byte[]>>) pc1.apply("formatCsvKV",
+                return ((PCollection<KV<byte[], byte[]>>) pc1.apply(
                         MapElements.via(new FormatCsvKV(properties.getDatasetProperties().fieldDelimiter.getValue()))))
                                 .apply(kafkaWrite);
             }
@@ -74,10 +76,12 @@ public class KafkaOutputPTransformRuntime extends PTransform<PCollection<Indexed
         case ROUND_ROBIN: {
             if (useAvro) {
                 // TODO for now use incoming avro schema directly, do not check configured schema, improvement it.
-                return (PDone) objectPCollection.apply(MapElements.via(new AvroToByteArray())).apply(kafkaWrite.values());
+                return (PDone) objectPCollection.apply(MapElements.via(new AvroToByteArray())).apply(
+                        kafkaWrite.values());
             } else { // csv
                 return (PDone) objectPCollection
-                        .apply(MapElements.via(new FormatCsv(properties.getDatasetProperties().fieldDelimiter.getValue())))
+                        .apply(MapElements
+                                .via(new FormatCsv(properties.getDatasetProperties().fieldDelimiter.getValue())))
                         .apply(kafkaWrite.values());
             }
         }
