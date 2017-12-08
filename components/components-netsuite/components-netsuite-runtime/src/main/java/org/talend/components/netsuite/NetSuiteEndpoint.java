@@ -24,6 +24,7 @@ import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteCredentials;
 import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
+import org.talend.components.netsuite.input.NetSuiteInputProperties;
 
 /**
  * Represents NetSuite Web Service endpoint.
@@ -58,9 +59,9 @@ public class NetSuiteEndpoint {
      * @throws NetSuiteException if connection configuration not valid
      */
     public static ConnectionConfig createConnectionConfig(
-            NetSuiteConnectionProperties properties) throws NetSuiteException {
+            NetSuiteProvideConnectionProperties properties) throws NetSuiteException {
 
-        NetSuiteConnectionProperties connProps = properties.getEffectiveConnectionProperties();
+        NetSuiteConnectionProperties connProps = properties.getConnectionProperties();
 
         if (StringUtils.isEmpty(connProps.endpoint.getStringValue())) {
             throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
@@ -135,6 +136,9 @@ public class NetSuiteEndpoint {
         try {
             ConnectionConfig connectionConfig = new ConnectionConfig(
                     new URL(endpointUrl), apiVersion.getMajor(), credentials);
+            if (properties instanceof NetSuiteInputProperties) {
+                connectionConfig.setBodyFieldsOnly(((NetSuiteInputProperties) properties).bodyFieldsOnly.getValue());
+            }
             connectionConfig.setCustomizationEnabled(customizationEnabled);
             return connectionConfig;
         } catch (MalformedURLException e) {
@@ -188,7 +192,7 @@ public class NetSuiteEndpoint {
         NetSuiteClientService<?> clientService = clientFactory.createClient();
         clientService.setEndpointUrl(connectionConfig.getEndpointUrl().toString());
         clientService.setCredentials(connectionConfig.getCredentials());
-
+        clientService.setBodyFieldsOnly(connectionConfig.isBodyFieldsOnly());
         MetaDataSource metaDataSource = clientService.getMetaDataSource();
         metaDataSource.setCustomizationEnabled(connectionConfig.isCustomizationEnabled());
 
@@ -204,6 +208,7 @@ public class NetSuiteEndpoint {
         private URL endpointUrl;
         private NetSuiteVersion apiVersion;
         private NetSuiteCredentials credentials;
+        private boolean bodyFieldsOnly = true;
         private boolean customizationEnabled;
 
         public ConnectionConfig() {
@@ -239,6 +244,14 @@ public class NetSuiteEndpoint {
             this.credentials = credentials;
         }
 
+        public boolean isBodyFieldsOnly() {
+            return bodyFieldsOnly;
+        }
+
+        public void setBodyFieldsOnly(boolean bodyFieldsOnly) {
+            this.bodyFieldsOnly = bodyFieldsOnly;
+        }
+
         public boolean isCustomizationEnabled() {
             return customizationEnabled;
         }
@@ -249,13 +262,16 @@ public class NetSuiteEndpoint {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+            if (o == null || getClass() != o.getClass()) {
                 return false;
+            }
             ConnectionConfig that = (ConnectionConfig) o;
-            return customizationEnabled == that.customizationEnabled && Objects.equals(endpointUrl, that.endpointUrl) &&
-                    Objects.equals(apiVersion, that.apiVersion) && Objects.equals(credentials, that.credentials);
+            return bodyFieldsOnly == that.bodyFieldsOnly && customizationEnabled == that.customizationEnabled
+                    && Objects.equals(endpointUrl, that.endpointUrl) && Objects.equals(apiVersion, that.apiVersion)
+                    && Objects.equals(credentials, that.credentials);
         }
 
         @Override
@@ -269,6 +285,7 @@ public class NetSuiteEndpoint {
             sb.append("endpointUrl=").append(endpointUrl);
             sb.append("apiVersion=").append(apiVersion);
             sb.append(", credentials=").append(credentials);
+            sb.append(", bodyFieldsOnly=").append(bodyFieldsOnly);
             sb.append(", customizationEnabled=").append(customizationEnabled);
             sb.append('}');
             return sb.toString();

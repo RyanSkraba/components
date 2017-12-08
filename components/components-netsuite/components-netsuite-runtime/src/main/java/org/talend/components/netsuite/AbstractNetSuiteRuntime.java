@@ -15,7 +15,6 @@ package org.talend.components.netsuite;
 
 import org.talend.components.netsuite.client.NetSuiteClientFactory;
 import org.talend.components.netsuite.client.NetSuiteException;
-import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
 import org.talend.components.netsuite.util.ComponentExceptions;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -47,13 +46,13 @@ public abstract class AbstractNetSuiteRuntime implements NetSuiteRuntime {
     }
 
     @Override
-    public NetSuiteDatasetRuntime getDatasetRuntime(NetSuiteConnectionProperties properties) {
+    public NetSuiteDatasetRuntime getDatasetRuntime(NetSuiteProvideConnectionProperties properties) {
         NetSuiteEndpoint endpoint = getEndpoint(context, properties);
         return new NetSuiteDatasetRuntimeImpl(endpoint.getClientService().getMetaDataSource());
     }
 
     @Override
-    public ValidationResult validateConnection(NetSuiteConnectionProperties properties) {
+    public ValidationResult validateConnection(NetSuiteProvideConnectionProperties properties) {
         try {
             NetSuiteEndpoint endpoint = getEndpoint(context, properties);
             endpoint.connect();
@@ -76,7 +75,7 @@ public abstract class AbstractNetSuiteRuntime implements NetSuiteRuntime {
      * @throws NetSuiteException if an error occurs during obtaining of endpoint object
      */
     protected NetSuiteEndpoint getEndpoint(final NetSuiteRuntime.Context context,
-            final NetSuiteConnectionProperties properties) throws NetSuiteException {
+            final NetSuiteProvideConnectionProperties properties) throws NetSuiteException {
 
         // Create connection configuration for given connection properties.
         NetSuiteEndpoint.ConnectionConfig connectionConfig = NetSuiteEndpoint.createConnectionConfig(properties);

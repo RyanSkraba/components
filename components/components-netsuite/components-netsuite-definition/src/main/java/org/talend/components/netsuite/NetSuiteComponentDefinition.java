@@ -86,8 +86,7 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
             final Function<NetSuiteDatasetRuntime, R> func) {
         return withRuntime(properties, new Function<NetSuiteRuntime, R>() {
             @Override public R apply(NetSuiteRuntime runtime) {
-                NetSuiteConnectionProperties connectionProperties = properties.getConnectionProperties();
-                NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(connectionProperties);
+                NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(properties);
                 return func.apply(dataSetRuntime);
             }
         });
@@ -106,7 +105,7 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
 
         NetSuiteConnectionProperties connectionProperties = properties.getConnectionProperties();
         return runtimeInvoker.invokeRuntime(connectionProperties.getDesignTimeContext(),
-                properties.getConnectionProperties(), func);
+                properties, func);
     }
 
     /**
@@ -202,7 +201,7 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
          * @return result of operation
          */
         <R> R invokeRuntime(NetSuiteRuntime.Context context,
-                NetSuiteConnectionProperties properties,
+                NetSuiteProvideConnectionProperties properties,
                 Function<NetSuiteRuntime, R> func);
     }
 
@@ -213,7 +212,7 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
 
         @Override
         public <R> R invokeRuntime(final NetSuiteRuntime.Context context,
-                final NetSuiteConnectionProperties properties,
+                final NetSuiteProvideConnectionProperties properties,
                 final Function<NetSuiteRuntime, R> func) {
 
             RuntimeInfo runtimeInfo = getRuntimeInfo(properties, RUNTIME_CLASS);

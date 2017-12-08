@@ -13,7 +13,6 @@
 
 package org.talend.components.netsuite;
 
-import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
 import org.talend.daikon.properties.ValidationResult;
 
 /**
@@ -41,7 +40,7 @@ public interface NetSuiteRuntime {
      * @param properties connection properties
      * @return {@code NetSuiteDatasetRuntime} object
      */
-    NetSuiteDatasetRuntime getDatasetRuntime(NetSuiteConnectionProperties properties);
+    NetSuiteDatasetRuntime getDatasetRuntime(NetSuiteProvideConnectionProperties properties);
 
     /**
      * Validate connection for given connection properties.
@@ -49,7 +48,7 @@ public interface NetSuiteRuntime {
      * @param properties connection properties
      * @return result of validation
      */
-    ValidationResult validateConnection(NetSuiteConnectionProperties properties);
+    ValidationResult validateConnection(NetSuiteProvideConnectionProperties properties);
 
     /**
      * Context of runtime object.

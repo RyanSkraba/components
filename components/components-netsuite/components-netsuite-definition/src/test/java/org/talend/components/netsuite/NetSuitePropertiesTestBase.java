@@ -31,7 +31,6 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
 import org.talend.components.netsuite.schema.SearchFieldInfo;
 import org.talend.components.netsuite.schema.SearchInfo;
 import org.talend.daikon.NamedThing;
@@ -119,7 +118,7 @@ public abstract class NetSuitePropertiesTestBase {
         }
 
         @Override
-        public <R> R invokeRuntime(NetSuiteRuntime.Context context, NetSuiteConnectionProperties properties,
+        public <R> R invokeRuntime(NetSuiteRuntime.Context context, NetSuiteProvideConnectionProperties properties,
                 Function<NetSuiteRuntime, R> func) {
             runtime.setContext(context);
             return func.apply(runtime);

@@ -25,10 +25,12 @@ import static org.mockito.Mockito.when;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.netsuite.NetSuiteDatasetRuntime;
 import org.talend.components.netsuite.NetSuitePropertiesTestBase;
+import org.talend.components.netsuite.NetSuiteProvideConnectionProperties;
 import org.talend.components.netsuite.NetSuiteRuntime;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
@@ -54,7 +56,7 @@ public class NetSuiteInputPropertiesTest extends NetSuitePropertiesTestBase {
 
         properties = new NetSuiteInputProperties("input");
 
-        when(runtime.getDatasetRuntime(eq(properties.connection))).thenReturn(datasetRuntime);
+        when(runtime.getDatasetRuntime(Mockito.any(NetSuiteProvideConnectionProperties.class))).thenReturn(datasetRuntime);
     }
 
     @After

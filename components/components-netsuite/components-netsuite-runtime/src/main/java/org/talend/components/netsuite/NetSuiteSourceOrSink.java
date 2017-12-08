@@ -59,7 +59,7 @@ public class NetSuiteSourceOrSink implements SourceOrSink {
     public ValidationResult initialize(final RuntimeContainer container, final ComponentProperties properties) {
         this.properties = (NetSuiteProvideConnectionProperties) properties;
         NetSuiteEndpoint.ConnectionConfig connectionConfig =
-                NetSuiteEndpoint.createConnectionConfig(getConnectionProperties());
+                NetSuiteEndpoint.createConnectionConfig(this.properties);
         assertApiVersion(connectionConfig.getApiVersion());
         this.endpoint = new NetSuiteEndpoint(clientFactory, connectionConfig);
         return ValidationResult.OK;
