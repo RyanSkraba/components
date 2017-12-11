@@ -36,6 +36,7 @@ public class TransactionBodyCustomFieldAdapter<T> extends CustomFieldAdapter<T> 
             .put("inventoryAdjustment", "bodyInventoryAdjustment")
             .put("customerPayment", "bodyCustomerPayment")
             .put("vendorPayment", "bodyVendorPayment")
+            .put("vendorBill", "bodyPurchase")
             .build();
 
     public TransactionBodyCustomFieldAdapter() {
