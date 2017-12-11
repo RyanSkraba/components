@@ -13,18 +13,15 @@
 package org.talend.components.marketo;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.text.ParseException;
 import java.util.Collections;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
-import org.apache.avro.Schema.Type;
 import org.apache.avro.Schema.Field.Order;
+import org.apache.avro.Schema.Type;
 import org.junit.Test;
 import org.talend.daikon.avro.AvroUtils;
 
@@ -48,20 +45,12 @@ public class MarketoUtilsTest {
         } catch (ParseException pe) {
         }
         try {
-            MarketoUtils.parseDateString("2017-05-16 11:24:17 0000");
-            fail("Should not be here");
-        } catch (ParseException pe) {
-        }
-        try {
-            MarketoUtils.parseDateString("2017-05-16 11:24:17");
-            fail("Should not be here");
-        } catch (ParseException pe) {
-        }
-        try {
             MarketoUtils.parseDateString("2017-05-16'T'11:24:17 +0100");
             fail("Should not be here");
         } catch (ParseException pe) {
         }
+        assertNotNull(MarketoUtils.parseDateString("2017-05-16 11:24:17"));
+        assertNotNull(MarketoUtils.parseDateString("2017-05-16 11:24:17 0100"));
         assertNotNull(MarketoUtils.parseDateString("2017-05-16 11:24:17 +0100"));
         assertNotNull(MarketoUtils.parseDateString("2017-05-16 11:24:17 -0100"));
         assertNotNull(MarketoUtils.parseDateString("2017-05-16 11:24:17+0000"));

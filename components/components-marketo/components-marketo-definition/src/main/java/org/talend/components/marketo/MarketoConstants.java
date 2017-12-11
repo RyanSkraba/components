@@ -64,6 +64,8 @@ public class MarketoConstants {
 
     public static final String FIELD_CAMPAIGN_ID = "campaignId";
 
+    public static final String DATETIME_PATTERN_BASE = "yyyy-MM-dd HH:mm:ss";
+
     public static final String DATETIME_PATTERN_PARAM = "yyyy-MM-dd HH:mm:ss Z";
 
     public static final String DATETIME_PATTERN_PARAM_ALT = "yyyy-MM-dd HH:mm:ssZ";

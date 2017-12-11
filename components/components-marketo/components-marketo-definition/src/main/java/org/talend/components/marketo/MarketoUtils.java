@@ -27,6 +27,7 @@ import org.apache.avro.Schema.Type;
 public class MarketoUtils {
 
     private static final List<SimpleDateFormat> allowedDateFormats = Arrays.asList(
+            new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_BASE),
             new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM),
             new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM_ALT),
             new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM_UTC),
