@@ -37,6 +37,8 @@ import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDele
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
 
+import com.sforce.soap.partner.DeletedRecord;
+import com.sforce.soap.partner.GetDeletedResult;
 import com.sforce.soap.partner.GetUpdatedResult;
 import com.sforce.ws.ConnectionException;
 
@@ -52,28 +54,73 @@ public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase 
         runGetDeletedTest(true);
     }
 
+    /**
+     * For tSalesforceGetDeleted generate SOQL
+     */
     @Test
     public void testGetQueryStringList() throws Throwable {
-        SalesforceGetUpdatedReader updatedReader = new SalesforceGetUpdatedReader(null, null,
-                createSalesforceGetDeletedUpdatedProperties(false)) {
+        SalesforceGetDeletedReader deletedReader =
+                new SalesforceGetDeletedReader(null, null, createSalesforceGetDeletedUpdatedProperties(false)) {
 
-            @Override
-            protected GetUpdatedResult getResult() throws IOException, ConnectionException {
-                GetUpdatedResult result = new GetUpdatedResult();
-                List<String> ids = new ArrayList<>();
-                for (int i = 1000; i < 1999; i++) {
-                    ids.add("0019000001fvZV" + i);
-                }
-                result.setIds(ids.toArray(new String[0]));
-                return result;
-            }
-        };
-        List<String> queryStrings = updatedReader.getQueryStringList(updatedReader.getResult());
+                    @Override
+                    protected GetDeletedResult getResult() throws IOException, ConnectionException {
+                        GetDeletedResult result = new GetDeletedResult();
+                        List<DeletedRecord> records = new ArrayList<>();
+                        for (int i = 1000; i < 1999; i++) {
+                            DeletedRecord record = new DeletedRecord();
+                            record.setId("0019000001fvZV" + i);
+                            records.add(record);
+                        }
+                        result.setDeletedRecords(records.toArray(new DeletedRecord[records.size()]));
+                        return result;
+                    }
+                };
+        List<String> queryStrings = deletedReader.getQueryStringList(deletedReader.getResult());
         for (String query : queryStrings) {
             assertTrue(query.length() > 0);
-            assertTrue(query.length() < updatedReader.soqlCharacterLimit);
+            assertTrue(query.length() < deletedReader.soqlCharacterLimit);
         }
         assertEquals(3, queryStrings.size());
+    }
+
+    /**
+     * For tSalesforceGetUpdated splitIds
+     */
+    @Test
+    public void testSplitIdsList() throws Throwable {
+        SalesforceGetUpdatedReader updatedReader =
+                new SalesforceGetUpdatedReader(null, null, createSalesforceGetDeletedUpdatedProperties(false));
+        GetUpdatedResult updatedResult = new GetUpdatedResult();
+        // 1. ids size 0
+        List<String[]> updatedIdList = updatedReader.splitIds(updatedResult);
+        assertEquals(0, updatedIdList.size());
+        // 2.ids size 1999
+        List<String> updteIds = new ArrayList<>();
+        for (int i = 1000; i < 2999; i++) {
+            updteIds.add("0019000001fvZV" + i);
+        }
+        updatedResult.setIds(updteIds.toArray(new String[0]));
+        updatedIdList = updatedReader.splitIds(updatedResult);
+        assertEquals(1, updatedIdList.size());
+        assertEquals(1999, updatedIdList.get(0).length);
+        // 3.ids size 2000
+        updteIds.add("0019000001fvZV2999");
+        updatedResult.setIds(updteIds.toArray(new String[0]));
+        updatedIdList = updatedReader.splitIds(updatedResult);
+        assertEquals(1, updatedIdList.size());
+        assertEquals(2000, updatedIdList.get(0).length);
+
+        // 4.ids size 2001
+        updteIds.add("0019000001fvZV3000");
+        updatedResult.setIds(updteIds.toArray(new String[0]));
+        updatedIdList = updatedReader.splitIds(updatedResult);
+        assertEquals(2, updatedIdList.size());
+        assertEquals(2000, updatedIdList.get(0).length);
+        assertEquals(1, updatedIdList.get(1).length);
+
+        assertEquals("Id, Name, ShippingStreet, ShippingPostalCode, BillingStreet, BillingState, BillingPostalCode",
+                updatedReader.getFieldNamesStr());
+
     }
 
     protected SalesforceGetDeletedUpdatedProperties createSalesforceGetDeletedUpdatedProperties(boolean emptySchema)
