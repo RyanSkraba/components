@@ -224,8 +224,16 @@ public class SalesforceAvroRegistry extends AvroRegistry {
             return new StringToDecimalConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._double())) {
             return new StringToDoubleConverter(f);
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._float())) {
+            return new StringToFloatConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._int())) {
             return new StringToIntegerConverter(f);
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._byte())) {
+            return new StringToByteConverter(f);
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._short())) {
+            return new StringToShortConverter(f);
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._long())) {
+            return new StringToLongConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._date())) {
             return new StringToDateConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._bytes())) {
@@ -310,6 +318,18 @@ public class SalesforceAvroRegistry extends AvroRegistry {
         }
     }
 
+    public static class StringToFloatConverter extends AsStringConverter<Float> {
+
+        StringToFloatConverter(Schema.Field field) {
+            super(field);
+        }
+
+        @Override
+        public Float convertToAvro(String value) {
+            return StringUtils.isEmpty(value) ? null : Float.parseFloat(value);
+        }
+    }
+
     public static class StringToDateConverter extends AsStringConverter<Long> {
 
         private final SimpleDateFormat format;
@@ -334,7 +354,7 @@ public class SalesforceAvroRegistry extends AvroRegistry {
         public String convertToDatum(Long value) {
             return value == null ? null : format.format(new Date(value));
         }
-        
+
         public DateFormat getFormat() {
             return format;
         }
@@ -350,6 +370,42 @@ public class SalesforceAvroRegistry extends AvroRegistry {
         @Override
         public Integer convertToAvro(String value) {
             return StringUtils.isEmpty(value) ? null : Integer.parseInt(value);
+        }
+    }
+
+    public static class StringToByteConverter extends AsStringConverter<Byte> {
+
+        StringToByteConverter(Schema.Field field) {
+            super(field);
+        }
+
+        @Override
+        public Byte convertToAvro(String value) {
+            return StringUtils.isEmpty(value) ? null : Byte.parseByte(value);
+        }
+    }
+
+    public static class StringToShortConverter extends AsStringConverter<Short> {
+
+        StringToShortConverter(Schema.Field field) {
+            super(field);
+        }
+
+        @Override
+        public Short convertToAvro(String value) {
+            return StringUtils.isEmpty(value) ? null : Short.parseShort(value);
+        }
+    }
+
+    public static class StringToLongConverter extends AsStringConverter<Long> {
+
+        StringToLongConverter(Schema.Field field) {
+            super(field);
+        }
+
+        @Override
+        public Long convertToAvro(String value) {
+            return StringUtils.isEmpty(value) ? null : Long.parseLong(value);
         }
     }
 

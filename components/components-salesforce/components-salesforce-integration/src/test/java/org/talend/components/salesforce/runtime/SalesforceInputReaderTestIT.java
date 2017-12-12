@@ -12,12 +12,14 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -476,6 +478,66 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         assertEquals("MasterRecordId", fields.get(5).name());
         assertEquals("CreatedDate", fields.get(6).name());
 
+    }
+
+    @Test
+    public void testQueryWithTypes() throws Throwable {
+
+        Schema test_schema_long = SchemaBuilder.builder().record("Schema").fields() //
+                .name("Id").type().stringType().noDefault() //
+                .name("NumberOfEmployees").type().longType().noDefault() //
+                .name("AnnualRevenue").type(AvroUtils._float()).noDefault().endRecord();
+
+        Schema test_schema_short = SchemaBuilder.builder().record("Schema").fields() //
+                .name("Id").type().stringType().noDefault() //
+                .name("NumberOfEmployees").type(AvroUtils._short()).noDefault() //
+                .name("AnnualRevenue").type(AvroUtils._float()).noDefault().endRecord();
+
+        Schema test_schema_byte= SchemaBuilder.builder().record("Schema").fields() //
+                .name("Id").type().stringType().noDefault() //
+                .name("NumberOfEmployees").type(AvroUtils._byte()).noDefault() //
+                .name("AnnualRevenue").type(AvroUtils._float()).noDefault().endRecord();
+
+        try {
+            TSalesforceInputProperties sfInputProps = createTSalesforceInputProperties(false, false);
+
+            sfInputProps.condition.setValue("NumberOfEmployees != null  limit 1");
+            // 1.Test long and float type
+            sfInputProps.module.main.schema.setValue(test_schema_long);
+            List<IndexedRecord> inpuRecords = readRows(sfInputProps);
+            IndexedRecord record = null;
+            if (inpuRecords.size() < 1) {
+                LOGGER.warn("Salesforce default records have been changed!");
+            } else {
+                record = inpuRecords.get(0);
+                Object longValue = record.get(1);
+                Object floatValue = record.get(2);
+                if (longValue != null) {
+                    assertThat(longValue, instanceOf(Long.class));
+                }
+                if (floatValue != null) {
+                    assertThat(floatValue, instanceOf(Float.class));
+                }
+            }
+            // 2.Test short type
+            sfInputProps.condition.setValue("NumberOfEmployees = null  limit 1");
+            sfInputProps.module.main.schema.setValue(test_schema_short);
+            inpuRecords = readRows(sfInputProps);
+            if (inpuRecords.size() == 1) {
+                record = inpuRecords.get(0);
+                assertNull(record.get(1));
+            }
+            // 3.Test byte type
+            sfInputProps.module.main.schema.setValue(test_schema_byte);
+            inpuRecords = readRows(sfInputProps);
+            if (inpuRecords.size() == 1) {
+                record = inpuRecords.get(0);
+                assertNull(record.get(1));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Unexpected error: " + e.getMessage());
+        }
     }
 
     protected void testBulkQueryNullValue(SalesforceConnectionModuleProperties props, String random) throws Throwable {
