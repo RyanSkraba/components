@@ -16,12 +16,14 @@
 
     <name>Component REST API</name>
     <properties>
+        <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <daikon.version>0.19.0-SNAPSHOT</daikon.version>
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
+        <docker_tag_suffix>${maven.build.timestamp}</docker_tag_suffix>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
     </properties>
     <url>https://github.com/Talend/components/tree/master/services/components-api-service-rest</url>
@@ -385,7 +387,7 @@
                                             <build>
                                                 <from>${talend_docker_registry}/talend/microservices-base:1.latest</from>
                                                 <tags>
-                                                    <tag>${docker.version}</tag>
+                                                    <tag>${project.version}-${docker_tag_suffix}</tag>
                                                 </tags>
                                                 <ports>
                                                     <port>8989</port>
