@@ -27,7 +27,7 @@ This docker image accepts multiple environment variable but the only one that is
 
 * PAX\_MVN\_REPO=https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/@snapshots@id=talend,http://central.maven.org/maven2@id=maven 
 
-This contains the list of maven repositories following the definition of repositories in https://ops4j1.jira.com/wiki/display/paxurl/Mvn+Protocol
+This contains the list of maven repositories following the definition of repositories in https://ops4j1.jira.com/wiki/spaces/paxurl/pages/3833866/Mvn+Protocol#MvnProtocol-repositories
 
 * MVN\_CONFIG\_URL=mvn:org.talend.components/components-maven-repo/0.20.0-SNAPSHOT/zip/config
 
