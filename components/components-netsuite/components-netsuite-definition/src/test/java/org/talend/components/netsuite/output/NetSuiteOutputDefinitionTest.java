@@ -28,6 +28,7 @@ import static org.talend.components.api.component.ComponentDefinition.RETURN_ERR
 import static org.talend.components.api.component.ComponentDefinition.RETURN_REJECT_RECORD_COUNT_PROP;
 import static org.talend.components.api.component.ComponentDefinition.RETURN_SUCCESS_RECORD_COUNT_PROP;
 import static org.talend.components.api.component.ComponentDefinition.RETURN_TOTAL_RECORD_COUNT_PROP;
+import static org.talend.components.netsuite.output.NetSuiteOutputDefinition.RETURN_CURRENT_INTERNAL_ID_PROP;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -60,10 +61,10 @@ public class NetSuiteOutputDefinitionTest {
 
     @Test
     public void testGetReturnProperties() {
-        assertThat(definition.getReturnProperties().length, is(4));
+        assertThat(definition.getReturnProperties().length, is(5));
         assertThat(definition.getReturnProperties(), arrayContainingInAnyOrder(
                 (Property) RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP,
-                RETURN_SUCCESS_RECORD_COUNT_PROP, RETURN_REJECT_RECORD_COUNT_PROP));
+                RETURN_SUCCESS_RECORD_COUNT_PROP, RETURN_REJECT_RECORD_COUNT_PROP, RETURN_CURRENT_INTERNAL_ID_PROP));
     }
 
     @Test

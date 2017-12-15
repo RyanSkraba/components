@@ -21,6 +21,7 @@ import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.netsuite.NetSuiteComponentDefinition;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
@@ -40,8 +41,15 @@ public class NetSuiteOutputDefinition extends NetSuiteComponentDefinition {
 
     public static final String RETURN_LEGACY_CURRENT_INTERNAL_ID = "CURRENT_INTERNALID";
 
+    public static final String RETURN_CURRENT_INTERNAL_ID = "currentInternalid";
+
+    //declared only for outline as flow variable
+    public static final Property<String> RETURN_CURRENT_INTERNAL_ID_PROP = PropertyFactory.newString(RETURN_CURRENT_INTERNAL_ID);
+
     public NetSuiteOutputDefinition() {
         super(COMPONENT_NAME, ExecutionEngine.DI);
+
+        setupI18N(new Property<?>[] { RETURN_CURRENT_INTERNAL_ID_PROP });
     }
 
     @Override
@@ -90,8 +98,9 @@ public class NetSuiteOutputDefinition extends NetSuiteComponentDefinition {
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP,
-                RETURN_SUCCESS_RECORD_COUNT_PROP, RETURN_REJECT_RECORD_COUNT_PROP };
+        RETURN_CURRENT_INTERNAL_ID_PROP.setTaggedValue("AVAILABILITY", "FLOW");
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP, RETURN_SUCCESS_RECORD_COUNT_PROP,
+                RETURN_REJECT_RECORD_COUNT_PROP, RETURN_CURRENT_INTERNAL_ID_PROP };
     }
 
 }
