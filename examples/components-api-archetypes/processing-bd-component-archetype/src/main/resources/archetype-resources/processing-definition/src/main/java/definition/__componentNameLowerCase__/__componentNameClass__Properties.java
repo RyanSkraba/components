@@ -25,12 +25,12 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-public class ${componentNameClass}Properties extends FixedConnectorsComponentProperties{
+public class ${componentNameClass}Properties extends FixedConnectorsComponentProperties {
 
     // input schema
     public transient PropertyPathConnector INPUT_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "main");
 
-    public SchemaProperties main=new SchemaProperties("main"){
+    public SchemaProperties main = new SchemaProperties("main") {
         @SuppressWarnings("unused")
         public void afterSchema() {
                 updateOutputSchemas();
@@ -43,9 +43,16 @@ public class ${componentNameClass}Properties extends FixedConnectorsComponentPro
     public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow");
 
     /**
+    * // reject schema
+    * public transient PropertyPathConnector REJECT_CONNECTOR = new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject");
+    *
+    * public SchemaProperties schemaReject = new SchemaProperties("schemaReject");
+    */
+
+    /**
     * Example of a new property
-    * public Property<Integer> recordCount = PropertyFactory.newInteger("recordCount").setRequired().setValue(10);
-    * public Property<Boolean> showCountRecord = PropertyFactory.newBoolean("showCountRecord").setValue(false).setRequired();
+    * public Property<Integer> recordCount = PropertyFactory.newInteger("recordCount").setRequired();
+    * public Property<Boolean> showCountRecord = PropertyFactory.newBoolean("showCountRecord").setRequired();
     */
 
     public ${componentNameClass}Properties(String name) { super(name); }

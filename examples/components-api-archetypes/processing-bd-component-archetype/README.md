@@ -92,9 +92,24 @@ Your TCOMP processing is now created, you will find the different classes (defin
 
 You can now update those classes to fit with your own use case.
 
+#### Step 4: Implement the runtime part
+
+In the component runtime class, you have 4 choices to implement the runtime.
 
 
-#### Step 4 : Use a generic component
+* "function"
+    This  
+
+* "DoFn" => 1 record to another
+
+* "expand" => PTransform : 1 input PCollection => 1 output PCollection.
+
+* "build" => N Input => N Output 
+    --> Can call expand
+    --> Total control of the flow, we can define exactly what are the inputs and outputs.
+
+
+#### Step 5 : Use a generic component
 
 In order to use and test a generic processing component which is basically just a pass-through (take some data in input, retrieve same data as output), some comments have been added in the different classes. You will almost just have to uncomment them to be able to use the component.
 
@@ -116,5 +131,7 @@ You will just have to add few other line as follow :
 #### Additional information:
 You can define all the component properties in the `archetype.properties` files.
 
+The "Icon key" for the Definition class can be find on surge : http://talend.surge.sh/icons/
 
-
+In the Definition class, the "getRuntimeInfo" function is the link between the runtime and the definition part.
+We don't have any beam dependencies into the definition part with that process.

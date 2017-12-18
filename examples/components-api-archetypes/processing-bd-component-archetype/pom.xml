@@ -45,7 +45,7 @@
 				<filtering>true</filtering>
 				<includes>
 					<include>archetype-resources/processing-definition/pom.xml</include>
-					<include>archetype-resources/__componentNameLowerCase__-runtime__runtimeVersionConverted__/pom.xml</include>
+					<include>archetype-resources/__componentNameLowerCase__-runtime/pom.xml</include>
 				</includes>
 			</resource>
 			<resource>
@@ -53,7 +53,7 @@
 				<filtering>false</filtering>
 				<excludes>
 					<exclude>archetype-resources/__componentNameLowerCase__-definition/pom.xml</exclude>
-					<exclude>archetype-resources/__componentNameLowerCase__-runtime__runtimeVersionConverted__/pom.xml</exclude>
+					<exclude>archetype-resources/__componentNameLowerCase__-runtime/pom.xml</exclude>
 				</excludes>
 			</resource>
 		</resources>

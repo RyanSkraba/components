@@ -31,10 +31,10 @@ import java.util.Set;
 
 public class ${componentNameClass}Definition extends AbstractComponentDefinition{
 
-    public static final String NAME = "${componentNameClass}";
+    public static final String COMPONENT_NAME = "${componentNameClass}";
 
     public ${componentNameClass}Definition() {
-        super(NAME, ExecutionEngine.BEAM);
+        super(COMPONENT_NAME, ExecutionEngine.BEAM);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ${componentNameClass}Definition extends AbstractComponentDefinition
             return new JarRuntimeInfo(new URL("mvn:org.talend.components/processing-runtime"),
                     DependenciesReader.computeDependenciesFilePath(ProcessingFamilyDefinition.MAVEN_GROUP_ID,
                             ProcessingFamilyDefinition.MAVEN_ARTIFACT_ID),
-                    "org.talend.components.processing.runtime.${componentNameClass}Runtime");
+                    "org.talend.components.processing.runtime.${componentNameLowerCase}.${componentNameClass}Runtime");
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }

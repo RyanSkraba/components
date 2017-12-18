@@ -23,15 +23,59 @@ import ${packageTalend}.processing.definition.${componentNameLowerCase}.${compon
 import ${packageDaikon}.properties.ValidationResult;
 import org.apache.commons.lang3.StringUtils;
 
-public class ${componentNameClass}Runtime implements BeamJobBuilder, RuntimableRuntime<${componentNameClass}Properties> {
+public class ${componentNameClass}Runtime implements RuntimableRuntime<${componentNameClass}Properties> {
 
     private ${componentNameClass}Properties properties;
 
     private boolean hasFlow;
 
     @Override
+    public ValidationResult initialize(RuntimeContainer container, ${componentNameClass}Properties componentProperties) {
+        this.properties = componentProperties;
+        return ValidationResult.OK;
+    }
+
+    /*
+
+    **
+    *   You need to extends DoFn
+    *   Example : extends DoFn<Object, Object>
+    **
+
+    @ProcessElement
+    public void processElement(ProcessContext context) throws IOException {
+        if (context.element() != null) {
+            context.output(context.element());
+        }
+    }
+
+
+     */
+
+    /*
+    **
+    * ### You need to extends PTransform
+    * Example : extends PTransform<PCollection<IndexedRecord>, PCollection<IndexedRecord>>
+    **
+
+    @Override
+    public PCollection<IndexedRecord> expand(PCollection<IndexedRecord> input) {
+        ${componentNameClass}DoFn function = new ${componentNameClass}DoFn().withProperties(properties);
+        PCollection<IndexedRecord> output = input.apply("${componentNameClass}", ParDo.of(function))
+                .setCoder(LazyAvroCoder.<IndexedRecord>of());
+        return output;
+    }
+    */
+
+    /*
+    **
+    * ### You need to implements the class "BeamJobBuilder"
+    **
+
+    @Override
     public void build(BeamJobContext ctx) {
-        /*
+
+        *
         * Example of runtime action for a pass-through behaviour component
 
         String mainLink = ctx.getLinkNameByPortName("input_" + properties.INPUT_CONNECTOR.getName());
@@ -44,12 +88,7 @@ public class ${componentNameClass}Runtime implements BeamJobBuilder, RuntimableR
                     ctx.putPCollectionByLinkName(flowLink, mainPCollection);
                 }
             }
-        }*/
+        }
     }
-
-    @Override
-    public ValidationResult initialize(RuntimeContainer container, ${componentNameClass}Properties componentProperties) {
-        this.properties = componentProperties;
-        return ValidationResult.OK;
-    }
+    */
 }
