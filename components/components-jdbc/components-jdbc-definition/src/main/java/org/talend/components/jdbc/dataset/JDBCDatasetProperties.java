@@ -140,7 +140,7 @@ public class JDBCDatasetProperties extends PropertiesImpl
         if (sourceType.getValue() == SourceType.TABLE_NAME) {
             return "select * from " + tableName.getValue();
         } else {
-            return sql.getValue();
+            return CommonUtils.validateQuery(sql.getValue());
         }
     }
 

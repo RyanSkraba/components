@@ -26,6 +26,7 @@ import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties.SourceType;
 import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.PropertiesDynamicMethodHelper;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -74,11 +75,44 @@ public class JDBCDatasetPropertiesTest {
 
     @Test
     public void testGetSql() {
-        dataset.sql.setValue("abc");
-        assertEquals("abc", dataset.getSql());
         dataset.sourceType.setValue(TABLE_NAME);
         dataset.tableName.setValue("abc");
         assertEquals("select * from abc", dataset.getSql());
+    }
+    
+    @Test
+    public void testGetSqlWithQueryCheckCommonCase() {
+        dataset.sql.setValue("select id, name, intoone \n from abc where aaa \n group by bbb \n order by ccc");
+        dataset.sourceType.setValue(SourceType.QUERY);
+        assertEquals("select id, name, intoone \n from abc where aaa \n group by bbb \n order by ccc", dataset.getSql());
+    }
+    
+    @Test(expected = TalendRuntimeException.class)
+    public void testGetSqlWithQueryCheckINTOCase() {
+        dataset.sql.setValue("select * \n from abc INTO xyz");
+        dataset.sourceType.setValue(SourceType.QUERY);
+        dataset.getSql();
+    }
+    
+    @Test(expected = TalendRuntimeException.class)
+    public void testGetSqlWithQueryCheckFORUPDATELowerCase() {
+        dataset.sql.setValue("select * \n from abc for update  ");
+        dataset.sourceType.setValue(SourceType.QUERY);
+        dataset.getSql();
+    }
+    
+    @Test(expected = TalendRuntimeException.class)
+    public void testGetSqlWithQueryCheckFORUPDATEUpperCase() {
+        dataset.sql.setValue("select * \n from abc FOR UPDATE");
+        dataset.sourceType.setValue(SourceType.QUERY);
+        dataset.getSql();
+    }
+    
+    @Test(expected = TalendRuntimeException.class)
+    public void testGetSqlWithQueryCheckLOCKINSHAREDMODECase() {
+        dataset.sql.setValue("select * \n from abc LOCK  \n IN    SHARE    MODE ");
+        dataset.sourceType.setValue(SourceType.QUERY);
+        dataset.getSql();
     }
 
     @Test

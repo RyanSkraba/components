@@ -16,12 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -170,6 +172,26 @@ public class CommonUtils {
         setting.setJdbcUrl(connection.jdbcUrl.getValue());
         setting.setUsername(connection.userPassword.userId.getValue());
         setting.setPassword(connection.userPassword.password.getValue());
+    }
+
+    private static Pattern pattern = Pattern.compile(
+            "^SELECT\\s+((?!((\\bINTO\\b)|(\\bFOR\\s+UPDATE\\b)|(\\bLOCK\\s+IN\\s+SHARE\\s+MODE\\b))).)+$",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+
+    /**
+     * validate if the sql is a pure query statement which don't write or lock something, if a query, return it, if not, throw
+     * some exception
+     * 
+     * @param query
+     * @return
+     */
+    public static String validateQuery(String query) {
+        if ((query == null) || "".equals(query) || pattern.matcher(query.trim()).matches()) {
+            return query;
+        }
+
+        throw TalendRuntimeException.createUnexpectedException(
+                "Please check your sql as we only allow the query which don't do write or lock action.");
     }
 
 }
