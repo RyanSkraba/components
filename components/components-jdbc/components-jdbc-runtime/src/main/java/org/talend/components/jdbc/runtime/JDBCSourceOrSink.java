@@ -145,7 +145,7 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
         try {
             conn.setReadOnly(setting.isReadOnly());
         } catch (SQLFeatureNotSupportedException e) {
-            LOGGER.warn("JDBC driver '{}' does not support read only mode.", setting.getDriverClass(), e);
+            LOGGER.debug("JDBC driver '{}' does not support read only mode.", setting.getDriverClass(), e);
         }
 
         Boolean autoCommit = setting.getUseAutoCommit();
