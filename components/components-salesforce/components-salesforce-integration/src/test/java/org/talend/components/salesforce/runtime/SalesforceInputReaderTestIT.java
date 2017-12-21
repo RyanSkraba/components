@@ -443,6 +443,32 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         }
     }
 
+    /**
+     * Test query mode fields of schema is not case sensitive
+     */
+    @Test
+    public void testColumnNameCaseSensitive() throws Throwable {
+        TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
+        Schema schema = SchemaBuilder.builder().record("Schema").fields() //
+                .name("ID").type().stringType().noDefault() //
+                .name("NAME").type().stringType().noDefault().endRecord();
+        props.module.main.schema.setValue(schema);
+        props.condition.setValue("Id != null and name != null Limit 1");
+        props.validateGuessSchema();
+        List<IndexedRecord> rows = readRows(props);
+
+        if (rows.size() > 0) {
+            assertEquals(1, rows.size());
+            IndexedRecord row = rows.get(0);
+            Schema runtimeSchema = row.getSchema();
+            assertEquals(2, runtimeSchema.getFields().size());
+            assertNotNull(row.get(schema.getField("ID").pos()));
+            assertNotNull(row.get(schema.getField("NAME").pos()));
+        } else {
+            LOGGER.warn("Query result is empty!");
+        }
+    }
+
     @Test
     public void testInputNBLine() throws Throwable {
         TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);

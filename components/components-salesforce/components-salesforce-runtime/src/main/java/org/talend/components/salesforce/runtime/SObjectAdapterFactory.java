@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -148,7 +149,7 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
          */
         protected void processXmlObject(XmlObject xo, String prefixName, String prefixTypeName) {
             if (valueMap == null) {
-                valueMap = new HashMap<>();
+                valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             }
             Iterator<XmlObject> xos = xo.getChildren();
             if (xos.hasNext()) {
