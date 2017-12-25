@@ -41,6 +41,8 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.DefaultErrorCode;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.AsyncExceptionCode;
@@ -65,6 +67,9 @@ import com.sforce.ws.ConnectionException;
 public class SalesforceBulkRuntime {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceBulkRuntime.class.getName());
+
+    private static final I18nMessages MESSAGES =
+            GlobalI18N.getI18nMessageProvider().getI18nMessages(SalesforceBulkRuntime.class);
 
     private final String FILE_ENCODING = "UTF-8";
 
@@ -701,6 +706,7 @@ public class SalesforceBulkRuntime {
                 long processingTime = System.currentTimeMillis() - job.getCreatedDate().getTimeInMillis();
                 if (processingTime > MAX_BATCH_EXECUTION_TIME) {
                     // Break processing and return processed data if any batch was processed.
+                    LOGGER.warn(MESSAGES.getMessage("warn.batch.timeout"));
                     break;
                 }
             }
