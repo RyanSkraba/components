@@ -89,12 +89,18 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
             init();
 
             Iterator<XmlObject> fields = value.getChildren();
+            // Ignore "type" element when find firstly
+            int typeCount = 0;
             while (fields.hasNext()) {
                 XmlObject field = fields.next();
                 if (valueMap != null && (valueMap.containsKey(field.getName().getLocalPart()) || valueMap.containsKey(rootType
                         + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER) + field.getName().getLocalPart()))) {
                     continue;
                 } else {
+                    if ("type".equals(field.getName().getLocalPart()) && typeCount == 0) {
+                        typeCount++;
+                        continue;
+                    }
                     processXmlObject(field, rootType, null);
                 }
             }
@@ -125,7 +131,7 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
                 List<Schema.Field> fields = getSchema().getFields();
                 names = new String[fields.size()];
                 fieldConverter = new AvroConverter[names.length];
-                name2converter = new HashMap<String, AvroConverter>();
+                name2converter = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
                 for (int j = 0; j < names.length; j++) {
                     Field f = getSchema().getFields().get(j);
                     names[j] = f.name();

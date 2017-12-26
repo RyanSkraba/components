@@ -15,6 +15,7 @@ package org.talend.components.salesforce.runtime;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -451,9 +452,10 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
         Schema schema = SchemaBuilder.builder().record("Schema").fields() //
                 .name("ID").type().stringType().noDefault() //
+                .name("type").type().stringType().noDefault() //
                 .name("NAME").type().stringType().noDefault().endRecord();
         props.module.main.schema.setValue(schema);
-        props.condition.setValue("Id != null and name != null Limit 1");
+        props.condition.setValue("Id != null and name != null and type!=null Limit 1");
         props.validateGuessSchema();
         List<IndexedRecord> rows = readRows(props);
 
@@ -461,12 +463,33 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             assertEquals(1, rows.size());
             IndexedRecord row = rows.get(0);
             Schema runtimeSchema = row.getSchema();
-            assertEquals(2, runtimeSchema.getFields().size());
+            assertEquals(3, runtimeSchema.getFields().size());
             assertNotNull(row.get(schema.getField("ID").pos()));
+            assertNotNull(row.get(schema.getField("type").pos()));
+            assertNotEquals("Account",row.get(schema.getField("type").pos()));
             assertNotNull(row.get(schema.getField("NAME").pos()));
         } else {
             LOGGER.warn("Query result is empty!");
         }
+    }
+
+    /**
+     * Test aggregate query field not case sensitive
+     */
+    @Test
+    public void testAggregateQueryColumnNameCaseSensitive() throws Throwable {
+        TSalesforceInputProperties props = createTSalesforceInputProperties(true, false);
+        props.manualQuery.setValue(true);
+        props.query.setValue("SELECT MIN(CreatedDate) value FROM Contact GROUP BY FirstName, LastName LIMIT 1");
+        props.module.main.schema.setValue(SCHEMA_DATE);
+        List<IndexedRecord> outputRows = readRows(props);
+        if (outputRows.isEmpty()) {
+            return;
+        }
+        IndexedRecord record = outputRows.get(0);
+        assertNotNull(record.getSchema());
+        Object value = record.get(0);
+        Assert.assertTrue(value != null && value instanceof Long);
     }
 
     @Test
