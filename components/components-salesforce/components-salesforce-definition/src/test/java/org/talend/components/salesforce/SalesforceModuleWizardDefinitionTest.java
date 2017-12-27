@@ -21,6 +21,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Locale;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.wizard.ComponentWizard;
@@ -38,6 +40,8 @@ public class SalesforceModuleWizardDefinitionTest {
 
     @Before
     public void setUp() {
+        //set default local to EN to test labels
+        Locale.setDefault(Locale.ENGLISH);
         definition = new SalesforceModuleWizardDefinition();
 
         properties = new SalesforceModuleListProperties("module");

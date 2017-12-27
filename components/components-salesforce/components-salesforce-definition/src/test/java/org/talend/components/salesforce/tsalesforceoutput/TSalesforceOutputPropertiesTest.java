@@ -46,12 +46,24 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesService;
 import org.talend.daikon.properties.service.PropertiesServiceImpl;
+import org.talend.daikon.serialize.SerializerDeserializer;
+import org.talend.daikon.serialize.jsonio.PersistenceTestObject;
 
 public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
 
-    public static final Schema DEFAULT_SCHEMA_1 = SchemaBuilder.builder().record("Schema").fields() //
-            .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().stringType().noDefault() //
-            .name("Name").type().stringType().noDefault() //
+    public static final Schema DEFAULT_SCHEMA_1 = SchemaBuilder
+            .builder()
+            .record("Schema")
+            .fields() //
+            .name("Id")
+            .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")
+            .type()
+            .stringType()
+            .noDefault() //
+            .name("Name")
+            .type()
+            .stringType()
+            .noDefault() //
             .endRecord();
 
     private PropertiesService propertiesService;
@@ -140,8 +152,8 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
     public void testBeforeModuleName() throws Throwable {
         properties.init();
 
-        try (MockRuntimeSourceOrSinkTestFixture testFixture = new MockRuntimeSourceOrSinkTestFixture(
-                properties.connection, createDefaultTestDataset())) {
+        try (MockRuntimeSourceOrSinkTestFixture testFixture =
+                new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
             testFixture.setUp();
 
             propertiesService.beforePropertyActivate("moduleName", properties.module);
@@ -153,17 +165,19 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
 
     @Test
     public void testBeforeModuleNameErrorWhenExceptionOccurs() throws Throwable {
-        ValidationResult expectedValidationResult = new ValidationResult(ValidationResult.Result.ERROR, "UNEXPECTED_EXCEPTION:{message=ERROR}");
+        ValidationResult expectedValidationResult =
+                new ValidationResult(ValidationResult.Result.ERROR, "UNEXPECTED_EXCEPTION:{message=ERROR}");
         properties.init();
 
-        try (MockRuntimeSourceOrSinkTestFixture testFixture = new MockRuntimeSourceOrSinkTestFixture(
-                properties.connection, createDefaultTestDataset())) {
+        try (MockRuntimeSourceOrSinkTestFixture testFixture =
+                new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
             testFixture.setUp();
 
             when(testFixture.runtimeSourceOrSink.getSchemaNames(any(RuntimeContainer.class)))
                     .thenThrow(TalendRuntimeException.createUnexpectedException("ERROR"));
 
-            ValidationResult actualValidationResult =  propertiesService.beforePropertyActivate("moduleName", properties.module).getValidationResult();
+            ValidationResult actualValidationResult =
+                    propertiesService.beforePropertyActivate("moduleName", properties.module).getValidationResult();
 
             assertEquals(expectedValidationResult.getStatus(), actualValidationResult.getStatus());
             assertEquals(expectedValidationResult.getMessage(), actualValidationResult.getMessage());
@@ -174,8 +188,8 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
     public void testAfterModuleName() throws Throwable {
         properties.init();
 
-        try (MockRuntimeSourceOrSinkTestFixture testFixture = new MockRuntimeSourceOrSinkTestFixture(
-                properties.connection, createDefaultTestDataset())) {
+        try (MockRuntimeSourceOrSinkTestFixture testFixture =
+                new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
             testFixture.setUp();
 
             properties.outputAction.setValue(SalesforceOutputProperties.OutputAction.INSERT);
@@ -184,8 +198,7 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
             properties.module.moduleName.setValue("Account");
             propertiesService.afterProperty("moduleName", properties.module);
 
-            assertEquals(testFixture.getTestDataset().getSchema("Account"),
-                    properties.module.main.schema.getValue());
+            assertEquals(testFixture.getTestDataset().getSchema("Account"), properties.module.main.schema.getValue());
             assertThat((Iterable<String>) properties.upsertRelationTable.columnName.getPossibleValues(),
                     contains("Id", "Name"));
         }
@@ -195,8 +208,8 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
     public void testAfterModuleNameForUpsert() throws Throwable {
         properties.init();
 
-        try (MockRuntimeSourceOrSinkTestFixture testFixture = new MockRuntimeSourceOrSinkTestFixture(
-                properties.connection, createDefaultTestDataset())) {
+        try (MockRuntimeSourceOrSinkTestFixture testFixture =
+                new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
             testFixture.setUp();
 
             properties.outputAction.setValue(SalesforceOutputProperties.OutputAction.UPSERT);
@@ -214,8 +227,8 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
     public void testAfterModuleNameException() throws Throwable {
         properties.init();
 
-        try (MockRuntimeSourceOrSinkTestFixture testFixture = new MockRuntimeSourceOrSinkTestFixture(
-                properties.connection, createDefaultTestDataset())) {
+        try (MockRuntimeSourceOrSinkTestFixture testFixture =
+                new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
             testFixture.setUp();
 
             when(testFixture.runtimeSourceOrSink.getEndpointSchema(any(RuntimeContainer.class), eq("Customer")))
@@ -229,19 +242,12 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
     @Test
     public void testPropertiesConnectors() {
 
-        assertThat(properties.getPossibleConnectors(false), containsInAnyOrder(
-                (Connector) new PropertyPathConnector(Connector.MAIN_NAME, "schema")));
+        assertThat(properties.getPossibleConnectors(false),
+                containsInAnyOrder((Connector) new PropertyPathConnector(Connector.MAIN_NAME, "schema")));
 
-        assertThat(properties.getPossibleConnectors(true), containsInAnyOrder(
-                (Connector) new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow"),
-                new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject")));
-    }
-
-    @Test
-    public void testSerialize() throws Throwable {
-        properties.init();
-
-        ComponentTestUtils.checkSerialize(properties, errorCollector);
+        assertThat(properties.getPossibleConnectors(true),
+                containsInAnyOrder((Connector) new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow"),
+                        new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject")));
     }
 
 }

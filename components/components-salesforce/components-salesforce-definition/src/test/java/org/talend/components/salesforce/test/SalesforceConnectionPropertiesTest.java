@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.common.oauth.OAuth2FlowType;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.daikon.properties.ValidationResult;
@@ -94,7 +95,9 @@ public class SalesforceConnectionPropertiesTest extends SalesforceTestBase {
         reset(properties);
 
         properties.loginType.setValue(SalesforceConnectionProperties.LoginType.OAuth);
+        properties.oauth2FlowType.setValue(OAuth2FlowType.JWT_Flow);
         properties.afterLoginType();
+        
 
         verify(properties, times(3)).refreshLayout(any(Form.class));
 
