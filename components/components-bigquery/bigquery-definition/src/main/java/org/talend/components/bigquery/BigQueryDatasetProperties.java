@@ -40,9 +40,9 @@ public class BigQueryDatasetProperties extends PropertiesImpl implements Dataset
     public final ReferenceProperties<BigQueryDatastoreProperties> datastoreRef = new ReferenceProperties<>("datastoreRef",
             BigQueryDatastoreDefinition.NAME);
 
-    public Property<String> bqDataset = PropertyFactory.newString("bqDataset");
+    public Property<String> bqDataset = PropertyFactory.newString("bqDataset").setRequired();
 
-    public Property<SourceType> sourceType = PropertyFactory.newEnum("sourceType", SourceType.class);
+    public Property<SourceType> sourceType = PropertyFactory.newEnum("sourceType", SourceType.class).setRequired();
 
     public Property<String> tableName = PropertyFactory.newString("tableName");
 

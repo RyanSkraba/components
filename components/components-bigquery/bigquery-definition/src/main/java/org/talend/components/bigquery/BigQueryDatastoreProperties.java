@@ -22,16 +22,16 @@ import org.talend.daikon.properties.property.PropertyFactory;
 
 public class BigQueryDatastoreProperties extends PropertiesImpl implements DatastoreProperties {
 
-    public Property<String> projectName = PropertyFactory.newString("projectName");
+    public Property<String> projectName = PropertyFactory.newString("projectName").setRequired();
 
     /**
      * service account need to set on pipeline options, so it's kind of global setting
      * refer to: https://developers.google.com/identity/protocols/OAuth2ServiceAccount
      */
-    public Property<String> serviceAccountFile = PropertyFactory.newString("serviceAccountFile");
+    public Property<String> serviceAccountFile = PropertyFactory.newString("serviceAccountFile").setRequired();
 
     /** temp gs folder need to set on pipeline options, so it's kind of global setting */
-    public Property<String> tempGsFolder = PropertyFactory.newString("tempGsFolder");
+    public Property<String> tempGsFolder = PropertyFactory.newString("tempGsFolder").setRequired();
 
     public BigQueryDatastoreProperties(String name) {
         super(name);
