@@ -52,6 +52,9 @@ public class NormalizeDoFn extends DoFn<IndexedRecord, IndexedRecord> {
         boolean isTrim = properties.trim.getValue();
 
         if (StringUtils.isNotEmpty(columnToNormalize)) {
+            if (columnToNormalize.startsWith(".")) {
+                columnToNormalize = columnToNormalize.substring(1, columnToNormalize.length());
+            }
 
             String[] path = columnToNormalize.split("\\.");
 

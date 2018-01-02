@@ -23,6 +23,7 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
@@ -65,7 +66,7 @@ public class NormalizeProperties extends FixedConnectorsComponentProperties {
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
-        mainForm.addRow(columnToNormalize);
+        mainForm.addRow(Widget.widget(columnToNormalize).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
         mainForm.addRow(isList);
         mainForm.addRow(fieldSeparator);
         mainForm.addRow(otherSeparator);

@@ -30,53 +30,98 @@ import org.talend.daikon.exception.TalendRuntimeException;
 
 public class NormalizeDoFnTest {
 
-    private final Schema inputSchemaL = SchemaBuilder.record("inputRowL") //
+    private final Schema inputSchemaL = SchemaBuilder
+            .record("inputRowL") //
             .fields() //
-            .name("l").type().optional().stringType() //
+            .name("l")
+            .type()
+            .optional()
+            .stringType() //
             .endRecord();
 
     private final Schema inputSchemaListOfL = SchemaBuilder.array().items(inputSchemaL);
 
-    private final Schema inputSchemaJK = SchemaBuilder.record("inputRowJK") //
+    private final Schema inputSchemaJK = SchemaBuilder
+            .record("inputRowJK") //
             .fields() //
-            .name("j").type(inputSchemaListOfL).noDefault() //
-            .name("k").type().optional().stringType() //
+            .name("j")
+            .type(inputSchemaListOfL)
+            .noDefault() //
+            .name("k")
+            .type()
+            .optional()
+            .stringType() //
             .endRecord();
 
-    private final Schema inputSchemaDE = SchemaBuilder.record("inputRowDE") //
+    private final Schema inputSchemaDE = SchemaBuilder
+            .record("inputRowDE") //
             .fields() //
-            .name("d").type(inputSchemaJK).noDefault() //
-            .name("e").type().optional().stringType() //
+            .name("d")
+            .type(inputSchemaJK)
+            .noDefault() //
+            .name("e")
+            .type()
+            .optional()
+            .stringType() //
             .endRecord();
 
-    private final Schema inputSchemaHI = SchemaBuilder.record("inputRowHI") //
+    private final Schema inputSchemaHI = SchemaBuilder
+            .record("inputRowHI") //
             .fields() //
-            .name("h").type().optional().stringType() //
-            .name("i").type().optional().stringType() //
+            .name("h")
+            .type()
+            .optional()
+            .stringType() //
+            .name("i")
+            .type()
+            .optional()
+            .stringType() //
             .endRecord();
 
     private final Schema inputSchemaListOfHI = SchemaBuilder.array().items(inputSchemaHI);
 
-    private final Schema inputSchemaFG = SchemaBuilder.record("inputRowFG") //
+    private final Schema inputSchemaFG = SchemaBuilder
+            .record("inputRowFG") //
             .fields() //
-            .name("f").type().optional().stringType() //
-            .name("g").type(inputSchemaListOfHI).noDefault() //
+            .name("f")
+            .type()
+            .optional()
+            .stringType() //
+            .name("g")
+            .type(inputSchemaListOfHI)
+            .noDefault() //
             .endRecord();
 
-    private final Schema inputSchemaXY = SchemaBuilder.record("inputRowXY") //
+    private final Schema inputSchemaXY = SchemaBuilder
+            .record("inputRowXY") //
             .fields() //
-            .name("x").type().optional().stringType() //
-            .name("y").type(inputSchemaDE).noDefault() //
+            .name("x")
+            .type()
+            .optional()
+            .stringType() //
+            .name("y")
+            .type(inputSchemaDE)
+            .noDefault() //
             .endRecord();
 
     private final Schema inputSchemaListM = SchemaBuilder.array().items().stringType();
 
-    private final Schema inputParentSchema = SchemaBuilder.record("inputParentRow") //
+    private final Schema inputParentSchema = SchemaBuilder
+            .record("inputParentRow") //
             .fields() //
-            .name("a").type().optional().stringType() //
-            .name("b").type(inputSchemaXY).noDefault() //
-            .name("c").type(inputSchemaFG).noDefault() //
-            .name("m").type(inputSchemaListM).noDefault() //
+            .name("a")
+            .type()
+            .optional()
+            .stringType() //
+            .name("b")
+            .type(inputSchemaXY)
+            .noDefault() //
+            .name("c")
+            .type(inputSchemaFG)
+            .noDefault() //
+            .name("m")
+            .type(inputSchemaListM)
+            .noDefault() //
             .endRecord();
 
     /**
@@ -224,6 +269,39 @@ public class NormalizeDoFnTest {
     /**
      * Input parent record: {@link NormalizeDoFnTest#inputParentRecord}
      *
+     * Normalize simple field: `.a`
+     *
+     * Expected normalized results of the field `a`:
+     *
+     * {"a": "aaa", "b": {"x": "x1;x2", "y": {"d": {"j": [{"l": "l1"}, {"l": "l2"}], "k": "k1;k2"}, "e": "e"}}, "c":
+     * {"f": "f", "g": [{"h": "h1", "i": "i2"}, {"h": "h2", "i": "i1"}]}, "m": ["m1", "m2", "m3"]}
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testNormalizeSimpleFields_a_withDot() throws Exception {
+        NormalizeProperties properties = new NormalizeProperties("test");
+        properties.init();
+        properties.schemaListener.afterSchema();
+        properties.isList.setValue(false);
+        properties.trim.setValue(true);
+        properties.discardTrailingEmptyStr.setValue(true);
+
+        // Normalize `a` simple field
+        properties.columnToNormalize.setValue(".a");
+
+        NormalizeDoFn function = new NormalizeDoFn().withProperties(properties);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
+        List<IndexedRecord> outputs = fnTester.processBundle(inputParentRecord);
+        Assert.assertEquals(1, outputs.size());
+        GenericRecord outputRecord = (GenericRecord) outputs.get(0);
+        Assert.assertEquals(inputParentRecord.toString(), outputRecord.toString());
+        Assert.assertEquals(inputParentRecord.getSchema().toString(), outputRecord.getSchema().toString());
+    }
+
+    /**
+     * Input parent record: {@link NormalizeDoFnTest#inputParentRecord}
+     *
      * Normalize simple field: `b.x`
      *
      * Expected normalized results of the field `b.x`:
@@ -247,6 +325,67 @@ public class NormalizeDoFnTest {
 
         // Normalize `b.x` simple field
         properties.columnToNormalize.setValue("b.x");
+
+        NormalizeDoFn function = new NormalizeDoFn().withProperties(properties);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
+        List<IndexedRecord> outputs = fnTester.processBundle(inputParentRecord);
+        Assert.assertEquals(2, outputs.size());
+
+        GenericRecord expectedRecordX1Y = new GenericRecordBuilder(inputSchemaXY) //
+                .set("x", "x1") //
+                .set("y", inputRecordDE) //
+                .build();
+        GenericRecord expectedRecordX2Y = new GenericRecordBuilder(inputSchemaXY) //
+                .set("x", "x2") //
+                .set("y", inputRecordDE) //
+                .build();
+        GenericRecord expectedParentRecordX1 = new GenericRecordBuilder(inputParentSchema) //
+                .set("a", "aaa") //
+                .set("b", expectedRecordX1Y) //
+                .set("c", inputRecordFG) //
+                .set("m", listInputRecordM) //
+                .build();
+        GenericRecord expectedParentRecordX2 = new GenericRecordBuilder(inputParentSchema) //
+                .set("a", "aaa") //
+                .set("b", expectedRecordX2Y) //
+                .set("c", inputRecordFG) //
+                .set("m", listInputRecordM) //
+                .build();
+
+        GenericRecord outputRecord1 = (GenericRecord) outputs.get(0);
+        GenericRecord outputRecord2 = (GenericRecord) outputs.get(1);
+        Assert.assertEquals(expectedParentRecordX1.toString(), outputRecord1.toString());
+        Assert.assertEquals(expectedParentRecordX1.getSchema().toString(), outputRecord1.getSchema().toString());
+        Assert.assertEquals(expectedParentRecordX2.toString(), outputRecord2.toString());
+        Assert.assertEquals(expectedParentRecordX2.getSchema().toString(), outputRecord2.getSchema().toString());
+    }
+
+    /**
+     * Input parent record: {@link NormalizeDoFnTest#inputParentRecord}
+     *
+     * Normalize simple field: `.b.x`
+     *
+     * Expected normalized results of the field `b.x`:
+     *
+     * [{"a": "aaa", "b": {"x": "x1", "y": {"d": {"j": [{"l": "l1"}, {"l": "l2"}], "k": "k1;k2"}, "e": "e"}}, "c": {"f":
+     * "f", "g": [{"h": "h1", "i": "i2"}, {"h": "h2", "i": "i1"}]}, "m": ["m1", "m2", "m3"]},
+     * 
+     * {"a": "aaa", "b": {"x": "x2", "y": {"d": {"j": [{"l": "l1"}, {"l": "l2"}], "k": "k1;k2"}, "e": "e"}}, "c": {"f":
+     * "f", "g": [{"h": "h1", "i": "i2"}, {"h": "h2", "i": "i1"}]}, "m": ["m1", "m2", "m3"]}]
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testNormalizeSimpleFields_bx_withDot() throws Exception {
+        NormalizeProperties properties = new NormalizeProperties("test");
+        properties.init();
+        properties.schemaListener.afterSchema();
+        properties.isList.setValue(false);
+        properties.trim.setValue(true);
+        properties.discardTrailingEmptyStr.setValue(true);
+
+        // Normalize `b.x` simple field
+        properties.columnToNormalize.setValue(".b.x");
 
         NormalizeDoFn function = new NormalizeDoFn().withProperties(properties);
         DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
@@ -379,7 +518,7 @@ public class NormalizeDoFnTest {
 
         NormalizeDoFn function = new NormalizeDoFn().withProperties(properties);
         DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
-        List<IndexedRecord> outputs = fnTester.processBundle(inputParentRecord);
+        fnTester.processBundle(inputParentRecord);
     }
 
     /**
@@ -487,24 +626,47 @@ public class NormalizeDoFnTest {
         List<IndexedRecord> outputs = fnTester.processBundle(inputParentRecord);
         Assert.assertEquals(2, outputs.size());
 
-        Schema expectedSchemaHI = SchemaBuilder.record("inputRowHI") //
+        Schema expectedSchemaHI = SchemaBuilder
+                .record("inputRowHI") //
                 .fields() //
-                .name("h").type().optional().stringType() //
-                .name("i").type().optional().stringType() //
+                .name("h")
+                .type()
+                .optional()
+                .stringType() //
+                .name("i")
+                .type()
+                .optional()
+                .stringType() //
                 .endRecord();
 
-        Schema expectedSchemaFG = SchemaBuilder.record("inputRowFG") //
+        Schema expectedSchemaFG = SchemaBuilder
+                .record("inputRowFG") //
                 .fields() //
-                .name("f").type().optional().stringType() //
-                .name("g").type(expectedSchemaHI).noDefault() //
+                .name("f")
+                .type()
+                .optional()
+                .stringType() //
+                .name("g")
+                .type(expectedSchemaHI)
+                .noDefault() //
                 .endRecord();
 
-        Schema expectedParentSchema = SchemaBuilder.record("inputParentRow") //
+        Schema expectedParentSchema = SchemaBuilder
+                .record("inputParentRow") //
                 .fields() //
-                .name("a").type().optional().stringType() //
-                .name("b").type(inputSchemaXY).noDefault() //
-                .name("c").type(expectedSchemaFG).noDefault() //
-                .name("m").type(inputSchemaListM).noDefault() //
+                .name("a")
+                .type()
+                .optional()
+                .stringType() //
+                .name("b")
+                .type(inputSchemaXY)
+                .noDefault() //
+                .name("c")
+                .type(expectedSchemaFG)
+                .noDefault() //
+                .name("m")
+                .type(inputSchemaListM)
+                .noDefault() //
                 .endRecord();
 
         GenericRecord expectedRecordFG1 = new GenericRecordBuilder(expectedSchemaFG) //
@@ -566,35 +728,67 @@ public class NormalizeDoFnTest {
         List<IndexedRecord> outputs = fnTester.processBundle(inputParentRecord);
         Assert.assertEquals(2, outputs.size());
 
-        Schema expectedSchemaL = SchemaBuilder.record("inputRowL") //
+        Schema expectedSchemaL = SchemaBuilder
+                .record("inputRowL") //
                 .fields() //
-                .name("l").type().optional().stringType() //
+                .name("l")
+                .type()
+                .optional()
+                .stringType() //
                 .endRecord();
 
-        Schema expectedSchemaJK = SchemaBuilder.record("inputRowJK") //
+        Schema expectedSchemaJK = SchemaBuilder
+                .record("inputRowJK") //
                 .fields() //
-                .name("j").type(expectedSchemaL).noDefault() //
-                .name("k").type().optional().stringType() //
+                .name("j")
+                .type(expectedSchemaL)
+                .noDefault() //
+                .name("k")
+                .type()
+                .optional()
+                .stringType() //
                 .endRecord();
 
-        Schema expectedSchemaDE = SchemaBuilder.record("inputRowDE") //
+        Schema expectedSchemaDE = SchemaBuilder
+                .record("inputRowDE") //
                 .fields() //
-                .name("d").type(expectedSchemaJK).noDefault() //
-                .name("e").type().optional().stringType() //
+                .name("d")
+                .type(expectedSchemaJK)
+                .noDefault() //
+                .name("e")
+                .type()
+                .optional()
+                .stringType() //
                 .endRecord();
 
-        Schema expectedSchemaXY = SchemaBuilder.record("inputRowXY") //
+        Schema expectedSchemaXY = SchemaBuilder
+                .record("inputRowXY") //
                 .fields() //
-                .name("x").type().optional().stringType() //
-                .name("y").type(expectedSchemaDE).noDefault() //
+                .name("x")
+                .type()
+                .optional()
+                .stringType() //
+                .name("y")
+                .type(expectedSchemaDE)
+                .noDefault() //
                 .endRecord();
 
-        Schema expectedParentSchema = SchemaBuilder.record("inputParentRow") //
+        Schema expectedParentSchema = SchemaBuilder
+                .record("inputParentRow") //
                 .fields() //
-                .name("a").type().optional().stringType() //
-                .name("b").type(expectedSchemaXY).noDefault() //
-                .name("c").type(inputSchemaFG).noDefault() //
-                .name("m").type(inputSchemaListM).noDefault() //
+                .name("a")
+                .type()
+                .optional()
+                .stringType() //
+                .name("b")
+                .type(expectedSchemaXY)
+                .noDefault() //
+                .name("c")
+                .type(inputSchemaFG)
+                .noDefault() //
+                .name("m")
+                .type(inputSchemaListM)
+                .noDefault() //
                 .endRecord();
 
         GenericRecord expectedRecordJ1K = new GenericRecordBuilder(expectedSchemaJK) //
@@ -675,12 +869,23 @@ public class NormalizeDoFnTest {
         List<IndexedRecord> outputs = fnTester.processBundle(inputParentRecord);
         Assert.assertEquals(3, outputs.size());
 
-        Schema expectedParentSchema = SchemaBuilder.record("inputParentRow") //
+        Schema expectedParentSchema = SchemaBuilder
+                .record("inputParentRow") //
                 .fields() //
-                .name("a").type().optional().stringType() //
-                .name("b").type(inputSchemaXY).noDefault() //
-                .name("c").type(inputSchemaFG).noDefault() //
-                .name("m").type().stringType().noDefault() //
+                .name("a")
+                .type()
+                .optional()
+                .stringType() //
+                .name("b")
+                .type(inputSchemaXY)
+                .noDefault() //
+                .name("c")
+                .type(inputSchemaFG)
+                .noDefault() //
+                .name("m")
+                .type()
+                .stringType()
+                .noDefault() //
                 .endRecord();
 
         GenericRecord expectedParentRecordM1 = new GenericRecordBuilder(expectedParentSchema) //
@@ -734,7 +939,7 @@ public class NormalizeDoFnTest {
 
         NormalizeDoFn function = new NormalizeDoFn().withProperties(properties);
         DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
-        List<IndexedRecord> outputs = fnTester.processBundle(inputParentRecord);
+        fnTester.processBundle(inputParentRecord);
     }
 
     /**
@@ -896,8 +1101,9 @@ public class NormalizeDoFnTest {
         // Test a hierarchical variable
         ((GenericRecord) outputRecord1.get("b")).put("x", "MODIFIED_X1");
         // Test a looped variable
-        AbstractList<GenericRecord> j = (AbstractList<GenericRecord>) ((GenericRecord) ((GenericRecord) ((GenericRecord) outputRecord1
-                .get("b")).get("y")).get("d")).get("j");
+        AbstractList<GenericRecord> j =
+                (AbstractList<GenericRecord>) ((GenericRecord) ((GenericRecord) ((GenericRecord) outputRecord1.get("b"))
+                        .get("y")).get("d")).get("j");
         j.get(0).put("l", "MODIFIED_L1");
 
         // Check outputRecord2
