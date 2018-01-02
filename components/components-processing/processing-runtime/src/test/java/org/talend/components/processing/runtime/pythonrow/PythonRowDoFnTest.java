@@ -15,6 +15,7 @@ package org.talend.components.processing.runtime.pythonrow;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -54,8 +55,8 @@ public class PythonRowDoFnTest {
         properties.pythonCode.setValue("outputList.append(input)");
         PythonRowDoFn function = new PythonRowDoFn();
         assertEquals(ValidationResult.OK, function.initialize(null, properties));
-        DoFnTester<Object, Object> fnTester = DoFnTester.of(function);
-        List<Object> outputs = fnTester.processBundle((IndexedRecord) null);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
+        List<IndexedRecord> outputs = fnTester.processBundle((IndexedRecord) null);
         assertEquals(0, outputs.size());
     }
 
@@ -68,8 +69,8 @@ public class PythonRowDoFnTest {
         properties.pythonCode.setValue("output = input");
         PythonRowDoFn function = new PythonRowDoFn();
         assertEquals(ValidationResult.OK, function.initialize(null, properties));
-        DoFnTester<Object, Object> fnTester = DoFnTester.of(function);
-        List<Object> outputs = fnTester.processBundle(inputIndexedRecord);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
+        List<IndexedRecord> outputs = fnTester.processBundle(inputIndexedRecord);
         assertEquals(1, outputs.size());
 
         GenericRecord outputRecord = (GenericRecord) outputs.get(0);
@@ -94,8 +95,8 @@ public class PythonRowDoFnTest {
         properties.pythonCode.setValue(sb.toString());
         PythonRowDoFn function = new PythonRowDoFn();
         assertEquals(ValidationResult.OK, function.initialize(null, properties));
-        DoFnTester<Object, Object> fnTester = DoFnTester.of(function);
-        List<Object> outputs = fnTester.processBundle(inputIndexedRecord);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
+        List<IndexedRecord> outputs = fnTester.processBundle(inputIndexedRecord);
         assertEquals(1, outputs.size());
 
         GenericRecord outputRecord = (GenericRecord) outputs.get(0);
@@ -121,12 +122,11 @@ public class PythonRowDoFnTest {
         properties.pythonCode.setValue(sb.toString());
         PythonRowDoFn function = new PythonRowDoFn();
         assertEquals(ValidationResult.OK, function.initialize(null, properties));
-        DoFnTester<Object, Object> fnTester = DoFnTester.of(function);
-        List<Object> outputs = fnTester.processBundle(inputIndexedRecord);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
+        List<IndexedRecord> outputs = fnTester.processBundle(inputIndexedRecord);
         assertEquals(1, outputs.size());
 
         GenericRecord outputRecord = (GenericRecord) outputs.get(0);
-        System.out.println(outputRecord);
         compareRecords(outputIndexedRecord, outputRecord);
     }
 
@@ -139,8 +139,8 @@ public class PythonRowDoFnTest {
         properties.pythonCode.setValue("outputList.append(input)");
         PythonRowDoFn function = new PythonRowDoFn();
         assertEquals(ValidationResult.OK, function.initialize(null, properties));
-        DoFnTester<Object, Object> fnTester = DoFnTester.of(function);
-        List<Object> outputs = fnTester.processBundle(inputIndexedRecord);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
+        List<IndexedRecord> outputs = fnTester.processBundle(inputIndexedRecord);
         assertEquals(1, outputs.size());
 
         GenericRecord outputRecord = (GenericRecord) outputs.get(0);
@@ -161,8 +161,8 @@ public class PythonRowDoFnTest {
         properties.pythonCode.setValue(sb.toString());
         PythonRowDoFn function = new PythonRowDoFn();
         assertEquals(ValidationResult.OK, function.initialize(null, properties));
-        DoFnTester<Object, Object> fnTester = DoFnTester.of(function);
-        List<Object> outputs = fnTester.processBundle(inputIndexedRecord);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
+        List<IndexedRecord> outputs = fnTester.processBundle(inputIndexedRecord);
         assertEquals(3, outputs.size());
 
         for (int i = 0; i < 3; i++) {
@@ -185,8 +185,8 @@ public class PythonRowDoFnTest {
         properties.pythonCode.setValue(sb.toString());
         PythonRowDoFn function = new PythonRowDoFn();
         assertEquals(ValidationResult.OK, function.initialize(null, properties));
-        DoFnTester<Object, Object> fnTester = DoFnTester.of(function);
-        List<Object> outputs = fnTester.processBundle(inputIndexedRecord, inputIndexedRecord, inputIndexedRecord);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
+        List<IndexedRecord> outputs = fnTester.processBundle(inputIndexedRecord, inputIndexedRecord, inputIndexedRecord);
         assertEquals(9, outputs.size());
 
         for (int i = 0; i < 9; i++) {
@@ -217,8 +217,8 @@ public class PythonRowDoFnTest {
         properties.pythonCode.setValue(sb.toString());
         PythonRowDoFn function = new PythonRowDoFn();
         assertEquals(ValidationResult.OK, function.initialize(null, properties));
-        DoFnTester<Object, Object> fnTester = DoFnTester.of(function);
-        List<Object> outputs = fnTester.processBundle(inputIndexedRecord);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
+        List<IndexedRecord> outputs = fnTester.processBundle(inputIndexedRecord);
         assertEquals(3, outputs.size());
 
         GenericRecord outputRecord1 = (GenericRecord) outputs.get(0);
