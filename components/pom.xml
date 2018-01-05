@@ -32,6 +32,7 @@
         <module>components-netsuite</module>
         <module>components-hadoopcluster</module>
         <module>components-couchbase</module>
+        <module>components-kinesis</module>
 
         <!-- Slow-building components are built last. -->
         <module>components-salesforce</module>

@@ -120,10 +120,15 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<version>10.12.1.1</version>
-		</dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>kinesis-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.12.1.1</version>
+        </dependency>
 	</dependencies>
 
 	<dependencyManagement>
@@ -224,6 +229,8 @@
 								<extraArtifact>org.talend.components:processing-runtime:${project.version}:jar</extraArtifact>
 								<extraArtifact>org.talend.components:bigquery-runtime:${project.version}:jar</extraArtifact>
 								<extraArtifact>org.talend.components:pubsub-runtime:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:kinesis-runtime:${project.version}:jar
+                                </extraArtifact>
 								<!-- JDBC drivers -->
 								<extraArtifact>org.apache.derby:derbyclient:${derby.driver.version}:jar</extraArtifact>
 								<extraArtifact>org.mariadb.jdbc:mariadb-java-client:${mariadb.driver.version}:jar</extraArtifact>
@@ -343,6 +350,11 @@
 									<artifactId>pubsub-definition</artifactId>
 									<version>${project.version}</version>
 								</artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>kinesis-definition</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
 							</artifacts>
 						</configuration>
 					</execution>

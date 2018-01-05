@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>components-parent</artifactId>
+        <groupId>org.talend.components</groupId>
+        <version>0.21.0-SNAPSHOT</version>
+        <relativePath>../../../components-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>kinesis-integration</artifactId>
+
+    <name>Components - Kinesis Integration Tests</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <!-- skip the deployment for integration tests, not necessary -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
+    </properties>
+
+    <dependencies>
+        <!-- Depend only on definitions. -->
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>kinesis-definition</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>
+            <version>2.4.7</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- aws-java-sdk-core 1.11.18 need -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>2.6.6</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>2.6.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.6.6</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.20-PAXEXAM-PATCH</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
+                    <systemPropertyVariables>
+                        <aws.accesskey>${aws.accesskey}</aws.accesskey>
+                        <aws.secretkey>${aws.secretkey}</aws.secretkey>
+                        <aws.region>${aws.region}</aws.region>
+                        <aws.sts.role.arn>${aws.sts.role.arn}</aws.sts.role.arn>
+                        <aws.sts.role.sessionname>${aws.sts.role.sessionname}</aws.sts.role.sessionname>
+                        <aws.sts.role.externalid>${aws.sts.role.externalid}</aws.sts.role.externalid>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
