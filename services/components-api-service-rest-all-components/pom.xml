@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>org.talend.components</groupId>
-    <version>0.21.0-SNAPSHOT</version>
+    <version>0.22.0-SNAPSHOT</version>
 
     <artifactId>components-api-service-rest-all-components</artifactId>
 
@@ -23,6 +23,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <daikon.version>0.21.0-SNAPSHOT</daikon.version>
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
         <docker_tag_suffix>${maven.build.timestamp}</docker_tag_suffix>
@@ -91,12 +92,12 @@
             <artifactId>daikon</artifactId>
             <classifier>tests</classifier>
             <scope>test</scope>
-            <version>0.20.0-SNAPSHOT</version>
+            <version>${daikon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon-spring-utils</artifactId>
-            <version>0.20.0-SNAPSHOT</version>
+            <version>${daikon.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
