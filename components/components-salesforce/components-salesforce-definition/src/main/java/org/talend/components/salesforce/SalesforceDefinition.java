@@ -49,6 +49,8 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
 
     public static final String SOURCE_OR_SINK_CLASS = "org.talend.components.salesforce.runtime.SalesforceSourceOrSink";
 
+    public static final String BULK_EXEC_RUNTIME_CLASS = "org.talend.components.salesforce.runtime.SalesforceBulkExecRuntime";
+
     public static final String SOURCE_CLASS = "org.talend.components.salesforce.runtime.SalesforceSource";
 
     public static final String SINK_CLASS = "org.talend.components.salesforce.runtime.SalesforceSink";
@@ -81,8 +83,7 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
 
     public static RuntimeInfo getCommonRuntimeInfo(String clazzFullName) {
         return new JarRuntimeInfo(RUNTIME_MVN_URL,
-                DependenciesReader.computeDependenciesFilePath(RUNTIME_MVN_GROUP_ID, RUNTIME_MVN_ARTIFACT_ID),
-                clazzFullName);
+                DependenciesReader.computeDependenciesFilePath(RUNTIME_MVN_GROUP_ID, RUNTIME_MVN_ARTIFACT_ID), clazzFullName);
     }
 
     public List<TagImpl> doGetTags() {
@@ -92,7 +93,8 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
     /**
      * Set provider of {@link SandboxedInstance}s.
      *
-     * <p>The method is intended for debug/test purposes only and should not be used in production.
+     * <p>
+     * The method is intended for debug/test purposes only and should not be used in production.
      *
      * @param provider provider to be set, can't be {@code null}
      */

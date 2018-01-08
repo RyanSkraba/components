@@ -62,9 +62,12 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
     @Override
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
         assertEngineCompatibility(engine);
-        if (componentType == ConnectorTopology.OUTGOING || componentType == ConnectorTopology.NONE) {
+        switch (componentType) {
+        case OUTGOING:
             return getCommonRuntimeInfo(SOURCE_CLASS);
-        } else {
+        case NONE:
+            return getCommonRuntimeInfo(BULK_EXEC_RUNTIME_CLASS);
+        default:
             return null;
         }
     }

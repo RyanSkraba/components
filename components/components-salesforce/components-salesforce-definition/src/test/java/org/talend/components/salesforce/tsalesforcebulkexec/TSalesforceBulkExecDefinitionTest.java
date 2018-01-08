@@ -18,11 +18,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.talend.components.salesforce.SalesforceDefinition.BULK_EXEC_RUNTIME_CLASS;
 import static org.talend.components.salesforce.SalesforceDefinition.SOURCE_CLASS;
 
 import java.util.Arrays;
@@ -61,23 +58,23 @@ public class TSalesforceBulkExecDefinitionTest extends SalesforceTestBase {
     @Test
     public void testRuntimeInfo() {
         RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.OUTGOING);
-        assertRuntimeInfo(runtimeInfo);
+        assertRuntimeInfo(runtimeInfo, SOURCE_CLASS);
 
         runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.NONE);
-        assertRuntimeInfo(runtimeInfo);
+        assertRuntimeInfo(runtimeInfo, BULK_EXEC_RUNTIME_CLASS);
 
         runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.INCOMING);
         assertThat(runtimeInfo, nullValue(RuntimeInfo.class));
     }
 
-    private void assertRuntimeInfo(RuntimeInfo runtimeInfo) {
+    private void assertRuntimeInfo(RuntimeInfo runtimeInfo, String clazz) {
         assertNotNull(runtimeInfo);
         assertThat(runtimeInfo, instanceOf(JarRuntimeInfo.class));
 
         JarRuntimeInfo jarRuntimeInfo = (JarRuntimeInfo) runtimeInfo;
         assertNotNull(jarRuntimeInfo.getJarUrl());
         assertNotNull(jarRuntimeInfo.getDepTxtPath());
-        assertEquals(SOURCE_CLASS, jarRuntimeInfo.getRuntimeClassName());
+        assertEquals(clazz, jarRuntimeInfo.getRuntimeClassName());
     }
 
     @Test
@@ -89,8 +86,8 @@ public class TSalesforceBulkExecDefinitionTest extends SalesforceTestBase {
     @Test
     public void testNestedCompatibleComponentPropertiesClass() {
         Assert.assertThat(definition.getNestedCompatibleComponentPropertiesClass().length, is(2));
-        Collection<Class<? extends ComponentProperties>> properties = Arrays.asList(
-                definition.getNestedCompatibleComponentPropertiesClass());
+        Collection<Class<? extends ComponentProperties>> properties = Arrays
+                .asList(definition.getNestedCompatibleComponentPropertiesClass());
         assertTrue(properties.contains(SalesforceModuleProperties.class));
         assertTrue(properties.contains(SalesforceConnectionProperties.class));
     }
