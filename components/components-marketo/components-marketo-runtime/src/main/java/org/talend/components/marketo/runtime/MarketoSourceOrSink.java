@@ -114,10 +114,12 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
         List<NamedThing> customObjects = new ArrayList<>();
         MarketoClientServiceExtended client = (MarketoClientServiceExtended) getClientService(null);
         TMarketoInputProperties ip = new TMarketoInputProperties("COSchemas");
+        ip.init();
         ip.connection = properties.getConnectionProperties();
         ip.inputOperation.setValue(InputOperation.CustomObject);
         ip.customObjectAction.setValue(CustomObjectAction.list);
         ip.customObjectNames.setValue("");
+        ip.schemaInput.schema.setValue(MarketoConstants.getCustomObjectDescribeSchema());
         MarketoRecordResult r = client.listCustomObjects(ip);
         for (IndexedRecord co : r.getRecords()) {
             String name = co.get(0).toString();// name cannot be null
