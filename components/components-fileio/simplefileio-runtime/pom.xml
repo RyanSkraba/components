@@ -108,8 +108,28 @@
                     <groupId>org.mortbay.jetty</groupId>
                     <artifactId>servlet-api</artifactId>
                 </exclusion>
-            </exclusions>
-        </dependency>
+				<!--  exclude those dependencies cause they have know CVEs -->
+				<exclusion>
+					<groupId>org.codehaus.jackson</groupId>
+					<artifactId>jackson-core-asl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.jackson</groupId>
+					<artifactId>jackson-mapper-asl</artifactId>
+				</exclusion>
+			</exclusions> 
+		</dependency>
+		<!-- include the avro dependencies manually with fixes for those know CVEs -->
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>1.9.14-TALEND</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.14-TALEND</version>
+		</dependency>
 
         <!-- To include in dependencies.txt. -->
         <dependency>

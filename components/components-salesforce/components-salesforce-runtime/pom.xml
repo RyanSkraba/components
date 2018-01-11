@@ -28,6 +28,28 @@
 			<groupId>com.force.api</groupId>
 			<artifactId>force-wsc</artifactId>
 			<version>39.0.5</version>
+            <exclusions>
+				<!--  exclude those dependencies cause they have know CVEs -->
+				<exclusion>
+					<groupId>org.codehaus.jackson</groupId>
+					<artifactId>jackson-core-asl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.jackson</groupId>
+					<artifactId>jackson-mapper-asl</artifactId>
+				</exclusion>
+			</exclusions> 
+		</dependency>
+		<!-- include the avro dependencies manually with fixes for those know CVEs -->
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>1.9.14-TALEND</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.14-TALEND</version>
 		</dependency>
 		<!-- the following 2 deps are required for the com.force.api above -->
 		<dependency>
