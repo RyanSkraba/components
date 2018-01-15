@@ -67,8 +67,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private transient static final Logger LOGGER = LoggerFactory.getLogger(SalesforceWriter.class);
 
-    private static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider()
-            .getI18nMessages(SalesforceWriter.class);
+    private static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider().getI18nMessages(SalesforceWriter.class);
 
     private final SalesforceWriteOperation salesforceWriteOperation;
 
@@ -300,7 +299,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             break;
         }
         if (valueToAdd instanceof Date) {
-            xmlObject.setField(fieldName, SalesforceRuntime.convertDateToCalendar((Date) valueToAdd,true));
+            xmlObject.setField(fieldName, SalesforceRuntime.convertDateToCalendar((Date) valueToAdd, true));
         } else {
             Schema.Field se = moduleSchema.getField(fieldName);
             if (se != null && valueToAdd instanceof String) {
@@ -334,7 +333,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     private SaveResult[] doInsert() throws IOException {
         if (insertItems.size() > 0) {
             // Clean the feedback records at each batch write.
-            cleanFeedbackRecords();
+            cleanWrites();
             SObject[] accs = new SObject[insertItems.size()];
             for (int i = 0; i < insertItems.size(); i++) {
                 accs[i] = createSObject(insertItems.get(i));
@@ -375,7 +374,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     private SaveResult[] doUpdate() throws IOException {
         if (updateItems.size() > 0) {
             // Clean the feedback records at each batch write.
-            cleanFeedbackRecords();
+            cleanWrites();
             SObject[] upds = new SObject[updateItems.size()];
             for (int i = 0; i < updateItems.size(); i++) {
                 upds[i] = createSObject(updateItems.get(i));
@@ -420,7 +419,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     private UpsertResult[] doUpsert() throws IOException {
         if (upsertItems.size() > 0) {
             // Clean the feedback records at each batch write.
-            cleanFeedbackRecords();
+            cleanWrites();
             SObject[] upds = new SObject[upsertItems.size()];
             for (int i = 0; i < upsertItems.size(); i++) {
                 upds[i] = createSObjectForUpsert(upsertItems.get(i));
@@ -577,7 +576,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     private DeleteResult[] doDelete() throws IOException {
         if (deleteItems.size() > 0) {
             // Clean the feedback records at each batch write.
-            cleanFeedbackRecords();
+            cleanWrites();
             String[] delIDs = new String[deleteItems.size()];
             String[] changedItemKeys = new String[delIDs.length];
             for (int ix = 0; ix < delIDs.length; ++ix) {
@@ -666,18 +665,18 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         return Collections.unmodifiableList(rejectedWrites);
     }
 
-    private void cleanFeedbackRecords() {
+    @Override
+    public void cleanWrites() {
         successfulWrites.clear();
         rejectedWrites.clear();
     }
 
     /**
-     * Transform {@link OutputAction} name into Past representation.
-     * <br/>
+     * Transform {@link OutputAction} name into Past representation. <br/>
      * Example:
      * <ul>
-     * <li> {@link OutputAction#DELETE} - deleted.</li>
-     * <li> {@link OutputAction#INSERT} - inserted.</li>
+     * <li>{@link OutputAction#DELETE} - deleted.</li>
+     * <li>{@link OutputAction#INSERT} - inserted.</li>
      * </ul>
      *
      * @param outputAction action to be performed on data.

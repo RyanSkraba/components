@@ -41,10 +41,10 @@ import org.talend.components.netsuite.client.model.TypeDesc;
  *
  * Subclasses override {@link #doWrite(List)} to perform required output operation:
  * <ul>
- *     <li>Add - {@link NetSuiteAddWriter}</li>
- *     <li>Update - {@link NetSuiteUpdateWriter}</li>
- *     <li>Upsert - {@link NetSuiteUpsertWriter}</li>
- *     <li>Delete - {@link NetSuiteDeleteWriter}</li>
+ * <li>Add - {@link NetSuiteAddWriter}</li>
+ * <li>Update - {@link NetSuiteUpdateWriter}</li>
+ * <li>Upsert - {@link NetSuiteUpsertWriter}</li>
+ * <li>Delete - {@link NetSuiteDeleteWriter}</li>
  * </ul>
  *
  * @param <T> type of NetSuite objects that are passed to {@link NetSuiteClientService}
@@ -99,7 +99,8 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
     /** Translates {@code IndexedRecord} to NetSuite data object. */
     protected NsObjectOutputTransducer transducer;
 
-    public NetSuiteOutputWriter(NetSuiteWriteOperation writeOperation, RuntimeContainer container, MetaDataSource metaDataSource) {
+    public NetSuiteOutputWriter(NetSuiteWriteOperation writeOperation, RuntimeContainer container,
+            MetaDataSource metaDataSource) {
         this.writeOperation = writeOperation;
         this.container = container;
         this.metaDataSource = metaDataSource;
@@ -119,6 +120,13 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
 
     public void setBatchSize(int batchSize) {
         this.batchSize = batchSize;
+    }
+
+    @Override
+    public void cleanWrites() {
+        writeResponses.clear();
+        successfulWrites.clear();
+        rejectedWrites.clear();
     }
 
     @Override
@@ -170,7 +178,8 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
     /**
      * Initialize transducer.
      *
-     * <p>Subclasses can override this method to customize transducer.
+     * <p>
+     * Subclasses can override this method to customize transducer.
      */
     protected void initTransducer() {
         transducer = new NsObjectOutputTransducer(clientService, typeDesc.getTypeName());
@@ -211,7 +220,7 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
             return;
         }
 
-        clearWriteFeedback();
+        cleanWrites();
 
         // Transduce IndexedRecords to NetSuite data model objects
 
@@ -279,15 +288,6 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
                 logger.error("Couldn't parse internalId as Integer: {}", internalId);
             }
         }
-    }
-
-    /**
-     * Clear accumulated write results.
-     */
-    private void clearWriteFeedback() {
-        writeResponses.clear();
-        successfulWrites.clear();
-        rejectedWrites.clear();
     }
 
     /**

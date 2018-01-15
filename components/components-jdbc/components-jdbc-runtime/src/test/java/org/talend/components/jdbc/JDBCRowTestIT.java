@@ -14,7 +14,7 @@ package org.talend.components.jdbc;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -410,6 +410,7 @@ public class JDBCRowTestIT {
             Assert.assertNotNull(reject.get(3));
             assertThat(writer.getSuccessfulWrites(), empty());
 
+            writer.cleanWrites();
             IndexedRecord r2 = new GenericData.Record(properties.main.schema.getValue());
             r2.put(0, 5);
             r2.put(1, "xiaobai");
@@ -424,6 +425,7 @@ public class JDBCRowTestIT {
             Assert.assertNotNull(reject.get(3));
             assertThat(writer.getSuccessfulWrites(), empty());
 
+            writer.cleanWrites();
             writer.close();
         } finally {
             writer.close();
@@ -528,6 +530,7 @@ public class JDBCRowTestIT {
             resultSet.next();
             Assert.assertEquals(3, resultSet.getInt(1));
             Assert.assertEquals("dabao", resultSet.getString(2));
+            writer.cleanWrites();
             resultSet.close();
 
             IndexedRecord r2 = new GenericData.Record(properties.main.schema.getValue());
@@ -546,6 +549,7 @@ public class JDBCRowTestIT {
             resultSet.next();
             Assert.assertEquals(3, resultSet.getInt(1));
             Assert.assertEquals("dabao", resultSet.getString(2));
+            writer.cleanWrites();
             resultSet.close();
 
             writer.close();

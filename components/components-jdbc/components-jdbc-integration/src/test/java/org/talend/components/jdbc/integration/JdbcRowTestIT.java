@@ -14,7 +14,7 @@ package org.talend.components.jdbc.integration;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -429,6 +429,7 @@ public class JdbcRowTestIT {
                 writer.write(r1);
 
                 List<IndexedRecord> rejects = writer.getRejectedWrites();
+                writer.cleanWrites();
                 assertThat(rejects, hasSize(1));
                 IndexedRecord reject = rejects.get(0);
                 Assert.assertEquals(4, reject.get(0));
@@ -443,6 +444,7 @@ public class JdbcRowTestIT {
                 writer.write(r2);
 
                 rejects = writer.getRejectedWrites();
+                writer.cleanWrites();
                 assertThat(rejects, hasSize(1));
                 reject = rejects.get(0);
                 Assert.assertEquals(5, reject.get(0));
@@ -552,6 +554,7 @@ public class JdbcRowTestIT {
 
                 assertThat(writer.getRejectedWrites(), empty());
                 List<IndexedRecord> successfulWrites = writer.getSuccessfulWrites();
+                writer.cleanWrites();
                 assertThat(successfulWrites, hasSize(1));
                 IndexedRecord successRecord = successfulWrites.get(0);
                 Assert.assertEquals(4, successRecord.get(0));
@@ -570,6 +573,7 @@ public class JdbcRowTestIT {
 
                 assertThat(writer.getRejectedWrites(), empty());
                 successfulWrites = writer.getSuccessfulWrites();
+                writer.cleanWrites();
                 assertThat(successfulWrites, hasSize(1));
                 successRecord = successfulWrites.get(0);
                 Assert.assertEquals(5, successRecord.get(0));

@@ -166,6 +166,12 @@ public class TFilterRowWriter implements WriterWithFeedback<Result, IndexedRecor
     }
 
     @Override
+    public void cleanWrites() {
+        success.clear();
+        reject.clear();
+    }
+
+    @Override
     public Iterable<IndexedRecord> getSuccessfulWrites() {
         LinkedList<IndexedRecord> successResult = new LinkedList<>(success);
         success.clear();

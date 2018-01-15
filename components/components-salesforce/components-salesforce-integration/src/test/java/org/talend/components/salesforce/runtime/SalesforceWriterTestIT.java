@@ -19,13 +19,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.FIELD_SALESFORCE_ID;
 
 import java.io.File;
@@ -452,6 +446,8 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         assertThat(sfWriter.getSuccessfulWrites(), hasSize(1));
         assertThat(sfWriter.getSuccessfulWrites().get(0), is(r));
 
+        sfWriter.cleanWrites();
+
         // Rejected and successful writes are reset on the next record.
         r = new GenericData.Record(SCHEMA_INSERT_ACCOUNT);
         r.put(0, UNIQUE_NAME + "_" + UNIQUE_ID);
@@ -763,12 +759,14 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         assertThat(sfWriterInsert.getSuccessfulWrites(), empty());
         assertThat(sfWriterInsert.getRejectedWrites(), hasSize(1));
         LOGGER.debug("1 record is reject by insert action.");
+        sfWriterInsert.cleanWrites();
 
         sfWriterInsert.write(insertRecord_1);
         assertThat(sfWriterInsert.getSuccessfulWrites(), hasSize(1));
         assertThat(sfWriterInsert.getRejectedWrites(), empty());
         // Check the rejected record.
         IndexedRecord successRecord = sfWriterInsert.getSuccessfulWrites().get(0);
+        sfWriterInsert.cleanWrites();
         assertThat(successRecord.getSchema().getFields(), hasSize(6));
         assertEquals(FIELD_SALESFORCE_ID, successRecord.getSchema().getFields().get(5).name());
         // The enriched fields.
@@ -996,8 +994,8 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
     }
 
     /*
-     * With current API like date/datetime/int/.... string value can't be write to server side So we need convert the
-     * field value type.
+     * With current API like date/datetime/int/.... string value can't be write to server side So we need convert the field
+     * value type.
      */
     @Test
     public void testSinkAllWithStringValue() throws Exception {

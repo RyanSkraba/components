@@ -85,7 +85,7 @@ public class MarketoInputWriter extends MarketoWriter {
         if (object == null) {
             return;
         }
-        successfulWrites.clear();
+        cleanWrites();
         //
         inputRecord = (IndexedRecord) object;
         result.totalCount++;

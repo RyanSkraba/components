@@ -14,7 +14,7 @@
 package org.talend.components.filterrow;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -121,6 +121,7 @@ public class TFilterRowTest {
         IndexedRecord successWrite = (IndexedRecord) successIterator.next();
         assertThat(successWrite.getSchema(), is(schema));
         assertThat(successWrite, is(record));
+        writer.cleanWrites();
 
         record = new GenericData.Record(schema);
         record.put(schema.getField("field1").pos(), "test123");

@@ -128,4 +128,10 @@ public abstract class MarketoWriter implements WriterWithFeedback<Result, Indexe
         } catch (InterruptedException e) {
         }
     }
+
+    @Override
+    public void cleanWrites() {
+        successfulWrites.clear();
+        rejectedWrites.clear();
+    }
 }

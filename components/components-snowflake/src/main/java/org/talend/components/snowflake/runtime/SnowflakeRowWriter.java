@@ -48,8 +48,8 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
 /**
- * This class implements {@link Writer} interface for SnowflakeRow component.
- * It can be used to retrieve data using simple query or prepared statement, insert/delete/update data.
+ * This class implements {@link Writer} interface for SnowflakeRow component. It can be used to retrieve data using
+ * simple query or prepared statement, insert/delete/update data.
  *
  */
 public class SnowflakeRowWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
@@ -143,7 +143,8 @@ public class SnowflakeRowWriter implements WriterWithFeedback<Result, IndexedRec
                 }
             }
 
-            // We should return the result of query execution, instead of returning incoming value if checked propagate query's result set.
+            // We should return the result of query execution, instead of returning incoming value if checked propagate query's
+            // result set.
             handleSuccess(input);
         } catch (SQLException e) {
             if (rowProperties.dieOnError.getValue()) {
@@ -289,12 +290,17 @@ public class SnowflakeRowWriter implements WriterWithFeedback<Result, IndexedRec
     }
 
     @Override
+    public void cleanWrites() {
+        successfulWrites.clear();
+        rejectedWrites.clear();
+    }
+
+    @Override
     public Result close() throws IOException {
 
         try {
 
-            successfulWrites.clear();
-            rejectedWrites.clear();
+            cleanWrites();
 
             if (commitCount > 0 && connection != null && statement != null) {
                 if (!rowProperties.propagateQueryResultSet()) {

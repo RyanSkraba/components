@@ -76,7 +76,7 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
     private transient boolean isFirst = true;
 
     private transient List<Schema.Field> collectedFields;
-    
+
     private Formatter formatter = new Formatter();
 
     @Override
@@ -87,6 +87,12 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
     @Override
     public Iterable<IndexedRecord> getRejectedWrites() {
         return listener.getErrors();
+    }
+
+    @Override
+    public void cleanWrites() {
+        successfulWrites.clear();
+        rejectedWrites.clear();
     }
 
     public SnowflakeWriter(SnowflakeWriteOperation sfWriteOperation, RuntimeContainer container) {
@@ -170,8 +176,8 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         List<Schema.Field> remoteTableFields = mainSchema.getFields();
 
         /*
-         * This piece will be executed only once per instance. Will not cause performance issue.
-         * Perform input and mainSchema synchronization. Such situation is useful in case of Dynamic fields.
+         * This piece will be executed only once per instance. Will not cause performance issue. Perform input and mainSchema
+         * synchronization. Such situation is useful in case of Dynamic fields.
          */
         if (isFirst) {
             collectedFields = DynamicSchemaUtils.getCommonFieldsForDynamicSchema(mainSchema, input.getSchema());

@@ -147,8 +147,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             return;
         }
         // initialize feedback collections for the write operation
-        successfulWrites = new ArrayList<>();
-        rejectedWrites = new ArrayList<>();
+        cleanWrites();
 
         result.totalCount++;
         IndexedRecord inputRecord = (IndexedRecord) object;
@@ -309,6 +308,12 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
     @Override
     public Iterable<IndexedRecord> getRejectedWrites() {
         return Collections.unmodifiableList(rejectedWrites);
+    }
+
+    @Override
+    public void cleanWrites() {
+        successfulWrites.clear();
+        rejectedWrites.clear();
     }
 
     private TableOperation getTableOperation(DynamicTableEntity entity) {

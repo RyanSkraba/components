@@ -157,8 +157,7 @@ public class MarketoOutputWriter extends MarketoWriter {
     }
 
     public void processResult(MarketoSyncResult mktoResult) {
-        successfulWrites.clear();
-        rejectedWrites.clear();
+        cleanWrites();
         if (!mktoResult.isSuccess()) {
             // build a SyncStatus for record which failed
             SyncStatus status = new SyncStatus();

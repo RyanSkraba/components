@@ -141,9 +141,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
     @Override
     public void write(Object datum) throws IOException {
         result.totalCount++;
-
-        successfulWrites.clear();
-        rejectedWrites.clear();
+        cleanWrites();
     }
 
     @Override
@@ -196,6 +194,12 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
     @Override
     public List<IndexedRecord> getRejectedWrites() {
         return Collections.unmodifiableList(rejectedWrites);
+    }
+
+    @Override
+    public void cleanWrites() {
+        successfulWrites.clear();
+        rejectedWrites.clear();
     }
 
     protected void handleSuccess(IndexedRecord input) {
