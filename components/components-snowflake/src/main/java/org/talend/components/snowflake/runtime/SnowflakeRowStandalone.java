@@ -88,7 +88,7 @@ public class SnowflakeRowStandalone extends SnowflakeRuntime implements Componen
         }
     }
 
-    public void throwComponentException(Exception ex, String messageProperty) {
+    private void throwComponentException(Exception ex, String messageProperty) {
         if (dieOnError) {
             throw new ComponentException(ex);
         }

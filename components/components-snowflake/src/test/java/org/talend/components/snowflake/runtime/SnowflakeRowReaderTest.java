@@ -150,15 +150,19 @@ public class SnowflakeRowReaderTest {
     @Test(expected = IOException.class)
     public void testCoudlnotCreateStatement() throws SQLException, IOException {
         Mockito.when(connection.createStatement()).thenThrow(new SQLException("Incorrect query please specify correct one"));
-
+        properties.dieOnError.setValue(true);
         reader.start();
     }
 
     @Test(expected = IOException.class)
     public void testCouldnotGetNextResultSet() throws Exception {
         Statement statement = Mockito.mock(Statement.class);
+        properties.dieOnError.setValue(true);
         Mockito.when(connection.createStatement()).thenReturn(statement);
         rs = Mockito.mock(ResultSet.class);
+        ResultSetMetaData rsmd = Mockito.mock(ResultSetMetaData.class);
+        Mockito.when(rs.getMetaData()).thenReturn(rsmd);
+        Mockito.when(rsmd.getColumnName(1)).thenReturn("Different");
         Mockito.when(statement.executeQuery(Mockito.eq(query))).thenReturn(rs);
         Mockito.when(rs.next()).thenThrow(new SQLException("Something happened with result set"));
 

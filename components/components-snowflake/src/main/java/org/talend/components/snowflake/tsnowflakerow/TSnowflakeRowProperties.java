@@ -53,15 +53,13 @@ public class TSnowflakeRowProperties extends SnowflakeConnectionTableProperties 
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject");
 
-    public final PresentationItem guessQuery = new PresentationItem("guessQuery");
+    public transient PresentationItem guessQuery = new PresentationItem("guessQuery");
 
     public Property<String> query = PropertyFactory.newString("query", "\"select id, name from employee\"");
 
     public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError").setRequired();
 
     // advanced
-
-    public Property<Boolean> propagateQueryResultSet = PropertyFactory.newBoolean("propagateQueryResultSet").setRequired();
 
     public Property<Boolean> usePreparedStatement = PropertyFactory.newBoolean("usePreparedStatement").setRequired();
 
@@ -73,7 +71,7 @@ public class TSnowflakeRowProperties extends SnowflakeConnectionTableProperties 
     public TSnowflakeRowProperties(String name) {
         super(name);
     }
-    
+
     @Override
     public void setupLayout() {
         super.setupLayout();
@@ -84,12 +82,11 @@ public class TSnowflakeRowProperties extends SnowflakeConnectionTableProperties 
         main.addRow(dieOnError);
 
         Form advancedForm = getForm(Form.ADVANCED);
-        advancedForm.addRow(propagateQueryResultSet);
         advancedForm.addRow(usePreparedStatement);
         advancedForm.addRow(Widget.widget(preparedStatementTable).setWidgetType(Widget.TABLE_WIDGET_TYPE));
         advancedForm.addRow(commitCount);
     }
-    
+
     @Override
     public void setupProperties() {
       super.setupProperties();
@@ -220,9 +217,4 @@ public class TSnowflakeRowProperties extends SnowflakeConnectionTableProperties 
     public boolean usePreparedStatement() {
         return usePreparedStatement.getValue();
     }
-
-    public boolean propagateQueryResultSet() {
-        return propagateQueryResultSet.getValue();
-    }
-
 }

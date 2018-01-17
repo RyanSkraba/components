@@ -90,6 +90,19 @@ public class SnowflakeRowStandaloneTest {
     }
 
     @Test
+    public void testCannotCreateConnection() throws IOException, SQLException {
+        Mockito.when(DriverManagerUtils.getConnection(properties.getConnectionProperties()))
+                .thenThrow(new IOException("cannot connect"));
+        properties.dieOnError.setValue(false);
+        standalone.initialize(null, properties);
+
+        standalone.runAtDriver(null);
+
+        PowerMockito.verifyStatic();
+        DriverManagerUtils.getConnection(properties.getConnectionProperties());
+    }
+
+    @Test
     public void testCannotCreateConnectionWithDieOnError() throws IOException, SQLException {
         exceptionRule.expect(ComponentException.class);
         Mockito.when(DriverManagerUtils.getConnection(properties.getConnectionProperties()))
@@ -98,6 +111,18 @@ public class SnowflakeRowStandaloneTest {
         standalone.initialize(null, properties);
 
         standalone.runAtDriver(null);
+    }
+
+    @Test
+    public void testCannotCreateStatement() throws IOException, SQLException {
+        Mockito.when(connection.createStatement())
+                .thenThrow(new SQLException("Cannot construct statement for current connection"));
+        properties.dieOnError.setValue(false);
+        standalone.initialize(null, properties);
+
+        standalone.runAtDriver(null);
+
+        Mockito.verify(connection, Mockito.times(1)).createStatement();
     }
 
     @Test
