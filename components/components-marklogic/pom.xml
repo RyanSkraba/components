@@ -1,0 +1,76 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>components-implementation-aggregator</artifactId>
+        <groupId>org.talend.components</groupId>
+        <version>0.22.0-SNAPSHOT</version>
+        <relativePath>../../components/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>components-marklogic-aggregator</artifactId>
+
+    <name>Components - MarkLogic Aggregator</name>
+    <packaging>pom</packaging>
+
+    <properties>
+        <!-- skip the deployment for this aggregator, not necessary -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
+    <modules>
+        <module>components-marklogic-definition</module>
+        <module>components-marklogic-runtime</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.8</version>
+                <executions>
+                    <execution>
+                        <id>merge-ut</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>merge</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/jacoco.exec</destFile>
+                            <fileSets>
+                                <fileSet>
+                                    <directory>${project.basedir}</directory>
+                                    <includes>
+                                        <include>components-marklogic-definition/target/jacoco.exec</include>
+                                        <include>components-marklogic-runtime/target/jacoco.exec</include>
+                                    </includes>
+                                </fileSet>
+                            </fileSets>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>merge-it</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>merge</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/jacoco-it.exec</destFile>
+                            <fileSets>
+                                <fileSet>
+                                    <directory>${project.basedir}</directory>
+                                    <includes>
+                                        <include>components-marklogic-definition/target/jacoco-it.exec</include>
+                                        <include>components-marklogic-runtime/target/jacoco-it.exec</include>
+                                    </includes>
+                                </fileSet>
+                            </fileSets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

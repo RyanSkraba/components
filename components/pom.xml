@@ -33,6 +33,7 @@
         <module>components-hadoopcluster</module>
         <module>components-couchbase</module>
         <module>components-kinesis</module>
+        <module>components-marklogic</module>
         <module>components-google-drive</module>
         <!-- Slow-building components are built last. -->
         <module>components-salesforce</module>

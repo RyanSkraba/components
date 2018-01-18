@@ -26,7 +26,7 @@ public class PropertyPathConnector extends SimpleNamedThing implements Connector
 
     /**
      * 
-     * @param type type of the connector, there may be multiple connector with the same type
+     * @param name type of the connector, there may be multiple connector with the same type
      * @param propertyPath, path see {@link Properties#getProperty(String)} relative a ComponentProperties that will
      * provide this connector.
      */
