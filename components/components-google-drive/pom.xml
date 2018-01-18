@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.talend.components</groupId>
     <artifactId>components-google-drive-aggregator</artifactId>
-    <version>0.21.0-SNAPSHOT</version>
+    <version>0.22.0-SNAPSHOT</version>
     <name>Components - Google Drive Aggregator</name>
     <packaging>pom</packaging>
     <properties>
