@@ -119,6 +119,11 @@ public class TJDBCConnectionProperties extends ComponentPropertiesImpl implement
 
         CommonUtils.setCommonConnectionInfo(setting, connection);
 
+        setting.setShareConnection(this.shareConnection.getValue());
+        setting.setSharedConnectionName(this.sharedConnectionName.getValue());
+        setting.setUseDataSource(this.useDataSource.getValue());
+        setting.setDataSource(this.dataSource.getValue());
+
         setting.setUseAutoCommit(this.useAutoCommit.getValue());
         setting.setAutocommit(this.autocommit.getValue());
 

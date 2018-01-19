@@ -12,15 +12,13 @@
 // ============================================================================
 package org.talend.components.common.avro;
 
+import java.sql.ResultSet;
+
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-import org.talend.daikon.exception.TalendRuntimeException;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class JDBCResultSetIndexedRecordConverter implements IndexedRecordConverter<ResultSet, IndexedRecord> {
 
@@ -38,7 +36,6 @@ public class JDBCResultSetIndexedRecordConverter implements IndexedRecordConvert
     public Schema getSchema() {
         return schema;
     }
-
 
     protected JDBCAvroRegistry getRegistry() {
         return JDBCAvroRegistry.get();
@@ -58,6 +55,16 @@ public class JDBCResultSetIndexedRecordConverter implements IndexedRecordConvert
             }
             fieldConverter[j] = jdbcConverter;
         }
+    }
+
+    private int sizeInResultSet;
+
+    public void setSizeInResultSet(int sizeInResultSet) {
+        this.sizeInResultSet = sizeInResultSet;
+    }
+    
+    protected void resetSizeByResultSet(ResultSet resultSet) {
+        //do nothing as default
     }
 
     @Override
@@ -86,13 +93,15 @@ public class JDBCResultSetIndexedRecordConverter implements IndexedRecordConvert
         private Object[] values;
 
         public ResultSetIndexedRecord(ResultSet resultSet) {
-            try {
-                values = new Object[resultSet.getMetaData().getColumnCount()];
-                for (int i = 0; i < values.length; i++) {
-                    values[i] = fieldConverter[i].convertToAvro(resultSet);
+            resetSizeByResultSet(resultSet);
+            
+            values = new Object[names.length];
+            for (int i = 0; i < values.length; i++) {
+                if ((sizeInResultSet > 0) && (i == sizeInResultSet)) {
+                    break;
                 }
-            } catch (SQLException e) {
-                TalendRuntimeException.unexpectedException(e);
+
+                values[i] = fieldConverter[i].convertToAvro(resultSet);
             }
         }
 

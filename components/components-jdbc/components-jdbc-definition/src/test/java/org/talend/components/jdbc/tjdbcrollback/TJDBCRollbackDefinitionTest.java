@@ -36,13 +36,13 @@ public class TJDBCRollbackDefinitionTest {
         TJDBCRollbackDefinition result = new TJDBCRollbackDefinition();
 
         assertEquals(true, result.isStartable());
-        assertEquals("tJDBCRollbackNew", result.getName());
-        assertEquals("tJDBCRollbackNew_icon32.png", result.getImagePath());
+        assertEquals("tJDBCRollback", result.getName());
+        assertEquals("tJDBCRollback_icon32.png", result.getImagePath());
         assertEquals(null, result.getIconKey());
         assertEquals(null, result.getPartitioning());
         assertEquals(false, result.isConditionalInputs());
         assertEquals(false, result.isDataAutoPropagate());
-        assertEquals(false, result.isSchemaAutoPropagate());
+        assertEquals(true, result.isSchemaAutoPropagate());
         assertEquals(false, result.isRejectAfterClose());
         assertEquals("JDBC Rollback", result.getDisplayName());
         assertEquals("JDBC Rollback", result.getTitle());
@@ -128,13 +128,13 @@ public class TJDBCRollbackDefinitionTest {
         assertNotNull(result);
 
         result = fixture.getRuntimeInfo(engine, properties, ConnectorTopology.INCOMING);
-        assertNull(result);
+        assertNotNull(result);
 
         result = fixture.getRuntimeInfo(engine, properties, ConnectorTopology.OUTGOING);
         assertNull(result);
 
         result = fixture.getRuntimeInfo(engine, properties, ConnectorTopology.INCOMING_AND_OUTGOING);
-        assertNull(result);
+        assertNotNull(result);
     }
 
     /**
@@ -151,7 +151,7 @@ public class TJDBCRollbackDefinitionTest {
         Set<ConnectorTopology> result = fixture.getSupportedConnectorTopologies();
 
         assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(3, result.size());
     }
 
     /**

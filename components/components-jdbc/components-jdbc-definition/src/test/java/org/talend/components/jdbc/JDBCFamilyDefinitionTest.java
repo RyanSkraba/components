@@ -44,17 +44,17 @@ public class JDBCFamilyDefinitionTest {
     @Test
     public void testBasic() {
         assertThat(def.getName(), is("Jdbc"));
-        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCConnectionNew"))));
-        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCCloseNew"))));
-        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCCommitNew"))));
-        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCRollbackNew"))));
-        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCInputNew"))));
-        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCOutputNew"))));
-        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCRowNew"))));
+        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCConnection"))));
+        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCClose"))));
+        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCCommit"))));
+        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCRollback"))));
+        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCInput"))));
+        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCOutput"))));
+        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCRow"))));
         assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("JDBC"))));
         assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("JDBCDatastore"))));
         assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("JDBCDataset"))));
-        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCInputNew"))));
+        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("tJDBCInput"))));
         assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("JdbcOutput"))));
         assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("DataPrepDBInput"))));
     }

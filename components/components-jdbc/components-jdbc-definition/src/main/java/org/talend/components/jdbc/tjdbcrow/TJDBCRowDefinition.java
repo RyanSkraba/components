@@ -19,8 +19,11 @@ import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.JdbcRuntimeInfo;
+import org.talend.components.jdbc.wizard.JDBCConnectionWizardProperties;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
@@ -29,10 +32,11 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class TJDBCRowDefinition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tJDBCRowNew";
+    public static final String COMPONENT_NAME = "tJDBCRow";
 
     public TJDBCRowDefinition() {
         super(COMPONENT_NAME, ExecutionEngine.DI);
+        setupI18N(new Property<?>[] { RETURN_QUERY_PROP });
     }
 
     @Override
@@ -45,11 +49,12 @@ public class TJDBCRowDefinition extends AbstractComponentDefinition {
         return new String[] { "Databases/DB_JDBC" };
     }
 
-    // TODO add more return properties
+    public static final Property<String> RETURN_QUERY_PROP = PropertyFactory.newString(ComponentConstants.RETURN_QUERY);
+
     @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
-        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP };
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_QUERY_PROP };
     }
 
     @Override
@@ -78,6 +83,11 @@ public class TJDBCRowDefinition extends AbstractComponentDefinition {
     @Override
     public boolean isConditionalInputs() {
         return true;
+    }
+
+    @Override
+    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
+        return new Class[] { JDBCConnectionWizardProperties.class };
     }
 
 }

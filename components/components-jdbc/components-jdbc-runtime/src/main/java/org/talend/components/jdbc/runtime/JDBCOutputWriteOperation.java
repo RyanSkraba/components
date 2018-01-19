@@ -12,11 +12,8 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime;
 
-import java.util.Map;
-
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Sink;
-import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jdbc.RuntimeSettingProvider;
@@ -31,29 +28,17 @@ import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
  * common JDBC output write operation
  *
  */
-public class JDBCOutputWriteOperation implements WriteOperation<Result> {
+public class JDBCOutputWriteOperation extends DefaultWriteOperation {
 
-    private static final long serialVersionUID = 7572409371695331857L;
-
-    private Sink sink;
+    private static final long serialVersionUID = 1L;
 
     public JDBCOutputWriteOperation(Sink sink) {
-        this.sink = sink;
-    }
-
-    @Override
-    public void initialize(RuntimeContainer runtimeContainer) {
-        // nothing to do here
-    }
-
-    @Override
-    public Map<String, Object> finalize(Iterable<Result> iterable, RuntimeContainer runtimeContainer) {
-        return Result.accumulateAndReturnMap(iterable);
+        super(sink);
     }
 
     @Override
     public Writer<Result> createWriter(RuntimeContainer runtimeContainer) {
-        RuntimeSettingProvider properties = ((JDBCSink) sink).properties;
+        RuntimeSettingProvider properties = ((JDBCSink) this.getSink()).properties;
 
         DataAction dataAction = properties.getRuntimeSetting().getDataAction();
 
@@ -64,9 +49,9 @@ public class JDBCOutputWriteOperation implements WriteOperation<Result> {
             return new JDBCOutputUpdateWriter(this, runtimeContainer);
         case DELETE:
             return new JDBCOutputDeleteWriter(this, runtimeContainer);
-        case INSERTORUPDATE:
+        case INSERT_OR_UPDATE:
             return new JDBCOutputInsertOrUpdateWriter(this, runtimeContainer);
-        case UPDATEORINSERT:
+        case UPDATE_OR_INSERT:
             return new JDBCOutputUpdateOrInsertWriter(this, runtimeContainer);
         default:
             return null;
@@ -74,8 +59,4 @@ public class JDBCOutputWriteOperation implements WriteOperation<Result> {
 
     }
 
-    @Override
-    public Sink getSink() {
-        return sink;
-    }
 }

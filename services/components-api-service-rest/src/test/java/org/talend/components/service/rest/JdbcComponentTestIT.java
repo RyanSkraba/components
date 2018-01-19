@@ -111,6 +111,8 @@ public class JdbcComponentTestIT {
         db.shutdown();
     }
 
+    // TODO the test will fail if the writer is case sensitive, please see org.talend.components.jdbc.runtime.type.RowWriter for
+    // DI, we can make the test success by change jdbc_component_write_properties_on_DI.json, but not sure should do it
     @Test
     public void setDatasetData_DiRuntime() throws Exception {
         // given

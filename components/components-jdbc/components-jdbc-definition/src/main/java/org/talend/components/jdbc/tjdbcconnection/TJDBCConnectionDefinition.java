@@ -20,6 +20,7 @@ import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.JdbcRuntimeInfo;
+import org.talend.components.jdbc.wizard.JDBCConnectionWizardProperties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -29,7 +30,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class TJDBCConnectionDefinition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tJDBCConnectionNew";
+    public static final String COMPONENT_NAME = "tJDBCConnection";
 
     public TJDBCConnectionDefinition() {
         super(COMPONENT_NAME, ExecutionEngine.DI);
@@ -42,7 +43,7 @@ public class TJDBCConnectionDefinition extends AbstractComponentDefinition {
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Databases/DB_JDBC" };
+        return new String[] { "Databases/DB_JDBC", "ELT/Connections" };
     }
 
     @SuppressWarnings("rawtypes")
@@ -71,6 +72,11 @@ public class TJDBCConnectionDefinition extends AbstractComponentDefinition {
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
         return EnumSet.of(ConnectorTopology.NONE);
+    }
+    
+    @Override
+    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
+        return new Class[] { JDBCConnectionWizardProperties.class };
     }
 
 }

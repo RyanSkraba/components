@@ -12,18 +12,14 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 
-import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.setting.JdbcRuntimeSourceOrSinkDefault;
-import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.ValidationResultMutable;
@@ -34,13 +30,13 @@ import org.talend.daikon.properties.ValidationResultMutable;
  */
 public class JDBCCommitSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
-    private static final long serialVersionUID = -7226558840084293603L;
+    private static final long serialVersionUID = 1L;
 
-    public ComponentProperties properties;
+    private AllSetting setting;
 
     @Override
     public ValidationResult initialize(RuntimeContainer runtime, ComponentProperties properties) {
-        this.properties = properties;
+        this.setting = ((RuntimeSettingProvider) properties).getRuntimeSetting();
         return ValidationResult.OK;
     }
 
@@ -56,25 +52,14 @@ public class JDBCCommitSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
         return vr;
     }
 
-    @Override
-    public List<NamedThing> getSchemaNames(RuntimeContainer runtime) throws IOException {
-        return null;
-    }
-
-    @Override
-    public Schema getEndpointSchema(RuntimeContainer runtime, String tableName) throws IOException {
-        return null;
-    }
-
     public void doCommitAction(RuntimeContainer runtime) throws SQLException {
-        String refComponentId = ((RuntimeSettingProvider) properties).getRuntimeSetting().getReferencedComponentId();
+        String refComponentId = setting.getReferencedComponentId();
         if (refComponentId != null && runtime != null) {
-            java.sql.Connection conn = (java.sql.Connection) runtime.getComponentData(refComponentId,
-                    ComponentConstants.CONNECTION_KEY);
+            java.sql.Connection conn = (java.sql.Connection) runtime.getComponentData(ComponentConstants.CONNECTION_KEY,
+                    refComponentId);
             if (conn != null && !conn.isClosed()) {
                 conn.commit();
 
-                AllSetting setting = ((RuntimeSettingProvider) properties).getRuntimeSetting();
                 if (setting.getCloseConnection()) {
                     conn.close();
                 }

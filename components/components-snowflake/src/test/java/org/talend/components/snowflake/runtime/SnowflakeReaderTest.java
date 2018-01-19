@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.i18n.GlobalI18N;
@@ -166,8 +165,8 @@ public class SnowflakeReaderTest {
         snowflakeReader.advance();
     }
 
-    @Test(expected = ComponentException.class)
-    public void testFailedConvertCurrent() throws Exception {
+    @Test
+    public void testConvertCurrent() throws Exception {
         Statement statementMock = Mockito.mock(Statement.class);
         Connection connectionMock = Mockito.mock(Connection.class);
         ResultSet resultSetMock = Mockito.mock(ResultSet.class);

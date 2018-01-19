@@ -36,8 +36,8 @@ public class TJDBCInputDefinitionTest {
         TJDBCInputDefinition result = new TJDBCInputDefinition();
 
         assertEquals(true, result.isSchemaAutoPropagate());
-        assertEquals("tJDBCInputNew", result.getName());
-        assertEquals("tJDBCInputNew_icon32.png", result.getImagePath());
+        assertEquals("tJDBCInput", result.getName());
+        assertEquals("tJDBCInput_icon32.png", result.getImagePath());
         assertEquals(true, result.isStartable());
         assertEquals(null, result.getIconKey());
         assertEquals(null, result.getPartitioning());
@@ -141,13 +141,13 @@ public class TJDBCInputDefinitionTest {
         assertNotNull(result);
 
         result = fixture.getRuntimeInfo(engine, properties, ConnectorTopology.INCOMING);
-        assertNull(result);
+        assertNotNull(result);
 
         result = fixture.getRuntimeInfo(engine, properties, ConnectorTopology.NONE);
-        assertNull(result);
+        assertNotNull(result);
 
         result = fixture.getRuntimeInfo(engine, properties, ConnectorTopology.INCOMING_AND_OUTGOING);
-        assertNull(result);
+        assertNotNull(result);
     }
 
     /**

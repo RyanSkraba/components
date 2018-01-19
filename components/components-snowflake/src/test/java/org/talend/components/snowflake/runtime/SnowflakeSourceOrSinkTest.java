@@ -12,6 +12,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
@@ -203,7 +204,9 @@ public class SnowflakeSourceOrSinkTest {
     /**
      * Checks {@link SnowflakeSourceOrSink#getSchema(RuntimeContainer, Connection, String)} adds property key to the
      * field
+     * TODO remove this test as we it check the code we removed
      */
+    @Ignore
     @Test
     public void testGetSchemaAddKeyProperty() throws Exception {
         Schema schemaToEdit = SchemaBuilder.builder().record("Schema").fields().name("field").type().stringType().noDefault()

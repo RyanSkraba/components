@@ -36,8 +36,8 @@ public class TJDBCCloseDefinitionTest {
         TJDBCCloseDefinition result = new TJDBCCloseDefinition();
 
         assertEquals(true, result.isStartable());
-        assertEquals("tJDBCCloseNew", result.getName());
-        assertEquals("tJDBCCloseNew_icon32.png", result.getImagePath());
+        assertEquals("tJDBCClose", result.getName());
+        assertEquals("tJDBCClose_icon32.png", result.getImagePath());
         assertEquals(null, result.getIconKey());
         assertEquals(null, result.getPartitioning());
         assertEquals(false, result.isConditionalInputs());

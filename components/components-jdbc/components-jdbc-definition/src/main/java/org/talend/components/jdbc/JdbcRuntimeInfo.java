@@ -21,6 +21,7 @@ import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
+import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.sandbox.SandboxControl;
 
 /**
@@ -55,9 +56,6 @@ public class JdbcRuntimeInfo extends JarRuntimeInfo {
             throw new NullPointerException("props must not be null");
         }
         this.props = props;
-        if (props.getRuntimeSetting().getDriverClass() == null) {
-            throw new NullPointerException("props must provide not null driver class");
-        }
         this.driverClassName = props.getRuntimeSetting().getDriverClass();
     }
 
@@ -83,7 +81,13 @@ public class JdbcRuntimeInfo extends JarRuntimeInfo {
             List<String> driverPaths = props.getRuntimeSetting().getDriverPaths();
             if (driverPaths != null) {
                 for (String driver : driverPaths) {
-                    driverUrls.add(new URL(removeQuote(driver)));
+                    String mavenPath = removeQuote(driver);
+                    // there is some bug in the upriver in studio and the getMavenUrlDependencies is called at some strange time,
+                    // so need to filter like below
+                    if ("newLine".equals(mavenPath)) {
+                        continue;
+                    }
+                    driverUrls.add(new URL(mavenPath));
                 }
             }
             return driverUrls;

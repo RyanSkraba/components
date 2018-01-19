@@ -12,6 +12,10 @@
 // ============================================================================
 package org.talend.components.snowflake.runtime;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
 
@@ -20,6 +24,15 @@ public class SnowflakeResultSetIndexedRecordConverter extends JDBCResultSetIndex
     @Override
     protected JDBCAvroRegistry getRegistry() {
         return SnowflakeAvroRegistry.get();
+    }
+
+    @Override
+    protected void resetSizeByResultSet(ResultSet resultSet) {
+        try {
+            this.setSizeInResultSet(resultSet.getMetaData().getColumnCount());
+        } catch (SQLException e) {
+            throw new ComponentException(e);
+        }
     }
 
 }

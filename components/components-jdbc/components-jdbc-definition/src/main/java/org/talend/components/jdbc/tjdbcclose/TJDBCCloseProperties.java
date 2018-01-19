@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc.tjdbcclose;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
@@ -50,8 +50,7 @@ public class TJDBCCloseProperties extends ComponentPropertiesImpl
     public AllSetting getRuntimeSetting() {
         AllSetting setting = new AllSetting();
 
-        setting.setReferencedComponentId(referencedComponent.componentInstanceId.getValue());
-        setting.setReferencedComponentProperties(referencedComponent.getReference());
+        CommonUtils.setReferenceInfo(setting, referencedComponent);
 
         return setting;
     }

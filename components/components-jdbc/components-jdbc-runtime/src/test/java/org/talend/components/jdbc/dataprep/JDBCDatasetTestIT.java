@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.jdbc.dataprep;
 
+import java.io.IOException;
+import java.util.Iterator;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
@@ -22,9 +25,12 @@ import org.talend.components.jdbc.common.DBTestUtils;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.datastore.JDBCDatastoreDefinition;
 import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
+import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
 import org.talend.components.jdbc.runtime.dataprep.JDBCDatasetRuntime;
+import org.talend.components.jdbc.runtime.dataprep.JDBCDatastoreRuntime;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.java8.Consumer;
+import org.talend.daikon.properties.ValidationResult;
 
 public class JDBCDatasetTestIT {
 
@@ -49,7 +55,7 @@ public class JDBCDatasetTestIT {
         Schema schema = dataset.main.schema.getValue();
 
         Assert.assertNotNull(schema);
-        DBTestUtils.testMetadata(schema.getFields());
+        DBTestUtils.testMetadata(schema.getFields(), true);
     }
 
     @Test
@@ -61,7 +67,25 @@ public class JDBCDatasetTestIT {
         Schema schema = runtime.getSchema();
 
         Assert.assertNotNull(schema);
-        DBTestUtils.testMetadata(schema.getFields());
+        DBTestUtils.testMetadata(schema.getFields(), true);
+    }
+    
+    @Test
+    public void testGetSchemaFromTable() throws IOException {
+        JDBCDatasetProperties dataset = createDatasetProperties(false);
+
+        JDBCDatasetRuntime runtime = new JDBCDatasetRuntime();
+        runtime.initialize(null, dataset);
+        
+        JDBCSourceOrSink jss = new JDBCSourceOrSink();
+        jss.initialize(null, dataset);
+        Schema schema = jss.getEndpointSchema(null, DBTestUtils.getTablename());
+
+        Assert.assertNotNull(schema);
+        DBTestUtils.testMetadata(schema.getFields(), true);
+        
+        jss.getEndpointSchema(null, DBTestUtils.getAllTypesTablename());
+        //TODO assert the result
     }
 
     @Test
@@ -74,6 +98,18 @@ public class JDBCDatasetTestIT {
     public void testGetSampleWithoutDesignSchema() {
         JDBCDatasetProperties dataset = createDatasetProperties(false);
         getSampleAction(dataset);
+    }
+    
+    @Test
+    public void testDoHealthChecks() {
+        JDBCDatasetProperties dataset = createDatasetProperties(true);
+        JDBCDatastoreRuntime runtime = new JDBCDatastoreRuntime();
+        runtime.initialize(null, dataset.getDatastoreProperties());
+        Iterable<ValidationResult> result = runtime.doHealthChecks(null);
+        Assert.assertNotNull(result);
+        Iterator<ValidationResult> iterator = result.iterator();
+        Assert.assertTrue(iterator.hasNext());
+        Assert.assertEquals(ValidationResult.Result.OK, iterator.next().getStatus());
     }
 
     private void getSampleAction(JDBCDatasetProperties dataset) {

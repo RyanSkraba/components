@@ -31,7 +31,7 @@ public class JDBCConnectionWizardPropertiesTest {
 
         JDBCConnectionWizardProperties result = new JDBCConnectionWizardProperties(name);
 
-        assertEquals(null, result.getRuntimeSetting());
+        assertNotNull(result.getRuntimeSetting());
         assertEquals("properties.wizard.displayName", result.getDisplayName());
         assertEquals(name, result.getName());
         assertEquals(name, result.getTitle());

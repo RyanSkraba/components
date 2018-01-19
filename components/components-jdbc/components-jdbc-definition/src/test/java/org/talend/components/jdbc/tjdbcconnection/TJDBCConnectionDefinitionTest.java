@@ -37,8 +37,8 @@ public class TJDBCConnectionDefinitionTest {
         TJDBCConnectionDefinition result = new TJDBCConnectionDefinition();
 
         assertEquals(true, result.isStartable());
-        assertEquals("tJDBCConnectionNew", result.getName());
-        assertEquals("tJDBCConnectionNew_icon32.png", result.getImagePath());
+        assertEquals("tJDBCConnection", result.getName());
+        assertEquals("tJDBCConnection_icon32.png", result.getImagePath());
         assertEquals(null, result.getIconKey());
         assertEquals(null, result.getPartitioning());
         assertEquals(false, result.isConditionalInputs());
@@ -63,8 +63,9 @@ public class TJDBCConnectionDefinitionTest {
         String[] result = fixture.getFamilies();
 
         assertNotNull(result);
-        assertEquals(1, result.length);
+        assertEquals(2, result.length);
         assertEquals("Databases/DB_JDBC", result[0]);
+        assertEquals("ELT/Connections", result[1]);
     }
 
     /**

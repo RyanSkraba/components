@@ -29,7 +29,7 @@ public class JDBCDatastoreRuntime implements DatastoreRuntime<JDBCDatastorePrope
     /**
      * 
      */
-    private static final long serialVersionUID = -2341607291965168491L;
+    private static final long serialVersionUID = 1L;
 
     protected JDBCDatastoreProperties datastore;
 

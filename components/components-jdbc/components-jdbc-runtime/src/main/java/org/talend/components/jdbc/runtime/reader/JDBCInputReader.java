@@ -13,24 +13,29 @@
 package org.talend.components.jdbc.runtime.reader;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
+import org.talend.components.jdbc.CommonUtils;
+import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.JdbcComponentErrorsCode;
 import org.talend.components.jdbc.RuntimeSettingProvider;
-import org.talend.components.jdbc.avro.JDBCAvroRegistryString;
-import org.talend.components.jdbc.avro.ResultSetStringRecordConverter;
 import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.avro.AvroUtils;
@@ -52,7 +57,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     protected ResultSet resultSet;
 
-    private transient IndexedRecordConverter<ResultSet, IndexedRecord> factory;
+    private transient IndexedRecordConverter<ResultSet, IndexedRecord> converter;
 
     private transient Schema querySchema;
 
@@ -82,53 +87,110 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     private Schema getSchema() throws IOException, SQLException {
         if (querySchema == null) {
+            // we can't use the method below as the reader also work for dataset topic which don't support that.
             // querySchema = CommonUtils.getMainSchemaFromOutputConnector((ComponentProperties) properties);
             querySchema = setting.getSchema();
 
-            if (AvroUtils.isSchemaEmpty(querySchema) || AvroUtils.isIncludeAllFields(querySchema)) {
-                /**
-                 * the code above make the action different with the usage in studio,
-                 * as in studio, we only use the design schema if no dynamic column exists.
-                 * Here, we will use the runtime schema too when no valid design schema found,
-                 * it work for data set topic.
-                 * 
-                 * And another thing, the reader or other runtime execution object should be common,
-                 * and not depend on the platform, so should use the same action, so we use the same
-                 * reader for studio and dataprep(now for data store and set) execution platform. And
-                 * need more thinking about it.
-                 */
-                querySchema = JDBCAvroRegistryString.get().inferSchema(resultSet.getMetaData());
+            /**
+             * the code above make the action different with the usage in studio,
+             * as in studio, we only use the design schema if no dynamic column exists.
+             * Here, we will use the runtime schema too when no valid design schema found,
+             * it work for data set topic.
+             * 
+             * And another thing, the reader or other runtime execution object should be common,
+             * and not depend on the platform, so should use the same action, so we use the same
+             * reader for studio and dataprep(now for data store and set) execution platform. And
+             * need more thinking about it.
+             */
+            if (AvroUtils.isSchemaEmpty(querySchema)) {
+                querySchema = source.infer(resultSet.getMetaData(), container);
             }
+
+            boolean includeDynamic = AvroUtils.isIncludeAllFields(querySchema);
+            if (includeDynamic) {
+                Schema runtimeSchema4ResultSet = source.infer(resultSet.getMetaData(), container);
+                querySchema = CommonUtils.mergeRuntimeSchema2DesignSchema4Dynamic(querySchema, runtimeSchema4ResultSet);
+            }
+
+            List<String> trimColumnLabels = setting.getTrimColumns();
+            List<Boolean> trims = setting.getTrims();
+
+            Map<Integer, Boolean> trimMap = new HashMap<>();
+            boolean defaultTrim = includeDynamic
+                    ? trims.get(Integer.valueOf(querySchema.getProp(ComponentConstants.TALEND6_DYNAMIC_COLUMN_POSITION))) : false;
+
+            int i = 0;
+            for (Field field : querySchema.getFields()) {
+                i++;
+                int j = 0;
+                trimMap.put(i, defaultTrim);
+
+                for (String trimColumnLabel : trimColumnLabels) {
+                    if (trimColumnLabel.equals(field.name())) {
+                        Boolean trim = trims.get(j);
+                        trimMap.put(i, trim);
+                        break;
+                    }
+
+                    j++;
+                }
+            }
+
+            setting.setTrimMap(trimMap);
         }
+
         return querySchema;
     }
 
-    private IndexedRecordConverter<ResultSet, IndexedRecord> getFactory() throws IOException, SQLException {
-        if (null == factory) {
-            factory = new ResultSetStringRecordConverter();
-            factory.setSchema(getSchema());
+    private IndexedRecordConverter<ResultSet, IndexedRecord> getConverter(ResultSet resultSet) throws IOException, SQLException {
+        if (converter == null) {
+            converter = source.getConverter();
+
+            // this is need to be called before setSchema
+            if (converter instanceof JDBCResultSetIndexedRecordConverter) {
+                ((JDBCResultSetIndexedRecordConverter) converter).setInfluencer(setting);
+            }
+
+            converter.setSchema(getSchema());
+
+            int sizeInResultSet = resultSet.getMetaData().getColumnCount();
+
+            if (converter instanceof JDBCResultSetIndexedRecordConverter) {
+                ((JDBCResultSetIndexedRecordConverter) converter).setSizeInResultSet(sizeInResultSet);
+            }
+
         }
-        return factory;
+        return converter;
     }
 
     @Override
     public boolean start() throws IOException {
-        // TODO need to adjust the key
         if (container != null) {
-            container.setComponentData(container.getCurrentComponentId(), "QUERY", setting.getSql());
+            container.setComponentData(container.getCurrentComponentId(),
+                    CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_QUERY), setting.getSql());
         }
 
         result = new Result();
         try {
             conn = source.getConnection(container);
-            statement = conn.createStatement();
 
-            // some information come from the old javajet:
-            // TODO for mysql driver, should use this statement :
-            // statement = conn.createStatement(java.sql.ResultSet.TYPE_FORWARD_ONLY, java.sql.ResultSet.CONCUR_READ_ONLY);
-            // ((com.mysql.jdbc.Statement) statement).enableStreamingResults();
-            // and mysql driver don't support setFetchSize method
-            if (setting.getUseCursor() != null && setting.getUseCursor()) {
+            String driverClass = setting.getDriverClass();
+            if (driverClass != null && driverClass.toLowerCase().contains("mysql")) {
+                statement = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+
+                Class clazz = statement.getClass();
+                String canonicalName = clazz.getCanonicalName();
+                if ("com.mysql.jdbc.Statement".equals(canonicalName)
+                        || "com.mysql.jdbc.jdbc2.optional.JDBC4StatementWrapper".equals(canonicalName)) {
+                    // have to use reflect here
+                    Method method = clazz.getMethod("enableStreamingResults");
+                    method.invoke(statement);
+                }
+            } else {
+                statement = conn.createStatement();
+            }
+
+            if (setting.getUseCursor()) {
                 statement.setFetchSize(setting.getCursor());
             }
 
@@ -146,8 +208,8 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
         boolean haveNext = resultSet.next();
 
         if (haveNext) {
-            currentRecord = getFactory().convertToAvro(resultSet);
             result.totalCount++;
+            currentRecord = getConverter(resultSet).convertToAvro(resultSet);
         }
 
         return haveNext;

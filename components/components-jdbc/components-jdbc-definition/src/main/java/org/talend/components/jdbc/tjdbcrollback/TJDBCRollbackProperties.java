@@ -14,8 +14,14 @@ package org.talend.components.jdbc.tjdbcrollback;
 
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
-import org.talend.components.api.properties.ComponentPropertiesImpl;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentReferenceProperties;
+import org.talend.components.common.FixedConnectorsComponentProperties;
+import org.talend.components.common.SchemaProperties;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
@@ -26,8 +32,7 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-public class TJDBCRollbackProperties extends ComponentPropertiesImpl
-        implements RuntimeSettingProvider {
+public class TJDBCRollbackProperties extends FixedConnectorsComponentProperties implements RuntimeSettingProvider {
 
     public TJDBCRollbackProperties(String name) {
         super(name);
@@ -38,6 +43,14 @@ public class TJDBCRollbackProperties extends ComponentPropertiesImpl
             "referencedComponent", TJDBCConnectionDefinition.COMPONENT_NAME);
 
     public Property<Boolean> closeConnection = PropertyFactory.newBoolean("closeConnection").setRequired();
+
+    public transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "main");
+
+    public SchemaProperties main = new SchemaProperties("main");
+
+    public transient PropertyPathConnector FLOW_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow");
+
+    public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow");
 
     @Override
     public void setupLayout() {
@@ -51,11 +64,26 @@ public class TJDBCRollbackProperties extends ComponentPropertiesImpl
     }
 
     @Override
+    public void setupProperties() {
+        closeConnection.setValue(true);
+    }
+
+    @Override
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        HashSet<PropertyPathConnector> connectors = new HashSet<>();
+        if (isOutputConnection) {
+            connectors.add(FLOW_CONNECTOR);
+        } else {
+            connectors.add(MAIN_CONNECTOR);
+        }
+        return connectors;
+    }
+
+    @Override
     public AllSetting getRuntimeSetting() {
         AllSetting setting = new AllSetting();
 
-        setting.setReferencedComponentId(referencedComponent.componentInstanceId.getValue());
-        setting.setReferencedComponentProperties(referencedComponent.getReference());
+        CommonUtils.setReferenceInfo(setting, referencedComponent);
         setting.setCloseConnection(this.closeConnection.getValue());
 
         return setting;

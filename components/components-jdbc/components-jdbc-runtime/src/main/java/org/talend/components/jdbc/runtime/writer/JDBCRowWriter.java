@@ -35,9 +35,9 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.components.jdbc.CommonUtils;
-import org.talend.components.jdbc.JDBCTemplate;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.JDBCRowSink;
+import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
@@ -71,10 +71,6 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
 
     private int rejectCount;
 
-    private int commitEvery;
-
-    private int commitCount;
-
     private boolean useExistedConnection;
 
     private boolean dieOnError;
@@ -85,17 +81,27 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
 
     private ResultSet resultSet;
 
-    private int insertCount;
-
-    private int updateCount;
-
-    private int deleteCount;
+    // private int insertCount;
+    //
+    // private int updateCount;
+    //
+    // private int deleteCount;
 
     private boolean usePreparedStatement;
 
     private String sql;
 
     private boolean propagateQueryResultSet;
+
+    private boolean useCommit;
+
+    private int commitCount;
+
+    private int commitEvery;
+
+    private Schema outSchema;
+
+    private Schema rejectSchema;
 
     public JDBCRowWriter(WriteOperation<Result> writeOperation, RuntimeContainer runtime) {
         this.writeOperation = writeOperation;
@@ -105,8 +111,11 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
         properties = sink.properties;
 
         useExistedConnection = setting.getReferencedComponentId() != null;
-        if (!useExistedConnection) {
-            commitEvery = setting.getCommitEvery();
+
+        Integer commitEveryNumber = setting.getCommitEvery();
+        useCommit = !useExistedConnection && commitEveryNumber != null && commitEveryNumber != 0;
+        if (useCommit) {
+            commitEvery = commitEveryNumber;
         }
 
         dieOnError = setting.getDieOnError();
@@ -114,6 +123,10 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
         propagateQueryResultSet = setting.getPropagateQueryResultSet();
 
         result = new Result();
+
+        outSchema = CommonUtils.getOutputSchema((ComponentProperties) properties);
+
+        rejectSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
     }
 
     public void open(String uId) throws IOException {
@@ -140,9 +153,12 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
 
         IndexedRecord input = this.getFactory(datum).convertToAvro(datum);
 
+        //TODO low performance, but need to reset it by row level
+        setting = sink.properties.getRuntimeSetting();
+        
         try {
             if (usePreparedStatement) {
-                JDBCTemplate.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
+                JdbcRuntimeUtils.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
                         setting.getValues());
 
                 if (propagateQueryResultSet) {
@@ -164,6 +180,8 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
                 throw new ComponentException(e);
             } else {
                 LOG.warn(e.getMessage());
+                // TODO should not print it when reject line, but we can't know the information at the runtime
+                System.err.println(e.getMessage());
             }
 
             handleReject(input, e);
@@ -202,7 +220,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
         }
 
         try {
-            if (commitCount > 0) {
+            if (useCommit && commitCount > 0) {
                 commitCount = 0;
 
                 if (conn != null) {
@@ -212,7 +230,9 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
 
             if (conn != null) {
                 // need to call the commit before close for some database when do some read action like reading the resultset
-                conn.commit();
+                if (useCommit) {
+                    conn.commit();
+                }
 
                 conn.close();
                 conn = null;
@@ -257,7 +277,6 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
     private void handleSuccess(IndexedRecord input) {
         successCount++;
 
-        Schema outSchema = CommonUtils.getOutputSchema((ComponentProperties) properties);
         if (outSchema == null || outSchema.getFields().size() == 0) {
             return;
         }
@@ -283,8 +302,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
     private void handleReject(IndexedRecord input, SQLException e) throws IOException {
         rejectCount++;
 
-        Schema outSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
-        IndexedRecord reject = new GenericData.Record(outSchema);
+        IndexedRecord reject = new GenericData.Record(rejectSchema);
 
         for (Schema.Field outField : reject.getSchema().getFields()) {
             Object outValue = null;
@@ -295,7 +313,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
             } else if ("errorCode".equals(outField.name())) {
                 outValue = e.getSQLState();
             } else if ("errorMessage".equals(outField.name())) {
-                outValue = e.getMessage();
+                outValue = e.getMessage() + " - Line: " + result.totalCount;
             }
 
             reject.put(outField.pos(), outValue);
@@ -305,15 +323,13 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
     }
 
     private void executeCommit() throws SQLException {
-        if (useExistedConnection) {
-            return;
-        }
-
-        if (commitCount < commitEvery) {
-            commitCount++;
-        } else {
-            commitCount = 0;
-            conn.commit();
+        if (useCommit) {
+            if (commitCount < commitEvery) {
+                commitCount++;
+            } else {
+                commitCount = 0;
+                conn.commit();
+            }
         }
     }
 
@@ -328,12 +344,16 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
     }
 
     private void constructResult() {
-        // TODO need to adjust the key
+        /*
         if (runtime != null) {
-            runtime.setComponentData(runtime.getCurrentComponentId(), "NB_LINE_DELETED", deleteCount);
-            runtime.setComponentData(runtime.getCurrentComponentId(), "NB_LINE_INSERTED", insertCount);
-            runtime.setComponentData(runtime.getCurrentComponentId(), "NB_LINE_UPDATED", updateCount);
+            runtime.setComponentData(runtime.getCurrentComponentId(),
+                    CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_DELETE_RECORD_COUNT), deleteCount);
+            runtime.setComponentData(runtime.getCurrentComponentId(),
+                    CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_INSERT_RECORD_COUNT), insertCount);
+            runtime.setComponentData(runtime.getCurrentComponentId(),
+                    CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_UPDATE_RECORD_COUNT), updateCount);
         }
+        */
 
         result.successCount = successCount;
         result.rejectCount = rejectCount;

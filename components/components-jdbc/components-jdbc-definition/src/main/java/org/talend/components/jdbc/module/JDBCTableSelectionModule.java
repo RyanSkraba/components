@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.jdbc.module;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.io.IOException;
 import java.util.List;
@@ -61,7 +61,7 @@ public class JDBCTableSelectionModule extends PropertiesImpl {
     }
 
     public ValidationResult beforeTablename() throws IOException {
-        JdbcRuntimeInfo jdbcRuntimeInfo = new JdbcRuntimeInfo(connection, "org.talend.components.jdbc.runtime.JDBCSourceOrSink");
+        JdbcRuntimeInfo jdbcRuntimeInfo = new JdbcRuntimeInfo(connection, "org.talend.components.jdbc.runtime.JDBCSource");
         try (SandboxedInstance sandboxI = RuntimeUtil.createRuntimeClass(jdbcRuntimeInfo,
                 connection.getClass().getClassLoader())) {
             SourceOrSink ss = (SourceOrSink) sandboxI.getInstance();

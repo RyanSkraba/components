@@ -19,7 +19,9 @@ import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.JdbcRuntimeInfo;
+import org.talend.components.jdbc.wizard.JDBCConnectionWizardProperties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -30,10 +32,11 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class TJDBCInputDefinition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tJDBCInputNew";
+    public static final String COMPONENT_NAME = "tJDBCInput";
 
     public TJDBCInputDefinition() {
         super(COMPONENT_NAME, ExecutionEngine.DI);
+        setupI18N(new Property<?>[] { RETURN_QUERY_PROP });
     }
 
     @Override
@@ -46,15 +49,11 @@ public class TJDBCInputDefinition extends AbstractComponentDefinition {
         return new String[] { "Databases/DB_JDBC" };
     }
 
-    // TODO can't i18n
-    public static final String RETURN_QUERY = "query";
-
-    public static final Property<String> RETURN_QUERY_PROP = PropertyFactory.newString(RETURN_QUERY);
+    public static final Property<String> RETURN_QUERY_PROP = PropertyFactory.newString(ComponentConstants.RETURN_QUERY);
 
     @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
-        setupI18N(new Property<?>[] { RETURN_QUERY_PROP });
         return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP, RETURN_QUERY_PROP };
     }
 
@@ -67,15 +66,17 @@ public class TJDBCInputDefinition extends AbstractComponentDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        if (connectorTopology == ConnectorTopology.OUTGOING) {
-            return new JdbcRuntimeInfo((TJDBCInputProperties) properties, "org.talend.components.jdbc.runtime.JDBCSource");
-        }
-        return null;
+        return new JdbcRuntimeInfo((TJDBCInputProperties) properties, "org.talend.components.jdbc.runtime.JDBCSource");
     }
 
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
         return EnumSet.of(ConnectorTopology.OUTGOING);
+    }
+
+    @Override
+    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
+        return new Class[] { JDBCConnectionWizardProperties.class };
     }
 
 }

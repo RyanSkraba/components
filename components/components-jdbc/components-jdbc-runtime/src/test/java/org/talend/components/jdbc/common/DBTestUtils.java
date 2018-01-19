@@ -15,7 +15,8 @@ package org.talend.components.jdbc.common;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,6 +62,8 @@ import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
 import org.talend.components.jdbc.tjdbcrow.TJDBCRowDefinition;
 import org.talend.components.jdbc.tjdbcrow.TJDBCRowProperties;
+import org.talend.components.jdbc.tjdbcsp.TJDBCSPDefinition;
+import org.talend.components.jdbc.tjdbcsp.TJDBCSPProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
@@ -71,11 +74,21 @@ public class DBTestUtils {
         // TODO need to shutdown the db or drop the db?
 
         /*
-         * if ("org.apache.derby.jdbc.EmbeddedDriver".equals(driverClass)) { boolean gotSQLExc = false; try {
-         * DriverManager.getConnection("jdbc:derby:memory:;drop=true"); } catch (SQLException se) { if
-         * (se.getSQLState().equals("XJ015")) { gotSQLExc = true; } } if (!gotSQLExc) {
-         * System.out.println("Database did not shut down normally"); } else {
-         * System.out.println("Database shut down normally"); } }
+         * if ("org.apache.derby.jdbc.EmbeddedDriver".equals(driverClass)) {
+         * boolean gotSQLExc = false;
+         * try {
+         * DriverManager.getConnection("jdbc:derby:memory:;drop=true");
+         * } catch (SQLException se) {
+         * if (se.getSQLState().equals("XJ015")) {
+         * gotSQLExc = true;
+         * }
+         * }
+         * if (!gotSQLExc) {
+         * System.out.println("Database did not shut down normally");
+         * } else {
+         * System.out.println("Database shut down normally");
+         * }
+         * }
          */
     }
 
@@ -144,8 +157,9 @@ public class DBTestUtils {
     }
 
     /**
-     * Following several methods are setup and tearDown methods for ALL_TYPES table. ALL_TYPES tables contains columns for
-     * each data type available in Derby DB This is required to test conversion between SQL -> JDBC -> Avro data types
+     * Following several methods are setup and tearDown methods for ALL_TYPES table.
+     * ALL_TYPES tables contains columns for each data type available in Derby DB
+     * This is required to test conversion between SQL -> JDBC -> Avro data types
      */
     public static void createAllTypesTable(Connection conn) throws SQLException {
         try (Statement statement = conn.createStatement()) {
@@ -207,8 +221,8 @@ public class DBTestUtils {
     public static Schema createAllTypesSchema() {
         FieldAssembler<Schema> builder = SchemaBuilder.builder().record("ALL_TYPES").fields();
 
-        // sql (smallint)short -> avro int
-        Schema schema = AvroUtils._int();
+        // sql (smallint)short -> avro short
+        Schema schema = AvroUtils._short();
         schema = wrap(schema);
         builder = builder.name("SMALL_INT_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "SMALL_INT_COL").type(schema)
                 .noDefault();
@@ -264,20 +278,20 @@ public class DBTestUtils {
         builder = builder.name("CLOB_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "CLOB_COL").type(schema)
                 .noDefault();
 
-        // sql date -> avro logical date
-        schema = AvroUtils._logicalDate();
+        // sql date -> avro date
+        schema = AvroUtils._date();
         schema = wrap(schema);
         builder = builder.name("DATE_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "DATE_COL").type(schema)
                 .noDefault();
 
-        // sql time -> avro logical time
-        schema = AvroUtils._logicalTime();
+        // sql time -> avro date
+        schema = AvroUtils._date();
         schema = wrap(schema);
         builder = builder.name("TIME_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "TIME_COL").type(schema)
                 .noDefault();
 
-        // sql timestamp -> avro logical timestamp
-        schema = AvroUtils._logicalTimestamp();
+        // sql timestamp -> avro date
+        schema = AvroUtils._date();
         schema = wrap(schema);
         builder = builder.name("TIMESTAMP_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "TIMESTAMP_COL").type(schema)
                 .noDefault();
@@ -331,6 +345,14 @@ public class DBTestUtils {
     public static void createTableForEveryType(AllSetting allSetting) throws SQLException, ClassNotFoundException {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
             createTestTableForEveryType(conn);
+        }
+    }
+    
+    public static void createTableWithSpecialName(AllSetting allSetting) throws SQLException, ClassNotFoundException {
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            try (Statement statement = conn.createStatement()) {
+                statement.execute("CREATE TABLE TEST (P1_Vente_Qté INT)");
+            }
         }
     }
 
@@ -436,8 +458,7 @@ public class DBTestUtils {
         }
     }
 
-    // TODO : now we have to use the type for derby to test, should use the common one for every database or write it for
-    // every
+    // TODO : now we have to use the type for derby to test, should use the common one for every database or write it for every
     // database
     private static void createTestTableForEveryType(Connection conn) throws SQLException {
         try (Statement statement = conn.createStatement()) {
@@ -773,9 +794,9 @@ public class DBTestUtils {
         case 2:
             return DataAction.DELETE;
         case 3:
-            return DataAction.INSERTORUPDATE;
+            return DataAction.INSERT_OR_UPDATE;
         case 4:
-            return DataAction.UPDATEORINSERT;
+            return DataAction.UPDATE_OR_INSERT;
         default:
             return DataAction.INSERT;
         }
@@ -789,9 +810,9 @@ public class DBTestUtils {
         case 1:
             return DataAction.UPDATE;
         case 2:
-            return DataAction.INSERTORUPDATE;
+            return DataAction.INSERT_OR_UPDATE;
         case 3:
-            return DataAction.UPDATEORINSERT;
+            return DataAction.UPDATE_OR_INSERT;
         default:
             return DataAction.INSERT;
         }
@@ -921,14 +942,14 @@ public class DBTestUtils {
         return "select * from ALL_TYPES";
     }
 
-    public static void testMetadata(List<Field> columns) {
+    public static void testMetadata(List<Field> columns, boolean dataprep) {
         Schema.Field field = columns.get(0);
 
         assertEquals("ID", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        assertEquals(Schema.Type.STRING, AvroUtils.unwrapIfNullable(field.schema()).getType());
-        assertEquals(java.sql.Types.INTEGER, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals(dataprep ? Schema.Type.STRING : Schema.Type.INT, AvroUtils.unwrapIfNullable(field.schema()).getType());
+        assertEquals(dataprep ? java.sql.Types.INTEGER : "INTEGER", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
-        assertEquals(10, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
+        assertEquals(dataprep ? 10 : null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
@@ -937,11 +958,84 @@ public class DBTestUtils {
 
         assertEquals("NAME", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
         assertEquals(Schema.Type.STRING, AvroUtils.unwrapIfNullable(field.schema()).getType());
-        assertEquals(java.sql.Types.VARCHAR, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
-        assertEquals(8, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+        assertEquals(dataprep ? java.sql.Types.VARCHAR : "VARCHAR", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals(dataprep ? 8 : "8", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
+    }
+
+    public static void testMetadata(List<Field> columns) {
+        testMetadata(columns, false);
+    }
+
+    private static void createAllFunctionOrProcedures(AllSetting allSetting) throws Exception {
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            try (Statement statement = conn.createStatement()) {
+                statement.execute("CREATE PROCEDURE p1 ()  INSERT INTO TEST values(4, 'lucky') ");//no in, no out
+                statement.execute("CREATE PROCEDURE p2 (IN a1 CHAR(20), IN a2 CHAR(20)) BEGIN INSERT INTO TEST values(a1, a2); END");//only in
+                statement.execute("CREATE PROCEDURE p3 (OUT a1 INT) BEGIN SELECT COUNT(*) INTO a1 FROM TEST; END");//only out
+                statement.execute("CREATE PROCEDURE p4 (IN a1 CHAR(20), IN a2 CHAR(20), OUT a3 INT) BEGIN INSERT INTO TEST values(a1, a2);SELECT COUNT(*) INTO a3 FROM TEST; END");//in and out
+                statement.execute("CREATE FUNCTION f1 (a CHAR(20)) RETURNS CHAR(50) DETERMINISTIC RETURN CONCAT('Hello, ',a,'!')");//function
+            }
+        }
+    }
+    
+    private static void dropAllFunctionOrProcedures(AllSetting allSetting) throws ClassNotFoundException, SQLException {
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            try (Statement statement = conn.createStatement()) {
+                statement.execute("DROP PROCEDURE p1");
+                statement.execute("DROP PROCEDURE p2");
+                statement.execute("DROP PROCEDURE p3");
+                statement.execute("DROP PROCEDURE p4");
+                statement.execute("DROP FUNCTION f1");
+            }
+        }
+    }
+    
+    public static Schema createSPSchema1() {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+
+        Schema schema = AvroUtils._int();
+        schema = wrap(schema);
+        builder = builder.name("PARAMETER").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "PARAMETER").type(schema).noDefault();
+
+        return builder.endRecord();
+    }
+    
+    public static Schema createSPSchema2() {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+
+        Schema schema = AvroUtils._string();
+        schema = wrap(schema);
+        builder = builder.name("PARAMETER").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "PARAMETER").type(schema).noDefault();
+
+        return builder.endRecord();
+    }
+    
+    public static Schema createSPSchema3() {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+
+        Schema schema = AvroUtils._int();
+        schema = wrap(schema);
+        builder = builder.name("PARAMETER1").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "PARAMETER1").type(schema).noDefault();
+        
+        schema = AvroUtils._string();
+        schema = wrap(schema);
+        builder = builder.name("PARAMETER2").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "PARAMETER2").type(schema).noDefault();
+
+        return builder.endRecord();
+    }
+    
+    public static TJDBCSPProperties createCommonJDBCSPProperties(AllSetting allSetting, TJDBCSPDefinition definition) {
+        TJDBCSPProperties properties = (TJDBCSPProperties) definition.createRuntimeProperties();
+
+        // properties.connection.driverTable.drivers.setValue(Arrays.asList(driverPath));
+        properties.connection.driverClass.setValue(allSetting.getDriverClass());
+        properties.connection.jdbcUrl.setValue(allSetting.getJdbcUrl());
+        properties.connection.userPassword.userId.setValue(allSetting.getUsername());
+        properties.connection.userPassword.password.setValue(allSetting.getPassword());
+        return properties;
     }
 }

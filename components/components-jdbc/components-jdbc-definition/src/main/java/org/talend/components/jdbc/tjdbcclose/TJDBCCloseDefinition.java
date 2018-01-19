@@ -29,7 +29,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class TJDBCCloseDefinition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tJDBCCloseNew";
+    public static final String COMPONENT_NAME = "tJDBCClose";
 
     public TJDBCCloseDefinition() {
         super(COMPONENT_NAME, ExecutionEngine.DI);

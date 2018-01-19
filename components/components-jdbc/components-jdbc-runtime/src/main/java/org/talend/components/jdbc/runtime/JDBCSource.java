@@ -20,8 +20,6 @@ import java.util.List;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.jdbc.ComponentConstants;
-import org.talend.components.jdbc.JDBCTemplate;
 import org.talend.components.jdbc.runtime.reader.JDBCInputReader;
 
 /**
@@ -30,7 +28,7 @@ import org.talend.components.jdbc.runtime.reader.JDBCInputReader;
  */
 public class JDBCSource extends JDBCSourceOrSink implements BoundedSource {
 
-    private static final long serialVersionUID = -9111994542816954024L;
+    private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -60,15 +58,11 @@ public class JDBCSource extends JDBCSourceOrSink implements BoundedSource {
     public Connection connect(RuntimeContainer runtime) throws ClassNotFoundException, SQLException {
         String refComponentId = setting.getReferencedComponentId();
         // using another component's connection
-        if (refComponentId != null && runtime != null) {
-            Object existedConn = runtime.getComponentData(refComponentId, ComponentConstants.CONNECTION_KEY);
-            if (existedConn == null) {
-                throw new RuntimeException("Referenced component: " + refComponentId + " is not connected");
-            }
-            return (Connection) existedConn;
+        if (refComponentId != null) {
+            return JdbcRuntimeUtils.fetchConnectionFromContextOrCreateNew(setting, runtime);
+        } else {
+            return JdbcRuntimeUtils.createConnectionOrGetFromSharedConnectionPoolOrDataSource(runtime, setting, false);
         }
-
-        return JdbcRuntimeUtils.createConnection(setting);
     }
 
 }

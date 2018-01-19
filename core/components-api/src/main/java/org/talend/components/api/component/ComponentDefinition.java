@@ -131,6 +131,9 @@ public interface ComponentDefinition extends Definition<ComponentProperties> {
      *         before processing, {@code false} otherwise
      */
     boolean isConditionalInputs();
+    
+    // FIXME - An ENUM perhaps?
+    boolean isParallelize();
 
     /**
      * True if the component needs to report on rejected writes after the close() method in the writer.

@@ -15,8 +15,10 @@ package org.talend.components.jdbc.tjdbcoutput;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
@@ -26,8 +28,11 @@ import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.jdbc.CommonUtils;
+import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.JdbcRuntimeInfo;
 import org.talend.components.jdbc.RuntimeSettingProvider;
+import org.talend.components.jdbc.module.AdditionalColumnsTable;
+import org.talend.components.jdbc.module.FieldOptionsTable;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.module.JDBCTableSelectionModule;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
@@ -41,6 +46,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
+import org.talend.daikon.properties.runtime.RuntimeContext;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
@@ -61,8 +67,8 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
     public enum DataAction {
         INSERT,
         UPDATE,
-        INSERTORUPDATE,
-        UPDATEORINSERT,
+        INSERT_OR_UPDATE,
+        UPDATE_OR_INSERT,
         DELETE
     }
 
@@ -89,7 +95,7 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject");
 
-    public final PresentationItem fetchSchemaFromTable = new PresentationItem("fetchSchemaFromTable", "Fetch schema from table");
+    public final transient PresentationItem fetchSchemaFromTable = new PresentationItem("fetchSchemaFromTable", "Guess schema");
 
     public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError").setRequired();
 
@@ -100,9 +106,11 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
     // advanced
     public Property<Integer> commitEvery = PropertyFactory.newInteger("commitEvery").setRequired();
 
-    // TODO additional columns
+    public AdditionalColumnsTable additionalColumns = new AdditionalColumnsTable("additionalColumns");
 
-    // TODO use field options and table
+    public Property<Boolean> enableFieldOptions = PropertyFactory.newBoolean("enableFieldOptions").setRequired();
+
+    public FieldOptionsTable fieldOptions = new FieldOptionsTable("fieldOptions");
 
     public Property<Boolean> debug = PropertyFactory.newBoolean("debug").setRequired();
 
@@ -147,7 +155,7 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
         mainForm.addRow(tableSelection.getForm(Form.REFERENCE));
 
         mainForm.addRow(dataAction);
-        mainForm.addRow(clearDataInTable);
+        mainForm.addColumn(clearDataInTable);
 
         mainForm.addRow(main.getForm(Form.REFERENCE));
 
@@ -160,6 +168,12 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
 
         Form advancedForm = CommonUtils.addForm(this, Form.ADVANCED);
         advancedForm.addRow(commitEvery);
+
+        advancedForm.addRow(Widget.widget(additionalColumns).setWidgetType(Widget.TABLE_WIDGET_TYPE));
+
+        advancedForm.addRow(enableFieldOptions);
+        advancedForm.addRow(Widget.widget(fieldOptions).setWidgetType(Widget.TABLE_WIDGET_TYPE));
+
         advancedForm.addRow(debug);
         advancedForm.addRow(useBatch);
         advancedForm.addRow(batchSize);
@@ -177,15 +191,15 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
         batchSize.setValue(10000);
 
         tableSelection.setConnection(this);
+
+        connection.setNotRequired();
     }
 
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        String refComponentIdValue = referencedComponent.componentInstanceId.getStringValue();
-        boolean useOtherConnection = refComponentIdValue != null
-                && refComponentIdValue.startsWith(TJDBCConnectionDefinition.COMPONENT_NAME);
+        boolean useOtherConnection = CommonUtils.useExistedConnection(referencedComponent);
 
         if (form.getName().equals(Form.MAIN)) {
             form.getChildForm(connection.getName()).setHidden(useOtherConnection);
@@ -199,9 +213,27 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
         }
 
         if (form.getName().equals(Form.ADVANCED)) {
-            form.getWidget(batchSize.getName()).setHidden(!useBatch.getValue());
             form.getWidget(commitEvery.getName()).setHidden(useOtherConnection);
+            form.getWidget(batchSize.getName()).setHidden(!useBatch.getValue());
+            form.getWidget(fieldOptions.getName()).setVisible(enableFieldOptions.getValue());
+
+            updateReferenceColumns();
+            updateFieldOptions();
         }
+    }
+
+    private void updateReferenceColumns() {
+        Schema schema = main.schema.getValue();
+        if (schema == null) {
+            return;
+        }
+
+        List<String> fieldNames = new ArrayList<>();
+        for (Schema.Field f : schema.getFields()) {
+            fieldNames.add(f.name());
+        }
+
+        additionalColumns.referenceColumns.setPossibleValues(fieldNames);
     }
 
     public void afterReferencedComponent() {
@@ -217,6 +249,83 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
         refreshLayout(getForm(Form.ADVANCED));
     }
 
+    public void afterEnableFieldOptions() {
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+
+    private void updateFieldOptions() {
+        Schema schema = main.schema.getValue();
+        if (schema == null) {
+            return;
+        }
+
+        Map<String, FieldOption> oldValues = getOldFieldOptions();
+
+        List<String> fieldNames = new ArrayList<>();
+        List<Boolean> insertable = new ArrayList<>();
+        List<Boolean> updateable = new ArrayList<>();
+
+        for (Schema.Field f : schema.getFields()) {
+            fieldNames.add(f.name());
+            FieldOption oldValue = null;
+            if (oldValues != null && (oldValue = oldValues.get(f.name())) != null) {
+                // set the old value if the field is old after schema changed
+                insertable.add(oldValue.insertable);
+                updateable.add(oldValue.updatable);
+            } else {
+                // set the default value if the field is new after schema changed
+                insertable.add(true);
+                updateable.add(true);
+            }
+        }
+        fieldOptions.schemaColumns.setValue(fieldNames);
+        fieldOptions.insertable.setValue(insertable);
+        fieldOptions.updatable.setValue(updateable);
+    }
+
+    private Map<String, FieldOption> getOldFieldOptions() {
+        Map<String, FieldOption> oldValueMap = null;
+        Object fs = fieldOptions.schemaColumns.getValue();
+        Object is = fieldOptions.insertable.getValue();
+        Object us = fieldOptions.updatable.getValue();
+        if (fs != null && is != null && us != null && (fs instanceof List) && (is instanceof List) && (us instanceof List)) {
+            oldValueMap = new HashMap<>();
+            List<String> names = (List<String>) fs;
+            List<Object> insertables = (List<Object>) is;
+            List<Object> updatables = (List<Object>) us;
+            for (int i = 0; i < names.size(); i++) {
+                FieldOption option = new FieldOption();
+                option.fieldName = names.get(i);
+                Object its = insertables.get(i);
+                Object uts = updatables.get(i);
+
+                if (its instanceof Boolean) {
+                    option.insertable = (Boolean) its;
+                } else {
+                    option.insertable = Boolean.valueOf((String) its);
+                }
+
+                if (its instanceof Boolean) {
+                    option.updatable = (Boolean) uts;
+                } else {
+                    option.updatable = Boolean.valueOf((String) uts);
+                }
+
+                oldValueMap.put(option.fieldName, option);
+            }
+        }
+        return oldValueMap;
+    }
+
+    private class FieldOption {
+
+        String fieldName;
+
+        boolean insertable;
+
+        boolean updatable;
+    }
+
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         HashSet<PropertyPathConnector> connectors = new HashSet<>();
@@ -229,14 +338,20 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
         return connectors;
     }
 
-    public ValidationResult afterFetchSchemaFromTable() {
-        JdbcRuntimeInfo jdbcRuntimeInfo = new JdbcRuntimeInfo(this, "org.talend.components.jdbc.runtime.JDBCSourceOrSink");
+    public ValidationResult afterFetchSchemaFromTable(RuntimeContext runtimeContext) {
+        Object mappingFileLocation = runtimeContext.getData(ComponentConstants.MAPPING_LOCATION);
+        if (mappingFileLocation == null) {
+            return new ValidationResult(ValidationResult.Result.ERROR, "can't find the mapping files directory");
+        }
+
+        JdbcRuntimeInfo jdbcRuntimeInfo = new JdbcRuntimeInfo(this, "org.talend.components.jdbc.runtime.JDBCSource");
         try (SandboxedInstance sandboxI = RuntimeUtil.createRuntimeClass(jdbcRuntimeInfo,
                 connection.getClass().getClassLoader())) {
             JdbcRuntimeSourceOrSink ss = (JdbcRuntimeSourceOrSink) sandboxI.getInstance();
             ss.initialize(null, this);
             Schema schema = null;
             try {
+                ss.setDBTypeMapping(CommonUtils.getMapping((String) mappingFileLocation, this.getRuntimeSetting(), null, null));
                 schema = ss.getEndpointSchema(null, tableSelection.tablename.getValue());
             } catch (Exception e) {
                 return new ValidationResult(ValidationResult.Result.ERROR, e.getCause().getMessage());
@@ -247,24 +362,42 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
         return ValidationResult.OK;
     }
 
+    // this method is necessary as the callback logic, we need to improve it
+    public ValidationResult afterFetchSchemaFromTable() {
+        // do nothing
+        return ValidationResult.OK;
+    }
+
     @Override
     public AllSetting getRuntimeSetting() {
         AllSetting setting = new AllSetting();
 
-        setting.setReferencedComponentId(referencedComponent.componentInstanceId.getValue());
-        setting.setReferencedComponentProperties(referencedComponent.getReference());
-
-        CommonUtils.setCommonConnectionInfo(setting, connection);
+        CommonUtils.setReferenceInfoAndConnectionInfo(setting, referencedComponent, connection);
 
         setting.setTablename(this.tableSelection.tablename.getValue());
         setting.setDataAction(this.dataAction.getValue());
         setting.setClearDataInTable(this.clearDataInTable.getValue());
         setting.setDieOnError(this.dieOnError.getValue());
 
+        setting.setUseAutoCommit(this.useDataSource.getValue());
+        setting.setDataSource(this.dataSource.getValue());
+
         setting.setCommitEvery(this.commitEvery.getValue());
         setting.setDebug(this.debug.getValue());
         setting.setUseBatch(this.useBatch.getValue());
         setting.setBatchSize(this.batchSize.getValue());
+
+        setting.setNewDBColumnNames4AdditionalParameters(this.additionalColumns.names.getValue());
+        setting.setSqlExpressions4AdditionalParameters(this.additionalColumns.sqlExpressions.getValue());
+        setting.setPositions4AdditionalParameters(this.additionalColumns.positions.getValue());
+        setting.setReferenceColumns4AdditionalParameters(this.additionalColumns.referenceColumns.getValue());
+
+        setting.setEnableFieldOptions(this.enableFieldOptions.getValue());
+        setting.setSchemaColumns4FieldOption(this.fieldOptions.schemaColumns.getValue());
+        setting.setInsertable4FieldOption(this.fieldOptions.insertable.getValue());
+        setting.setUpdatable4FieldOption(this.fieldOptions.updatable.getValue());
+        setting.setUpdateKey4FieldOption(this.fieldOptions.updateKey.getValue());
+        setting.setDeletionKey4FieldOption(this.fieldOptions.deletionKey.getValue());
 
         return setting;
     }

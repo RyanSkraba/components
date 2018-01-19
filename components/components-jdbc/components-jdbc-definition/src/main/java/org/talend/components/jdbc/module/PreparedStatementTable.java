@@ -12,13 +12,14 @@
 // ============================================================================
 package org.talend.components.jdbc.module;
 
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
+import org.talend.components.jdbc.CommonUtils;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -52,16 +53,20 @@ public class PreparedStatementTable extends ComponentPropertiesImpl {
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = new Form(this, Form.MAIN);
+        Form mainForm = CommonUtils.addForm(this, Form.MAIN);
         mainForm.addColumn(indexs);
-        mainForm.addColumn(new Widget(types).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        mainForm.addColumn(Widget.widget(types).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         mainForm.addColumn(values);
     }
 
     @Override
     public void setupProperties() {
         super.setupProperties();
-        types.setPossibleValues(Arrays.asList(Type.values()));
+        List<String> values = new ArrayList<>();
+        for (Type type : Type.values()) {
+            values.add(type.toString());
+        }
+        types.setPossibleValues(values);
     }
 
     public enum Type {

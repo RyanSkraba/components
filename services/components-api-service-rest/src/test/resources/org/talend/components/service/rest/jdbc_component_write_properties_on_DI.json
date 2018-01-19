@@ -9,7 +9,7 @@
       "debug": false,
       "useBatch": true,
       "batchSize": 10000,
-      "referencedComponent": "tJDBCConnectionNew",
+      "referencedComponent": "tJDBCConnection",
       "connection": {
         "jdbcUrl":"{jdbc_url}",
         "driverClass":"org.apache.derby.jdbc.ClientDriver",
@@ -27,7 +27,7 @@
       },
       "main": {
         "schema_bak": "{\"type\":\"record\",\"name\":\"EmptyRecord\",\"fields\":[id, first_name, last_name, email, gender, ip_address]}",
-        "schema": "{\"type\":\"record\",\"name\":\"DYNAMIC\",\"fields\":[{\"name\":\"ID\",\"type\":[\"string\",\"null\"],\"talend.field.precision\":10,\"talend.field.dbType\":4,\"talend.field.dbColumnName\":\"ID\"},{\"name\":\"FIRST_NAME\",\"type\":[\"string\",\"null\"],\"talend.field.length\":50,\"talend.field.dbType\":12,\"talend.field.dbColumnName\":\"FIRST_NAME\"},{\"name\":\"LAST_NAME\",\"type\":[\"string\",\"null\"],\"talend.field.length\":50,\"talend.field.dbType\":12,\"talend.field.dbColumnName\":\"LAST_NAME\"},{\"name\":\"EMAIL\",\"type\":[\"string\",\"null\"],\"talend.field.length\":50,\"talend.field.dbType\":12,\"talend.field.dbColumnName\":\"EMAIL\"},{\"name\":\"GENDER\",\"type\":[\"string\",\"null\"],\"talend.field.length\":50,\"talend.field.dbType\":12,\"talend.field.dbColumnName\":\"GENDER\"},{\"name\":\"IP_ADDRESS\",\"type\":[\"string\",\"null\"],\"talend.field.length\":20,\"talend.field.dbType\":12,\"talend.field.dbColumnName\":\"IP_ADDRESS\"}]}"
+        "schema": "{\"type\":\"record\",\"name\":\"DYNAMIC\",\"fields\":[{\"name\":\"id\",\"type\":[\"string\",\"null\"],\"talend.field.precision\":10,\"talend.field.dbType\":4,\"talend.field.dbColumnName\":\"id\"},{\"name\":\"first_name\",\"type\":[\"string\",\"null\"],\"talend.field.length\":50,\"talend.field.dbType\":12,\"talend.field.dbColumnName\":\"first_name\"},{\"name\":\"last_name\",\"type\":[\"string\",\"null\"],\"talend.field.length\":50,\"talend.field.dbType\":12,\"talend.field.dbColumnName\":\"last_name\"},{\"name\":\"email\",\"type\":[\"string\",\"null\"],\"talend.field.length\":50,\"talend.field.dbType\":12,\"talend.field.dbColumnName\":\"email\"},{\"name\":\"gender\",\"type\":[\"string\",\"null\"],\"talend.field.length\":50,\"talend.field.dbType\":12,\"talend.field.dbColumnName\":\"gender\"},{\"name\":\"ip_address\",\"type\":[\"string\",\"null\"],\"talend.field.length\":20,\"talend.field.dbType\":12,\"talend.field.dbColumnName\":\"ip_address\"}]}"
       },
       "schemaFlow": {
         "schema": "{\"type\":\"record\",\"name\":\"EmptyRecord\",\"fields\":[]}"
@@ -35,7 +35,7 @@
       "schemaReject": {
         "schema": "{\"type\":\"record\",\"name\":\"EmptyRecord\",\"fields\":[]}"
       },
-      "@definitionName": "tJDBCOutputNew"
+      "@definitionName": "tJDBCOutput"
     },
     "dependencies": []
   },

@@ -19,7 +19,6 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.jdbc.ComponentConstants;
 
 /**
  * JDBC runtime execution object for output action
@@ -39,17 +38,9 @@ public class JDBCSink extends JDBCSourceOrSink implements Sink {
         String refComponentId = setting.getReferencedComponentId();
         // using another component's connection
         if (refComponentId != null) {
-            if (runtime != null) {
-                Object existedConn = runtime.getComponentData(refComponentId, ComponentConstants.CONNECTION_KEY);
-                if (existedConn == null) {
-                    throw new RuntimeException("Referenced component: " + refComponentId + " is not connected");
-                }
-                return (Connection) existedConn;
-            }
-
-            return JdbcRuntimeUtils.createConnection(setting);
+            return JdbcRuntimeUtils.fetchConnectionFromContextOrCreateNew(setting, runtime);
         } else {
-            Connection conn = JdbcRuntimeUtils.createConnection(setting);
+            Connection conn = JdbcRuntimeUtils.createConnectionOrGetFromSharedConnectionPoolOrDataSource(runtime, setting, false);
 
             Integer commitEvery = setting.getCommitEvery();
             if (commitEvery != null && commitEvery > 0) {

@@ -12,11 +12,8 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime;
 
-import java.util.Map;
-
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Sink;
-import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jdbc.runtime.writer.JDBCRowWriter;
@@ -25,24 +22,12 @@ import org.talend.components.jdbc.runtime.writer.JDBCRowWriter;
  * JDBC row write operation
  *
  */
-public class JDBCRowWriteOperation implements WriteOperation<Result> {
+public class JDBCRowWriteOperation extends DefaultWriteOperation {
 
-    private static final long serialVersionUID = 7572409371695331857L;
-
-    private Sink sink;
+    private static final long serialVersionUID = 1L;
 
     public JDBCRowWriteOperation(Sink sink) {
-        this.sink = sink;
-    }
-
-    @Override
-    public void initialize(RuntimeContainer runtimeContainer) {
-        // nothing to do here
-    }
-
-    @Override
-    public Map<String, Object> finalize(Iterable<Result> iterable, RuntimeContainer runtimeContainer) {
-        return Result.accumulateAndReturnMap(iterable);
+        super(sink);
     }
 
     @Override
@@ -50,8 +35,4 @@ public class JDBCRowWriteOperation implements WriteOperation<Result> {
         return new JDBCRowWriter(this, runtimeContainer);
     }
 
-    @Override
-    public Sink getSink() {
-        return sink;
-    }
 }

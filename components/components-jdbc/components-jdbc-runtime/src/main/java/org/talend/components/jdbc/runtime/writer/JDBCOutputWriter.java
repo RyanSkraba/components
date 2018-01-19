@@ -35,6 +35,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.components.jdbc.CommonUtils;
+import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.JDBCSink;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
@@ -49,6 +50,8 @@ import org.talend.daikon.avro.converter.IndexedRecordConverter;
 abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
     private transient static final Logger LOG = LoggerFactory.getLogger(JDBCOutputWriter.class);
+    
+    protected static final String QUERY_KEY = CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_QUERY);
 
     private WriteOperation<Result> writeOperation;
 
@@ -82,6 +85,8 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
 
     protected int commitCount;
 
+    protected boolean useCommit;
+
     protected boolean useExistedConnection;
 
     protected boolean dieOnError;
@@ -94,16 +99,28 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
 
     protected int deleteCount;
 
+    protected List<JDBCSQLBuilder.Column> columnList;
+
+    protected Schema componentSchema;
+
+    protected Schema rejectSchema;
+
     public JDBCOutputWriter(WriteOperation<Result> writeOperation, RuntimeContainer runtime) {
         this.writeOperation = writeOperation;
         this.runtime = runtime;
+
+        if (this.runtime != null) {
+            bufferSizeKey4Parallelize = "buffersSizeKey_" + runtime.getCurrentComponentId() + "_"
+                    + Thread.currentThread().getId();
+        }
+
         sink = (JDBCSink) writeOperation.getSink();
         properties = sink.properties;
         setting = properties.getRuntimeSetting();
 
         useBatch = setting.getUseBatch();
         DataAction dataAction = setting.getDataAction();
-        if ((dataAction == DataAction.INSERTORUPDATE) || (dataAction == DataAction.UPDATEORINSERT)) {
+        if ((dataAction == DataAction.INSERT_OR_UPDATE) || (dataAction == DataAction.UPDATE_OR_INSERT)) {
             useBatch = false;
         }
         if (useBatch) {
@@ -111,8 +128,11 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         }
 
         useExistedConnection = setting.getReferencedComponentId() != null;
-        if (!useExistedConnection) {
+        if (!useExistedConnection && setting.getCommitEvery() != null) {
             commitEvery = setting.getCommitEvery();
+            if (commitEvery > 0) {
+                useCommit = true;
+            }
         }
 
         dieOnError = setting.getDieOnError();
@@ -122,6 +142,10 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
 
     @Override
     public void open(String uId) throws IOException {
+        componentSchema = CommonUtils.getMainSchemaFromInputConnector((ComponentProperties) properties);
+        rejectSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
+        columnList = JDBCSQLBuilder.getInstance().createColumnList(setting, componentSchema);
+
         if (!setting.getClearDataInTable()) {
             return;
         }
@@ -138,9 +162,29 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
 
     }
 
+    private String bufferSizeKey4Parallelize;
+
     @Override
     public void write(Object datum) throws IOException {
-        result.totalCount++;
+        if (runtime != null) {// TODO slow?
+            Object bufferSizeObject = runtime.getGlobalData(bufferSizeKey4Parallelize);
+            if (bufferSizeObject != null) {
+                int bufferSize = (int) bufferSizeObject;
+                commitEvery = bufferSize;
+                batchSize = bufferSize;
+            }
+        }
+
+        // the var(result.totalCount) is equals with the old "nb_line" var, but the old one is a little strange in tjdbcoutput, i
+        // don't know why,
+        // maybe a bug, but
+        // now only keep the old action for the tujs :
+        // 1: insert action, update action : plus after addbatch or executeupdate
+        // 2: insert or update action, update or insert action, delete action : plus after addbatch(delete action) or
+        // executeupdate, also when not die on error and exception appear
+        
+        // result.totalCount++;
+
         cleanWrites();
     }
 
@@ -153,7 +197,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         }
 
         try {
-            if (commitCount > 0) {
+            if (useCommit && commitCount > 0) {
                 commitCount = 0;
 
                 if (conn != null) {
@@ -213,21 +257,21 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         }
 
         rejectCount++;
-        Schema outSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
-        IndexedRecord reject = new GenericData.Record(outSchema);
-        for (Schema.Field outField : reject.getSchema().getFields()) {
-            Object outValue = null;
-            Schema.Field inField = input.getSchema().getField(outField.name());
+        IndexedRecord reject = new GenericData.Record(rejectSchema);
+        for (Schema.Field rejectField : rejectSchema.getFields()) {
+            Object rejectValue = null;
+            //getField is a O(1) method for time, so performance is OK here.
+            Schema.Field inField = input.getSchema().getField(rejectField.name());
 
             if (inField != null) {
-                outValue = input.get(inField.pos());
-            } else if ("errorCode".equals(outField.name())) {
-                outValue = e.getSQLState();
-            } else if ("errorMessage".equals(outField.name())) {
-                outValue = e.getMessage();
+                rejectValue = input.get(inField.pos());
+            } else if ("errorCode".equals(rejectField.name())) {
+                rejectValue = e.getSQLState();
+            } else if ("errorMessage".equals(rejectField.name())) {
+                rejectValue = e.getMessage() + " - Line: " + result.totalCount;
             }
 
-            reject.put(outField.pos(), outValue);
+            reject.put(rejectField.pos(), rejectValue);
         }
         rejectedWrites.add(reject);
     }
@@ -235,12 +279,14 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
     protected int executeCommit(PreparedStatement statement) throws SQLException {
         int result = 0;
 
-        if (useExistedConnection) {
+        if (!useCommit) {
             return result;
         }
 
+        commitCount++;
+
         if (commitCount < commitEvery) {
-            commitCount++;
+
         } else {
             commitCount = 0;
 
@@ -261,15 +307,21 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
 
         if (useBatch) {
             statement.addBatch();
+            
+            result.totalCount++;
+
+            batchCount++;
 
             if (batchCount < batchSize) {
-                batchCount++;
+
             } else {
                 batchCount = 0;
                 count = executeBatchAndGetCount(statement);
             }
         } else {
             count = statement.executeUpdate();
+            
+            result.totalCount++;
         }
 
         handleSuccess(input);
@@ -320,15 +372,36 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
     }
 
     protected void constructResult() {
-        // TODO need to adjust the key
         if (runtime != null) {
-            runtime.setComponentData(runtime.getCurrentComponentId(), "NB_LINE_DELETED", deleteCount);
-            runtime.setComponentData(runtime.getCurrentComponentId(), "NB_LINE_INSERTED", insertCount);
-            runtime.setComponentData(runtime.getCurrentComponentId(), "NB_LINE_UPDATED", updateCount);
+            runtime.setComponentData(runtime.getCurrentComponentId(),
+                    CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_DELETE_RECORD_COUNT), deleteCount);
+            runtime.setComponentData(runtime.getCurrentComponentId(),
+                    CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_INSERT_RECORD_COUNT), insertCount);
+            runtime.setComponentData(runtime.getCurrentComponentId(),
+                    CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_UPDATE_RECORD_COUNT), updateCount);
+            runtime.setComponentData(runtime.getCurrentComponentId(),
+                    CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_REJECT_RECORD_COUNT), rejectCount);
         }
 
         result.successCount = successCount;
         result.rejectCount = rejectCount;
+    }
+
+    protected int executeBatchAtLast() {
+        if (useBatch && batchCount > 0) {
+            try {
+                batchCount = 0;
+                return executeBatchAndGetCount(statement);
+            } catch (SQLException e) {
+                if (dieOnError) {
+                    throw new ComponentException(e);
+                } else {
+                    LOG.warn(e.getMessage());
+                }
+            }
+        }
+
+        return 0;
     }
 
 }

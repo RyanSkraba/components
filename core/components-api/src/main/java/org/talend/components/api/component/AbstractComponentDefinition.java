@@ -13,7 +13,12 @@
 package org.talend.components.api.component;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 import org.talend.components.api.AbstractTopLevelDefinition;
 import org.talend.components.api.component.runtime.ExecutionEngine;
@@ -100,8 +105,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         TalendRuntimeException.build(ComponentsErrorCode.WRONG_EXECUTION_ENGINE) //
                 .put("component", getName()) //
                 .put("requested", engine == null ? "null" : engine.toString()) //
-                .put("available", getSupportedExecutionEngines().toString())
-                .throwIt();
+                .put("available", getSupportedExecutionEngines().toString()).throwIt();
     }
 
     protected void assertConnectorTopologyCompatibility(ConnectorTopology connectorTopology) throws TalendRuntimeException {
@@ -110,12 +114,12 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         }
     }
 
-    protected void throwIncompatibleConnectorTopologyException(ConnectorTopology connectorTopology) throws TalendRuntimeException {
+    protected void throwIncompatibleConnectorTopologyException(ConnectorTopology connectorTopology)
+            throws TalendRuntimeException {
         TalendRuntimeException.build(ComponentsErrorCode.WRONG_CONNECTOR) //
                 .put("component", getName()) //
                 .put("requested", connectorTopology == null ? "null" : connectorTopology.toString()) //
-                .put("available", getSupportedExecutionEngines().toString())
-                .throwIt();
+                .put("available", getSupportedExecutionEngines().toString()).throwIt();
     }
 
     /**
@@ -262,10 +266,10 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     @Override
     public String getImagePath(DefinitionImageType type) {
         switch (type) {
-            case PALETTE_ICON_32X32:
-                return componentName + "_icon32.png";
-            case SVG_ICON:
-                return null;
+        case PALETTE_ICON_32X32:
+            return componentName + "_icon32.png";
+        case SVG_ICON:
+            return null;
         }
         return null;
     }
@@ -277,7 +281,11 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     @Override
     public List<String> getSupportedProducts() {
-        return Arrays.asList( SupportedProduct.ALL );
+        return Arrays.asList(SupportedProduct.ALL);
     }
 
+    @Override
+    public boolean isParallelize() {
+        return false;
+    }
 }

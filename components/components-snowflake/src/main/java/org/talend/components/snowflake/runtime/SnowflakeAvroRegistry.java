@@ -32,9 +32,13 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
         return sInstance;
     }
 
+    Field sqlType2Avro(int size, int scale, int dbtype, boolean nullable, String name, String dbColumnName, Object defaultValue) {
+        return sqlType2Avro(size, scale, dbtype, nullable, name, dbColumnName, defaultValue, false);
+    }
+
     @Override
     protected Field sqlType2Avro(int size, int scale, int dbtype, boolean nullable, String name, String dbColumnName,
-            Object defaultValue) {
+            Object defaultValue, boolean isKey) {
         Field field = null;
         Schema schema = null;
 
@@ -95,6 +99,10 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
 
         if (defaultValue != null) {
             field.addProp(SchemaConstants.TALEND_COLUMN_DEFAULT, defaultValue);
+        }
+
+        if (isKey) {
+            field.addProp(SchemaConstants.TALEND_COLUMN_IS_KEY, "true");
         }
 
         return field;

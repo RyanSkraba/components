@@ -12,6 +12,16 @@
 // ============================================================================
 package org.talend.components.common.avro;
 
+import java.sql.CallableStatement;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
@@ -24,13 +34,6 @@ import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.avro.converter.IndexedRecordConverter.UnmodifiableAdapterException;
 import org.talend.daikon.java8.SerializableFunction;
 
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 public class JDBCAvroRegistry extends AvroRegistry {
 
     private static final JDBCAvroRegistry sInstance = new JDBCAvroRegistry();
@@ -41,13 +44,13 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
     protected JDBCAvroRegistry() {
 
-        registerSchemaInferrer(ResultSet.class, new SerializableFunction<ResultSet, Schema>() {
+        registerSchemaInferrer(JDBCTableMetadata.class, new SerializableFunction<JDBCTableMetadata, Schema>() {
 
             /** Default serial version UID. */
             private static final long serialVersionUID = 1L;
 
             @Override
-            public Schema apply(ResultSet t) {
+            public Schema apply(JDBCTableMetadata t) {
                 try {
                     return inferSchemaResultSet(t);
                 } catch (SQLException e) {
@@ -87,7 +90,10 @@ public class JDBCAvroRegistry extends AvroRegistry {
             String fieldName = metadata.getColumnLabel(i);
             String dbColumnName = metadata.getColumnName(i);
 
-            Field field = sqlType2Avro(size, scale, dbtype, nullable, fieldName, dbColumnName, null);
+            // not necessary for the result schema from the query statement
+            boolean isKey = false;
+
+            Field field = sqlType2Avro(size, scale, dbtype, nullable, fieldName, dbColumnName, null, isKey);
 
             fields.add(field);
         }
@@ -95,32 +101,58 @@ public class JDBCAvroRegistry extends AvroRegistry {
         return Schema.createRecord("DYNAMIC", null, null, false, fields);
     }
 
-    protected Schema inferSchemaResultSet(ResultSet metadata) throws SQLException {
-        if (!metadata.next()) {
-            return null;
+    protected Schema inferSchemaResultSet(JDBCTableMetadata tableMetadata) throws SQLException {
+        DatabaseMetaData databaseMetdata = tableMetadata.getDatabaseMetaData();
+
+        Set<String> keys = getPrimaryKeys(databaseMetdata, tableMetadata.getCatalog(), tableMetadata.getDbSchema(),
+                tableMetadata.getTablename());
+
+        try (ResultSet metadata = databaseMetdata.getColumns(tableMetadata.getCatalog(), tableMetadata.getDbSchema(),
+                tableMetadata.getTablename(), null)) {
+            if (!metadata.next()) {
+                return null;
+            }
+
+            List<Field> fields = new ArrayList<>();
+            String tablename = metadata.getString("TABLE_NAME");
+
+            do {
+                int size = metadata.getInt("COLUMN_SIZE");
+                int scale = metadata.getInt("DECIMAL_DIGITS");
+                int dbtype = metadata.getInt("DATA_TYPE");
+                boolean nullable = DatabaseMetaData.columnNullable == metadata.getInt("NULLABLE");
+
+                String columnName = metadata.getString("COLUMN_NAME");
+                boolean isKey = keys.contains(columnName);
+
+                String defaultValue = metadata.getString("COLUMN_DEF");
+
+                Field field = sqlType2Avro(size, scale, dbtype, nullable, columnName, columnName, defaultValue, isKey);
+
+                fields.add(field);
+            } while (metadata.next());
+
+            return Schema.createRecord(tablename, null, null, false, fields);
+        }
+    }
+
+    private Set<String> getPrimaryKeys(DatabaseMetaData databaseMetdata, String catalogName, String schemaName, String tableName)
+            throws SQLException {
+        Set<String> result = new HashSet<>();
+
+        try (ResultSet resultSet = databaseMetdata.getPrimaryKeys(catalogName, schemaName, tableName)) {
+            if (resultSet != null) {
+                while (resultSet.next()) {
+                    result.add(resultSet.getString("COLUMN_NAME"));
+                }
+            }
         }
 
-        List<Field> fields = new ArrayList<>();
-        String tablename = metadata.getString("TABLE_NAME");
-
-        do {
-            int size = metadata.getInt("COLUMN_SIZE");
-            int scale = metadata.getInt("DECIMAL_DIGITS");
-            int dbtype = metadata.getInt("DATA_TYPE");
-            boolean nullable = DatabaseMetaData.columnNullable == metadata.getInt("NULLABLE");
-            String columnName = metadata.getString("COLUMN_NAME");
-            String defaultValue = metadata.getString("COLUMN_DEF");
-
-            Field field = sqlType2Avro(size, scale, dbtype, nullable, columnName, columnName, defaultValue);
-
-            fields.add(field);
-        } while (metadata.next());
-
-        return Schema.createRecord(tablename, null, null, false, fields);
+        return result;
     }
 
     protected Field sqlType2Avro(int size, int scale, int dbtype, boolean nullable, String name, String dbColumnName,
-            Object defaultValue) {
+            Object defaultValue, boolean isKey) {
         Field field = null;
         Schema schema = null;
 
@@ -216,6 +248,10 @@ public class JDBCAvroRegistry extends AvroRegistry {
             field.addProp(SchemaConstants.TALEND_COLUMN_DEFAULT, defaultValue);
         }
 
+        if (isKey) {
+            field.addProp(SchemaConstants.TALEND_COLUMN_IS_KEY, "true");
+        }
+
         return field;
     }
 
@@ -224,7 +260,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
         return new Field(name, schema, null, (JsonNode) null);
     }
 
-    public JDBCConverter getConverter(final Field f) {
+    public JDBCConverter getConverter(final Field f, final int index) {
         Schema basicSchema = AvroUtils.unwrapIfNullable(f.schema());
 
         if (AvroUtils.isSameType(basicSchema, AvroUtils._string())) {
@@ -232,12 +268,11 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Object convertToAvro(ResultSet value) {
-                    boolean trimAll = isTrim();
-                    // TODO trim the columns which is selected by user
+                    boolean trim = isTrim() || isTrim(index);
                     try {
-                        String result = value.getString(f.pos() + 1);
+                        String result = value.getString(index);
 
-                        if (trimAll && result != null) {
+                        if (trim && result != null) {
                             return result.trim();
                         }
 
@@ -253,7 +288,6 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Object convertToAvro(ResultSet value) {
-                    int index = f.pos() + 1;
                     try {
                         if (value.getObject(index) == null) {
                             return null;
@@ -274,7 +308,6 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 public Object convertToAvro(ResultSet value) {
                     java.util.Date date = null;
 
-                    int index = f.pos() + 1;
                     try {
                         date = value.getTimestamp(index);
                     } catch (SQLException e1) {
@@ -302,7 +335,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 @Override
                 public Object convertToAvro(ResultSet value) {
                     try {
-                        return value.getBigDecimal(f.pos() + 1);
+                        return value.getBigDecimal(index);
                     } catch (SQLException e) {
                         throw new ComponentException(e);
                     }
@@ -314,7 +347,6 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Object convertToAvro(ResultSet value) {
-                    int index = f.pos() + 1;
                     try {
                         if (value.getObject(index) == null) {
                             return null;
@@ -332,7 +364,6 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Object convertToAvro(ResultSet value) {
-                    int index = f.pos() + 1;
                     try {
                         if (value.getObject(index) == null) {
                             return null;
@@ -350,7 +381,6 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Object convertToAvro(ResultSet value) {
-                    int index = f.pos() + 1;
                     try {
                         if (value.getObject(index) == null) {
                             return null;
@@ -368,7 +398,6 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Object convertToAvro(ResultSet value) {
-                    int index = f.pos() + 1;
                     try {
                         if (value.getObject(index) == null) {
                             return null;
@@ -386,7 +415,6 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Object convertToAvro(ResultSet value) {
-                    int index = f.pos() + 1;
                     try {
                         if (value.getObject(index) == null) {
                             return null;
@@ -404,12 +432,11 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Object convertToAvro(ResultSet value) {
-                    boolean trimAll = isTrim();
-                    // TODO trim the columns which is selected by user
+                    boolean trim = isTrim() || isTrim(index);
                     try {
-                        String result = value.getString(f.pos() + 1);
+                        String result = value.getString(index);
 
-                        if (trimAll && result != null) {
+                        if (trim && result != null) {
                             return result.trim();
                         }
 
@@ -429,7 +456,6 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Object convertToAvro(ResultSet value) {
-                    int index = f.pos() + 1;
                     try {
                         if (value.getObject(index) == null) {
                             return null;
@@ -442,16 +468,29 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 }
 
             };
+        } else if (isObject(basicSchema)) {
+            return new JDBCConverter() {
+  
+              @Override
+              public Object convertToAvro(ResultSet value) {
+                  try {
+                      return value.getObject(index);
+                  } catch (SQLException e) {
+                      throw new ComponentException(e);
+                  }
+              }
+  
+            };
         } else {
             return new JDBCConverter() {
 
                 @Override
                 public Object convertToAvro(ResultSet value) {
-                    // TODO trim the columns which is selected by user
+                    boolean trim = isTrim() || isTrim(index);
                     try {
-                        String result = value.getString(f.pos() + 1);
+                        String result = value.getString(index);
 
-                        if (isTrim() && result != null) {
+                        if (trim && result != null) {
                             return result.trim();
                         }
 
@@ -463,6 +502,10 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
             };
         }
+    }
+
+    public JDBCConverter getConverter(final Field f) {
+        return getConverter(f, f.pos() + 1);
     }
 
     public abstract class JDBCConverter implements AvroConverter<ResultSet, Object> {
@@ -492,10 +535,285 @@ public class JDBCAvroRegistry extends AvroRegistry {
             return false;
         }
 
+        protected boolean isTrim(int index) {
+            if (influencer != null)
+                return influencer.isTrim(index);
+            return false;
+        }
+
         public void setInfluencer(JDBCAvroRegistryInfluencer influencer) {
             this.influencer = influencer;
         }
 
+    }
+
+    public abstract class JDBCSPConverter implements AvroConverter<CallableStatement, Object> {
+
+        protected JDBCAvroRegistryInfluencer influencer;
+
+        @Override
+        public Schema getSchema() {
+            // do nothing
+            return null;
+        }
+
+        @Override
+        public Class<CallableStatement> getDatumClass() {
+            // do nothing
+            return null;
+        }
+
+        @Override
+        public CallableStatement convertToDatum(Object value) {
+            throw new UnmodifiableAdapterException();
+        }
+
+    }
+
+    public JDBCSPConverter getSPConverter(final Field f, final int index) {
+        Schema basicSchema = AvroUtils.unwrapIfNullable(f.schema());
+
+        if (AvroUtils.isSameType(basicSchema, AvroUtils._string())) {
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                        String result = value.getString(index);
+
+                        return result;
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._int())) {
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                        if (value.getObject(index) == null) {
+                            return null;
+                        }
+
+                        return value.getInt(index);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._date())) {// no date type in AVRO types, so we replace it by long
+            // type
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    java.util.Date date = null;
+
+                    try {
+                        date = value.getTimestamp(index);
+                    } catch (SQLException e1) {
+                        try {
+                            date = value.getDate(index);
+                        } catch (SQLException e2) {
+                            throw new ComponentException(e2);
+                        }
+                    }
+
+                    if (date == null) {
+                        return null;
+                    }
+                    return date.getTime();
+                }
+
+            };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._decimal()))
+
+        {// TODO why we use big decimal type though AVRO types
+         // don't contain it? No need to consider the
+         // serialization? But we do it for date type above
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                        return value.getBigDecimal(index);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._long())) {
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                        if (value.getObject(index) == null) {
+                            return null;
+                        }
+
+                        return value.getLong(index);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._double())) {
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                        if (value.getObject(index) == null) {
+                            return null;
+                        }
+
+                        return value.getDouble(index);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._float())) {
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                        if (value.getObject(index) == null) {
+                            return null;
+                        }
+
+                        return value.getFloat(index);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._boolean())) {
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                        if (value.getObject(index) == null) {
+                            return null;
+                        }
+
+                        return value.getBoolean(index);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._short())) {
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                        if (value.getObject(index) == null) {
+                            return null;
+                        }
+
+                        return value.getShort(index);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._character())) {
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                        String result = value.getString(index);
+
+                        if (result == null || result.isEmpty()) {
+                            return null;
+                        }
+
+                        return result.charAt(0);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._byte())) {
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                        if (value.getObject(index) == null) {
+                            return null;
+                        }
+
+                        return value.getByte(index);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        } else if (isObject(basicSchema)) {
+            return new JDBCSPConverter() {
+    
+              @Override
+              public Object convertToAvro(CallableStatement value) {
+                  try {
+                      return value.getObject(index);
+                  } catch (SQLException e) {
+                      throw new ComponentException(e);
+                  }
+              }
+    
+            };
+        } else {
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                        String result = value.getString(index);
+
+                        return result;
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        }
+    }
+    
+    //please see the method in MetadataToolAvroHelper :
+    //org.talend.core.model.metadata.builder.connection.MetadataColumn convertFromAvro(Schema.Field field,
+    //org.talend.core.model.metadata.builder.connection.MetadataColumn col)
+    public static boolean isObject(Schema schema) {
+        if(schema == null) {
+            return false;
+        }
+        
+        if(schema.getType() == Schema.Type.STRING) {
+            if(schema.getProp(SchemaConstants.JAVA_CLASS_FLAG) != null) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
 }

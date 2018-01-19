@@ -36,8 +36,8 @@ public class TJDBCOutputDefinitionTest {
         TJDBCOutputDefinition result = new TJDBCOutputDefinition();
 
         assertEquals(true, result.isConditionalInputs());
-        assertEquals("tJDBCOutputNew", result.getName());
-        assertEquals("tJDBCOutputNew_icon32.png", result.getImagePath());
+        assertEquals("tJDBCOutput", result.getName());
+        assertEquals("tJDBCOutput_icon32.png", result.getImagePath());
         assertEquals(false, result.isStartable());
         assertEquals(null, result.getIconKey());
         assertEquals(null, result.getPartitioning());
@@ -113,39 +113,39 @@ public class TJDBCOutputDefinitionTest {
         assertEquals("java.lang.Integer", result[1].getType());
 
         assertNotNull(result[2]);
-        assertEquals("Number of success", result[2].getDisplayName());
-        assertEquals("Property: successRecordCount", result[2].toString());
-        assertEquals("successRecordCount", result[2].getName());
+        assertEquals("Number of inserted", result[2].getDisplayName());
+        assertEquals("Property: nbLineInserted", result[2].toString());
+        assertEquals("nbLineInserted", result[2].getName());
         assertEquals(null, result[2].getValue());
         assertEquals("java.lang.Integer", result[2].getType());
 
         assertNotNull(result[3]);
-        assertEquals("Number of reject", result[3].getDisplayName());
-        assertEquals("Property: rejectRecordCount", result[3].toString());
-        assertEquals("rejectRecordCount", result[3].getName());
+        assertEquals("Number of updated", result[3].getDisplayName());
+        assertEquals("Property: nbLineUpdated", result[3].toString());
+        assertEquals("nbLineUpdated", result[3].getName());
         assertEquals(null, result[3].getValue());
         assertEquals("java.lang.Integer", result[3].getType());
 
         assertNotNull(result[4]);
-        assertEquals("Insert record count", result[4].getDisplayName());
-        assertEquals("Property: insertRecordCount", result[4].toString());
-        assertEquals("insertRecordCount", result[4].getName());
+        assertEquals("Number of deleted", result[4].getDisplayName());
+        assertEquals("Property: nbLineDeleted", result[4].toString());
+        assertEquals("nbLineDeleted", result[4].getName());
         assertEquals(null, result[4].getValue());
         assertEquals("java.lang.Integer", result[4].getType());
 
         assertNotNull(result[5]);
-        assertEquals("Update record count", result[5].getDisplayName());
-        assertEquals("Property: updateRecordCount", result[5].toString());
-        assertEquals("updateRecordCount", result[5].getName());
+        assertEquals("Number of reject", result[5].getDisplayName());
+        assertEquals("Property: nbLineRejected", result[5].toString());
+        assertEquals("nbLineRejected", result[5].getName());
         assertEquals(null, result[5].getValue());
         assertEquals("java.lang.Integer", result[5].getType());
 
         assertNotNull(result[6]);
-        assertEquals("Delete record count", result[6].getDisplayName());
-        assertEquals("Property: deleteRecordCount", result[6].toString());
-        assertEquals("deleteRecordCount", result[6].getName());
+        assertEquals("Query", result[6].getDisplayName());
+        assertEquals("Property: query", result[6].toString());
+        assertEquals("query", result[6].getName());
         assertEquals(null, result[6].getValue());
-        assertEquals("java.lang.Integer", result[6].getType());
+        assertEquals("java.lang.String", result[6].getType());
     }
 
     /**

@@ -14,6 +14,7 @@ package org.talend.components.jdbc.runtime.writer;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -24,10 +25,8 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.runtime.setting.JDBCSQLBuilder;
-import org.talend.components.jdbc.runtime.type.JDBCMapping;
+import org.talend.components.jdbc.runtime.type.RowWriter;
 
 public class JDBCOutputInsertWriter extends JDBCOutputWriter {
 
@@ -44,11 +43,29 @@ public class JDBCOutputInsertWriter extends JDBCOutputWriter {
         super.open(uId);
         try {
             conn = sink.getConnection(runtime);
-            sql = JDBCSQLBuilder.getInstance().generateSQL4Insert(setting.getTablename(),
-                    CommonUtils.getMainSchemaFromInputConnector((ComponentProperties) properties));
+            sql = JDBCSQLBuilder.getInstance().generateSQL4Insert(setting.getTablename(), columnList);
             statement = conn.prepareStatement(sql);
         } catch (SQLException | ClassNotFoundException e) {
             throw new ComponentException(e);
+        }
+    }
+
+    private RowWriter rowWriter = null;
+
+    private void initRowWriterIfNot(List<JDBCSQLBuilder.Column> columnList, Schema inputSchema, Schema componentSchema) {
+        if (rowWriter == null) {
+            List<JDBCSQLBuilder.Column> columnList4Statement = new ArrayList<>();
+            for (JDBCSQLBuilder.Column column : columnList) {
+                if (column.addCol || (column.isReplaced())) {
+                    continue;
+                }
+
+                if (column.insertable) {
+                    columnList4Statement.add(column);
+                }
+            }
+
+            rowWriter = new RowWriter(columnList4Statement, inputSchema, componentSchema, statement, setting.getDebug(), sql);
         }
     }
 
@@ -58,12 +75,14 @@ public class JDBCOutputInsertWriter extends JDBCOutputWriter {
 
         IndexedRecord input = this.getFactory(datum).convertToAvro(datum);
 
-        List<Schema.Field> fields = input.getSchema().getFields();
+        Schema inputSchema = input.getSchema();
+
+        initRowWriterIfNot(columnList, inputSchema, componentSchema);
 
         try {
-            int index = 0;
-            for (Schema.Field f : fields) {
-                JDBCMapping.setValue(++index, statement, f, input.get(f.pos()));
+            String sql_fact = rowWriter.write(input);
+            if (sql_fact != null) {
+                runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
             }
         } catch (SQLException e) {
             throw new ComponentException(e);
@@ -80,6 +99,7 @@ public class JDBCOutputInsertWriter extends JDBCOutputWriter {
                 // System.err.print(e.getMessage());
 
                 // also it seems that we should not use the System.err in future, should use log instead of it.
+                System.err.println(e.getMessage());
                 LOG.warn(e.getMessage());
             }
 
@@ -100,18 +120,7 @@ public class JDBCOutputInsertWriter extends JDBCOutputWriter {
     @Override
     public Result close() throws IOException {
         // execute the batch to make everything is passed to the server side before release the resource
-        if (useBatch && batchCount > 0) {
-            try {
-                batchCount = 0;
-                insertCount += executeBatchAndGetCount(statement);
-            } catch (SQLException e) {
-                if (dieOnError) {
-                    throw new ComponentException(e);
-                } else {
-                    LOG.warn(e.getMessage());
-                }
-            }
-        }
+        insertCount += executeBatchAtLast();
 
         closeStatementQuietly(statement);
         statement = null;

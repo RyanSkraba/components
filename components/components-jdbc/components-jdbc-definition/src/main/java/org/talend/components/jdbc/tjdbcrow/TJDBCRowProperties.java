@@ -31,8 +31,8 @@ import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.module.JDBCTableSelectionModule;
 import org.talend.components.jdbc.module.PreparedStatementTable;
+import org.talend.components.jdbc.query.QueryUtils;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
-import org.talend.components.jdbc.runtime.setting.JDBCSQLBuilder;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
 import org.talend.daikon.avro.SchemaConstants;
@@ -77,11 +77,9 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
 
     public JDBCTableSelectionModule tableSelection = new JDBCTableSelectionModule("tableSelection");
 
-    // TODO query type
-
     public Property<String> sql = PropertyFactory.newString("sql").setRequired(true);
 
-    public final PresentationItem guessQueryFromSchema = new PresentationItem("guessQueryFromSchema", "Guess query from schema");
+    public final transient PresentationItem guessQueryFromSchema = new PresentationItem("guessQueryFromSchema", "Guess Query");
 
     public Property<Boolean> useDataSource = PropertyFactory.newBoolean("useDataSource").setRequired();
 
@@ -113,9 +111,9 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
         mainForm.addRow(main.getForm(Form.REFERENCE));
 
         mainForm.addRow(tableSelection.getForm(Form.REFERENCE));
-        mainForm.addRow(sql);
 
         mainForm.addRow(Widget.widget(guessQueryFromSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
+        mainForm.addRow(Widget.widget(sql).setWidgetType("widget.type.memoSql"));
 
         mainForm.addRow(useDataSource);
         mainForm.addRow(dataSource);
@@ -138,16 +136,19 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
         super.setupProperties();
 
         commitEvery.setValue(10000);
+        sql.setValue("select id, name from employee");
         tableSelection.setConnection(this);
+
+        connection.setNotRequired();
+
+        sql.setTaggedValue(org.talend.components.common.ComponentConstants.LINE_SEPARATOR_REPLACED_TO, " ");
     }
 
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        String refComponentIdValue = referencedComponent.componentInstanceId.getStringValue();
-        boolean useOtherConnection = refComponentIdValue != null
-                && refComponentIdValue.startsWith(TJDBCConnectionDefinition.COMPONENT_NAME);
+        boolean useOtherConnection = CommonUtils.useExistedConnection(referencedComponent);
 
         if (form.getName().equals(Form.MAIN)) {
             form.getChildForm(connection.getName()).setHidden(useOtherConnection);
@@ -222,18 +223,19 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
     }
 
     public ValidationResult afterGuessQueryFromSchema() {
-        String tablename = tableSelection.tablename.getValue();
+        String tablenameDisplayed = tableSelection.tablename.getStoredValue() == null ? null
+                : tableSelection.tablename.getStoredValue().toString();
         Schema schema = main.schema.getValue();
-        if (tablename == null || tablename.isEmpty()) {
+        if (tablenameDisplayed == null || tablenameDisplayed.isEmpty()) {
             return new ValidationResult(ValidationResult.Result.ERROR, "Please set the table name before it");
         }
         if (schema == null || schema.getFields().isEmpty()) {
             return new ValidationResult(ValidationResult.Result.ERROR, "Please set the schema before it");
         }
-        String query = JDBCSQLBuilder.getInstance().generateSQL4SelectTable(tablename, schema);
-        sql.setValue("\"" + query + "\"");
+        String query = QueryUtils.generateNewQuery("General JDBC", null, null, tablenameDisplayed, getRuntimeSetting());
+        sql.setValue(query);
 
-        // TODO : it doesn't work
+        // TODO maybe we need to split it two trigger methods : validate and after
         refreshLayout(getForm(Form.MAIN));
 
         return ValidationResult.OK;
@@ -260,10 +262,7 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
     public AllSetting getRuntimeSetting() {
         AllSetting setting = new AllSetting();
 
-        setting.setReferencedComponentId(referencedComponent.componentInstanceId.getValue());
-        setting.setReferencedComponentProperties(referencedComponent.getReference());
-
-        CommonUtils.setCommonConnectionInfo(setting, connection);
+        CommonUtils.setReferenceInfoAndConnectionInfo(setting, referencedComponent, connection);
 
         setting.setTablename(this.tableSelection.tablename.getValue());
         setting.setSql(this.sql.getValue());
@@ -273,10 +272,16 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
 
         setting.setPropagateQueryResultSet(this.propagateQueryResultSet.getValue());
         setting.setUseColumn(this.useColumn.getValue());
+
         setting.setUsePreparedStatement(this.usePreparedStatement.getValue());
         setting.setIndexs(this.preparedStatementTable.indexs.getValue());
         setting.setTypes(this.preparedStatementTable.types.getValue());
         setting.setValues(this.preparedStatementTable.values.getValue());
+
+        setting.setUseDataSource(this.useDataSource.getValue());
+        setting.setDataSource(this.dataSource.getValue());
+        
+        setting.setSchema(main.schema.getValue());
 
         return setting;
     }

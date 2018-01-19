@@ -12,9 +12,13 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime.setting;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.common.config.jdbc.Dbms;
 
 /**
  * common JDBC runtime execution object
@@ -22,5 +26,7 @@ import org.talend.components.api.container.RuntimeContainer;
  */
 public interface JdbcRuntimeSourceOrSink extends SourceOrSink {
 
+    public void setDBTypeMapping(Dbms mapping);
+    
     public Schema getSchemaFromQuery(RuntimeContainer runtime, String query);
 }

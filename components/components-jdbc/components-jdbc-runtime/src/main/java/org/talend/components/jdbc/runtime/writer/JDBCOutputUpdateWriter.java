@@ -14,6 +14,7 @@ package org.talend.components.jdbc.runtime.writer;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -24,11 +25,8 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.jdbc.CommonUtils;
-import org.talend.components.jdbc.JDBCTemplate;
 import org.talend.components.jdbc.runtime.setting.JDBCSQLBuilder;
-import org.talend.components.jdbc.runtime.type.JDBCMapping;
+import org.talend.components.jdbc.runtime.type.RowWriter;
 
 public class JDBCOutputUpdateWriter extends JDBCOutputWriter {
 
@@ -45,8 +43,7 @@ public class JDBCOutputUpdateWriter extends JDBCOutputWriter {
         super.open(uId);
         try {
             conn = sink.getConnection(runtime);
-            sql = JDBCSQLBuilder.getInstance().generateSQL4Update(setting.getTablename(),
-                    CommonUtils.getMainSchemaFromInputConnector((ComponentProperties) properties));
+            sql = JDBCSQLBuilder.getInstance().generateSQL4Update(setting.getTablename(), columnList);
             statement = conn.prepareStatement(sql);
         } catch (ClassNotFoundException | SQLException e) {
             throw new ComponentException(e);
@@ -54,23 +51,48 @@ public class JDBCOutputUpdateWriter extends JDBCOutputWriter {
 
     }
 
+    private RowWriter rowWriter = null;
+
+    private void initRowWriterIfNot(List<JDBCSQLBuilder.Column> columnList, Schema inputSchema, Schema componentSchema) {
+        if (rowWriter == null) {
+            List<JDBCSQLBuilder.Column> columnList4Statement = new ArrayList<>();
+            for (JDBCSQLBuilder.Column column : columnList) {
+                if (column.addCol || (column.isReplaced())) {
+                    continue;
+                }
+
+                if (column.updatable) {
+                    columnList4Statement.add(column);
+                }
+            }
+
+            for (JDBCSQLBuilder.Column column : columnList) {
+                if (column.addCol || (column.isReplaced())) {
+                    continue;
+                }
+
+                if (column.updateKey) {
+                    columnList4Statement.add(column);
+                }
+            }
+
+            rowWriter = new RowWriter(columnList4Statement, inputSchema, componentSchema, statement, setting.getDebug(), sql);
+        }
+    }
+
     @Override
     public void write(Object datum) throws IOException {
         super.write(datum);
 
         IndexedRecord input = this.getFactory(datum).convertToAvro(datum);
+        Schema inputSchema = input.getSchema();
 
-        List<Schema.Field> keys = JDBCTemplate.getKeyColumns(input.getSchema().getFields());
-        List<Schema.Field> values = JDBCTemplate.getValueColumns(input.getSchema().getFields());
+        initRowWriterIfNot(columnList, inputSchema, componentSchema);
 
         try {
-            int index = 0;
-            for (Schema.Field value : values) {
-                JDBCMapping.setValue(++index, statement, value, input.get(value.pos()));
-            }
-
-            for (Schema.Field key : keys) {
-                JDBCMapping.setValue(++index, statement, key, input.get(key.pos()));
+            String sql_fact = rowWriter.write(input);
+            if (sql_fact != null) {
+                runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
             }
         } catch (SQLException e) {
             throw new ComponentException(e);
@@ -82,6 +104,7 @@ public class JDBCOutputUpdateWriter extends JDBCOutputWriter {
             if (dieOnError) {
                 throw new ComponentException(e);
             } else {
+                System.err.println(e.getMessage());
                 LOG.warn(e.getMessage());
             }
 
@@ -101,18 +124,7 @@ public class JDBCOutputUpdateWriter extends JDBCOutputWriter {
 
     @Override
     public Result close() throws IOException {
-        if (useBatch && batchCount > 0) {
-            try {
-                batchCount = 0;
-                updateCount += executeBatchAndGetCount(statement);
-            } catch (SQLException e) {
-                if (dieOnError) {
-                    throw new ComponentException(e);
-                } else {
-                    LOG.warn(e.getMessage());
-                }
-            }
-        }
+        updateCount += executeBatchAtLast();
 
         closeStatementQuietly(statement);
         statement = null;

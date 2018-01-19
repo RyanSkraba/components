@@ -32,9 +32,10 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.CommonUtils;
-import org.talend.components.jdbc.JDBCTemplate;
+import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.JDBCRowSource;
+import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 
 /**
@@ -63,6 +64,14 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
 
     private AllSetting setting;
 
+    private boolean useCommit;
+
+    private Integer commitEvery;
+
+    private Schema outSchema;
+
+    private Schema rejectSchema;
+
     public JDBCRowReader(RuntimeContainer container, JDBCRowSource source, RuntimeSettingProvider props) {
         super(source);
         this.container = container;
@@ -70,14 +79,20 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
         this.source = (JDBCRowSource) getCurrentSource();
 
         this.setting = props.getRuntimeSetting();
+        this.useExistedConnection = this.setting.getReferencedComponentId() != null;
 
+        commitEvery = setting.getCommitEvery();
+        useCommit = !useExistedConnection && commitEvery != null && commitEvery != 0;
+
+        outSchema = CommonUtils.getOutputSchema((ComponentProperties) properties);
+        rejectSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
     }
 
     @Override
     public boolean start() throws IOException {
-        // TODO need to adjust the key
         if (container != null) {
-            container.setComponentData(container.getCurrentComponentId(), "QUERY", setting.getSql());
+            container.setComponentData(container.getCurrentComponentId(),
+                    CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_QUERY), setting.getSql());
         }
 
         result = new Result();
@@ -106,7 +121,7 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
             if (usePreparedStatement) {
                 prepared_statement = conn.prepareStatement(sql);
 
-                JDBCTemplate.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
+                JdbcRuntimeUtils.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
                         setting.getValues());
 
                 if (propagateQueryResultSet) {
@@ -126,12 +141,17 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
 
             IndexedRecord output = handleSuccess(propagateQueryResultSet);
 
+            if (useCommit) {
+                conn.commit();
+            }
+
             return output;
         } catch (SQLException e) {
             if (setting.getDieOnError()) {
                 throw new ComponentException(e);
             } else {
-                // TODO : log it
+                // no need to print it as we will print the error message in component_begin.javajet for the reader if no reject
+                // line
             }
 
             handleReject(e);
@@ -140,7 +160,6 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
     }
 
     private IndexedRecord handleSuccess(boolean propagateQueryResultSet) {
-        Schema outSchema = CommonUtils.getOutputSchema((ComponentProperties) properties);
         IndexedRecord output = new GenericData.Record(outSchema);
 
         if (propagateQueryResultSet) {
@@ -156,8 +175,7 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
     }
 
     private void handleReject(SQLException e) {
-        Schema outSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
-        IndexedRecord reject = new GenericData.Record(outSchema);
+        IndexedRecord reject = new GenericData.Record(rejectSchema);
 
         for (Schema.Field outField : reject.getSchema().getFields()) {
             Object outValue = null;
@@ -173,6 +191,8 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
 
         Map<String, Object> resultMessage = new HashMap<String, Object>();
         resultMessage.put("error", e.getMessage());
+        resultMessage.put("errorCode", e.getSQLState());
+        resultMessage.put("errorMessage", e.getMessage() + " - Line: " + result.totalCount);
         resultMessage.put("talend_record", reject);
         throw new DataRejectException(resultMessage);
     }
@@ -191,7 +211,10 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
             }
 
             if (!useExistedConnection && conn != null) {
-                conn.commit();
+                // need to call the commit before close for some database when do some read action like reading the resultset
+                if (useCommit) {
+                    conn.commit();
+                }
                 conn.close();
                 conn = null;
             }

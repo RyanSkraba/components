@@ -51,7 +51,7 @@ public class JDBCCommitTestIT {
 
     public static AllSetting allSetting;
 
-    private final String refComponentId = "tJDBCConnection1";
+    private final String refComponentId = TJDBCConnectionDefinition.COMPONENT_NAME + "1";
 
     RuntimeContainer container = new RuntimeContainer() {
 
@@ -122,6 +122,7 @@ public class JDBCCommitTestIT {
         outputProperties.dataAction.setValue(DataAction.INSERT);
 
         outputProperties.referencedComponent.componentInstanceId.setValue(refComponentId);
+        outputProperties.referencedComponent.setReference(connectionProperties);
 
         JDBCSink sink = new JDBCSink();
         sink.initialize(container, outputProperties);
@@ -176,8 +177,8 @@ public class JDBCCommitTestIT {
 
         Assert.assertEquals(5, count);
 
-        try (java.sql.Connection refConnection = (java.sql.Connection) container.getComponentData(refComponentId,
-                ComponentConstants.CONNECTION_KEY)) {
+        try (java.sql.Connection refConnection = (java.sql.Connection) container.getComponentData(ComponentConstants.CONNECTION_KEY,refComponentId
+                )) {
             assertTrue(refConnection != null);
             Assert.assertTrue(!refConnection.isClosed());
         }
@@ -207,8 +208,8 @@ public class JDBCCommitTestIT {
         commitSourceOrSink.initialize(container, commitProperties);
         commitSourceOrSink.validate(container);
 
-        try (java.sql.Connection refConnection = (java.sql.Connection) container.getComponentData(refComponentId,
-                ComponentConstants.CONNECTION_KEY)) {
+        try (java.sql.Connection refConnection = (java.sql.Connection) container
+                .getComponentData(ComponentConstants.CONNECTION_KEY, refComponentId)) {
             assertTrue(refConnection != null);
             Assert.assertTrue(refConnection.isClosed());
         }

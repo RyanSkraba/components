@@ -29,7 +29,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class TJDBCRollbackDefinition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tJDBCRollbackNew";
+    public static final String COMPONENT_NAME = "tJDBCRollback";
 
     public TJDBCRollbackDefinition() {
         super(COMPONENT_NAME, ExecutionEngine.DI);
@@ -61,16 +61,32 @@ public class TJDBCRollbackDefinition extends AbstractComponentDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        if (connectorTopology == ConnectorTopology.NONE) {
+        switch (connectorTopology) {
+        case NONE:
             return new JdbcRuntimeInfo((TJDBCRollbackProperties) properties,
                     "org.talend.components.jdbc.runtime.JDBCRollbackSourceOrSink");
+        case INCOMING:
+        case INCOMING_AND_OUTGOING:
+            return new JdbcRuntimeInfo((TJDBCRollbackProperties) properties,
+                    "org.talend.components.jdbc.runtime.JDBCRollbackSink");
+        default:
+            return null;
         }
-        return null;
     }
 
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-        return EnumSet.of(ConnectorTopology.NONE);
+        return EnumSet.of(ConnectorTopology.NONE, ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING);
+    }
+
+    @Override
+    public boolean isSchemaAutoPropagate() {
+        return true;
+    }
+
+    @Override
+    public boolean isDataAutoPropagate() {
+        return false;
     }
 
 }

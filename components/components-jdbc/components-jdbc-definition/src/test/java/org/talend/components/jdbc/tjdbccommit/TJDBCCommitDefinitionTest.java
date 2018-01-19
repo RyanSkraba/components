@@ -36,13 +36,13 @@ public class TJDBCCommitDefinitionTest {
         TJDBCCommitDefinition result = new TJDBCCommitDefinition();
 
         assertEquals(true, result.isStartable());
-        assertEquals("tJDBCCommitNew", result.getName());
-        assertEquals("tJDBCCommitNew_icon32.png", result.getImagePath());
+        assertEquals("tJDBCCommit", result.getName());
+        assertEquals("tJDBCCommit_icon32.png", result.getImagePath());
         assertEquals(null, result.getIconKey());
         assertEquals(null, result.getPartitioning());
         assertEquals(false, result.isConditionalInputs());
         assertEquals(false, result.isDataAutoPropagate());
-        assertEquals(false, result.isSchemaAutoPropagate());
+        assertEquals(true, result.isSchemaAutoPropagate());
         assertEquals(false, result.isRejectAfterClose());
         assertEquals("JDBC Commit", result.getDisplayName());
         assertEquals("JDBC Commit", result.getTitle());
@@ -127,13 +127,13 @@ public class TJDBCCommitDefinitionTest {
         assertNotNull(result);
 
         result = fixture.getRuntimeInfo(engine, properties, ConnectorTopology.INCOMING);
-        assertNull(result);
+        assertNotNull(result);
 
         result = fixture.getRuntimeInfo(engine, properties, ConnectorTopology.OUTGOING);
         assertNull(result);
 
         result = fixture.getRuntimeInfo(engine, properties, ConnectorTopology.INCOMING_AND_OUTGOING);
-        assertNull(result);
+        assertNotNull(result);
     }
 
     /**
@@ -150,7 +150,7 @@ public class TJDBCCommitDefinitionTest {
         Set<ConnectorTopology> result = fixture.getSupportedConnectorTopologies();
 
         assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(3, result.size());
     }
 
     /**

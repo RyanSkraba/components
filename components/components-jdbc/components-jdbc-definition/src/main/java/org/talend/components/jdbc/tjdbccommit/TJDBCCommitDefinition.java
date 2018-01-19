@@ -29,7 +29,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class TJDBCCommitDefinition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tJDBCCommitNew";
+    public static final String COMPONENT_NAME = "tJDBCCommit";
 
     public TJDBCCommitDefinition() {
         super(COMPONENT_NAME, ExecutionEngine.DI);
@@ -61,16 +61,32 @@ public class TJDBCCommitDefinition extends AbstractComponentDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        if (connectorTopology == ConnectorTopology.NONE) {
+        switch (connectorTopology) {
+        case NONE:
             return new JdbcRuntimeInfo((TJDBCCommitProperties) properties,
                     "org.talend.components.jdbc.runtime.JDBCCommitSourceOrSink");
+        case INCOMING:
+        case INCOMING_AND_OUTGOING:
+            return new JdbcRuntimeInfo((TJDBCCommitProperties) properties,
+                    "org.talend.components.jdbc.runtime.JDBCCommitSink");
+        default:
+            return null;
         }
-        return null;
     }
 
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-        return EnumSet.of(ConnectorTopology.NONE);
+        return EnumSet.of(ConnectorTopology.NONE, ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING);
+    }
+
+    @Override
+    public boolean isSchemaAutoPropagate() {
+        return true;
+    }
+
+    @Override
+    public boolean isDataAutoPropagate() {
+        return false;
     }
 
 }

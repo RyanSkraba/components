@@ -19,7 +19,9 @@ import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.JdbcRuntimeInfo;
+import org.talend.components.jdbc.wizard.JDBCConnectionWizardProperties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -30,10 +32,12 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class TJDBCOutputDefinition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tJDBCOutputNew";
+    public static final String COMPONENT_NAME = "tJDBCOutput";
 
     public TJDBCOutputDefinition() {
         super(COMPONENT_NAME, ExecutionEngine.DI);
+        setupI18N(new Property<?>[] { RETURN_INSERT_RECORD_COUNT_PROP, RETURN_UPDATE_RECORD_COUNT_PROP,
+                RETURN_DELETE_RECORD_COUNT_PROP, RETURN_COMMON_REJECT_RECORD_COUNT_PROP, RETURN_QUERY_PROP });
     }
 
     @Override
@@ -46,30 +50,26 @@ public class TJDBCOutputDefinition extends AbstractComponentDefinition {
         return new String[] { "Databases/DB_JDBC" };
     }
 
-    // TODO can't i18n
-    public static final String RETURN_INSERT_RECORD_COUNT = "insertRecordCount";
-
-    public static final String RETURN_UPDATE_RECORD_COUNT = "updateRecordCount";
-
-    public static final String RETURN_DELETE_RECORD_COUNT = "deleteRecordCount";
-
     public static final Property<Integer> RETURN_INSERT_RECORD_COUNT_PROP = PropertyFactory
-            .newInteger(RETURN_INSERT_RECORD_COUNT);
+            .newInteger(ComponentConstants.RETURN_INSERT_RECORD_COUNT);
 
     public static final Property<Integer> RETURN_UPDATE_RECORD_COUNT_PROP = PropertyFactory
-            .newInteger(RETURN_UPDATE_RECORD_COUNT);
+            .newInteger(ComponentConstants.RETURN_UPDATE_RECORD_COUNT);
 
     public static final Property<Integer> RETURN_DELETE_RECORD_COUNT_PROP = PropertyFactory
-            .newInteger(RETURN_DELETE_RECORD_COUNT);
+            .newInteger(ComponentConstants.RETURN_DELETE_RECORD_COUNT);
+
+    public static final Property<Integer> RETURN_COMMON_REJECT_RECORD_COUNT_PROP = PropertyFactory
+            .newInteger(ComponentConstants.RETURN_REJECT_RECORD_COUNT);
+
+    public static final Property<String> RETURN_QUERY_PROP = PropertyFactory.newString(ComponentConstants.RETURN_QUERY);
 
     @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
-        setupI18N(new Property<?>[] { RETURN_INSERT_RECORD_COUNT_PROP, RETURN_UPDATE_RECORD_COUNT_PROP,
-                RETURN_DELETE_RECORD_COUNT_PROP });
-        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP, RETURN_SUCCESS_RECORD_COUNT_PROP,
-                RETURN_REJECT_RECORD_COUNT_PROP, RETURN_INSERT_RECORD_COUNT_PROP, RETURN_UPDATE_RECORD_COUNT_PROP,
-                RETURN_DELETE_RECORD_COUNT_PROP };
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP, RETURN_INSERT_RECORD_COUNT_PROP,
+                RETURN_UPDATE_RECORD_COUNT_PROP, RETURN_DELETE_RECORD_COUNT_PROP, RETURN_COMMON_REJECT_RECORD_COUNT_PROP,
+                RETURN_QUERY_PROP };
     }
 
     @Override
@@ -90,6 +90,16 @@ public class TJDBCOutputDefinition extends AbstractComponentDefinition {
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
         return EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING);
+    }
+
+    @Override
+    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
+        return new Class[] { JDBCConnectionWizardProperties.class};
+    }
+
+    @Override
+    public boolean isParallelize() {
+        return true;
     }
 
 }

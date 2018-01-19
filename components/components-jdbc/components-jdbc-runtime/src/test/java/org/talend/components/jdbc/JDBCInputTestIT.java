@@ -12,13 +12,16 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -30,6 +33,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Reader;
+import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.jdbc.common.DBTestUtils;
 import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.reader.JDBCInputReader;
@@ -37,7 +43,6 @@ import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputDefinition;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
 import org.talend.daikon.NamedThing;
-import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 public class JDBCInputTestIT {
@@ -86,7 +91,65 @@ public class JDBCInputTestIT {
 
         assertTrue(exists);
     }
+    
+    @Test(expected = ComponentException.class)
+    public void testGetSchemaNamesWithException() throws Exception {
+        TJDBCInputDefinition definition = new TJDBCInputDefinition();
+        TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
 
+        properties.connection.driverClass.setValue("notexist");
+
+        JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
+
+        source.getSchemaNames(null);
+    }
+
+    @Test(expected = ComponentException.class)
+    public void testGetSchemaWithException() throws Exception {
+        TJDBCInputDefinition definition = new TJDBCInputDefinition();
+        TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
+
+        properties.connection.driverClass.setValue("notexist");
+
+        JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
+
+        source.getEndpointSchema(null, "TEST");
+    }
+    
+    @Test(expected = ComponentException.class)
+    public void testGetSchemaFromQueryWithException1() throws Exception {
+        TJDBCInputDefinition definition = new TJDBCInputDefinition();
+        TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
+
+        JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
+
+        source.getSchemaFromQuery(null, "select * from notexist");
+    }
+    
+    @Test(expected = ComponentException.class)
+    public void testGetSchemaFromQueryWithException2() throws Exception {
+        TJDBCInputDefinition definition = new TJDBCInputDefinition();
+        TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
+
+        properties.connection.driverClass.setValue("notexist");
+        
+        JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
+
+        source.getSchemaFromQuery(null, "select * from TEST");
+    }
+    
+    @Test(expected = ComponentException.class)
+    public void testGetSchemaFromQueryWithException3() throws Exception {
+        TJDBCInputDefinition definition = new TJDBCInputDefinition();
+        TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
+
+        properties.connection.jdbcUrl.setValue("wrongone");
+        
+        JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
+
+        source.getSchemaFromQuery(null, "select * from TEST");
+    }
+    
     @Test
     public void testGetSchema() throws Exception {
         TJDBCInputDefinition definition = new TJDBCInputDefinition();
@@ -98,7 +161,16 @@ public class JDBCInputTestIT {
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
-        Schema schema = source.getEndpointSchema(null, "TEST");
+        RuntimeContainer container = new DefaultComponentRuntimeContainerImpl() {
+            @Override
+            public String getCurrentComponentId() {
+                return "tJDBCInput1";
+            }
+        };
+        java.net.URL mappings_url = this.getClass().getResource("/mappings");
+        container.setComponentData(container.getCurrentComponentId(), ComponentConstants.MAPPING_URL_SUBFIX, mappings_url);
+        
+        Schema schema = source.getEndpointSchema(container, "TEST");
         assertEquals("TEST", schema.getName().toUpperCase());
         List<Field> columns = schema.getFields();
         DBTestUtils.testMetadata(columns);
@@ -121,28 +193,28 @@ public class JDBCInputTestIT {
             reader.start();
 
             IndexedRecord row = (IndexedRecord) reader.getCurrent();
-            String id = (String) row.get(0);
+            Integer id = (Integer) row.get(0);
             String name = (String) row.get(1);
 
-            assertEquals("1", id);
+            assertEquals(1, id.intValue());
             assertEquals("wangwei", name);
 
             reader.advance();
 
             row = (IndexedRecord) reader.getCurrent();
-            id = (String) row.get(0);
+            id = (Integer) row.get(0);
             name = (String) row.get(1);
 
-            assertEquals("2", id);
+            assertEquals(2, id.intValue());
             assertEquals("gaoyan", name);
 
             reader.advance();
 
             row = (IndexedRecord) reader.getCurrent();
-            id = (String) row.get(0);
+            id = (Integer) row.get(0);
             name = (String) row.get(1);
 
-            assertEquals("3", id);
+            assertEquals(3, id.intValue());
             assertEquals("dabao", name);
 
             reader.close();
@@ -180,57 +252,40 @@ public class JDBCInputTestIT {
         reader.start();
 
         IndexedRecord record = (IndexedRecord) reader.getCurrent();
-        String col0 = (String) record.get(0);
-        String col1 = (String) record.get(1);
-        String col2 = (String) record.get(2);
-        String col3 = (String) record.get(3);
-        String col4 = (String) record.get(4);
-        String col5 = (String) record.get(5);
+        Short col0 = (Short) record.get(0);
+        Integer col1 = (Integer) record.get(1);
+        Long col2 = (Long) record.get(2);
+        Float col3 = (Float) record.get(3);
+        Double col4 = (Double) record.get(4);
+        BigDecimal col5 = (BigDecimal) record.get(5);
         String col6 = (String) record.get(6);
         String col7 = (String) record.get(7);
         String col8 = (String) record.get(8);
         String col9 = (String) record.get(9);
-        String col10 = (String) record.get(10);
-        String col11 = (String) record.get(11);
-        String col12 = (String) record.get(12);
-        String col13 = (String) record.get(13);
+        Long col10 = (Long) record.get(10);
+        Long col11 = (Long) record.get(11);
+        Long col12 = (Long) record.get(12);
+        Boolean col13 = (Boolean) record.get(13);
         
-        assertEquals("32767", col0);
-        assertEquals("2147483647", col1);
-        assertEquals("9223372036854775807", col2);
-        assertEquals("1.1111112", col3);
-        assertEquals("2.222222222", col4);
-        assertEquals("1234567890.1234567890", col5);
+        assertEquals(32767, col0.shortValue());
+        assertEquals(2147483647, col1.intValue());
+        assertEquals(9223372036854775807l, col2.longValue());
+        assertTrue(col3 > 1);
+        assertTrue(col4 > 2);
+        assertEquals(new BigDecimal("1234567890.1234567890"), col5);
         assertEquals("abcd", col6);
         assertEquals("abcdefg", col7);
         assertEquals("00010203040506070809", col8);
         assertEquals("abcdefg", col9);
-        assertEquals("2016-12-28", col10);
-        assertEquals("14:30:33", col11);
-        assertEquals("2016-12-28 14:31:56.12345", col12);
-        assertEquals("true", col13);
+        assertEquals("2016-12-28", new SimpleDateFormat("yyyy-MM-dd").format(new Date(col10)));
+        assertEquals("14:30:33", new SimpleDateFormat("HH:mm:ss").format(new Date(col11)));
+        assertEquals("2016-12-28 14:31:56.123",  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date(col12)));
+        assertEquals(true, col13);
         
         Schema actualSchema = record.getSchema();
         List<Field> actualFields = actualSchema.getFields();
         
         assertEquals(14, actualFields.size());
-        
-        Schema nullableStringSchema = AvroUtils.wrapAsNullable(AvroUtils._string());
-        assertEquals(nullableStringSchema, actualFields.get(0).schema());
-        assertEquals(nullableStringSchema, actualFields.get(1).schema());
-        assertEquals(nullableStringSchema, actualFields.get(2).schema());
-        assertEquals(nullableStringSchema, actualFields.get(3).schema());
-        assertEquals(nullableStringSchema, actualFields.get(4).schema());
-        assertEquals(nullableStringSchema, actualFields.get(5).schema());
-        assertEquals(nullableStringSchema, actualFields.get(6).schema());
-        assertEquals(nullableStringSchema, actualFields.get(7).schema());
-        assertEquals(nullableStringSchema, actualFields.get(8).schema());
-        assertEquals(nullableStringSchema, actualFields.get(9).schema());
-        assertEquals(nullableStringSchema, actualFields.get(10).schema());
-        assertEquals(nullableStringSchema, actualFields.get(11).schema());
-        assertEquals(nullableStringSchema, actualFields.get(12).schema());
-        assertEquals(nullableStringSchema, actualFields.get(13).schema());
-        
         reader.close();
     }
 
@@ -254,7 +309,7 @@ public class JDBCInputTestIT {
 
                 IndexedRecord record = converter.convertToAvro(reader.getCurrent());
 
-                assertEquals(String.class, record.get(0).getClass());
+                assertEquals(Integer.class, record.get(0).getClass());
                 assertEquals(String.class, record.get(1).getClass());
             }
 

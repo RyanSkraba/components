@@ -12,9 +12,10 @@
 // ============================================================================
 package org.talend.components.jdbc.type;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -30,6 +31,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Reader;
+import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.common.DBTestUtils;
 import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
@@ -80,7 +84,16 @@ public class JDBCTypeMappingTestIT {
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
-        Schema schema = source.getEndpointSchema(null, "TEST");
+        RuntimeContainer container = new DefaultComponentRuntimeContainerImpl() {
+            @Override
+            public String getCurrentComponentId() {
+                return "tJDBCInput1";
+            }
+        };
+        java.net.URL mappings_url = this.getClass().getResource("/mappings");
+        container.setComponentData(container.getCurrentComponentId(), ComponentConstants.MAPPING_URL_SUBFIX, mappings_url);
+        
+        Schema schema = source.getEndpointSchema(container, "TEST");
         assertEquals("TEST", schema.getName().toUpperCase());
         List<Field> columns = schema.getFields();
         testMetadata(columns);
@@ -91,10 +104,10 @@ public class JDBCTypeMappingTestIT {
         Schema.Field field = columns.get(0);
 
         assertEquals("C1", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        assertEquals(AvroUtils._string(), AvroUtils.unwrapIfNullable(field.schema()));
-        assertEquals(java.sql.Types.INTEGER, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals(AvroUtils._int(), AvroUtils.unwrapIfNullable(field.schema()));
+        assertEquals("INTEGER", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
-        // assertEquals(10, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
+        // assertEquals("10", field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
@@ -102,10 +115,10 @@ public class JDBCTypeMappingTestIT {
         field = columns.get(1);
 
         assertEquals("C2", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        assertEquals(AvroUtils._string(), AvroUtils.unwrapIfNullable(field.schema()));
-        assertEquals(java.sql.Types.SMALLINT, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals(AvroUtils._short(), AvroUtils.unwrapIfNullable(field.schema()));
+        assertEquals("SMALLINT", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
-        // assertEquals(5, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
+        // assertEquals("5", field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
@@ -113,10 +126,10 @@ public class JDBCTypeMappingTestIT {
         field = columns.get(2);
 
         assertEquals("C3", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        assertEquals(AvroUtils._string(), AvroUtils.unwrapIfNullable(field.schema()));
-        assertEquals(java.sql.Types.BIGINT, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals(AvroUtils._long(), AvroUtils.unwrapIfNullable(field.schema()));
+        assertEquals("BIGINT", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
-        // assertEquals(19, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
+        // assertEquals("19", field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
@@ -125,8 +138,8 @@ public class JDBCTypeMappingTestIT {
 
         assertEquals("C4", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
         // assertEquals(AvroUtils._float(), AvroUtils.unwrapIfNullable(field.schema()));
-        // assertEquals(java.sql.Types.REAL, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
-        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+        assertEquals("REAL", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals("23", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
         // assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
@@ -135,8 +148,8 @@ public class JDBCTypeMappingTestIT {
         field = columns.get(4);
 
         assertEquals("C5", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        assertEquals(AvroUtils._string(), AvroUtils.unwrapIfNullable(field.schema()));
-        assertEquals(java.sql.Types.DOUBLE, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals(AvroUtils._double(), AvroUtils.unwrapIfNullable(field.schema()));
+        assertEquals("DOUBLE", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
@@ -157,22 +170,22 @@ public class JDBCTypeMappingTestIT {
         field = columns.get(6);
 
         assertEquals("C7", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        assertEquals(AvroUtils._string(), AvroUtils.unwrapIfNullable(field.schema()));
-        assertEquals(java.sql.Types.DECIMAL, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
-        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
-        assertEquals(10, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
-        assertEquals(2, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
+        assertEquals(AvroUtils._decimal(), AvroUtils.unwrapIfNullable(field.schema()));
+        assertEquals("DECIMAL", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals("10", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+        assertEquals("2", field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
+        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
 
         field = columns.get(7);
 
         assertEquals("C8", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        assertEquals(AvroUtils._string(), AvroUtils.unwrapIfNullable(field.schema()));
+        assertEquals(AvroUtils._decimal(), AvroUtils.unwrapIfNullable(field.schema()));
         // assertEquals(java.sql.Types.NUMERIC, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
-        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
-        assertEquals(10, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
-        assertEquals(2, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
+        assertEquals("10", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+        assertEquals("2", field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
+        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
 
@@ -191,8 +204,8 @@ public class JDBCTypeMappingTestIT {
 
         assertEquals("C10", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
         assertEquals(AvroUtils._string(), AvroUtils.unwrapIfNullable(field.schema()));
-        assertEquals(java.sql.Types.CHAR, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
-        assertEquals(64, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+        assertEquals("CHAR", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals("64", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
@@ -201,8 +214,8 @@ public class JDBCTypeMappingTestIT {
         field = columns.get(10);
 
         assertEquals("C11", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        assertEquals(AvroUtils._string(), AvroUtils.unwrapIfNullable(field.schema()));
-        assertEquals(java.sql.Types.DATE, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals(AvroUtils._date(), AvroUtils.unwrapIfNullable(field.schema()));
+        assertEquals("DATE", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
@@ -212,8 +225,8 @@ public class JDBCTypeMappingTestIT {
         field = columns.get(11);
 
         assertEquals("C12", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        assertEquals(AvroUtils._string(), AvroUtils.unwrapIfNullable(field.schema()));
-        assertEquals(java.sql.Types.TIME, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals(AvroUtils._date(), AvroUtils.unwrapIfNullable(field.schema()));
+        assertEquals("TIME", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
@@ -223,8 +236,8 @@ public class JDBCTypeMappingTestIT {
         field = columns.get(12);
 
         assertEquals("C13", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        assertEquals(AvroUtils._string(), AvroUtils.unwrapIfNullable(field.schema()));
-        assertEquals(java.sql.Types.TIMESTAMP, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals(AvroUtils._date(), AvroUtils.unwrapIfNullable(field.schema()));
+        assertEquals("TIMESTAMP", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
@@ -235,8 +248,8 @@ public class JDBCTypeMappingTestIT {
 
         assertEquals("C14", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
         assertEquals(AvroUtils._string(), AvroUtils.unwrapIfNullable(field.schema()));
-        assertEquals(java.sql.Types.VARCHAR, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
-        assertEquals(64, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+        assertEquals("VARCHAR", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals("64", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
@@ -246,8 +259,8 @@ public class JDBCTypeMappingTestIT {
 
         assertEquals("C15", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
         assertEquals(AvroUtils._string(), AvroUtils.unwrapIfNullable(field.schema()));
-        assertEquals(java.sql.Types.LONGVARCHAR, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
-        // assertEquals(32700, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+        assertEquals("LONG VARCHAR", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        // assertEquals("32700", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
@@ -284,19 +297,19 @@ public class JDBCTypeMappingTestIT {
 
             IndexedRecord record = converter.convertToAvro(reader.getCurrent());
 
-            assertEquals(String.class, record.get(0).getClass());
-            assertEquals(String.class, record.get(1).getClass());
-            assertEquals(String.class, record.get(2).getClass());
-            assertEquals(String.class, record.get(3).getClass());
-            assertEquals(String.class, record.get(4).getClass());
-            assertEquals(String.class, record.get(5).getClass());
-            assertEquals(String.class, record.get(6).getClass());
-            assertEquals(String.class, record.get(7).getClass());
-            assertEquals(String.class, record.get(8).getClass());
+            assertEquals(Integer.class, record.get(0).getClass());
+            assertEquals(Short.class, record.get(1).getClass());
+            assertEquals(Long.class, record.get(2).getClass());
+            assertEquals(Float.class, record.get(3).getClass());
+            assertEquals(Double.class, record.get(4).getClass());
+            assertEquals(Float.class, record.get(5).getClass());
+            assertEquals(BigDecimal.class, record.get(6).getClass());
+            assertEquals(BigDecimal.class, record.get(7).getClass());
+            assertEquals(Boolean.class, record.get(8).getClass());
             assertEquals(String.class, record.get(9).getClass());
-            assertEquals(String.class, record.get(10).getClass());
-            assertEquals(String.class, record.get(11).getClass());
-            assertEquals(String.class, record.get(12).getClass());
+            assertEquals(Long.class, record.get(10).getClass());
+            assertEquals(Long.class, record.get(11).getClass());
+            assertEquals(Long.class, record.get(12).getClass());
             assertEquals(String.class, record.get(13).getClass());
             assertEquals(String.class, record.get(14).getClass());
 
@@ -332,31 +345,31 @@ public class JDBCTypeMappingTestIT {
             reader.start();
 
             IndexedRecord row = (IndexedRecord) reader.getCurrent();
-            String c1 = (String) row.get(0);
-            String c2 = (String) row.get(1);
-            String c3 = (String) row.get(2);
-            String c4 = (String) row.get(3);
-            String c5 = (String) row.get(4);
-            String c6 = (String) row.get(5);
-            String c7 = (String) row.get(6);
-            String c8 = (String) row.get(7);
-            String c9 = (String) row.get(8);
+            Integer c1 = (Integer) row.get(0);
+            Short c2 = (Short) row.get(1);
+            Long c3 = (Long) row.get(2);
+            Float c4 = (Float) row.get(3);
+            Double c5 = (Double) row.get(4);
+            Float c6 = (Float) row.get(5);
+            BigDecimal c7 = (BigDecimal) row.get(6);
+            BigDecimal c8 = (BigDecimal) row.get(7);
+            Boolean c9 = (Boolean) row.get(8);
             String c10 = (String) row.get(9);
-            String c11 = (String) row.get(10);
-            String c12 = (String) row.get(11);
-            String c13 = (String) row.get(12);
+            Long c11 = (Long) row.get(10);
+            Long c12 = (Long) row.get(11);
+            Long c13 = (Long) row.get(12);
             String c14 = (String) row.get(13);
             String c15 = (String) row.get(14);
 
-            assertEquals("1", c1);
-            assertEquals("2", c2);
-            assertEquals("3", c3);
+            assertEquals(1, c1.intValue());
+            assertEquals(2, c2.intValue());
+            assertEquals(3, c3.intValue());
             Assert.assertNotNull(c4);
             Assert.assertNotNull(c5);
             Assert.assertNotNull(c6);
-            assertEquals("7.01", c7);
-            assertEquals("8.01", c8);
-            assertEquals("true", c9);
+            assertEquals(new BigDecimal("7.01"), c7);
+            assertEquals(new BigDecimal("8.01"), c8);
+            assertEquals(true, c9);
             assertEquals("the first char value", c10.trim());
             Assert.assertNotNull(c11);
             Assert.assertNotNull(c12);
@@ -367,31 +380,31 @@ public class JDBCTypeMappingTestIT {
             reader.advance();
 
             row = (IndexedRecord) reader.getCurrent();
-            c1 = (String) row.get(0);
-            c2 = (String) row.get(1);
-            c3 = (String) row.get(2);
-            c4 = (String) row.get(3);
-            c5 = (String) row.get(4);
-            c6 = (String) row.get(5);
-            c7 = (String) row.get(6);
-            c8 = (String) row.get(7);
-            c9 = (String) row.get(8);
+            c1 = (Integer) row.get(0);
+            c2 = (Short) row.get(1);
+            c3 = (Long) row.get(2);
+            c4 = (Float) row.get(3);
+            c5 = (Double) row.get(4);
+            c6 = (Float) row.get(5);
+            c7 = (BigDecimal) row.get(6);
+            c8 = (BigDecimal) row.get(7);
+            c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (String) row.get(10);
-            c12 = (String) row.get(11);
-            c13 = (String) row.get(12);
+            c11 = (Long) row.get(10);
+            c12 = (Long) row.get(11);
+            c13 = (Long) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
 
-            assertEquals("1", c1);
-            assertEquals("2", c2);
-            assertEquals("3", c3);
+            assertEquals(1, c1.intValue());
+            assertEquals(2, c2.intValue());
+            assertEquals(3, c3.intValue());
             Assert.assertNotNull(c4);
             Assert.assertNotNull(c5);
             Assert.assertNotNull(c6);
-            assertEquals("7.01", c7);
-            assertEquals("8.01", c8);
-            assertEquals("true", c9);
+            assertEquals(new BigDecimal("7.01"), c7);
+            assertEquals(new BigDecimal("8.01"), c8);
+            assertEquals(true, c9);
             assertEquals("the second char value", c10.trim());
             Assert.assertNotNull(c11);
             Assert.assertNotNull(c12);
@@ -402,31 +415,31 @@ public class JDBCTypeMappingTestIT {
             reader.advance();
 
             row = (IndexedRecord) reader.getCurrent();
-            c1 = (String) row.get(0);
-            c2 = (String) row.get(1);
-            c3 = (String) row.get(2);
-            c4 = (String) row.get(3);
-            c5 = (String) row.get(4);
-            c6 = (String) row.get(5);
-            c7 = (String) row.get(6);
-            c8 = (String) row.get(7);
-            c9 = (String) row.get(8);
+            c1 = (Integer) row.get(0);
+            c2 = (Short) row.get(1);
+            c3 = (Long) row.get(2);
+            c4 = (Float) row.get(3);
+            c5 = (Double) row.get(4);
+            c6 = (Float) row.get(5);
+            c7 = (BigDecimal) row.get(6);
+            c8 = (BigDecimal) row.get(7);
+            c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (String) row.get(10);
-            c12 = (String) row.get(11);
-            c13 = (String) row.get(12);
+            c11 = (Long) row.get(10);
+            c12 = (Long) row.get(11);
+            c13 = (Long) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
 
-            assertEquals("1", c1);
-            assertEquals("2", c2);
-            assertEquals("3", c3);
+            assertEquals(1, c1.intValue());
+            assertEquals(2, c2.intValue());
+            assertEquals(3, c3.intValue());
             Assert.assertNotNull(c4);
             Assert.assertNotNull(c5);
             Assert.assertNotNull(c6);
-            assertEquals("7.01", c7);
-            assertEquals("8.01", c8);
-            assertEquals("true", c9);
+            assertEquals(new BigDecimal("7.01"), c7);
+            assertEquals(new BigDecimal("8.01"), c8);
+            assertEquals(true, c9);
             assertEquals("the third char value", c10.trim());
             Assert.assertNotNull(c11);
             Assert.assertNotNull(c12);
@@ -437,23 +450,23 @@ public class JDBCTypeMappingTestIT {
             reader.advance();
 
             row = (IndexedRecord) reader.getCurrent();
-            c1 = (String) row.get(0);
-            c2 = (String) row.get(1);
-            c3 = (String) row.get(2);
-            c4 = (String) row.get(3);
-            c5 = (String) row.get(4);
-            c6 = (String) row.get(5);
-            c7 = (String) row.get(6);
-            c8 = (String) row.get(7);
-            c9 = (String) row.get(8);
+            c1 = (Integer) row.get(0);
+            c2 = (Short) row.get(1);
+            c3 = (Long) row.get(2);
+            c4 = (Float) row.get(3);
+            c5 = (Double) row.get(4);
+            c6 = (Float) row.get(5);
+            c7 = (BigDecimal) row.get(6);
+            c8 = (BigDecimal) row.get(7);
+            c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (String) row.get(10);
-            c12 = (String) row.get(11);
-            c13 = (String) row.get(12);
+            c11 = (Long) row.get(10);
+            c12 = (Long) row.get(11);
+            c13 = (Long) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
 
-            assertEquals("1", c1);
+            assertEquals(1, c1.intValue());
             Assert.assertNull(c2);
             Assert.assertNull(c3);
             Assert.assertNull(c4);
@@ -473,19 +486,19 @@ public class JDBCTypeMappingTestIT {
             reader.advance();
 
             row = (IndexedRecord) reader.getCurrent();
-            c1 = (String) row.get(0);
-            c2 = (String) row.get(1);
-            c3 = (String) row.get(2);
-            c4 = (String) row.get(3);
-            c5 = (String) row.get(4);
-            c6 = (String) row.get(5);
-            c7 = (String) row.get(6);
-            c8 = (String) row.get(7);
-            c9 = (String) row.get(8);
+            c1 = (Integer) row.get(0);
+            c2 = (Short) row.get(1);
+            c3 = (Long) row.get(2);
+            c4 = (Float) row.get(3);
+            c5 = (Double) row.get(4);
+            c6 = (Float) row.get(5);
+            c7 = (BigDecimal) row.get(6);
+            c8 = (BigDecimal) row.get(7);
+            c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (String) row.get(10);
-            c12 = (String) row.get(11);
-            c13 = (String) row.get(12);
+            c11 = (Long) row.get(10);
+            c12 = (Long) row.get(11);
+            c13 = (Long) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
 
@@ -582,31 +595,31 @@ public class JDBCTypeMappingTestIT {
             }
 
             IndexedRecord row = (IndexedRecord) reader.getCurrent();
-            String c1 = (String) row.get(0);
-            String c2 = (String) row.get(1);
-            String c3 = (String) row.get(2);
-            String c4 = (String) row.get(3);
-            String c5 = (String) row.get(4);
-            String c6 = (String) row.get(5);
-            String c7 = (String) row.get(6);
-            String c8 = (String) row.get(7);
-            String c9 = (String) row.get(8);
+            Integer c1 = (Integer) row.get(0);
+            Short c2 = (Short) row.get(1);
+            Long c3 = (Long) row.get(2);
+            Float c4 = (Float) row.get(3);
+            Double c5 = (Double) row.get(4);
+            Float c6 = (Float) row.get(5);
+            BigDecimal c7 = (BigDecimal) row.get(6);
+            BigDecimal c8 = (BigDecimal) row.get(7);
+            Boolean c9 = (Boolean) row.get(8);
             String c10 = (String) row.get(9);
-            String c11 = (String) row.get(10);
-            String c12 = (String) row.get(11);
-            String c13 = (String) row.get(12);
+            Long c11 = (Long) row.get(10);
+            Long c12 = (Long) row.get(11);
+            Long c13 = (Long) row.get(12);
             String c14 = (String) row.get(13);
             String c15 = (String) row.get(14);
 
-            assertEquals("1", c1);
-            assertEquals("2", c2);
-            assertEquals("3", c3);
+            assertEquals(1, c1.intValue());
+            assertEquals(2, c2.intValue());
+            assertEquals(3, c3.intValue());
             Assert.assertNotNull(c4);
             Assert.assertNotNull(c5);
             Assert.assertNotNull(c6);
-            assertEquals("7.01", c7);
-            assertEquals("8.01", c8);
-            assertEquals("true", c9);
+            assertEquals(new BigDecimal("7.01"), c7);
+            assertEquals(new BigDecimal("8.01"), c8);
+            assertEquals(true, c9);
             assertEquals("content : 1", c10.trim());
             Assert.assertNotNull(c11);
             Assert.assertNotNull(c12);
@@ -617,31 +630,31 @@ public class JDBCTypeMappingTestIT {
             reader.advance();
 
             row = (IndexedRecord) reader.getCurrent();
-            c1 = (String) row.get(0);
-            c2 = (String) row.get(1);
-            c3 = (String) row.get(2);
-            c4 = (String) row.get(3);
-            c5 = (String) row.get(4);
-            c6 = (String) row.get(5);
-            c7 = (String) row.get(6);
-            c8 = (String) row.get(7);
-            c9 = (String) row.get(8);
+            c1 = (Integer) row.get(0);
+            c2 = (Short) row.get(1);
+            c3 = (Long) row.get(2);
+            c4 = (Float) row.get(3);
+            c5 = (Double) row.get(4);
+            c6 = (Float) row.get(5);
+            c7 = (BigDecimal) row.get(6);
+            c8 = (BigDecimal) row.get(7);
+            c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (String) row.get(10);
-            c12 = (String) row.get(11);
-            c13 = (String) row.get(12);
+            c11 = (Long) row.get(10);
+            c12 = (Long) row.get(11);
+            c13 = (Long) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
 
-            assertEquals("1", c1);
-            assertEquals("2", c2);
-            assertEquals("3", c3);
+            assertEquals(1, c1.intValue());
+            assertEquals(2, c2.intValue());
+            assertEquals(3, c3.intValue());
             Assert.assertNotNull(c4);
             Assert.assertNotNull(c5);
             Assert.assertNotNull(c6);
-            assertEquals("7.01", c7);
-            assertEquals("8.01", c8);
-            assertEquals("true", c9);
+            assertEquals(new BigDecimal("7.01"), c7);
+            assertEquals(new BigDecimal("8.01"), c8);
+            assertEquals(true, c9);
             assertEquals("content : 2", c10.trim());
             Assert.assertNotNull(c11);
             Assert.assertNotNull(c12);
@@ -652,31 +665,31 @@ public class JDBCTypeMappingTestIT {
             reader.advance();
 
             row = (IndexedRecord) reader.getCurrent();
-            c1 = (String) row.get(0);
-            c2 = (String) row.get(1);
-            c3 = (String) row.get(2);
-            c4 = (String) row.get(3);
-            c5 = (String) row.get(4);
-            c6 = (String) row.get(5);
-            c7 = (String) row.get(6);
-            c8 = (String) row.get(7);
-            c9 = (String) row.get(8);
+            c1 = (Integer) row.get(0);
+            c2 = (Short) row.get(1);
+            c3 = (Long) row.get(2);
+            c4 = (Float) row.get(3);
+            c5 = (Double) row.get(4);
+            c6 = (Float) row.get(5);
+            c7 = (BigDecimal) row.get(6);
+            c8 = (BigDecimal) row.get(7);
+            c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (String) row.get(10);
-            c12 = (String) row.get(11);
-            c13 = (String) row.get(12);
+            c11 = (Long) row.get(10);
+            c12 = (Long) row.get(11);
+            c13 = (Long) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
 
-            assertEquals("1", c1);
-            assertEquals("2", c2);
-            assertEquals("3", c3);
+            assertEquals(1, c1.intValue());
+            assertEquals(2, c2.intValue());
+            assertEquals(3, c3.intValue());
             Assert.assertNotNull(c4);
             Assert.assertNotNull(c5);
             Assert.assertNotNull(c6);
-            assertEquals("7.01", c7);
-            assertEquals("8.01", c8);
-            assertEquals("true", c9);
+            assertEquals(new BigDecimal("7.01"), c7);
+            assertEquals(new BigDecimal("8.01"), c8);
+            assertEquals(true, c9);
             assertEquals("content : 3", c10.trim());
             Assert.assertNotNull(c11);
             Assert.assertNotNull(c12);
@@ -687,23 +700,23 @@ public class JDBCTypeMappingTestIT {
             reader.advance();
 
             row = (IndexedRecord) reader.getCurrent();
-            c1 = (String) row.get(0);
-            c2 = (String) row.get(1);
-            c3 = (String) row.get(2);
-            c4 = (String) row.get(3);
-            c5 = (String) row.get(4);
-            c6 = (String) row.get(5);
-            c7 = (String) row.get(6);
-            c8 = (String) row.get(7);
-            c9 = (String) row.get(8);
+            c1 = (Integer) row.get(0);
+            c2 = (Short) row.get(1);
+            c3 = (Long) row.get(2);
+            c4 = (Float) row.get(3);
+            c5 = (Double) row.get(4);
+            c6 = (Float) row.get(5);
+            c7 = (BigDecimal) row.get(6);
+            c8 = (BigDecimal) row.get(7);
+            c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (String) row.get(10);
-            c12 = (String) row.get(11);
-            c13 = (String) row.get(12);
+            c11 = (Long) row.get(10);
+            c12 = (Long) row.get(11);
+            c13 = (Long) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
 
-            assertEquals("1", c1);
+            assertEquals(1, c1.intValue());
             Assert.assertNull(c2);
             Assert.assertNull(c3);
             Assert.assertNull(c4);
@@ -723,19 +736,19 @@ public class JDBCTypeMappingTestIT {
             reader.advance();
 
             row = (IndexedRecord) reader.getCurrent();
-            c1 = (String) row.get(0);
-            c2 = (String) row.get(1);
-            c3 = (String) row.get(2);
-            c4 = (String) row.get(3);
-            c5 = (String) row.get(4);
-            c6 = (String) row.get(5);
-            c7 = (String) row.get(6);
-            c8 = (String) row.get(7);
-            c9 = (String) row.get(8);
+            c1 = (Integer) row.get(0);
+            c2 = (Short) row.get(1);
+            c3 = (Long) row.get(2);
+            c4 = (Float) row.get(3);
+            c5 = (Double) row.get(4);
+            c6 = (Float) row.get(5);
+            c7 = (BigDecimal) row.get(6);
+            c8 = (BigDecimal) row.get(7);
+            c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (String) row.get(10);
-            c12 = (String) row.get(11);
-            c13 = (String) row.get(12);
+            c11 = (Long) row.get(10);
+            c12 = (Long) row.get(11);
+            c13 = (Long) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
 

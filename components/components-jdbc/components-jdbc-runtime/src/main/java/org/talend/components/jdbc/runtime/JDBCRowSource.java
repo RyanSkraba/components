@@ -20,8 +20,6 @@ import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jdbc.runtime.reader.JDBCRowReader;
 import org.talend.daikon.properties.ValidationResult;
-import org.talend.daikon.properties.ValidationResult.Result;
-import org.talend.daikon.properties.ValidationResultMutable;
 
 /**
  * JDBC row runtime execution object for input action
@@ -29,7 +27,7 @@ import org.talend.daikon.properties.ValidationResultMutable;
  */
 public class JDBCRowSource extends JDBCRowSourceOrSink implements BoundedSource {
 
-    private static final long serialVersionUID = -9111994542816954024L;
+    private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -58,14 +56,7 @@ public class JDBCRowSource extends JDBCRowSourceOrSink implements BoundedSource 
 
     @Override
     public ValidationResult validate(RuntimeContainer runtime) {
-        ValidationResultMutable vr = new ValidationResultMutable();
-        try {
-            connect(runtime);
-        } catch (Exception ex) {
-            vr.setStatus(Result.ERROR);
-            vr.setMessage(ex.getMessage());
-        }
-        return vr;
+        return JdbcRuntimeUtils.validate(runtime, this);
     }
 
 }

@@ -51,7 +51,7 @@ public class JDBCRollbackTestIT {
 
     public static AllSetting allSetting;
 
-    private final String refComponentId = "tJDBCConnection1";
+    private final String refComponentId = TJDBCConnectionDefinition.COMPONENT_NAME + "1";
 
     RuntimeContainer container = new RuntimeContainer() {
 
@@ -122,6 +122,7 @@ public class JDBCRollbackTestIT {
         outputProperties.dataAction.setValue(DataAction.INSERT);
 
         outputProperties.referencedComponent.componentInstanceId.setValue(refComponentId);
+        outputProperties.referencedComponent.setReference(connectionProperties);
 
         JDBCSink sink = new JDBCSink();
         sink.initialize(container, outputProperties);
@@ -175,8 +176,8 @@ public class JDBCRollbackTestIT {
 
         Assert.assertEquals(3, count);
 
-        try (java.sql.Connection refConnection = (java.sql.Connection) container.getComponentData(refComponentId,
-                ComponentConstants.CONNECTION_KEY)) {
+        try (java.sql.Connection refConnection = (java.sql.Connection) container
+                .getComponentData(ComponentConstants.CONNECTION_KEY, refComponentId)) {
             assertTrue(refConnection != null);
             Assert.assertTrue(!refConnection.isClosed());
         }
@@ -206,8 +207,8 @@ public class JDBCRollbackTestIT {
         rollbackSourceOrSink.initialize(container, rollbackProperties);
         rollbackSourceOrSink.validate(container);
 
-        try (java.sql.Connection refConnection = (java.sql.Connection) container.getComponentData(refComponentId,
-                ComponentConstants.CONNECTION_KEY)) {
+        try (java.sql.Connection refConnection = (java.sql.Connection) container
+                .getComponentData(ComponentConstants.CONNECTION_KEY, refComponentId)) {
             assertTrue(refConnection != null);
             Assert.assertTrue(refConnection.isClosed());
         }
