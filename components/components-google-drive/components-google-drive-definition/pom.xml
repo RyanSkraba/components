@@ -175,7 +175,7 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.google-drive.definition</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.google-drive</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>*</Import-Package>
                                 <Embed-Dependency>
