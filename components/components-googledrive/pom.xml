@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.talend.components</groupId>
-    <artifactId>components-google-drive-aggregator</artifactId>
+    <artifactId>components-googledrive-aggregator</artifactId>
     <version>0.22.0-SNAPSHOT</version>
     <name>Components - Google Drive Aggregator</name>
     <packaging>pom</packaging>
@@ -11,8 +11,8 @@
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
     <modules>
-        <module>components-google-drive-definition</module>
-        <module>components-google-drive-runtime</module>
+        <module>components-googledrive-definition</module>
+        <module>components-googledrive-runtime</module>
     </modules>
     <build>
         <plugins>
@@ -33,8 +33,8 @@
                                 <fileSet>
                                     <directory>${project.basedir}</directory>
                                     <includes>
-                                        <include>components-google-drive-definition/target/jacoco.exec</include>
-                                        <include>components-google-drive-runtime/target/jacoco.exec</include>
+                                        <include>components-googledrive-definition/target/jacoco.exec</include>
+                                        <include>components-googledrive-runtime/target/jacoco.exec</include>
                                     </includes>
                                 </fileSet>
                             </fileSets>
@@ -52,9 +52,9 @@
                                 <fileSet>
                                     <directory>${project.basedir}</directory>
                                     <includes>
-                                        <include>components-google-drive-definition/target/jacoco-it.exec</include>
-                                        <include>components-google-drive-runtime/target/jacoco-it.exec</include>
-                                        <include>components-google-drive-integration/target/jacoco-it.exec</include>
+                                        <include>components-googledrive-definition/target/jacoco-it.exec</include>
+                                        <include>components-googledrive-runtime/target/jacoco-it.exec</include>
+                                        <include>components-googledrive-integration/target/jacoco-it.exec</include>
                                     </includes>
                                 </fileSet>
                             </fileSets>

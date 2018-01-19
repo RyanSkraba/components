@@ -34,7 +34,7 @@
         <module>components-couchbase</module>
         <module>components-kinesis</module>
         <module>components-marklogic</module>
-        <module>components-google-drive</module>
+        <module>components-googledrive</module>
         <!-- Slow-building components are built last. -->
         <module>components-salesforce</module>
         <module>components-snowflake</module>

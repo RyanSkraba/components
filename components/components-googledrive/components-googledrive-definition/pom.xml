@@ -7,14 +7,14 @@
         <version>0.22.0-SNAPSHOT</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
-    <artifactId>components-google-drive-definition</artifactId>
+    <artifactId>components-googledrive-definition</artifactId>
     <name>Components - Google Drive Definition</name>
     <packaging>jar</packaging>
     <properties>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
     <dependencies>
-        <!-- google-drive runtime specific dependencies -->
+        <!-- googledrive runtime specific dependencies -->
         <!-- -->
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -155,7 +155,7 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.google-drive.definition.lib
+                                <Bundle-SymbolicName>org.talend.components.googledrive.lib
                                 </Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Service-Component>*</Service-Component>
@@ -175,7 +175,7 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.google-drive</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.googledrive</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>*</Import-Package>
                                 <Embed-Dependency>

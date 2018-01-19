@@ -7,23 +7,33 @@
         <version>0.22.0-SNAPSHOT</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
-    <artifactId>components-google-drive-integration</artifactId>
-    <name>Components - Google Drive Integration</name>
+    <artifactId>components-googledrive-runtime</artifactId>
+    <name>Components - Google Drive Runtime</name>
     <packaging>jar</packaging>
     <properties>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
     <dependencies>
-        <!-- google-drive runtime specific dependencies -->
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>components-google-drive-definition</artifactId>
+            <artifactId>components-googledrive-definition</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- googledrive runtime specific dependencies -->
         <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-google-drive-runtime</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>1.23.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.oauth-client</groupId>
+            <artifactId>google-oauth-client-jetty</artifactId>
+            <version>1.23.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-drive</artifactId>
+            <version>v3-rev97-1.23.0</version>
         </dependency>
         <!-- -->
         <dependency>
@@ -108,9 +118,6 @@
                     <argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
                     <systemPropertyVariables>
                         <pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
-                        <org.talend.components.google.drive.service_account_file>
-                            ${org.talend.components.google.drive.service_account_file}
-                        </org.talend.components.google.drive.service_account_file>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -159,7 +166,7 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.google-drive.lib</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.googledrive.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Include-Resource>
                                     {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
@@ -178,7 +185,7 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.google-drive</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.googledrive</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>*</Import-Package>
                                 <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*

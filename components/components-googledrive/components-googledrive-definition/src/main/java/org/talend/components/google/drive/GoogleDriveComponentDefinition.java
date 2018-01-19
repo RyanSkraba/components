@@ -32,7 +32,7 @@ public abstract class GoogleDriveComponentDefinition extends AbstractComponentDe
 
     public static final String MAVEN_GROUP_ID = "org.talend.components";
 
-    public static final String MAVEN_ARTIFACT_ID = "components-google-drive-runtime";
+    public static final String MAVEN_ARTIFACT_ID = "components-googledrive-runtime";
 
     public static final String MAVEN_RUNTIME_PATH = "mvn:" + MAVEN_GROUP_ID + "/" + MAVEN_ARTIFACT_ID;
 
