@@ -179,12 +179,14 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
                 statement = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 
                 Class clazz = statement.getClass();
-                String canonicalName = clazz.getCanonicalName();
-                if ("com.mysql.jdbc.Statement".equals(canonicalName)
-                        || "com.mysql.jdbc.jdbc2.optional.JDBC4StatementWrapper".equals(canonicalName)) {
-                    // have to use reflect here
+                try {
                     Method method = clazz.getMethod("enableStreamingResults");
-                    method.invoke(statement);
+                    if (method != null) {
+                        // have to use reflect here
+                        method.invoke(statement);
+                    }
+                } catch (Exception e) {
+                    // ignore anything
                 }
             } else {
                 statement = conn.createStatement();
