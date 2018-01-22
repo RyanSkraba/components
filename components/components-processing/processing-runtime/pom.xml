@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.wandoulabs.avro</groupId>
             <artifactId>wandou-avpath_2.11</artifactId>
-            <version>0.1.3-talend-SNAPSHOT</version>
+            <version>0.1.3-talend</version>
         </dependency>
 
         <!-- Tests -->

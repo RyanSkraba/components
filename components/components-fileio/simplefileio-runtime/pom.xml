@@ -17,7 +17,7 @@
         <hadoop.version>2.7.0</hadoop.version>
         <!-- See below on information for hadoop-aws. -->
         <hadoop.aws.artifactId>hadoop-aws-tlnd</hadoop.aws.artifactId>
-        <hadoop.aws.version>2.7.3.1-SNAPSHOT</hadoop.aws.version>
+        <hadoop.aws.version>2.7.3.1</hadoop.aws.version>
         <parquet.version>1.9.0</parquet.version>
         <spark.version>1.6.0</spark.version>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>

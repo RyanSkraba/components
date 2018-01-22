@@ -7,10 +7,23 @@
     <artifactId>components</artifactId>
     <packaging>pom</packaging>
 
-	<scm>
-		<connection>scm:git:https://github.com/Talend/components.git</connection>
-	  <tag>HEAD</tag>
-  </scm>
+    <scm>
+      <connection>scm:git:https://github.com/Talend/components.git</connection>
+      <developerConnection>scm:git:https://github.com/Talend/components.git</developerConnection>
+      <url>https://github.com/Talend/components</url>
+      <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+      <snapshotRepository>
+        <id>talend_nexus_deployment</id>
+        <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
+      </snapshotRepository>
+      <repository>
+        <id>talend_nexus_deployment</id>
+        <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+      </repository>
+    </distributionManagement>
 	
     <name>Component Aggregator</name>
     <modules>
@@ -21,33 +34,22 @@
         <module>services</module>
     </modules>
     <build>
-        <!-- skip the deployment for this aggregator, not necessary -->
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.2</version>
             </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
-				<configuration>
-					<!-- Only unit-tests are launched because for the moment release prepared on local machine. Should be replaced to clean install, when we setup Jenkins for release process -->
-					<preparationGoals>clean test</preparationGoals>
-					<pushChanges>false</pushChanges>
-					<scmCommentPrefix xml:space="preserve">release: </scmCommentPrefix>
-					<tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
-				</configuration>
-			</plugin>
+			      <plugin>
+				      <groupId>org.apache.maven.plugins</groupId>
+				      <artifactId>maven-release-plugin</artifactId>
+				      <version>2.5.3</version>
+				      <configuration>
+					      <scmCommentPrefix xml:space="preserve">release: </scmCommentPrefix>
+					      <tagNameFormat>release/@{project.version}</tagNameFormat>
+					      <autoVersionSubmodules>true</autoVersionSubmodules>
+				      </configuration>
+			      </plugin>
         </plugins>
     </build>
 </project>
