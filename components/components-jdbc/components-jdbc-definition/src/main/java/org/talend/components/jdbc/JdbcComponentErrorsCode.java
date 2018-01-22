@@ -13,8 +13,6 @@
 
 package org.talend.components.jdbc;
 
-import static org.apache.http.HttpStatus.*;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,12 +21,12 @@ import org.talend.daikon.exception.error.ErrorCode;
 public class JdbcComponentErrorsCode implements ErrorCode {
 
     public static final JdbcComponentErrorsCode SQL_SYNTAX_ERROR = //
-    new JdbcComponentErrorsCode("SQL_SYNTAX_ERROR", SC_BAD_REQUEST);
+    new JdbcComponentErrorsCode("SQL_SYNTAX_ERROR", 400);
 
-    public static final JdbcComponentErrorsCode SQL_ERROR = new JdbcComponentErrorsCode("SQL_ERROR", SC_INTERNAL_SERVER_ERROR);
+    public static final JdbcComponentErrorsCode SQL_ERROR = new JdbcComponentErrorsCode("SQL_ERROR", 500);
 
     public static final JdbcComponentErrorsCode DRIVER_NOT_PRESENT_ERROR = //
-    new JdbcComponentErrorsCode("DRIVER_NOT_PRESENT_ERROR", SC_INTERNAL_SERVER_ERROR);
+    new JdbcComponentErrorsCode("DRIVER_NOT_PRESENT_ERROR", 500);
 
     public static final String PRODUCT_TALEND_COMPONENTS = "TCOMP";
 
