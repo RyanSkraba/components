@@ -181,6 +181,7 @@
                                 <Embed-Dependency>
                                     *;scope=compile|runtime;inline=false;artifactId=!components*|auto-service
                                 </Embed-Dependency>
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <Include-Resource>
                                     {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
                                 </Include-Resource>
