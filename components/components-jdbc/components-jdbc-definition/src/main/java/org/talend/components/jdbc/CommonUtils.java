@@ -293,7 +293,7 @@ public class CommonUtils {
 
         throw TalendRuntimeException.createUnexpectedException(
                 "Please check your sql as we only allow the query which don't do write or lock action.");
-	}
+    }
 
     public static List<String> getAllSchemaFieldDBNames(Schema schema) {
         List<String> values = new ArrayList<>();
@@ -390,6 +390,9 @@ public class CommonUtils {
         }
 
         File mappingFileFullPath = new File(mappingFilesDir.getFile(), "mapping_" + mappingFileSubfix + ".xml");
+        if (!mappingFileFullPath.exists()) {
+            mappingFileFullPath = new File(mappingFilesDir.getFile(), "mapping_" + mappingFileSubfix.toLowerCase() + ".xml");
+        }
 
         MappingFileLoader fileLoader = new MappingFileLoader();
         List<Dbms> dbmsList = fileLoader.load(mappingFileFullPath);
