@@ -117,7 +117,7 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
         Object o;
         String value = null;
         LinkedHashMap ov;
-        if (!(property.getStoredValue() instanceof LinkedHashMap) && fixEnum.getCanonicalName().equals(property.getType())) {
+        if (property.getStoredValue() instanceof Enum && fixEnum.getCanonicalName().equals(property.getType())) {
             return property;
         }
         o = property.getStoredValue();
@@ -125,7 +125,7 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
             ov = (LinkedHashMap) o;
             value = String.valueOf(ov.get("name"));
         }
-        if (o instanceof String) {
+        if (o instanceof String || o instanceof Enum) {
             value = String.valueOf(o);
         }
         if (value == null) {
