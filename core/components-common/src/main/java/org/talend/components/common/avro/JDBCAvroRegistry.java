@@ -310,7 +310,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                     try {
                         date = value.getTimestamp(index);
-                    } catch (SQLException e1) {
+                    } catch (Exception e1) {
                         try {
                             date = value.getDate(index);
                         } catch (SQLException e2) {
@@ -615,7 +615,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                     try {
                         date = value.getTimestamp(index);
-                    } catch (SQLException e1) {
+                    } catch (Exception e1) {
                         try {
                             date = value.getDate(index);
                         } catch (SQLException e2) {
