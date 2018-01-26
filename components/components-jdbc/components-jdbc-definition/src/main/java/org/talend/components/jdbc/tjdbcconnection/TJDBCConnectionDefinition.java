@@ -43,7 +43,7 @@ public class TJDBCConnectionDefinition extends AbstractComponentDefinition {
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Databases/DB_JDBC", "ELT/Connections" };
+        return new String[] { "Databases/DB Specifics/JDBC", "ELT/Connections" };
     }
 
     @SuppressWarnings("rawtypes")

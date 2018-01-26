@@ -41,7 +41,7 @@ public class MarkLogicBulkLoadDefinitionTest {
 
     @Test
     public void testGetFamilies() {
-        String[] expectedFamilies = new String[] { "Databases/MarkLogic", "Big Data/MarkLogic" };
+        String[] expectedFamilies = new String[] { "Databases/DB Specifics/MarkLogic", "Big Data/MarkLogic" };
 
         String[] actualFamilies = bulkLoadDefinition.getFamilies();
 

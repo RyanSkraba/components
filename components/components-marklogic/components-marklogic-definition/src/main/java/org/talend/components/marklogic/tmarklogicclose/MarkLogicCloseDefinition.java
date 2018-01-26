@@ -33,7 +33,7 @@ public class MarkLogicCloseDefinition extends AbstractComponentDefinition {
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Databases/MarkLogic", "Big Data/MarkLogic" };
+        return new String[] { "Databases/DB Specifics/MarkLogic", "Big Data/MarkLogic" };
     }
 
     @Override

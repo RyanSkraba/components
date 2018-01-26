@@ -63,7 +63,7 @@ public class TJDBCCommitDefinitionTest {
 
         assertNotNull(result);
         assertEquals(1, result.length);
-        assertEquals("Databases/DB_JDBC", result[0]);
+        assertEquals("Databases/DB Specifics/JDBC", result[0]);
     }
 
     /**

@@ -39,7 +39,7 @@ public class MarkLogicBulkLoadDefinition extends AbstractMarkLogicComponentDefin
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Databases/MarkLogic", "Big Data/MarkLogic" };
+        return new String[] { "Databases/DB Specifics/MarkLogic", "Big Data/MarkLogic" };
     }
 
     @Override

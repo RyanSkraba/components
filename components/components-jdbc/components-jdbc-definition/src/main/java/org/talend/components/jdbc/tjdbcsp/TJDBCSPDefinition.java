@@ -43,7 +43,7 @@ public class TJDBCSPDefinition extends AbstractComponentDefinition {
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Databases/DB_JDBC" };
+        return new String[] { "Databases/DB Specifics/JDBC" };
     }
 
     @SuppressWarnings("rawtypes")

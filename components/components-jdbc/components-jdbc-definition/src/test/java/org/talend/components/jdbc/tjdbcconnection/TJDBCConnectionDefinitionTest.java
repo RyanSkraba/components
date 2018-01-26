@@ -64,7 +64,7 @@ public class TJDBCConnectionDefinitionTest {
 
         assertNotNull(result);
         assertEquals(2, result.length);
-        assertEquals("Databases/DB_JDBC", result[0]);
+        assertEquals("Databases/DB Specifics/JDBC", result[0]);
         assertEquals("ELT/Connections", result[1]);
     }
 

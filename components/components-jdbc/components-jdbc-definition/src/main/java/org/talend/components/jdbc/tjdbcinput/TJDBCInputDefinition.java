@@ -46,7 +46,7 @@ public class TJDBCInputDefinition extends AbstractComponentDefinition {
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Databases/DB_JDBC" };
+        return new String[] { "Databases/DB Specifics/JDBC" };
     }
 
     public static final Property<String> RETURN_QUERY_PROP = PropertyFactory.newString(ComponentConstants.RETURN_QUERY);

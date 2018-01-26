@@ -33,7 +33,7 @@ public class MarkLogicOutputDefinition extends AbstractMarkLogicComponentDefinit
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Databases/MarkLogic", "Big Data/MarkLogic" }; //$NON-NLS-1$
+        return new String[] { "Databases/DB Specifics/MarkLogic", "Big Data/MarkLogic" }; //$NON-NLS-1$
     }
 
     @Override

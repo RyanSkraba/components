@@ -34,7 +34,7 @@ public abstract class CouchbaseDefinition extends AbstractComponentDefinition {
 
     @Override
     public String[] getFamilies() {
-        return new String[]{"Databases/Couchbase"};
+        return new String[]{"Databases/DB Specifics/Couchbase"};
     }
 
     public static RuntimeInfo getRuntimeInfo(String runtimeClassName) {

@@ -47,7 +47,7 @@ public class TJDBCOutputDefinition extends AbstractComponentDefinition {
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Databases/DB_JDBC" };
+        return new String[] { "Databases/DB Specifics/JDBC" };
     }
 
     public static final Property<Integer> RETURN_INSERT_RECORD_COUNT_PROP = PropertyFactory

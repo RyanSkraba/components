@@ -48,7 +48,7 @@ public class MarkLogicInputDefinitionTest {
     public void testGetFamilies() {
         String[] actual = definition.getFamilies();
 
-        assertThat(Arrays.asList(actual), contains("Databases/MarkLogic", "Big Data/MarkLogic"));
+        assertThat(Arrays.asList(actual), contains("Databases/DB Specifics/MarkLogic", "Big Data/MarkLogic"));
     }
 
     @Test
