@@ -15,6 +15,7 @@
  */
 package org.talend.components.snowflake.tsnowflakeinput;
 
+import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
@@ -22,8 +23,10 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.ComponentConstants;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -53,6 +56,7 @@ public class TSnowflakeInputProperties extends SnowflakeConnectionTablePropertie
     public void setupProperties() {
         super.setupProperties();
         manualQuery.setValue(false);
+        query.setTaggedValue(ComponentConstants.LINE_SEPARATOR_REPLACED_TO, " ");
     }
 
     @Override
@@ -61,7 +65,7 @@ public class TSnowflakeInputProperties extends SnowflakeConnectionTablePropertie
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(manualQuery);
         mainForm.addRow(condition);
-        mainForm.addRow(query);
+        mainForm.addRow(widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
     }
 
     @Override

@@ -11,7 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.ComponentConstants;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 
 /**
  * Unit tests for {@link TSnowflakeInputProperties} class
@@ -65,6 +67,14 @@ public class TSnowflakeInputPropertiesTest {
 		assertTrue(isQueryPropertyHidden);
 		assertFalse(isConditionPropertyHidden);
 
+	}
+
+	@Test
+	public void testFullSQLQueryTextArea() {
+		Widget fullSQLQueryWidget = inputProperties.getForm(Form.MAIN).getWidget(inputProperties.query);
+
+		assertEquals(Widget.TEXT_AREA_WIDGET_TYPE, fullSQLQueryWidget.getWidgetType());
+		assertEquals(" ", inputProperties.query.getTaggedValue(ComponentConstants.LINE_SEPARATOR_REPLACED_TO));
 	}
 
 }
