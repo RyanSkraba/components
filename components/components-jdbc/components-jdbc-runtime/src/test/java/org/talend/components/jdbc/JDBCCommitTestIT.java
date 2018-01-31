@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -79,21 +79,32 @@ public class JDBCCommitTestIT {
 
     };
 
+    private static final String tablename = "JDBCCOMMIT";
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         allSetting = DBTestUtils.createAllSetting();
 
-        DBTestUtils.createTable(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.createTestTable(conn, tablename);
+        }
     }
 
     @AfterClass
     public static void afterClass() throws ClassNotFoundException, SQLException {
-        DBTestUtils.releaseResource(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.dropTestTable(conn, tablename);
+        } finally {
+            DBTestUtils.shutdownDBIfNecessary();
+        }
     }
 
     @Before
     public void before() throws SQLException, ClassNotFoundException {
-        DBTestUtils.truncateTableAndLoadData(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.truncateTable(conn, tablename);
+            DBTestUtils.loadTestData(conn, tablename);
+        }
     }
 
     @SuppressWarnings("rawtypes")
@@ -114,10 +125,10 @@ public class JDBCCommitTestIT {
         TJDBCOutputDefinition outputDefinition = new TJDBCOutputDefinition();
         TJDBCOutputProperties outputProperties = (TJDBCOutputProperties) outputDefinition.createRuntimeProperties();
 
-        outputProperties.main.schema.setValue(DBTestUtils.createTestSchema());
+        outputProperties.main.schema.setValue(DBTestUtils.createTestSchema(tablename));
         outputProperties.updateOutputSchemas();
 
-        outputProperties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
+        outputProperties.tableSelection.tablename.setValue(tablename);
 
         outputProperties.dataAction.setValue(DataAction.INSERT);
 
@@ -169,7 +180,7 @@ public class JDBCCommitTestIT {
         // create another session and check if the data is inserted
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting);
                 Statement statement = conn.createStatement();
-                ResultSet resultset = statement.executeQuery("select count(*) from TEST")) {
+                ResultSet resultset = statement.executeQuery("select count(*) from " + tablename)) {
             if (resultset.next()) {
                 count = resultset.getInt(1);
             }
@@ -177,8 +188,8 @@ public class JDBCCommitTestIT {
 
         Assert.assertEquals(5, count);
 
-        try (java.sql.Connection refConnection = (java.sql.Connection) container.getComponentData(ComponentConstants.CONNECTION_KEY,refComponentId
-                )) {
+        try (java.sql.Connection refConnection = (java.sql.Connection) container
+                .getComponentData(ComponentConstants.CONNECTION_KEY, refComponentId)) {
             assertTrue(refConnection != null);
             Assert.assertTrue(!refConnection.isClosed());
         }

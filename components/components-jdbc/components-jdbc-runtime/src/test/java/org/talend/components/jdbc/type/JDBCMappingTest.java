@@ -13,9 +13,11 @@ import org.talend.components.jdbc.runtime.type.JDBCMapping;
 
 public class JDBCMappingTest {
 
+    private static final String tablename = "JDBCMAPPING";
+    
     @Test
     public void testGetSQLTypeFromAvroType() {
-        Schema schema = DBTestUtils.createAllTypesSchema();
+        Schema schema = DBTestUtils.createAllTypesSchema(tablename);
         List<Field> fields = schema.getFields();
         
         Assert.assertEquals(Types.SMALLINT, JDBCMapping.getSQLTypeFromAvroType(fields.get(0)));

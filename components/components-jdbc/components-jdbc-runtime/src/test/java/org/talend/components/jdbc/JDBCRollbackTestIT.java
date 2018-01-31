@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -79,21 +79,32 @@ public class JDBCRollbackTestIT {
 
     };
 
+    private static final String tablename = "JDBCROLLBACK";
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         allSetting = DBTestUtils.createAllSetting();
 
-        DBTestUtils.createTable(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.createTestTable(conn, tablename);
+        }
     }
 
     @AfterClass
     public static void afterClass() throws ClassNotFoundException, SQLException {
-        DBTestUtils.releaseResource(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.dropTestTable(conn, tablename);
+        } finally {
+            DBTestUtils.shutdownDBIfNecessary();
+        }
     }
 
     @Before
-    public void before() throws Exception {
-        DBTestUtils.truncateTableAndLoadData(allSetting);
+    public void before() throws SQLException, ClassNotFoundException {
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.truncateTable(conn, tablename);
+            DBTestUtils.loadTestData(conn, tablename);
+        }
     }
 
     @SuppressWarnings("rawtypes")
@@ -114,10 +125,10 @@ public class JDBCRollbackTestIT {
         TJDBCOutputDefinition outputDefinition = new TJDBCOutputDefinition();
         TJDBCOutputProperties outputProperties = (TJDBCOutputProperties) outputDefinition.createRuntimeProperties();
 
-        outputProperties.main.schema.setValue(DBTestUtils.createTestSchema());
+        outputProperties.main.schema.setValue(DBTestUtils.createTestSchema(tablename));
         outputProperties.updateOutputSchemas();
 
-        outputProperties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
+        outputProperties.tableSelection.tablename.setValue(tablename);
 
         outputProperties.dataAction.setValue(DataAction.INSERT);
 
@@ -168,7 +179,7 @@ public class JDBCRollbackTestIT {
         int count = -1;
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting);
                 Statement statement = conn.createStatement();
-                ResultSet resultset = statement.executeQuery("select count(*) from TEST")) {
+                ResultSet resultset = statement.executeQuery("select count(*) from " + tablename)) {
             if (resultset.next()) {
                 count = resultset.getInt(1);
             }

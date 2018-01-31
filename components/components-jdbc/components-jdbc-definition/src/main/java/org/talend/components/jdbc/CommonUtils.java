@@ -180,7 +180,13 @@ public class CommonUtils {
     }
 
     public static Schema mergeRuntimeSchema2DesignSchema4Dynamic(Schema designSchema, Schema runtimeSchema) {
+        int dynPosition = Integer.valueOf(designSchema.getProp(ComponentConstants.TALEND6_DYNAMIC_COLUMN_POSITION));
         List<Field> designFields = designSchema.getFields();
+        List<Field> runtimeFields = runtimeSchema.getFields();
+
+        int dynamcStartColumnPostion = dynPosition;
+        int dynamcEndColumnPostion = dynPosition + runtimeFields.size() - designFields.size();
+
         Set<String> designFieldSet = new HashSet<>();
         for (Field designField : designFields) {
             String oname = designField.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
@@ -189,7 +195,8 @@ public class CommonUtils {
 
         List<Schema.Field> dynamicFields = new ArrayList<>();
 
-        for (Field runtimeField : runtimeSchema.getFields()) {
+        for (int i = dynamcStartColumnPostion; i < dynamcEndColumnPostion; i++) {
+            Field runtimeField = runtimeFields.get(i);
             String oname = runtimeField.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
             if (!designFieldSet.contains(oname)) {
                 dynamicFields.add(runtimeField);
@@ -198,7 +205,6 @@ public class CommonUtils {
 
         dynamicFields = cloneFieldsAndResetPosition(dynamicFields);
 
-        int dynPosition = Integer.valueOf(designSchema.getProp(ComponentConstants.TALEND6_DYNAMIC_COLUMN_POSITION));
         return CommonUtils.newSchema(designSchema, designSchema.getName(), dynamicFields, dynPosition);
     }
 

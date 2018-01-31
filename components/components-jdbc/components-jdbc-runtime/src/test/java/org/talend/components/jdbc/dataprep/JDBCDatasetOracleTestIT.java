@@ -13,6 +13,7 @@
 package org.talend.components.jdbc.dataprep;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -25,6 +26,7 @@ import org.talend.components.jdbc.common.DBTestUtils;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.datastore.JDBCDatastoreDefinition;
 import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
+import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
 import org.talend.components.jdbc.runtime.dataprep.JDBCDatasetRuntime;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.java8.Consumer;
@@ -47,13 +49,21 @@ public class JDBCDatasetOracleTestIT {
         allSetting.setUsername("");
         allSetting.setPassword("");
 
-        DBTestUtils.createTable(allSetting);
-        DBTestUtils.truncateTableAndLoadData(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.createTestTable(conn, tablename);
+            DBTestUtils.loadTestData(conn, tablename);
+        }
     }
-
+    
+    private static final String tablename = "JDBCORACLEDATASET";
+    
     @AfterClass
     public static void afterClass() throws Exception {
-        DBTestUtils.releaseResource(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.dropTestTable(conn, tablename);
+        } finally {
+            DBTestUtils.shutdownDBIfNecessary();
+        }
     }
 
     @Ignore
@@ -105,7 +115,7 @@ public class JDBCDatasetOracleTestIT {
         datastore.password.setValue(allSetting.getPassword());
 
         JDBCDatasetProperties dataset = (JDBCDatasetProperties) def.createDatasetProperties(datastore);
-        dataset.sql.setValue(DBTestUtils.getSQL());
+        dataset.sql.setValue(DBTestUtils.getSQL(tablename));
 
         return dataset;
     }

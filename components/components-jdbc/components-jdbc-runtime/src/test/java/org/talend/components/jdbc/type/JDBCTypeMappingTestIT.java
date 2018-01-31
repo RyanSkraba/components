@@ -52,17 +52,19 @@ public class JDBCTypeMappingTestIT {
 
     public static AllSetting allSetting;
 
+    private static final String tablename = "JDBCTYPEMAPPING";
+    
     @BeforeClass
     public static void beforeClass() throws Exception {
         allSetting = DBTestUtils.createAllSetting();
 
-        DBTestUtils.createTableForEveryType(allSetting);
+        DBTestUtils.createTableForEveryType(allSetting,tablename);
     }
 
     @AfterClass
     public static void afterClass() throws ClassNotFoundException, SQLException {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
-            DBTestUtils.dropTestTable(conn);
+            DBTestUtils.dropTestTable(conn,tablename);
         } finally {
             DBTestUtils.shutdownDBIfNecessary();
         }
@@ -70,7 +72,7 @@ public class JDBCTypeMappingTestIT {
 
     @Before
     public void before() throws Exception {
-        DBTestUtils.truncateTableAndLoadDataForEveryType(allSetting);
+        DBTestUtils.truncateTableAndLoadDataForEveryType(allSetting,tablename);
     }
 
     @Test
@@ -78,9 +80,9 @@ public class JDBCTypeMappingTestIT {
         TJDBCInputDefinition definition = new TJDBCInputDefinition();
         TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
 
-        properties.main.schema.setValue(DBTestUtils.createTestSchema3(true));
-        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
-        properties.sql.setValue(DBTestUtils.getSQL());
+        properties.main.schema.setValue(DBTestUtils.createTestSchema3(true,tablename));
+        properties.tableSelection.tablename.setValue(tablename);
+        properties.sql.setValue(DBTestUtils.getSQL(tablename));
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
@@ -93,8 +95,8 @@ public class JDBCTypeMappingTestIT {
         java.net.URL mappings_url = this.getClass().getResource("/mappings");
         container.setComponentData(container.getCurrentComponentId(), ComponentConstants.MAPPING_URL_SUBFIX, mappings_url);
         
-        Schema schema = source.getEndpointSchema(container, "TEST");
-        assertEquals("TEST", schema.getName().toUpperCase());
+        Schema schema = source.getEndpointSchema(container, tablename);
+        assertEquals(tablename, schema.getName().toUpperCase());
         List<Field> columns = schema.getFields();
         testMetadata(columns);
     }
@@ -282,9 +284,9 @@ public class JDBCTypeMappingTestIT {
         TJDBCInputDefinition definition = new TJDBCInputDefinition();
         TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
 
-        properties.main.schema.setValue(DBTestUtils.createTestSchema3(nullableForAnyColumn));
-        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
-        properties.sql.setValue(DBTestUtils.getSQL());
+        properties.main.schema.setValue(DBTestUtils.createTestSchema3(nullableForAnyColumn,tablename));
+        properties.tableSelection.tablename.setValue(tablename);
+        properties.sql.setValue(DBTestUtils.getSQL(tablename));
 
         Reader reader = DBTestUtils.createCommonJDBCInputReader(properties);
 
@@ -336,9 +338,9 @@ public class JDBCTypeMappingTestIT {
             TJDBCInputDefinition definition = new TJDBCInputDefinition();
             TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
 
-            properties.main.schema.setValue(DBTestUtils.createTestSchema3(nullableForAnyColumn));
-            properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
-            properties.sql.setValue(DBTestUtils.getSQL());
+            properties.main.schema.setValue(DBTestUtils.createTestSchema3(nullableForAnyColumn,tablename));
+            properties.tableSelection.tablename.setValue(tablename);
+            properties.sql.setValue(DBTestUtils.getSQL(tablename));
 
             reader = DBTestUtils.createCommonJDBCInputReader(properties);
 
@@ -551,11 +553,11 @@ public class JDBCTypeMappingTestIT {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
         TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
 
-        Schema schema = DBTestUtils.createTestSchema3(nullableForAnyColumn);
+        Schema schema = DBTestUtils.createTestSchema3(nullableForAnyColumn,tablename);
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
+        properties.tableSelection.tablename.setValue(tablename);
 
         properties.dataAction.setValue(DataAction.INSERT);
 
@@ -564,7 +566,7 @@ public class JDBCTypeMappingTestIT {
         try {
             writer.open("wid");
 
-            List<IndexedRecord> inputRecords = DBTestUtils.prepareIndexRecords(nullableForAnyColumn);
+            List<IndexedRecord> inputRecords = DBTestUtils.prepareIndexRecords(nullableForAnyColumn,tablename);
             for (IndexedRecord inputRecord : inputRecords) {
                 writer.write(inputRecord);
 
@@ -582,9 +584,9 @@ public class JDBCTypeMappingTestIT {
             TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
             TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
 
-            properties1.main.schema.setValue(DBTestUtils.createTestSchema3(nullableForAnyColumn));
-            properties1.tableSelection.tablename.setValue(DBTestUtils.getTablename());
-            properties1.sql.setValue(DBTestUtils.getSQL());
+            properties1.main.schema.setValue(DBTestUtils.createTestSchema3(nullableForAnyColumn,tablename));
+            properties1.tableSelection.tablename.setValue(tablename);
+            properties1.sql.setValue(DBTestUtils.getSQL(tablename));
 
             reader = DBTestUtils.createCommonJDBCInputReader(properties1);
 

@@ -92,35 +92,26 @@ public class DBTestUtils {
          */
     }
 
-    public static void releaseResource(AllSetting allSetting) throws ClassNotFoundException, SQLException {
-        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
-            dropTestTable(conn);
-            dropAllTypesTable(conn);
-        } finally {
-            shutdownDBIfNecessary();
-        }
-    }
-
-    public static void createTestTable(Connection conn) throws SQLException {
+    public static void createTestTable(Connection conn, String tablename) throws SQLException {
         try (Statement statement = conn.createStatement()) {
-            statement.execute("create table TEST (ID int, NAME varchar(8))");
+            statement.execute("create table " + tablename + " (ID int, NAME varchar(8))");
         }
     }
 
-    public static void dropTestTable(Connection conn) throws SQLException {
+    public static void dropTestTable(Connection conn, String tablename) throws SQLException {
         try (Statement statement = conn.createStatement()) {
-            statement.execute("drop table TEST");
+            statement.execute("drop table " + tablename);
         }
     }
 
-    public static void truncateTable(Connection conn) throws SQLException {
+    public static void truncateTable(Connection conn, String tablename) throws SQLException {
         try (Statement statement = conn.createStatement()) {
-            statement.execute("delete from TEST");
+            statement.execute("delete from " + tablename);
         }
     }
 
-    public static void loadTestData(Connection conn) throws SQLException {
-        try (PreparedStatement statement = conn.prepareStatement("insert into TEST values(?,?)")) {
+    public static void loadTestData(Connection conn, String tablename) throws SQLException {
+        try (PreparedStatement statement = conn.prepareStatement("insert into " + tablename + " values(?,?)")) {
             statement.setInt(1, 1);
             statement.setString(2, "wangwei");
 
@@ -142,8 +133,8 @@ public class DBTestUtils {
         }
     }
 
-    public static Schema createTestSchema() {
-        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+    public static Schema createTestSchema(String tablename) {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record(tablename).fields();
 
         Schema schema = AvroUtils._int();
         schema = wrap(schema);
@@ -157,36 +148,37 @@ public class DBTestUtils {
     }
 
     /**
-     * Following several methods are setup and tearDown methods for ALL_TYPES table.
-     * ALL_TYPES tables contains columns for each data type available in Derby DB
+     * Following several methods are setup and tearDown methods for all types table.
+     * all types tables contains columns for each data type available in Derby DB
      * This is required to test conversion between SQL -> JDBC -> Avro data types
      */
-    public static void createAllTypesTable(Connection conn) throws SQLException {
+    public static void createAllTypesTable(Connection conn, String tablename) throws SQLException {
         try (Statement statement = conn.createStatement()) {
-            statement.execute(
-                    "create table ALL_TYPES (SMALL_INT_COL smallint, INT_COL integer, BIG_INT_COL bigint, REAL_COL real, DOUBLE_COL double,"
-                            + "DECIMAL_COL decimal(20,10), CHAR_COL char(4), VARCHAR_COL varchar(8), BLOB_COL blob(16), CLOB_COL clob(16), DATE_COL date,"
-                            + "TIME_COL time, TIMESTAMP_COL timestamp, BOOLEAN_COL boolean)");
+            statement.execute("create table " + tablename
+                    + " (SMALL_INT_COL smallint, INT_COL integer, BIG_INT_COL bigint, REAL_COL real, DOUBLE_COL double,"
+                    + "DECIMAL_COL decimal(20,10), CHAR_COL char(4), VARCHAR_COL varchar(8), BLOB_COL blob(16), CLOB_COL clob(16), DATE_COL date,"
+                    + "TIME_COL time, TIMESTAMP_COL timestamp, BOOLEAN_COL boolean)");
         }
     }
 
-    public static void dropAllTypesTable(Connection conn) throws SQLException {
+    public static void dropAllTypesTable(Connection conn, String tablename) throws SQLException {
         try (Statement statement = conn.createStatement()) {
-            statement.execute("drop table ALL_TYPES");
+            statement.execute("drop table " + tablename);
         }
     }
 
-    public static void truncateAllTypesTable(Connection conn) throws SQLException {
+    public static void truncateAllTypesTable(Connection conn, String tablename) throws SQLException {
         try (Statement statement = conn.createStatement()) {
-            statement.execute("delete from ALL_TYPES");
+            statement.execute("delete from " + tablename);
         }
     }
 
     /**
      * Load only one record
      */
-    public static void loadAllTypesData(Connection conn) throws SQLException {
-        try (PreparedStatement statement = conn.prepareStatement("insert into ALL_TYPES values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
+    public static void loadAllTypesData(Connection conn, String tablename) throws SQLException {
+        try (PreparedStatement statement = conn
+                .prepareStatement("insert into " + tablename + " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
             statement.setShort(1, (short) 32767);
             statement.setInt(2, 2147483647);
             statement.setLong(3, 9223372036854775807l);
@@ -218,8 +210,8 @@ public class DBTestUtils {
         }
     }
 
-    public static Schema createAllTypesSchema() {
-        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("ALL_TYPES").fields();
+    public static Schema createAllTypesSchema(String tablename) {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record(tablename).fields();
 
         // sql (smallint)short -> avro short
         Schema schema = AvroUtils._short();
@@ -304,22 +296,6 @@ public class DBTestUtils {
         return builder.endRecord();
     }
 
-    public static void createTable(AllSetting allSetting) throws Exception {
-        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
-            createTestTable(conn);
-            createAllTypesTable(conn);
-        }
-    }
-
-    public static void truncateTableAndLoadData(AllSetting allSetting) throws ClassNotFoundException, SQLException {
-        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
-            truncateTable(conn);
-            loadTestData(conn);
-            truncateAllTypesTable(conn);
-            loadAllTypesData(conn);
-        }
-    }
-
     public static int countItemsInTable(String tableName, Connection conn) throws SQLException {
         PreparedStatement preparedStatement = conn.prepareStatement("select count(*) from " + tableName);
         ResultSet rs = preparedStatement.executeQuery();
@@ -327,8 +303,8 @@ public class DBTestUtils {
         return rs.getInt(1);
     }
 
-    public static Schema createTestSchema2() {
-        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+    public static Schema createTestSchema2(String tablename) {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record(tablename).fields();
 
         Schema schema = AvroUtils._int();
         schema = wrap(schema);
@@ -342,29 +318,33 @@ public class DBTestUtils {
         return builder.endRecord();
     }
 
-    public static void createTableForEveryType(AllSetting allSetting) throws SQLException, ClassNotFoundException {
+    public static void createTableForEveryType(AllSetting allSetting, String tablename)
+            throws SQLException, ClassNotFoundException {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
-            createTestTableForEveryType(conn);
+            createTestTableForEveryType(conn, tablename);
         }
     }
-    
-    public static void createTableWithSpecialName(AllSetting allSetting) throws SQLException, ClassNotFoundException {
+
+    public static void createTableWithSpecialName(AllSetting allSetting, String tablename)
+            throws SQLException, ClassNotFoundException {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
             try (Statement statement = conn.createStatement()) {
-                statement.execute("CREATE TABLE TEST (P1_Vente_Qté INT)");
+                statement.execute("CREATE TABLE " + tablename + " (P1_Vente_Qté INT)");
             }
         }
     }
 
-    public static void truncateTableAndLoadDataForEveryType(AllSetting allSetting) throws SQLException, ClassNotFoundException {
+    public static void truncateTableAndLoadDataForEveryType(AllSetting allSetting, String tablename)
+            throws SQLException, ClassNotFoundException {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
-            truncateTable(conn);
-            loadTestDataForEveryType(conn);
+            truncateTable(conn, tablename);
+            loadTestDataForEveryType(conn, tablename);
         }
     }
 
-    private static void loadTestDataForEveryType(Connection conn) throws SQLException {
-        try (PreparedStatement statement = conn.prepareStatement("insert into TEST values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
+    private static void loadTestDataForEveryType(Connection conn, String tablename) throws SQLException {
+        try (PreparedStatement statement = conn
+                .prepareStatement("insert into " + tablename + " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
             statement.setInt(1, 1);
             statement.setShort(2, (short) 2);
             statement.setLong(3, 3l);
@@ -460,15 +440,15 @@ public class DBTestUtils {
 
     // TODO : now we have to use the type for derby to test, should use the common one for every database or write it for every
     // database
-    private static void createTestTableForEveryType(Connection conn) throws SQLException {
+    private static void createTestTableForEveryType(Connection conn, String tablename) throws SQLException {
         try (Statement statement = conn.createStatement()) {
-            statement.execute(
-                    "CREATE TABLE TEST (C1 INT, C2 SMALLINT, C3 BIGINT, C4 REAL,C5 DOUBLE, C6 FLOAT, C7 DECIMAL(10,2), C8 NUMERIC(10,2), C9 BOOLEAN, C10 CHAR(64), C11 DATE, C12 TIME, C13 TIMESTAMP, C14 VARCHAR(64), C15 LONG VARCHAR)");
+            statement.execute("CREATE TABLE " + tablename
+                    + " (C1 INT, C2 SMALLINT, C3 BIGINT, C4 REAL,C5 DOUBLE, C6 FLOAT, C7 DECIMAL(10,2), C8 NUMERIC(10,2), C9 BOOLEAN, C10 CHAR(64), C11 DATE, C12 TIME, C13 TIMESTAMP, C14 VARCHAR(64), C15 LONG VARCHAR)");
         }
     }
 
-    public static Schema createTestSchema3(boolean nullableForAnyColumn) {
-        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+    public static Schema createTestSchema3(boolean nullableForAnyColumn, String tablename) {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record(tablename).fields();
 
         Schema schema = AvroUtils._int();
         schema = wrap(schema, nullableForAnyColumn);
@@ -546,10 +526,10 @@ public class DBTestUtils {
         return schema;
     }
 
-    public static List<IndexedRecord> prepareIndexRecords(boolean nullableForAnyColumn) {
+    public static List<IndexedRecord> prepareIndexRecords(boolean nullableForAnyColumn, String tablename) {
         List<IndexedRecord> result = new ArrayList<IndexedRecord>();
 
-        Schema schema = createTestSchema3(nullableForAnyColumn);
+        Schema schema = createTestSchema3(nullableForAnyColumn, tablename);
 
         IndexedRecord r = new GenericData.Record(schema);
         r.put(0, 1);
@@ -818,8 +798,8 @@ public class DBTestUtils {
         }
     }
 
-    public static Schema createTestSchema4() {
-        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+    public static Schema createTestSchema4(String tablename) {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record(tablename).fields();
 
         Schema schema = AvroUtils._string();// TODO : fix it as should be object type
         schema = wrap(schema);
@@ -829,8 +809,8 @@ public class DBTestUtils {
         return builder.endRecord();
     }
 
-    public static Schema createTestSchema5() {
-        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+    public static Schema createTestSchema5(String tablename) {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record(tablename).fields();
 
         Schema schema = AvroUtils._int();
         schema = wrap(schema);
@@ -926,20 +906,8 @@ public class DBTestUtils {
         return allSetting;
     }
 
-    public static String getTablename() {
-        return "TEST";
-    }
-
-    public static String getAllTypesTablename() {
-        return "ALL_TYPES";
-    }
-
-    public static String getSQL() {
-        return "select * from TEST";
-    }
-
-    public static String getAllTypesSQL() {
-        return "select * from ALL_TYPES";
+    public static String getSQL(String tablename) {
+        return "select * from " + tablename;
     }
 
     public static void testMetadata(List<Field> columns, boolean dataprep) {
@@ -970,18 +938,25 @@ public class DBTestUtils {
         testMetadata(columns, false);
     }
 
-    private static void createAllFunctionOrProcedures(AllSetting allSetting) throws Exception {
+    private static void createAllFunctionOrProcedures(AllSetting allSetting, String tablename) throws Exception {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
             try (Statement statement = conn.createStatement()) {
-                statement.execute("CREATE PROCEDURE p1 ()  INSERT INTO TEST values(4, 'lucky') ");//no in, no out
-                statement.execute("CREATE PROCEDURE p2 (IN a1 CHAR(20), IN a2 CHAR(20)) BEGIN INSERT INTO TEST values(a1, a2); END");//only in
-                statement.execute("CREATE PROCEDURE p3 (OUT a1 INT) BEGIN SELECT COUNT(*) INTO a1 FROM TEST; END");//only out
-                statement.execute("CREATE PROCEDURE p4 (IN a1 CHAR(20), IN a2 CHAR(20), OUT a3 INT) BEGIN INSERT INTO TEST values(a1, a2);SELECT COUNT(*) INTO a3 FROM TEST; END");//in and out
-                statement.execute("CREATE FUNCTION f1 (a CHAR(20)) RETURNS CHAR(50) DETERMINISTIC RETURN CONCAT('Hello, ',a,'!')");//function
+                statement.execute("CREATE PROCEDURE p1 ()  INSERT INTO " + tablename + " values(4, 'lucky') ");// no in, no out
+                statement.execute("CREATE PROCEDURE p2 (IN a1 CHAR(20), IN a2 CHAR(20)) BEGIN INSERT INTO " + tablename
+                        + " values(a1, a2); END");// only
+                // in
+                statement.execute("CREATE PROCEDURE p3 (OUT a1 INT) BEGIN SELECT COUNT(*) INTO a1 FROM " + tablename + "; END");// only
+                                                                                                                                // out
+                statement.execute("CREATE PROCEDURE p4 (IN a1 CHAR(20), IN a2 CHAR(20), OUT a3 INT) BEGIN INSERT INTO "
+                        + tablename + " values(a1, a2);SELECT COUNT(*) INTO a3 FROM " + tablename + "; END");// in
+                // and
+                // out
+                statement
+                        .execute("CREATE FUNCTION f1 (a CHAR(20)) RETURNS CHAR(50) DETERMINISTIC RETURN CONCAT('Hello, ',a,'!')");// function
             }
         }
     }
-    
+
     private static void dropAllFunctionOrProcedures(AllSetting allSetting) throws ClassNotFoundException, SQLException {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
             try (Statement statement = conn.createStatement()) {
@@ -993,41 +968,45 @@ public class DBTestUtils {
             }
         }
     }
-    
-    public static Schema createSPSchema1() {
-        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+
+    public static Schema createSPSchema1(String tablename) {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record(tablename).fields();
 
         Schema schema = AvroUtils._int();
         schema = wrap(schema);
-        builder = builder.name("PARAMETER").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "PARAMETER").type(schema).noDefault();
+        builder = builder.name("PARAMETER").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "PARAMETER").type(schema)
+                .noDefault();
 
         return builder.endRecord();
     }
-    
-    public static Schema createSPSchema2() {
-        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+
+    public static Schema createSPSchema2(String tablename) {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record(tablename).fields();
 
         Schema schema = AvroUtils._string();
         schema = wrap(schema);
-        builder = builder.name("PARAMETER").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "PARAMETER").type(schema).noDefault();
+        builder = builder.name("PARAMETER").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "PARAMETER").type(schema)
+                .noDefault();
 
         return builder.endRecord();
     }
-    
-    public static Schema createSPSchema3() {
-        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+
+    public static Schema createSPSchema3(String tablename) {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record(tablename).fields();
 
         Schema schema = AvroUtils._int();
         schema = wrap(schema);
-        builder = builder.name("PARAMETER1").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "PARAMETER1").type(schema).noDefault();
-        
+        builder = builder.name("PARAMETER1").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "PARAMETER1").type(schema)
+                .noDefault();
+
         schema = AvroUtils._string();
         schema = wrap(schema);
-        builder = builder.name("PARAMETER2").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "PARAMETER2").type(schema).noDefault();
+        builder = builder.name("PARAMETER2").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "PARAMETER2").type(schema)
+                .noDefault();
 
         return builder.endRecord();
     }
-    
+
     public static TJDBCSPProperties createCommonJDBCSPProperties(AllSetting allSetting, TJDBCSPDefinition definition) {
         TJDBCSPProperties properties = (TJDBCSPProperties) definition.createRuntimeProperties();
 

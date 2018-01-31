@@ -13,6 +13,7 @@
 package org.talend.components.jdbc.dataprep;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.Iterator;
 
 import org.apache.avro.Schema;
@@ -26,6 +27,7 @@ import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.datastore.JDBCDatastoreDefinition;
 import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
+import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
 import org.talend.components.jdbc.runtime.dataprep.JDBCDatasetRuntime;
 import org.talend.components.jdbc.runtime.dataprep.JDBCDatastoreRuntime;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
@@ -39,13 +41,26 @@ public class JDBCDatasetTestIT {
     @BeforeClass
     public static void beforeClass() throws Exception {
         allSetting = DBTestUtils.createAllSetting();
-        DBTestUtils.createTable(allSetting);
-        DBTestUtils.truncateTableAndLoadData(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.createTestTable(conn, tablename);
+            DBTestUtils.createAllTypesTable(conn, tablename_all_type);
+            DBTestUtils.loadTestData(conn, tablename);
+            DBTestUtils.loadAllTypesData(conn, tablename_all_type);
+        }
     }
+
+    private static final String tablename = "JDBCDATASET";
+
+    private static final String tablename_all_type = "JDBCDATASETALLTYPE";
 
     @AfterClass
     public static void afterClass() throws Exception {
-        DBTestUtils.releaseResource(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.dropTestTable(conn, tablename);
+            DBTestUtils.dropAllTypesTable(conn, tablename_all_type);
+        } finally {
+            DBTestUtils.shutdownDBIfNecessary();
+        }
     }
 
     @Test
@@ -69,23 +84,23 @@ public class JDBCDatasetTestIT {
         Assert.assertNotNull(schema);
         DBTestUtils.testMetadata(schema.getFields(), true);
     }
-    
+
     @Test
     public void testGetSchemaFromTable() throws IOException {
         JDBCDatasetProperties dataset = createDatasetProperties(false);
 
         JDBCDatasetRuntime runtime = new JDBCDatasetRuntime();
         runtime.initialize(null, dataset);
-        
+
         JDBCSourceOrSink jss = new JDBCSourceOrSink();
         jss.initialize(null, dataset);
-        Schema schema = jss.getEndpointSchema(null, DBTestUtils.getTablename());
+        Schema schema = jss.getEndpointSchema(null, tablename);
 
         Assert.assertNotNull(schema);
         DBTestUtils.testMetadata(schema.getFields(), true);
-        
-        jss.getEndpointSchema(null, DBTestUtils.getAllTypesTablename());
-        //TODO assert the result
+
+        jss.getEndpointSchema(null, tablename_all_type);
+        // TODO assert the result
     }
 
     @Test
@@ -99,7 +114,7 @@ public class JDBCDatasetTestIT {
         JDBCDatasetProperties dataset = createDatasetProperties(false);
         getSampleAction(dataset);
     }
-    
+
     @Test
     public void testDoHealthChecks() {
         JDBCDatasetProperties dataset = createDatasetProperties(true);
@@ -142,7 +157,7 @@ public class JDBCDatasetTestIT {
         datastore.password.setValue(allSetting.getPassword());
 
         JDBCDatasetProperties dataset = (JDBCDatasetProperties) def.createDatasetProperties(datastore);
-        dataset.sql.setValue(DBTestUtils.getSQL());
+        dataset.sql.setValue(DBTestUtils.getSQL(tablename));
 
         if (updateSchema) {
             updateSchema(dataset);

@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.talend.components.jdbc.module.SPParameterTable;
 import org.talend.components.jdbc.runtime.JDBCSPSink;
 import org.talend.components.jdbc.runtime.JDBCSPSource;
 import org.talend.components.jdbc.runtime.JDBCSPSourceOrSink;
+import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.writer.JDBCSPWriter;
 import org.talend.components.jdbc.tjdbcsp.TJDBCSPDefinition;
@@ -45,17 +47,28 @@ public class JDBCSPTestIT {
     public static void beforeClass() throws Exception {
         allSetting = DBTestUtils.createAllSetting();
 
-        DBTestUtils.createTable(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.createTestTable(conn, tablename);
+        }
     }
+
+    private static final String tablename = "JDBCSP";
 
     @AfterClass
     public static void afterClass() throws ClassNotFoundException, SQLException {
-        DBTestUtils.releaseResource(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.dropTestTable(conn, tablename);
+        } finally {
+            DBTestUtils.shutdownDBIfNecessary();
+        }
     }
 
     @Before
     public void before() throws Exception {
-        DBTestUtils.truncateTableAndLoadData(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.truncateTable(conn, tablename);
+            DBTestUtils.loadTestData(conn, tablename);
+        }
     }
 
     @Test
@@ -81,7 +94,7 @@ public class JDBCSPTestIT {
         properties.isFunction.setValue(true);
         properties.returnResultIn.setValue("PARAMETER");
         properties.spName.setValue("SYSCS_UTIL.SYSCS_GET_DATABASE_NAME");
-        Schema schema = DBTestUtils.createSPSchema2();
+        Schema schema = DBTestUtils.createSPSchema2(tablename);
         properties.main.schema.setValue(schema);
         properties.schemaFlow.schema.setValue(schema);
 
@@ -113,7 +126,7 @@ public class JDBCSPTestIT {
         TJDBCSPProperties properties = DBTestUtils.createCommonJDBCSPProperties(allSetting, definition);
 
         properties.spName.setValue("SYSCS_UTIL.SYSCS_DISABLE_LOG_ARCHIVE_MODE");
-        properties.main.schema.setValue(DBTestUtils.createSPSchema1());
+        properties.main.schema.setValue(DBTestUtils.createSPSchema1(tablename));
         properties.spParameterTable.parameterTypes.setValue(Arrays.asList(SPParameterTable.ParameterType.IN.name()));
         properties.spParameterTable.schemaColumns.setValue(Arrays.asList("PARAMETER"));
 
@@ -145,7 +158,7 @@ public class JDBCSPTestIT {
         TJDBCSPProperties properties = DBTestUtils.createCommonJDBCSPProperties(allSetting, definition);
 
         properties.spName.setValue("SYSCS_UTIL.SYSCS_DISABLE_LOG_ARCHIVE_MODE");
-        Schema schema = DBTestUtils.createSPSchema3();
+        Schema schema = DBTestUtils.createSPSchema3(tablename);
         properties.main.schema.setValue(schema);
         properties.schemaFlow.schema.setValue(schema);
         properties.spParameterTable.parameterTypes.setValue(Arrays.asList(SPParameterTable.ParameterType.IN.name()));

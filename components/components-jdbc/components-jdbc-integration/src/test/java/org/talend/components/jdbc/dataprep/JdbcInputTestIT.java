@@ -12,9 +12,10 @@
 // ============================================================================
 package org.talend.components.jdbc.dataprep;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -30,9 +31,9 @@ import org.talend.components.jdbc.common.DBTestUtils;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.datastore.JDBCDatastoreDefinition;
 import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
+import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 public class JdbcInputTestIT {
 
@@ -40,20 +41,30 @@ public class JdbcInputTestIT {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        PropertiesTestUtils.setupPaxUrlFromMavenLaunch();
         allSetting = DBTestUtils.createAllSetting();
 
-        DBTestUtils.createTable(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.createTestTable(conn, tablename);
+        }
     }
+
+    private static final String tablename = "JDBCINPUTINTEGRATION";
 
     @AfterClass
     public static void afterClass() throws ClassNotFoundException, SQLException {
-        DBTestUtils.releaseResource(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.dropTestTable(conn, tablename);
+        } finally {
+            DBTestUtils.shutdownDBIfNecessary();
+        }
     }
 
     @Before
-    public void before() throws SQLException, ClassNotFoundException {
-        DBTestUtils.truncateTableAndLoadData(allSetting);
+    public void before() throws Exception {
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.truncateTable(conn, tablename);
+            DBTestUtils.loadTestData(conn, tablename);
+        }
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -149,7 +160,7 @@ public class JdbcInputTestIT {
         datastore_props.password.setValue(allSetting.getPassword());
 
         JDBCDatasetProperties dataset = (JDBCDatasetProperties) datastore_def.createDatasetProperties(datastore_props);
-        dataset.sql.setValue(DBTestUtils.getSQL());
+        dataset.sql.setValue(DBTestUtils.getSQL(tablename));
 
         dataset.updateSchema();
 

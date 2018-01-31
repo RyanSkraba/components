@@ -12,16 +12,17 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -38,6 +39,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.jdbc.common.DBTestUtils;
 import org.talend.components.jdbc.runtime.JDBCSource;
+import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
 import org.talend.components.jdbc.runtime.reader.JDBCInputReader;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputDefinition;
@@ -53,17 +55,34 @@ public class JDBCInputTestIT {
     public static void beforeClass() throws Exception {
         allSetting = DBTestUtils.createAllSetting();
 
-        DBTestUtils.createTable(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.createTestTable(conn, tablename);
+            DBTestUtils.createAllTypesTable(conn, tablename_all_type);
+        }
     }
+
+    private static final String tablename = "JDBCINPUT";
+
+    private static final String tablename_all_type = "JDBCINPUTALLTYPE";
 
     @AfterClass
     public static void afterClass() throws ClassNotFoundException, SQLException {
-        DBTestUtils.releaseResource(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.dropTestTable(conn, tablename);
+            DBTestUtils.dropAllTypesTable(conn, tablename_all_type);
+        } finally {
+            DBTestUtils.shutdownDBIfNecessary();
+        }
     }
 
     @Before
     public void before() throws SQLException, ClassNotFoundException {
-        DBTestUtils.truncateTableAndLoadData(allSetting);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+            DBTestUtils.truncateTable(conn, tablename);
+            DBTestUtils.loadTestData(conn, tablename);
+            DBTestUtils.truncateAllTypesTable(conn, tablename_all_type);
+            DBTestUtils.loadAllTypesData(conn, tablename_all_type);
+        }
     }
 
     @Test
@@ -71,9 +90,9 @@ public class JDBCInputTestIT {
         TJDBCInputDefinition definition = new TJDBCInputDefinition();
         TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
 
-        properties.main.schema.setValue(DBTestUtils.createTestSchema());
-        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
-        properties.sql.setValue(DBTestUtils.getSQL());
+        properties.main.schema.setValue(DBTestUtils.createTestSchema(tablename));
+        properties.tableSelection.tablename.setValue(tablename);
+        properties.sql.setValue(DBTestUtils.getSQL(tablename));
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
@@ -83,7 +102,7 @@ public class JDBCInputTestIT {
 
         boolean exists = false;
         for (NamedThing name : schemaNames) {
-            if ("TEST".equals(name.getName().toUpperCase())) {
+            if (tablename.equals(name.getName().toUpperCase())) {
                 exists = true;
                 break;
             }
@@ -91,7 +110,7 @@ public class JDBCInputTestIT {
 
         assertTrue(exists);
     }
-    
+
     @Test(expected = ComponentException.class)
     public void testGetSchemaNamesWithException() throws Exception {
         TJDBCInputDefinition definition = new TJDBCInputDefinition();
@@ -113,9 +132,9 @@ public class JDBCInputTestIT {
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
-        source.getEndpointSchema(null, "TEST");
+        source.getEndpointSchema(null, tablename);
     }
-    
+
     @Test(expected = ComponentException.class)
     public void testGetSchemaFromQueryWithException1() throws Exception {
         TJDBCInputDefinition definition = new TJDBCInputDefinition();
@@ -125,43 +144,44 @@ public class JDBCInputTestIT {
 
         source.getSchemaFromQuery(null, "select * from notexist");
     }
-    
+
     @Test(expected = ComponentException.class)
     public void testGetSchemaFromQueryWithException2() throws Exception {
         TJDBCInputDefinition definition = new TJDBCInputDefinition();
         TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
 
         properties.connection.driverClass.setValue("notexist");
-        
+
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
-        source.getSchemaFromQuery(null, "select * from TEST");
+        source.getSchemaFromQuery(null, "select * from " + tablename);
     }
-    
+
     @Test(expected = ComponentException.class)
     public void testGetSchemaFromQueryWithException3() throws Exception {
         TJDBCInputDefinition definition = new TJDBCInputDefinition();
         TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
 
         properties.connection.jdbcUrl.setValue("wrongone");
-        
+
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
-        source.getSchemaFromQuery(null, "select * from TEST");
+        source.getSchemaFromQuery(null, "select * from " + tablename);
     }
-    
+
     @Test
     public void testGetSchema() throws Exception {
         TJDBCInputDefinition definition = new TJDBCInputDefinition();
         TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
 
-        properties.main.schema.setValue(DBTestUtils.createTestSchema());
-        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
-        properties.sql.setValue(DBTestUtils.getSQL());
+        properties.main.schema.setValue(DBTestUtils.createTestSchema(tablename));
+        properties.tableSelection.tablename.setValue(tablename);
+        properties.sql.setValue(DBTestUtils.getSQL(tablename));
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
         RuntimeContainer container = new DefaultComponentRuntimeContainerImpl() {
+
             @Override
             public String getCurrentComponentId() {
                 return "tJDBCInput1";
@@ -169,9 +189,9 @@ public class JDBCInputTestIT {
         };
         java.net.URL mappings_url = this.getClass().getResource("/mappings");
         container.setComponentData(container.getCurrentComponentId(), ComponentConstants.MAPPING_URL_SUBFIX, mappings_url);
-        
-        Schema schema = source.getEndpointSchema(container, "TEST");
-        assertEquals("TEST", schema.getName().toUpperCase());
+
+        Schema schema = source.getEndpointSchema(container, tablename);
+        assertEquals(tablename, schema.getName().toUpperCase());
         List<Field> columns = schema.getFields();
         DBTestUtils.testMetadata(columns);
     }
@@ -184,9 +204,9 @@ public class JDBCInputTestIT {
             TJDBCInputDefinition definition = new TJDBCInputDefinition();
             TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
 
-            properties.main.schema.setValue(DBTestUtils.createTestSchema());
-            properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
-            properties.sql.setValue(DBTestUtils.getSQL());
+            properties.main.schema.setValue(DBTestUtils.createTestSchema(tablename));
+            properties.tableSelection.tablename.setValue(tablename);
+            properties.sql.setValue(DBTestUtils.getSQL(tablename));
 
             reader = DBTestUtils.createCommonJDBCInputReader(properties);
 
@@ -234,18 +254,19 @@ public class JDBCInputTestIT {
         }
 
     }
-    
+
     /**
-     * Checks {@link JDBCInputReader} outputs {@link IndexedRecord} which contains nullable String type data for every SQL/JDBC type
+     * Checks {@link JDBCInputReader} outputs {@link IndexedRecord} which contains nullable String type data for every SQL/JDBC
+     * type
      */
     @Test
     public void testReaderAllTypesString() throws IOException {
         TJDBCInputDefinition definition = new TJDBCInputDefinition();
         TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
 
-        properties.main.schema.setValue(DBTestUtils.createAllTypesSchema());
-        properties.tableSelection.tablename.setValue(DBTestUtils.getAllTypesTablename());
-        properties.sql.setValue(DBTestUtils.getAllTypesSQL());
+        properties.main.schema.setValue(DBTestUtils.createAllTypesSchema(tablename_all_type));
+        properties.tableSelection.tablename.setValue(tablename_all_type);
+        properties.sql.setValue(DBTestUtils.getSQL(tablename_all_type));
 
         Reader reader = DBTestUtils.createCommonJDBCInputReader(properties);
 
@@ -266,7 +287,7 @@ public class JDBCInputTestIT {
         Long col11 = (Long) record.get(11);
         Long col12 = (Long) record.get(12);
         Boolean col13 = (Boolean) record.get(13);
-        
+
         assertEquals(32767, col0.shortValue());
         assertEquals(2147483647, col1.intValue());
         assertEquals(9223372036854775807l, col2.longValue());
@@ -279,12 +300,12 @@ public class JDBCInputTestIT {
         assertEquals("abcdefg", col9);
         assertEquals("2016-12-28", new SimpleDateFormat("yyyy-MM-dd").format(new Date(col10)));
         assertEquals("14:30:33", new SimpleDateFormat("HH:mm:ss").format(new Date(col11)));
-        assertEquals("2016-12-28 14:31:56.123",  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date(col12)));
+        assertEquals("2016-12-28 14:31:56.123", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date(col12)));
         assertEquals(true, col13);
-        
+
         Schema actualSchema = record.getSchema();
         List<Field> actualFields = actualSchema.getFields();
-        
+
         assertEquals(14, actualFields.size());
         reader.close();
     }
@@ -295,9 +316,9 @@ public class JDBCInputTestIT {
         TJDBCInputDefinition definition = new TJDBCInputDefinition();
         TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
 
-        properties.main.schema.setValue(DBTestUtils.createTestSchema());
-        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
-        properties.sql.setValue(DBTestUtils.getSQL());
+        properties.main.schema.setValue(DBTestUtils.createTestSchema(tablename));
+        properties.tableSelection.tablename.setValue(tablename);
+        properties.sql.setValue(DBTestUtils.getSQL(tablename));
 
         Reader reader = DBTestUtils.createCommonJDBCInputReader(properties);
 

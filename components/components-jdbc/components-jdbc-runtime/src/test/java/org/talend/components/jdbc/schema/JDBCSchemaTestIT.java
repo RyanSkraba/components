@@ -39,17 +39,19 @@ public class JDBCSchemaTestIT {
 
     public static AllSetting allSetting;
 
+    private static final String tablename = "JDBCSCHEMA";
+    
     @BeforeClass
     public static void beforeClass() throws Exception {
         allSetting = DBTestUtils.createAllSetting();
 
-        DBTestUtils.createTableWithSpecialName(allSetting);
+        DBTestUtils.createTableWithSpecialName(allSetting,tablename);
     }
 
     @AfterClass
     public static void afterClass() throws ClassNotFoundException, SQLException {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
-            DBTestUtils.dropTestTable(conn);
+            DBTestUtils.dropTestTable(conn, tablename);
         } finally {
             DBTestUtils.shutdownDBIfNecessary();
         }
@@ -60,9 +62,9 @@ public class JDBCSchemaTestIT {
         TJDBCInputDefinition definition = new TJDBCInputDefinition();
         TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
 
-        properties.main.schema.setValue(DBTestUtils.createTestSchema3(true));
-        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
-        properties.sql.setValue(DBTestUtils.getSQL());
+        properties.main.schema.setValue(DBTestUtils.createTestSchema3(true,tablename));
+        properties.tableSelection.tablename.setValue(tablename);
+        properties.sql.setValue(DBTestUtils.getSQL(tablename));
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
@@ -75,8 +77,8 @@ public class JDBCSchemaTestIT {
         java.net.URL mappings_url = this.getClass().getResource("/mappings");
         container.setComponentData(container.getCurrentComponentId(), ComponentConstants.MAPPING_URL_SUBFIX, mappings_url);
         
-        Schema schema = source.getEndpointSchema(container, "TEST");
-        assertEquals("TEST", schema.getName().toUpperCase());
+        Schema schema = source.getEndpointSchema(container, tablename);
+        assertEquals(tablename, schema.getName().toUpperCase());
         List<Field> columns = schema.getFields();
         testMetadata(columns);
     }
