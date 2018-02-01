@@ -129,7 +129,9 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
             Set<String> tableTypes = getAvailableTableTypes(dbMetaData);
 
-            try (ResultSet resultset = dbMetaData.getTables(null, null, null, tableTypes.toArray(new String[0]))) {
+            String database_schema = getDatabaseSchema();
+
+            try (ResultSet resultset = dbMetaData.getTables(null, database_schema, null, tableTypes.toArray(new String[0]))) {
                 while (resultset.next()) {
                     String tablename = resultset.getString("TABLE_NAME");
                     if (tablename == null) {
@@ -143,6 +145,19 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
                     ExceptionContext.withBuilder().put("message", e.getMessage()).build());
         }
         return result;
+    }
+
+    /**
+     * get database schema for database special
+     * @return
+     */
+    private String getDatabaseSchema() {
+        String jdbc_url = setting.getJdbcUrl();
+        String username = setting.getUsername();
+        if(jdbc_url!=null && username!=null && jdbc_url.contains("oracle")) {
+            return username.toUpperCase();
+        }
+        return null;
     }
 
     private Set<String> getAvailableTableTypes(DatabaseMetaData dbMetaData) throws SQLException {
