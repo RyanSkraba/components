@@ -12,16 +12,31 @@
 // ============================================================================
 package org.talend.components.marklogic.tmarklogicconnection;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.talend.daikon.properties.presentation.Form;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.talend.components.common.datastore.runtime.DatastoreRuntime;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.runtime.RuntimeInfo;
+import org.talend.daikon.sandbox.SandboxInstanceFactory;
+import org.talend.daikon.sandbox.SandboxedInstance;
+
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(SandboxInstanceFactory.class)
 public class MarkLogicConnectionPropertiesTest {
 
     public static final String EXPECTED_DEFAULT_HOST = "127.0.0.1";
@@ -95,5 +110,26 @@ public class MarkLogicConnectionPropertiesTest {
         assertFalse(main.getWidget(testConnectionProperties.username).isVisible());
         assertFalse(main.getWidget(testConnectionProperties.password).isVisible());
         assertFalse(main.getWidget(testConnectionProperties.authentication).isVisible());
+    }
+
+    @Test
+    public void testValidateConnection() {
+        testConnectionProperties.init();
+        SandboxedInstance sandbox = Mockito.mock(SandboxedInstance.class);
+        PowerMockito.mockStatic(SandboxInstanceFactory.class);
+        PowerMockito.when(SandboxInstanceFactory.createSandboxedInstance(Mockito.any(RuntimeInfo.class), Mockito.any(ClassLoader.class), Mockito.eq(false))).thenReturn(sandbox);
+        DatastoreRuntime<MarkLogicConnectionProperties> datastore = Mockito.mock(DatastoreRuntime.class);
+        Mockito.when(sandbox.getInstance()).thenReturn(datastore);
+        Mockito.when(datastore.doHealthChecks(null)).thenReturn(Collections.singletonList(new ValidationResult(Result.ERROR)));
+
+        ValidationResult vr = testConnectionProperties.validateTestConnection();
+        assertEquals(Result.ERROR, vr.getStatus());
+        assertFalse(testConnectionProperties.getForm(MarkLogicConnectionProperties.WIZARD).isAllowFinish());
+
+        Mockito.when(datastore.doHealthChecks(null)).thenReturn(Collections.singletonList(new ValidationResult(Result.OK)));
+
+        vr = testConnectionProperties.validateTestConnection();
+        assertEquals(Result.OK, vr.getStatus());
+        Assert.assertTrue(testConnectionProperties.getForm(MarkLogicConnectionProperties.WIZARD).isAllowFinish());
     }
 }

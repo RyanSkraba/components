@@ -12,6 +12,10 @@
 // ============================================================================
 package org.talend.components.marklogic.runtime;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
@@ -22,17 +26,13 @@ import org.talend.components.marklogic.connection.MarkLogicConnection;
 import org.talend.components.marklogic.exceptions.MarkLogicErrorCode;
 import org.talend.components.marklogic.exceptions.MarkLogicException;
 import org.talend.components.marklogic.tmarklogicconnection.MarkLogicConnectionProperties;
-import org.talend.components.marklogic.tmarklogicinput.MarkLogicInputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.ValidationResultMutable;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 public class MarkLogicSourceOrSink extends MarkLogicConnection implements SourceOrSink {
 
@@ -41,7 +41,7 @@ public class MarkLogicSourceOrSink extends MarkLogicConnection implements Source
     protected MarkLogicProvideConnectionProperties ioProperties;
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override
@@ -52,9 +52,12 @@ public class MarkLogicSourceOrSink extends MarkLogicConnection implements Source
     @Override
     public ValidationResult validate(RuntimeContainer container) {
         ValidationResultMutable vr = new ValidationResultMutable();
-
-        connect(container);
-
+        try {
+            connect(container);
+        } catch (MarkLogicException me) {
+            vr.setStatus(Result.ERROR);
+            vr.setMessage(me.getMessage());
+        }
         return vr;
     }
 

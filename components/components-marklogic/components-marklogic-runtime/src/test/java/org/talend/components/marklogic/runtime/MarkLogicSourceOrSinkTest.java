@@ -33,9 +33,11 @@ import org.talend.components.marklogic.tmarklogicoutput.MarkLogicOutputPropertie
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.client.ForbiddenUserException;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(DatabaseClientFactory.class)
@@ -118,10 +120,10 @@ public class MarkLogicSourceOrSinkTest {
         assertEquals(ValidationResult.Result.OK, vr.getStatus());
     }
 
-    @Test(expected = MarkLogicException.class)
+    @Test
     public void testValidateCannotConnect() {
         DatabaseClient mockedClient = mock(DatabaseClient.class);
-        when(mockedClient.openTransaction()).thenThrow(IOException.class);
+        when(mockedClient.openTransaction()).thenThrow(new ForbiddenUserException("User not allowed"));
         PowerMockito.mockStatic(DatabaseClientFactory.class);
         when(DatabaseClientFactory
                 .newClient(anyString(), anyInt(), anyString(), (DatabaseClientFactory.SecurityContext) anyObject()))
@@ -130,7 +132,7 @@ public class MarkLogicSourceOrSinkTest {
         MarkLogicInputProperties inputProperties = new MarkLogicInputProperties("inputProperties");
         sourceOrSink.initialize(null, inputProperties);
 
-        sourceOrSink.validate(null);
+        assertEquals(Result.ERROR, sourceOrSink.validate(null).getStatus());
     }
 
     @Test
