@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -33,40 +34,33 @@
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
-            <version>2.4.7</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
-            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-jaxb</artifactId>
-            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
-            <version>2.5.3</version>
         </dependency>
 
         <!-- To include in dependencies.txt. -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -75,7 +69,6 @@
         <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
-            <version>1.8.0</version>
         </dependency>
 
         <!-- Tests -->
@@ -107,7 +100,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>${cxf.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -122,13 +114,11 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-            <version>1.7.24</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.24</version>
             <scope>test</scope>
         </dependency>
 
@@ -190,10 +180,13 @@
                                     <wsdl>${basedir}/src/main/resources/wsdl/2016.2/netsuite.wsdl</wsdl>
                                     <serviceName>NetSuiteService</serviceName>
                                     <extraargs>
-                                        <extraarg>-xjc-b,${basedir}/src/main/resources/wsdl/2016.2/bindings.jaxb</extraarg>
+                                        <extraarg>-xjc-b,${basedir}/src/main/resources/wsdl/2016.2/bindings.jaxb
+                                        </extraarg>
                                         <extraarg>-xjc-Xbg</extraarg>
                                         <extraarg>-p</extraarg>
-                                        <extraarg>urn:platform_2016_2.webservices.netsuite.com=com.netsuite.webservices.v2016_2.platform</extraarg>
+                                        <extraarg>
+                                            urn:platform_2016_2.webservices.netsuite.com=com.netsuite.webservices.v2016_2.platform
+                                        </extraarg>
                                     </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
@@ -253,7 +246,8 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.netsuite.runtime.v2016_2.lib</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.netsuite.runtime.v2016_2.lib
+                                </Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Include-Resource>
                                     {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
@@ -287,7 +281,9 @@
         <profile>
             <id>tos-dev-local</id>
             <activation>
-                <property><name>tos.home</name></property>
+                <property>
+                    <name>tos.home</name>
+                </property>
             </activation>
             <properties>
                 <maven.javadoc.skip>true</maven.javadoc.skip>

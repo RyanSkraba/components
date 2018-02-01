@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -30,31 +31,28 @@
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.talend.libraries</groupId>
             <artifactId>talendcsv</artifactId>
-            <version>6.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.talend.libraries</groupId>
             <artifactId>talend_file_enhanced_20070724</artifactId>
-            <version>6.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.3.1</version>
         </dependency>
 
         <!-- Shared component properties such as Use/Password or Schema -->
         <dependency>
-          <groupId>org.talend.components</groupId>
-          <artifactId>components-common</artifactId>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-common</artifactId>
         </dependency>
-        
+
         <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -69,10 +67,10 @@
             <classifier>lib</classifier>
             <scope>test</scope>
             <exclusions>
-            	<exclusion>
-            		<groupId>ch.qos.logback</groupId>
-            		<artifactId>logback-classic</artifactId>
-            	</exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -91,7 +89,7 @@
             <artifactId>components-api-service-rest</artifactId>
             <scope>test</scope>
         </dependency>
-        </dependencies>
+    </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -112,7 +110,7 @@
                                 <Include-Resource>
                                     {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
                                 </Include-Resource>
-                                <Service-Component>*</Service-Component>                                
+                                <Service-Component>*</Service-Component>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>
                         </configuration>
@@ -125,15 +123,17 @@
                         </goals>
                         <configuration>
                             <classifier>tests</classifier>
-                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
+                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded
+                            </outputDirectory>
                             <instructions>
-                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*</Import-Package>
+                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*
+                                </Import-Package>
                                 <Bundle-SymbolicName>org.talend.components.filedelimited.test</Bundle-SymbolicName>
                                 <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
                                 <Fragment-Host>org.talend.components.filedelimited</Fragment-Host>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <DynamicImport-Package>*</DynamicImport-Package>
-                                <Embed-Dependency />
+                                <Embed-Dependency/>
                                 <Export-Package>*</Export-Package>
                                 <Include-Resource>=target/test-classes/</Include-Resource>
                             </instructions>
@@ -151,7 +151,9 @@
                                 <Bundle-SymbolicName>org.talend.components.filedelimited</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>!sun.security.*,*,aQute.bnd.annotation.component</Import-Package>
-                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|auto-service</Embed-Dependency>
+                                <Embed-Dependency>
+                                    *;scope=compile|runtime;inline=false;artifactId=!components*|auto-service
+                                </Embed-Dependency>
                                 <Include-Resource>
                                     {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
                                 </Include-Resource>

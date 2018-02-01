@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -88,13 +89,11 @@
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
-            <version>1.6.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
-            <version>1.6.5</version>
             <scope>test</scope>
         </dependency>
 
@@ -208,8 +207,11 @@
                                 <Import-Package>
                                     !*internal,org.talend*,org.slf4j*,javax*,org.apache.commons*,org.xml.sax*,org.apache.avro.*,org.codehaus.jackson*
                                 </Import-Package>
-                                <Export-Package>org.talend.components.snowflake*,com.snowflake*,net.snowflake*</Export-Package>
-                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|auto-service</Embed-Dependency>
+                                <Export-Package>org.talend.components.snowflake*,com.snowflake*,net.snowflake*
+                                </Export-Package>
+                                <Embed-Dependency>
+                                    *;scope=compile|runtime;inline=false;artifactId=!components*|auto-service
+                                </Embed-Dependency>
                                 <Include-Resource>
                                     {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
                                 </Include-Resource>

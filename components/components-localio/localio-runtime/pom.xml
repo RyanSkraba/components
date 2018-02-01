@@ -1,59 +1,57 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.talend.components</groupId>
-		<artifactId>components-adapter-beam-parent</artifactId>
-		<version>0.22.0-SNAPSHOT</version>
-		<relativePath>../../../core/components-adapter-beam-parent/pom.xml</relativePath>
-	</parent>
+    <parent>
+        <groupId>org.talend.components</groupId>
+        <artifactId>components-adapter-beam-parent</artifactId>
+        <version>0.22.0-SNAPSHOT</version>
+        <relativePath>../../../core/components-adapter-beam-parent/pom.xml</relativePath>
+    </parent>
 
-	<artifactId>localio-runtime</artifactId>
+    <artifactId>localio-runtime</artifactId>
 
-	<name>Components - Local IO Runtime</name>
-	<packaging>jar</packaging>
+    <name>Components - Local IO Runtime</name>
+    <packaging>jar</packaging>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-adapter-beam</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>localio-definition</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.beam</groupId>
-			<artifactId>beam-runners-direct-java</artifactId>
-			<version>${beam.version}</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-adapter-beam</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>localio-definition</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.beam</groupId>
+            <artifactId>beam-runners-direct-java</artifactId>
+            <version>${beam.version}</version>
+        </dependency>
 
-		<!-- CSV format-->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-csv</artifactId>
-			<version>1.4</version>
-		</dependency>
+        <!-- CSV format-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+        </dependency>
 
-		<!-- Tests -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-all</artifactId>
-			<version>1.3</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <!-- Tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

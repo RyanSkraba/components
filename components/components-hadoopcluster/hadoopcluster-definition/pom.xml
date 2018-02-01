@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>components-parent</artifactId>
@@ -76,7 +77,6 @@
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
-            <version>2.4.7</version>
         </dependency>
 
     </dependencies>
@@ -127,11 +127,16 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.hadoopcluster.definition.lib</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.hadoopcluster.definition.lib
+                                </Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|auto-service|pax-url-aether</Embed-Dependency>
-                                <Include-Resource>{maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
+                                <Embed-Dependency>
+                                    *;scope=compile|runtime;inline=false;artifactId=!components*|auto-service|pax-url-aether
+                                </Embed-Dependency>
+                                <Include-Resource>
+                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+                                </Include-Resource>
                                 <Service-Component>*</Service-Component>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>
@@ -146,10 +151,15 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.hadoopcluster.definition</Bundle-SymbolicName>
-                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*,org.apache.oltu.oauth2*,org.codehaus.jackson*</Import-Package>
+                                <Bundle-SymbolicName>org.talend.components.hadoopcluster.definition
+                                </Bundle-SymbolicName>
+                                <Import-Package>
+                                    !*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*,org.apache.oltu.oauth2*,org.codehaus.jackson*
+                                </Import-Package>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>!components*|auto-service,*;scope=compile|runtime;artifactId=!commons-beanutils|commons-collections</Embed-Dependency>
+                                <Embed-Dependency>
+                                    !components*|auto-service,*;scope=compile|runtime;artifactId=!commons-beanutils|commons-collections
+                                </Embed-Dependency>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <Include-Resource>
                                     {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt

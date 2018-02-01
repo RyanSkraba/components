@@ -1,209 +1,186 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.talend.components</groupId>
-		<artifactId>components-parent</artifactId>
-		<version>0.22.0-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>org.talend.components</groupId>
+        <artifactId>components-parent</artifactId>
+        <version>0.22.0-SNAPSHOT</version>
+        <relativePath>../../../components-parent/pom.xml</relativePath>
+    </parent>
 
-	<groupId>org.talend.components</groupId>
-	<artifactId>components-marklogic-runtime</artifactId>
-	<version>0.22.0-SNAPSHOT</version>
-	<name>Components - MarkLogic Runtime</name>
-	<packaging>jar</packaging>
+    <groupId>org.talend.components</groupId>
+    <artifactId>components-marklogic-runtime</artifactId>
+    <version>0.22.0-SNAPSHOT</version>
+    <name>Components - MarkLogic Runtime</name>
+    <packaging>jar</packaging>
 
-	<properties>
-		<coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
-	</properties>
+    <properties>
+        <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
+    </properties>
 
-	<repositories>
-		<repository>
-			<id>talend_nexus</id>
-			<name>snapshots</name>
-			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
-		</repository>
-		<repository>
-			<id>releases</id>
-			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
-		</repository>
-		<repository>
-			<id>MarkLogic-releases</id>
-			<name>MarkLogic Releases</name>
-			<url>http://developer.marklogic.com/maven2</url>
-		</repository>
-		<repository>
-			<id>mapr-releases</id>
-			<url>http://repository.mapr.com/maven/</url>
-			<snapshots><enabled>false</enabled></snapshots>
-			<releases><enabled>true</enabled></releases>
-		</repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <id>talend_nexus</id>
+            <name>snapshots</name>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
+        </repository>
+        <repository>
+            <id>releases</id>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+        </repository>
+        <repository>
+            <id>MarkLogic-releases</id>
+            <name>MarkLogic Releases</name>
+            <url>http://developer.marklogic.com/maven2</url>
+        </repository>
+        <repository>
+            <id>mapr-releases</id>
+            <url>http://repository.mapr.com/maven/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
 
-	<dependencies>
+    <dependencies>
 
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-marklogic-definition</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-marklogic-definition</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- APIs for all Components -->
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
+        <!-- APIs for all Components -->
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-common</artifactId>
+        </dependency>
 
-		<!-- Jar containing Test utils methods -->
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api</artifactId>
-			<version>${project.parent.version}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-		</dependency>
-		<!-- jar for integration tests -->
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api-service-common</artifactId>
-			<version>${project.parent.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- Java client API for MarkLogic -->
-		<dependency>
-			<groupId>com.marklogic</groupId>
-			<artifactId>marklogic-client-api</artifactId>
-			<version>4.0.3</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/dom4j/dom4j -->
-		<dependency>
-			<groupId>dom4j</groupId>
-			<artifactId>dom4j</artifactId>
-			<version>1.6.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <!-- Jar containing Test utils methods -->
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api</artifactId>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <!-- jar for integration tests -->
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api-service-common</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Java client API for MarkLogic -->
+        <dependency>
+            <groupId>com.marklogic</groupId>
+            <artifactId>marklogic-client-api</artifactId>
+            <version>4.0.3</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/dom4j/dom4j -->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+        </dependency>
 
-
-		<dependency>
+        <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
-            <version>1.6.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
-            <version>1.6.5</version>
             <scope>test</scope>
         </dependency>
 
-		<dependency>
-			<groupId>com.marklogic</groupId>
-			<artifactId>mlcp</artifactId>
-			<version>9.0.3</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.sun.jersey.contribs</groupId>
-					<artifactId>jersey-guice</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.sun.jersey</groupId>
-					<artifactId>jersey-json</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.sun.jersey</groupId>
-					<artifactId>jersey-server</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.sun.jersey</groupId>
-					<artifactId>jersey-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.sun.jersey</groupId>
-					<artifactId>jersey-client</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.avro</groupId>
-					<artifactId>avro-tools</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-classic</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>commons-compress</artifactId>
-				</exclusion>
-				<!-- the jars below are all indirect dependency from the compiler dependency hadoop-common jar-->
-				<exclusion>
-					<groupId>tomcat</groupId>
-					<artifactId>jasper-compiler</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>tomcat</groupId>
-					<artifactId>jasper-runtime</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.jamesmurty.utils</groupId>
-					<artifactId>java-xmlbuilder</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>commons-lang3</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-exec</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.glassfish.jersey.core</groupId>
-		    <artifactId>jersey-client</artifactId>
-		    <version>2.26</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.glassfish.jersey.core</groupId>
-		    <artifactId>jersey-common</artifactId>
-		    <version>2.26</version>
-		</dependency>
-	
-	</dependencies>
+        <dependency>
+            <groupId>com.marklogic</groupId>
+            <artifactId>mlcp</artifactId>
+            <version>9.0.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>jersey-guice</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-json</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-server</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.avro</groupId>
+                    <artifactId>avro-tools</artifactId>
+                </exclusion>
+                <!-- the jars below are all indirect dependency from the compiler dependency hadoop-common jar-->
+                <exclusion>
+                    <groupId>tomcat</groupId>
+                    <artifactId>jasper-compiler</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>tomcat</groupId>
+                    <artifactId>jasper-runtime</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.jamesmurty.utils</groupId>
+                    <artifactId>java-xmlbuilder</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-exec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.20-PAXEXAM-PATCH</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>integration-test</goal>
-							<goal>verify</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<argLine>-Xms128m -Xmx256m ${jacoco.agent.it.argLine}</argLine>
-					<systemPropertyVariables>
-						<pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
-					</systemPropertyVariables>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.20-PAXEXAM-PATCH</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <argLine>-Xms128m -Xmx256m ${jacoco.agent.it.argLine}</argLine>
+                    <systemPropertyVariables>
+                        <pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

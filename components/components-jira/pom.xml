@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -10,7 +11,6 @@
     </parent>
 
     <properties>
-        <httpcomponents.version>4.5.1</httpcomponents.version>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
     </properties>
 
@@ -63,10 +63,10 @@
             <classifier>lib</classifier>
             <scope>test</scope>
             <exclusions>
-            	<exclusion>
-            		<groupId>ch.qos.logback</groupId>
-            		<artifactId>logback-classic</artifactId>
-            	</exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -80,7 +80,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-       <dependency>
+        <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
             <scope>test</scope>
@@ -89,22 +89,18 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>${httpcomponents.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>fluent-hc</artifactId>
-            <version>${httpcomponents.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>1.10.19</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -119,17 +115,14 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.4.3</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.9</version>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.8.2</version>
         </dependency>
         <!-- dep for OSGI tests -->
         <dependency>
@@ -142,7 +135,7 @@
     <build>
         <plugins>
             <plugin>
-            <!-- This plugin is used to generate .link files used for the OSGI test execution with PaxExam -->
+                <!-- This plugin is used to generate .link files used for the OSGI test execution with PaxExam -->
                 <groupId>com.github.veithen.alta</groupId>
                 <artifactId>alta-maven-plugin</artifactId>
                 <version>0.4.2-Talend</version>
@@ -161,17 +154,17 @@
                                 <scope>test</scope>
                             </dependencySet>
                             <artifacts>
-                              <artifact>
-                                  <groupId>${project.groupId}</groupId>
-                                  <artifactId>${project.artifactId}</artifactId>
-                                  <classifier>bundle</classifier>
-                                  <version>${project.version}</version>
-                              </artifact>
-                           </artifacts>
+                                <artifact>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <classifier>bundle</classifier>
+                                    <version>${project.version}</version>
+                                </artifact>
+                            </artifacts>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>                  
+            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -202,15 +195,17 @@
                         </goals>
                         <configuration>
                             <classifier>tests</classifier>
-                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
+                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded
+                            </outputDirectory>
                             <instructions>
-                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*</Import-Package>
+                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*
+                                </Import-Package>
                                 <Bundle-SymbolicName>org.talend.components.jira.test</Bundle-SymbolicName>
                                 <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
                                 <Fragment-Host>org.talend.components.jira</Fragment-Host>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <DynamicImport-Package>*</DynamicImport-Package>
-                                <Embed-Dependency />
+                                <Embed-Dependency/>
                                 <Export-Package>*</Export-Package>
                                 <Include-Resource>=target/test-classes/</Include-Resource>
                             </instructions>
@@ -228,7 +223,9 @@
                                 <Bundle-SymbolicName>org.talend.components.jira</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>!org.joda.convert,*</Import-Package>
-                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|auto-service</Embed-Dependency>
+                                <Embed-Dependency>
+                                    *;scope=compile|runtime;inline=false;artifactId=!components*|auto-service
+                                </Embed-Dependency>
                                 <Include-Resource>
                                     {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
                                 </Include-Resource>
@@ -270,7 +267,8 @@
                                         </ports>
                                         <wait>
                                             <http>
-                                                <url>http://${docker.host.address}:${jira.port}/projects/PP1/issues</url>
+                                                <url>http://${docker.host.address}:${jira.port}/projects/PP1/issues
+                                                </url>
                                             </http>
                                             <time>300000</time>
                                         </wait>
@@ -298,7 +296,9 @@
         <profile>
             <id>tos-dev-local</id>
             <activation>
-                <property><name>tos.home</name></property>
+                <property>
+                    <name>tos.home</name>
+                </property>
             </activation>
             <properties>
                 <maven.javadoc.skip>true</maven.javadoc.skip>
