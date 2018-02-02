@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -22,6 +22,7 @@ import org.talend.components.marklogic.tmarklogicclose.MarkLogicCloseDefinition;
 import org.talend.components.marklogic.tmarklogicconnection.MarkLogicConnectionDefinition;
 import org.talend.components.marklogic.tmarklogicinput.MarkLogicInputDefinition;
 import org.talend.components.marklogic.tmarklogicoutput.MarkLogicOutputDefinition;
+import org.talend.components.marklogic.wizard.MarkLogicEditWizardDefinition;
 import org.talend.components.marklogic.wizard.MarkLogicWizardDefinition;
 
 import com.google.auto.service.AutoService;
@@ -42,6 +43,7 @@ public class MarkLogicFamilyDefinition
         super(NAME,
                 new MarkLogicInputDefinition(), new MarkLogicOutputDefinition(), new MarkLogicConnectionDefinition(),
                 new MarkLogicCloseDefinition(), new MarkLogicBulkLoadDefinition(), new MarkLogicWizardDefinition(),
+                new MarkLogicEditWizardDefinition(),
                 // Datastore & Dataset definitions.
                 new MarkLogicDatasetDefinition(), new MarkLogicDatastoreDefinition());
 

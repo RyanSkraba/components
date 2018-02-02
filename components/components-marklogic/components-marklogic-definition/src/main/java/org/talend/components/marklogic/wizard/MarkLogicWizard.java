@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -18,19 +18,27 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.marklogic.tmarklogicconnection.MarkLogicConnectionProperties;
 import org.talend.daikon.properties.presentation.Form;
 
+import java.util.List;
+
 public class MarkLogicWizard extends ComponentWizard {
 
+    private MarkLogicConnectionProperties props;
 
     public MarkLogicWizard(ComponentWizardDefinition definition, String repositoryLocation) {
         super(definition, repositoryLocation);
-        MarkLogicConnectionProperties props = new MarkLogicConnectionProperties("props");
+        props = new MarkLogicConnectionProperties("props");
+        props.init();
         props.setRepositoryLocation(repositoryLocation);
-        setupProperties(props);
+
         addForm(props.getForm("wizardForm"));
     }
 
     public void setupProperties(MarkLogicConnectionProperties properties) {
         properties.init();
+    }
+
+    public void loadProperties(MarkLogicConnectionProperties anotherProps) {
+        props.copyValuesFrom(anotherProps);
     }
 
     public boolean supportsProperties(ComponentProperties properties) {

@@ -28,6 +28,7 @@ import org.talend.components.marklogic.tmarklogicclose.MarkLogicCloseDefinition;
 import org.talend.components.marklogic.tmarklogicconnection.MarkLogicConnectionDefinition;
 import org.talend.components.marklogic.tmarklogicinput.MarkLogicInputDefinition;
 import org.talend.components.marklogic.tmarklogicoutput.MarkLogicOutputDefinition;
+import org.talend.components.marklogic.wizard.MarkLogicEditWizardDefinition;
 import org.talend.components.marklogic.wizard.MarkLogicWizardDefinition;
 import org.talend.daikon.definition.Definition;
 
@@ -49,6 +50,7 @@ public class MarkLogicFamilyDefinitionTest {
         expectedDefinitions.add(MarkLogicCloseDefinition.class);
         expectedDefinitions.add(MarkLogicBulkLoadDefinition.class);
         expectedDefinitions.add(MarkLogicWizardDefinition.class);
+        expectedDefinitions.add(MarkLogicEditWizardDefinition.class);
         expectedDefinitions.add(MarkLogicDatasetDefinition.class);
         expectedDefinitions.add(MarkLogicDatastoreDefinition.class);
 
