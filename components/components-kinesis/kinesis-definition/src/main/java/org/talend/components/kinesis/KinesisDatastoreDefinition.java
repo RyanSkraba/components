@@ -22,7 +22,6 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.kinesis.input.KinesisInputDefinition;
-import org.talend.components.kinesis.output.KinesisOutputDefinition;
 import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -91,7 +90,8 @@ public class KinesisDatastoreDefinition extends I18nDefinition
 
     @Override
     public String getOutputCompDefinitionName() {
-        return KinesisOutputDefinition.NAME;
+        // no output component now
+        return null;
     }
 
 }
