@@ -783,7 +783,15 @@ public class JDBCOutputTestIT {
         properties.dataAction.setValue(action);
         properties.dieOnError.setValue(true);
 
-        randomBatchAndCommit(properties);
+        properties.useBatch.setValue(DBTestUtils.randomBoolean());
+        properties.batchSize.setValue(DBTestUtils.randomInt());
+        // we set it like this to avoid the dead lock when this case :
+        // when die on error and not auto commit mode, we throw the exception, but not call commit or rollback in the finally
+        // part, it may make the dead lock for derby
+        // in all the javajet db components, we have this issue too, but different db, different result, in my view, we should
+        // process
+        // it, will create another test to show the dead lock issue for derby
+        properties.commitEvery.setValue(null);// or set value to 0 mean use the default commit mode, for derby, it's auto commit
 
         JDBCOutputWriter writer = DBTestUtils.createCommonJDBCOutputWriter(definition, properties);
 
