@@ -187,8 +187,15 @@ public class JDBCInputTestIT {
                 return "tJDBCInput1";
             }
         };
+        
+        // the getResource method will convert "@" to "%40" when work with maven together, not sure the bug appear where, bug make
+        // sure it come from the env, not the function code, so only convert here
+        // in the product env, the mappings_url is passed from the platform
         java.net.URL mappings_url = this.getClass().getResource("/mappings");
-        container.setComponentData(container.getCurrentComponentId(), ComponentConstants.MAPPING_URL_SUBFIX, mappings_url);
+        mappings_url = DBTestUtils.correctURL(mappings_url);
+        
+        container.setComponentData(container.getCurrentComponentId(), ComponentConstants.MAPPING_URL_SUBFIX,
+                mappings_url);
 
         Schema schema = source.getEndpointSchema(container, tablename);
         assertEquals(tablename, schema.getName().toUpperCase());

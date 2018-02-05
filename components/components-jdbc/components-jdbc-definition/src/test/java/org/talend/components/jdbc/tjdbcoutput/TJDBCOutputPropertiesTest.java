@@ -14,6 +14,7 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
+import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
 import org.talend.daikon.properties.presentation.Form;
 
 /**
@@ -144,6 +145,44 @@ public class TJDBCOutputPropertiesTest {
         fixture.useDataSource.setValue(false);
         fixture.afterUseDataSource();
         Assert.assertTrue(!main.getWidget(fixture.dataSource.getName()).isVisible());
+    }
+
+    /**
+     * Run the void afterDataAction() method test.
+     *
+     */
+    @Test
+    public void testAfterDataAction() {
+        TJDBCOutputProperties fixture = new TJDBCOutputProperties("output");
+        fixture.init();
+
+        Form main = fixture.getForm(Form.MAIN);
+        Form advanced = fixture.getForm(Form.ADVANCED);
+
+        fixture.dataAction.setValue(DataAction.INSERT);
+        fixture.afterDataAction();
+        Assert.assertTrue(advanced.getWidget(fixture.useBatch.getName()).isVisible());
+        Assert.assertTrue(advanced.getWidget(fixture.batchSize.getName()).isVisible());
+
+        fixture.dataAction.setValue(DataAction.DELETE);
+        fixture.afterDataAction();
+        Assert.assertTrue(advanced.getWidget(fixture.useBatch.getName()).isVisible());
+        Assert.assertTrue(advanced.getWidget(fixture.batchSize.getName()).isVisible());
+
+        fixture.dataAction.setValue(DataAction.UPDATE);
+        fixture.afterDataAction();
+        Assert.assertTrue(advanced.getWidget(fixture.useBatch.getName()).isVisible());
+        Assert.assertTrue(advanced.getWidget(fixture.batchSize.getName()).isVisible());
+
+        fixture.dataAction.setValue(DataAction.INSERT_OR_UPDATE);
+        fixture.afterDataAction();
+        Assert.assertFalse(advanced.getWidget(fixture.useBatch.getName()).isVisible());
+        Assert.assertFalse(advanced.getWidget(fixture.batchSize.getName()).isVisible());
+
+        fixture.dataAction.setValue(DataAction.UPDATE_OR_INSERT);
+        fixture.afterDataAction();
+        Assert.assertFalse(advanced.getWidget(fixture.useBatch.getName()).isVisible());
+        Assert.assertFalse(advanced.getWidget(fixture.batchSize.getName()).isVisible());
     }
 
     /**

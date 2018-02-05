@@ -75,6 +75,7 @@ public class JDBCSchemaTestIT {
             }
         };
         java.net.URL mappings_url = this.getClass().getResource("/mappings");
+        mappings_url = DBTestUtils.correctURL(mappings_url);
         container.setComponentData(container.getCurrentComponentId(), ComponentConstants.MAPPING_URL_SUBFIX, mappings_url);
         
         Schema schema = source.getEndpointSchema(container, tablename);

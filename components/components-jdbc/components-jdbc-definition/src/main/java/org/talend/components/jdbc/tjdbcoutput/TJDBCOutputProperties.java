@@ -214,7 +214,14 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
 
         if (form.getName().equals(Form.ADVANCED)) {
             form.getWidget(commitEvery.getName()).setHidden(useOtherConnection);
-            form.getWidget(batchSize.getName()).setHidden(!useBatch.getValue());
+            if ((dataAction.getValue() == DataAction.INSERT) || (dataAction.getValue() == DataAction.UPDATE)
+                    || (dataAction.getValue() == DataAction.DELETE)) {
+                form.getWidget(useBatch.getName()).setHidden(false);
+                form.getWidget(batchSize.getName()).setHidden(!useBatch.getValue());
+            } else {
+                form.getWidget(useBatch.getName()).setHidden(true);
+                form.getWidget(batchSize.getName()).setHidden(true);
+            }
             form.getWidget(fieldOptions.getName()).setVisible(enableFieldOptions.getValue());
 
             updateReferenceColumns();
@@ -245,6 +252,10 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
         refreshLayout(getForm(Form.MAIN));
     }
 
+    public void afterDataAction() {
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+    
     public void afterUseBatch() {
         refreshLayout(getForm(Form.ADVANCED));
     }

@@ -20,7 +20,11 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
@@ -1016,5 +1020,11 @@ public class DBTestUtils {
         properties.connection.userPassword.userId.setValue(allSetting.getUsername());
         properties.connection.userPassword.password.setValue(allSetting.getPassword());
         return properties;
+    }
+
+    public static java.net.URL correctURL(java.net.URL mappings_url) throws UnsupportedEncodingException, MalformedURLException {
+        String file_path = URLDecoder.decode(mappings_url.getFile(), "UTF-8");
+        mappings_url = new URL(mappings_url.getProtocol(),mappings_url.getHost(),mappings_url.getPort(),file_path);
+        return mappings_url;
     }
 }
