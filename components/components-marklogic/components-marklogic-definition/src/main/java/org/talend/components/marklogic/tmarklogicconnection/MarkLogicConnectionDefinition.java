@@ -34,7 +34,7 @@ public class MarkLogicConnectionDefinition extends AbstractComponentDefinition {
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Databases/DB Specifics/MarkLogic", "Big Data/MarkLogic" };
+        return new String[] { "Databases NoSQL/MarkLogic", "Big Data/MarkLogic" };
     }
 
     @Override

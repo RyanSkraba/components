@@ -41,7 +41,7 @@ public class MarkLogicCloseDefinitionTest {
 
     @Test
     public void testGetFamilies() {
-        String[] expectedFamilies = new String[] { "Databases/DB Specifics/MarkLogic", "Big Data/MarkLogic" };
+        String[] expectedFamilies = new String[] { "Databases NoSQL/MarkLogic", "Big Data/MarkLogic" };
 
         String[] actualFamilies = closeDefinition.getFamilies();
 
