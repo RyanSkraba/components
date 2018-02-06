@@ -32,6 +32,14 @@
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-drive</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
         <!-- -->
         <dependency>
             <groupId>org.talend.components</groupId>
