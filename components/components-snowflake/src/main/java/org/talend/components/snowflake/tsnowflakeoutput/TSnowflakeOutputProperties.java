@@ -15,6 +15,7 @@ package org.talend.components.snowflake.tsnowflakeoutput;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -52,6 +53,8 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     protected transient PropertyPathConnector REJECT_CONNECTOR = new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject");
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
+
+    public Property<Boolean> convertColumnsToUppercase = newBoolean("convertColumnsToUppercase");
 
     // Have to use an explicit class to get the override of afterTableName(), an anonymous
     // class cannot be public and thus cannot be called.
@@ -111,6 +114,8 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         table.connection = connection;
         table.setSchemaListener(listener);
         table.setupProperties();
+
+        convertColumnsToUppercase.setValue(true);
     }
 
     @Override
@@ -119,6 +124,9 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(outputAction);
         mainForm.addColumn(widget(upsertKeyColumn).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+
+        Form advancedForm = getForm(Form.ADVANCED);
+        advancedForm.addRow(convertColumnsToUppercase);
     }
 
     public void afterOutputAction() {
