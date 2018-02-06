@@ -117,7 +117,7 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
         name.setValue("");
         applicationName.setValue("");
         oAuthMethod.setPossibleValues(OAuthMethod.values());
-        oAuthMethod.setValue(OAuthMethod.AccessToken);
+        oAuthMethod.setValue(OAuthMethod.InstalledApplicationWithIdAndSecret);
         accessToken.setValue("");
         clientId.setValue("");
         clientSecret.setValue("");

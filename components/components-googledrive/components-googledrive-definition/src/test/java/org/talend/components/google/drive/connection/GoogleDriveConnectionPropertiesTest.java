@@ -60,25 +60,25 @@ public class GoogleDriveConnectionPropertiesTest extends GoogleDriveTestBase {
         properties.afterReferencedComponent();
         assertTrue(properties.getForm(Form.MAIN).getWidget(properties.oAuthMethod.getName()).isHidden());
         assertTrue(properties.getForm(Form.MAIN).getWidget(properties.applicationName.getName()).isHidden());
-        assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.datastorePath.getName()).isHidden());
+        assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.datastorePath.getName()).isHidden());
     }
 
     @Test
     public void testAfterOAuthMethod() throws Exception {
-        assertTrue(properties.getForm(Form.MAIN).getWidget(properties.accessToken.getName()).isVisible());
-        assertFalse(properties.getForm(Form.MAIN).getWidget(properties.clientId.getName()).isVisible());
-        assertFalse(properties.getForm(Form.MAIN).getWidget(properties.clientSecret.getName()).isVisible());
-        assertFalse(properties.getForm(Form.MAIN).getWidget(properties.clientSecretFile.getName()).isVisible());
-        assertFalse(properties.getForm(Form.MAIN).getWidget(properties.serviceAccountFile.getName()).isVisible());
-        assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.datastorePath.getName()).isVisible());
-        properties.oAuthMethod.setValue(OAuthMethod.InstalledApplicationWithIdAndSecret);
-        properties.afterOAuthMethod();
         assertFalse(properties.getForm(Form.MAIN).getWidget(properties.accessToken.getName()).isVisible());
         assertTrue(properties.getForm(Form.MAIN).getWidget(properties.clientId.getName()).isVisible());
         assertTrue(properties.getForm(Form.MAIN).getWidget(properties.clientSecret.getName()).isVisible());
         assertFalse(properties.getForm(Form.MAIN).getWidget(properties.clientSecretFile.getName()).isVisible());
         assertFalse(properties.getForm(Form.MAIN).getWidget(properties.serviceAccountFile.getName()).isVisible());
         assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.datastorePath.getName()).isVisible());
+        properties.oAuthMethod.setValue(OAuthMethod.AccessToken);
+        properties.afterOAuthMethod();
+        assertTrue(properties.getForm(Form.MAIN).getWidget(properties.accessToken.getName()).isVisible());
+        assertFalse(properties.getForm(Form.MAIN).getWidget(properties.clientId.getName()).isVisible());
+        assertFalse(properties.getForm(Form.MAIN).getWidget(properties.clientSecret.getName()).isVisible());
+        assertFalse(properties.getForm(Form.MAIN).getWidget(properties.clientSecretFile.getName()).isVisible());
+        assertFalse(properties.getForm(Form.MAIN).getWidget(properties.serviceAccountFile.getName()).isVisible());
+        assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.datastorePath.getName()).isVisible());
         properties.oAuthMethod.setValue(OAuthMethod.InstalledApplicationWithJSON);
         properties.afterOAuthMethod();
         assertFalse(properties.getForm(Form.MAIN).getWidget(properties.accessToken.getName()).isVisible());
