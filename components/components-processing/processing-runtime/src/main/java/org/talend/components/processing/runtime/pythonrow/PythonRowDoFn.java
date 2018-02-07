@@ -18,7 +18,6 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.transforms.DoFn;
-import org.python.core.PyCode;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyString;
@@ -33,14 +32,13 @@ import org.talend.daikon.properties.ValidationResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
-        implements RuntimableRuntime<PythonRowProperties> {
+public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord> implements RuntimableRuntime<PythonRowProperties> {
 
     private PythonRowProperties properties = null;
 
-    private PythonInterpreter interpretor = null;
+    private PythonInterpreter interpreter = null;
 
-    private PyCode pythonFunction = null;
+    private PyObject pyFn = null;
 
     private JsonGenericRecordConverter jsonGenericRecordConverter = null;
 
@@ -52,12 +50,13 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
 
     @Setup
     public void setup() throws Exception {
-        interpretor = new PythonInterpreter();
+        interpreter = new PythonInterpreter();
         if (MapType.MAP.equals(properties.mapType.getValue())) {
-            pythonFunction = interpretor.compile(setUpMap());
+            interpreter.exec(setUpMap());
         } else { // flatmap
-            pythonFunction = interpretor.compile(setUpFlatMap());
+            interpreter.exec(setUpFlatMap());
         }
+        pyFn = interpreter.get("userFunction");
     }
 
     @ProcessElement
@@ -69,7 +68,6 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
                 flatMap(context.element(), context);
             }
         }
-        interpretor.cleanup();
     }
 
     private String setUpMap() {
@@ -94,15 +92,7 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
     }
 
     private void map(IndexedRecord input, ProcessContext context) throws IOException {
-        // Prepare Python environment
-        interpretor.set("inputJSON", new PyString(input.toString()));
-
-        // Add user command
-        interpretor.exec(pythonFunction);
-
-        // Retrieve results
-        interpretor.exec("outputJSON = userFunction(inputJSON)");
-        PyObject output = interpretor.get("outputJSON");
+        PyObject output = pyFn.__call__(new PyString(input.toString()));
 
         if (jsonGenericRecordConverter == null) {
             JsonSchemaInferrer jsonSchemaInferrer = new JsonSchemaInferrer(new ObjectMapper());
@@ -116,14 +106,7 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
 
     private void flatMap(IndexedRecord input, ProcessContext context) throws IOException {
         // Prepare Python environment
-        interpretor.set("inputJSON", new PyString(input.toString()));
-
-        // Add user command
-        interpretor.exec(pythonFunction);
-
-        // Retrieve results
-        interpretor.exec("outputJSON = userFunction(inputJSON)");
-        PyObject outputList = interpretor.get("outputJSON");
+        PyObject outputList = pyFn.__call__(new PyString(input.toString()));
 
         if (outputList instanceof PyList) {
             PyList list = (PyList) outputList;
@@ -141,6 +124,6 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
 
     @Teardown
     public void tearDown() {
-        interpretor.close();
+        interpreter.close();
     }
 }

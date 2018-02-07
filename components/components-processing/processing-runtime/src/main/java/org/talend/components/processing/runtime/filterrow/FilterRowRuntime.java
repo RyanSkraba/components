@@ -13,7 +13,7 @@
 package org.talend.components.processing.runtime.filterrow;
 
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.beam.sdk.transforms.PTransform;
+import org.apache.beam.sdk.transforms.Filter;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionTuple;
@@ -27,59 +27,51 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.processing.definition.filterrow.FilterRowProperties;
 import org.talend.daikon.properties.ValidationResult;
 
-public class FilterRowRuntime extends PTransform<PCollection<Object>, PCollectionTuple>
-		implements BeamJobBuilder, RuntimableRuntime<FilterRowProperties> {
+public class FilterRowRuntime implements BeamJobBuilder, RuntimableRuntime<FilterRowProperties> {
 
-	final static TupleTag<IndexedRecord> flowOutput = new TupleTag<IndexedRecord>() {
-	};
+    private final static TupleTag<IndexedRecord> flowOutput = new TupleTag<IndexedRecord>() {
+    };
 
-	// Word lengths side output.
-	final static TupleTag<IndexedRecord> rejectOutput = new TupleTag<IndexedRecord>() {
-	};
+    final static TupleTag<IndexedRecord> rejectOutput = new TupleTag<IndexedRecord>() {
+    };
 
-	private FilterRowProperties properties;
+    private FilterRowProperties properties;
 
-	private boolean hasFlow;
+    @Override
+    public ValidationResult initialize(RuntimeContainer container, FilterRowProperties componentProperties) {
+        this.properties = componentProperties;
+        return ValidationResult.OK;
+    }
 
-	private boolean hasReject;
+    @Override
+    public void build(BeamJobContext ctx) {
+        String mainLink = ctx.getLinkNameByPortName("input_" + properties.MAIN_CONNECTOR.getName());
+        if (!StringUtils.isEmpty(mainLink)) {
+            PCollection<IndexedRecord> mainPCollection = ctx.getPCollectionByLinkName(mainLink);
+            if (mainPCollection != null) {
+                String flowLink = ctx.getLinkNameByPortName("output_" + properties.FLOW_CONNECTOR.getName());
+                String rejectLink = ctx.getLinkNameByPortName("output_" + properties.REJECT_CONNECTOR.getName());
 
-	@Override
-	public ValidationResult initialize(RuntimeContainer container, FilterRowProperties componentProperties) {
-		this.properties = componentProperties;
-		return ValidationResult.OK;
-	}
+                boolean hasFlow = !StringUtils.isEmpty(flowLink);
+                boolean hasReject = !StringUtils.isEmpty(rejectLink);
 
-	@Override
-	public PCollectionTuple expand(PCollection<Object> inputPCollection) {
-		FilterRowDoFn doFn = new FilterRowDoFn() //
-				.withProperties(properties) //
-				.withOutputSchema(hasFlow) //
-				.withRejectSchema(hasReject);
-		return inputPCollection.apply(ParDo.of(doFn).withOutputTags(flowOutput, TupleTagList.of(rejectOutput)));
-
-	}
-
-	@Override
-	public void build(BeamJobContext ctx) {
-		String mainLink = ctx.getLinkNameByPortName("input_" + properties.MAIN_CONNECTOR.getName());
-		if (!StringUtils.isEmpty(mainLink)) {
-			PCollection<Object> mainPCollection = ctx.getPCollectionByLinkName(mainLink);
-			if (mainPCollection != null) {
-				String flowLink = ctx.getLinkNameByPortName("output_" + properties.FLOW_CONNECTOR.getName());
-				String rejectLink = ctx.getLinkNameByPortName("output_" + properties.REJECT_CONNECTOR.getName());
-
-				hasFlow = !StringUtils.isEmpty(flowLink);
-				hasReject = !StringUtils.isEmpty(rejectLink);
-
-				PCollectionTuple outputTuples = mainPCollection.apply(ctx.getPTransformName(), this);
-
-				if (hasFlow) {
-					ctx.putPCollectionByLinkName(flowLink, outputTuples.get(flowOutput));
-				}
-				if (hasReject) {
-					ctx.putPCollectionByLinkName(rejectLink, outputTuples.get(rejectOutput));
-				}
-			}
-		}
-	}
+                if (hasFlow && hasReject) {
+                    // If both of the outputs are present, the DoFn must be used.
+                    PCollectionTuple outputTuples = mainPCollection.apply(ctx.getPTransformName(),
+                            ParDo.of(new FilterRowDoFn(properties)).withOutputTags(flowOutput, TupleTagList.of(rejectOutput)));
+                    ctx.putPCollectionByLinkName(flowLink, outputTuples.get(flowOutput));
+                    ctx.putPCollectionByLinkName(rejectLink, outputTuples.get(rejectOutput));
+                } else if (hasFlow || hasReject) {
+                    // If only one of the outputs is present, the predicate can be used for efficiency.
+                    FilterRowPredicate predicate = hasFlow //
+                            ? new FilterRowPredicate(properties) //
+                            : new FilterRowPredicate.Negate(properties);
+                    PCollection<IndexedRecord> output = mainPCollection.apply(ctx.getPTransformName(), Filter.by(predicate));
+                    ctx.putPCollectionByLinkName(hasFlow ? flowLink : rejectLink, output);
+                } else {
+                    // If neither are specified, then don't do anything. This component could have been cut from the pipeline.
+                }
+            }
+        }
+    }
 }

@@ -12,13 +12,11 @@
 // ============================================================================
 package org.talend.components.processing.runtime.filterrow;
 
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.talend.components.processing.runtime.SampleAvpathSchemas.SyntheticDatasets.copyAndReplaceSubrecordArray;
 import static org.talend.components.processing.runtime.SampleAvpathSchemas.SyntheticDatasets.getSubrecords;
@@ -66,34 +64,26 @@ public class FilterRowDoFnAvpathTest {
 
         IndexedRecord input = SampleAvpathSchemas.Vehicles.getDefaultVehicleCollection();
         // All of the Toyota automobiles were made after 2015, so record accepted.
-        {
-            DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(new FilterRowDoFn().withProperties(properties) //
-                    .withOutputSchema(true));
-            assertThat(fnTester.processBundle(input), contains(input));
-        }
+        assertThat(new FilterRowPredicate(properties).apply(input), is(Boolean.TRUE));
 
         // Not all of the Honda automobiles were made after 2009, so record rejected.
-        {
-            FilterRowCriteriaProperties criteria = properties.filters.subProperties.get(0);
-            criteria.columnName.setValue(".automobiles{.maker === \"Honda\"}.year");
-            criteria.operator.setValue(ConditionsRowConstant.Operator.GREATER);
-            criteria.value.setValue("2009");
-            DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(new FilterRowDoFn().withProperties(properties) //
-                    .withOutputSchema(true));
-            assertThat(fnTester.processBundle(input), not(contains(input)));
-        }
+        FilterRowCriteriaProperties criteria = properties.filters.subProperties.get(0);
+        criteria.columnName.setValue(".automobiles{.maker === \"Honda\"}.year");
+        criteria.operator.setValue(ConditionsRowConstant.Operator.GREATER);
+        criteria.value.setValue("2009");
+        assertThat(new FilterRowPredicate(properties).apply(input), is(Boolean.FALSE));
     }
 
     @Test
     public void testHierarchical_TFD2119_ERR1_UnknownColumn() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".unknown", //
                         null, //
                         ConditionsRowConstant.Operator.EQUAL, //
                         "unknown") //
 
-                ).withOutputSchema(true));
+                ));
 
         List<IndexedRecord> output = fnTester.processBundle(inputA);
 
@@ -105,14 +95,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_ERR2_SyntaxError() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         "asdf&*{.\\t", //
                         null, //
                         ConditionsRowConstant.Operator.EQUAL, //
                         "unknown") //
-
-                ).withOutputSchema(true));
+                ));
 
         // None of the records can possibly match, and a syntax error message is thrown.
         thrown.expect(TalendRuntimeException.class);
@@ -123,14 +112,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_ERR3_ArrayOutOfBounds() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".b1[99].id", //
                         null, //
                         ConditionsRowConstant.Operator.EQUAL, //
                         "1") //
-
-                ).withOutputSchema(true));
+                ));
 
         // Looks like this is not an exception -- it considers .b1[99] to be the last record.
         List<IndexedRecord> output = fnTester.processBundle(inputB);
@@ -143,14 +131,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_ERR4_NullArray() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".b1[0].id", //
                         null, //
                         ConditionsRowConstant.Operator.EQUAL, //
                         "1") //
-
-                ).withOutputSchema(true));
+                ));
 
         // Looks like this is not an exception -- it just doesn't match.
         IndexedRecord[] input = copyAndReplaceSubrecordArray(inputB, 10, true);
@@ -164,14 +151,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_A1_TopLevel() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".id", //
                         null, //
                         ConditionsRowConstant.Operator.EQUAL, //
                         "1") //
-
-                ).withOutputSchema(true));
+                ));
 
         List<IndexedRecord> output = fnTester.processBundle(inputA);
         for (IndexedRecord main : output) {
@@ -182,14 +168,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_A2_Subrecord() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".a1.id", //
                         null, //
                         ConditionsRowConstant.Operator.EQUAL, //
                         "1") //
-
-                ).withOutputSchema(true));
+                ));
 
         List<IndexedRecord> output = fnTester.processBundle(inputA);
         for (IndexedRecord main : output) {
@@ -201,14 +186,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_A3_Subsubrecord() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".a1.a2.id", //
                         null, //
                         ConditionsRowConstant.Operator.EQUAL, //
                         "1") //
-
-                ).withOutputSchema(true));
+                ));
 
         List<IndexedRecord> output = fnTester.processBundle(inputA);
         for (IndexedRecord main : output) {
@@ -221,14 +205,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_B1_AtLeastOneSubRecordHasValueGt10() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".b1{.value > 10}", //
                         ConditionsRowConstant.Function.COUNT, //
                         ConditionsRowConstant.Operator.GREATER, //
                         "0") //
-
-                ).withOutputSchema(true));
+                ));
 
         List<IndexedRecord> output = fnTester.processBundle(inputB);
         for (IndexedRecord main : output) {
@@ -244,14 +227,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_B2_AllSubRecordsHaveValueGt10() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".b1{.value <= 10}", //
                         ConditionsRowConstant.Function.COUNT, //
                         ConditionsRowConstant.Operator.EQUAL, //
                         "0") //
-
-                ).withOutputSchema(true));
+                ));
 
         List<IndexedRecord> output = fnTester.processBundle(inputB);
         for (IndexedRecord main : output) {
@@ -264,14 +246,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_B3_FirstRecordValueGt10() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".b1[0].value", //
                         null, //
                         ConditionsRowConstant.Operator.GREATER, //
                         "10") //
-
-                ).withOutputSchema(true));
+                ));
 
         List<IndexedRecord> output = fnTester.processBundle(inputB);
         for (IndexedRecord main : output) {
@@ -282,14 +263,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_B4_LastRecordValueGt10() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".b1[-1].value", //
                         null, //
                         ConditionsRowConstant.Operator.GREATER, //
                         "10") //
-
-                ).withOutputSchema(true));
+                ));
 
         List<IndexedRecord> output = fnTester.processBundle(inputB);
         for (IndexedRecord main : output) {
@@ -302,14 +282,13 @@ public class FilterRowDoFnAvpathTest {
     @Ignore("Parenthesis are not correctly implemented in avpath.")
     @Test
     public void testHierarchical_TFD2119_B5_AtLeast1SubRecordsWithId1Or2HasValueGt10() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".b1{(.id == 1) || (.id == 2)) && .value > 10}", //
                         ConditionsRowConstant.Function.COUNT, //
                         ConditionsRowConstant.Operator.GREATER, //
                         "0") //
-
-                ).withOutputSchema(true));
+                ));
 
         // TODO: for the moment, this just throws an exception.
         List<IndexedRecord> output = fnTester.processBundle(inputB);
@@ -327,14 +306,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_B5_AtLeast1SubRecordsWithId1Or2HasValueGt10_Alternative() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".b1{.id == 1 && .value > 10 || .id == 2 && .value > 10}", //
                         ConditionsRowConstant.Function.COUNT, //
                         ConditionsRowConstant.Operator.GREATER, //
                         "0") //
-
-                ).withOutputSchema(true));
+                ));
 
         List<IndexedRecord> output = fnTester.processBundle(inputB);
         for (IndexedRecord main : output) {
@@ -351,14 +329,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_B6_AllSubRecordsWithId1Or2HasValueGt10() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".b1{.id == 1 || .id == 2}.value", //
                         null, //
                         ConditionsRowConstant.Operator.GREATER, //
                         "10") //
-
-                ).withOutputSchema(true));
+                ));
 
         List<IndexedRecord> output = fnTester.processBundle(inputB);
 
@@ -378,14 +355,13 @@ public class FilterRowDoFnAvpathTest {
 
     @Test
     public void testHierarchical_TFD2119_B7_HasAtLeastOneSubrecordWithSubSubRecordValueGt10() throws Exception {
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of( //
-                new FilterRowDoFn().withProperties(addCriteria(null, //
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of( //
+                new FilterRowDoFn(addCriteria(null, //
                         ".b1{.b2.value > 10}", //
                         ConditionsRowConstant.Function.COUNT, //
                         ConditionsRowConstant.Operator.GREATER, //
                         "0") //
-
-                ).withOutputSchema(true));
+                ));
 
         List<IndexedRecord> output = fnTester.processBundle(inputB);
 

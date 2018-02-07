@@ -24,7 +24,6 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.avro.util.Utf8;
 import org.apache.beam.sdk.transforms.DoFnTester;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -128,7 +127,7 @@ public class FilterRowDoFnTest {
         assertEquals(0, rejects.size());
     }
 
-    private void checkSimpleInputValidOutput(DoFnTester<Object, IndexedRecord> fnTester) throws Exception {
+    private void checkSimpleInputValidOutput(DoFnTester<IndexedRecord, IndexedRecord> fnTester) throws Exception {
         List<IndexedRecord> outputs = fnTester.processBundle(inputSimpleRecord);
         assertEquals(1, outputs.size());
         assertEquals("aaa", outputs.get(0).get(0));
@@ -138,7 +137,7 @@ public class FilterRowDoFnTest {
         assertEquals(0, rejects.size());
     }
 
-    private void checkSimpleInputInvalidOutput(DoFnTester<Object, IndexedRecord> fnTester) throws Exception {
+    private void checkSimpleInputInvalidOutput(DoFnTester<IndexedRecord, IndexedRecord> fnTester) throws Exception {
         List<IndexedRecord> outputs = fnTester.processBundle(inputSimpleRecord);
         assertEquals(0, outputs.size());
         List<IndexedRecord> rejects = fnTester.peekOutputElements(FilterRowRuntime.rejectOutput);
@@ -155,7 +154,7 @@ public class FilterRowDoFnTest {
         assertEquals(0, rejects.size());
     }
 
-    private void checkNumericInputValidOutput(DoFnTester<Object, IndexedRecord> fnTester) throws Exception {
+    private void checkNumericInputValidOutput(DoFnTester<IndexedRecord, IndexedRecord> fnTester) throws Exception {
         List<IndexedRecord> outputs = fnTester.processBundle(inputNumericRecord);
         List<IndexedRecord> rejects = fnTester.peekOutputElements(FilterRowRuntime.rejectOutput);
         assertEquals(1, outputs.size());
@@ -165,7 +164,7 @@ public class FilterRowDoFnTest {
         assertEquals(0, rejects.size());
     }
 
-    private void checkNumericInputInvalidOutput(DoFnTester<Object, IndexedRecord> fnTester) throws Exception {
+    private void checkNumericInputInvalidOutput(DoFnTester<IndexedRecord, IndexedRecord> fnTester) throws Exception {
         List<IndexedRecord> outputs = fnTester.processBundle(inputNumericRecord);
         List<IndexedRecord> rejects = fnTester.peekOutputElements(FilterRowRuntime.rejectOutput);
         assertEquals(0, outputs.size());
@@ -176,89 +175,26 @@ public class FilterRowDoFnTest {
     }
 
     private void runSimpleTestValidSession(FilterRowProperties properties) throws Exception {
-        FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(false).withRejectSchema(false);
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
-        checkSimpleInputNoOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(false);
-        fnTester = DoFnTester.of(function);
+        FilterRowDoFn function = new FilterRowDoFn(properties);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
         checkSimpleInputValidOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(true);
-        fnTester = DoFnTester.of(function);
-        checkSimpleInputValidOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(false).withRejectSchema(true);
-        fnTester = DoFnTester.of(function);
-        checkSimpleInputNoOutput(fnTester);
     }
 
     private void runSimpleTestInvalidSession(FilterRowProperties properties) throws Exception {
-        FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(false).withRejectSchema(false);
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
-        checkSimpleInputNoOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(false);
-        fnTester = DoFnTester.of(function);
-        checkSimpleInputNoOutput(fnTester);
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(true);
-        fnTester = DoFnTester.of(function);
-        checkSimpleInputInvalidOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(false).withRejectSchema(true);
-        fnTester = DoFnTester.of(function);
+        FilterRowDoFn function = new FilterRowDoFn(properties);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
         checkSimpleInputInvalidOutput(fnTester);
     }
 
     private void runNumericTestValidSession(FilterRowProperties properties) throws Exception {
-        FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(false).withRejectSchema(false);
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
-        checkNumericInputNoOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(false);
-        fnTester = DoFnTester.of(function);
+        FilterRowDoFn function = new FilterRowDoFn(properties);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
         checkNumericInputValidOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(true);
-        fnTester = DoFnTester.of(function);
-        checkNumericInputValidOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(false).withRejectSchema(true);
-        fnTester = DoFnTester.of(function);
-        checkNumericInputNoOutput(fnTester);
     }
 
     private void runNumericTestInvalidSession(FilterRowProperties properties) throws Exception {
-        FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(false).withRejectSchema(false);
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
-        checkNumericInputNoOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(false);
-        fnTester = DoFnTester.of(function);
-        checkNumericInputNoOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(true);
-        fnTester = DoFnTester.of(function);
-        checkNumericInputInvalidOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(false).withRejectSchema(true);
-        fnTester = DoFnTester.of(function);
+        FilterRowDoFn function = new FilterRowDoFn(properties);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
         checkNumericInputInvalidOutput(fnTester);
     }
 
@@ -277,25 +213,9 @@ public class FilterRowDoFnTest {
         assertThat(criteria.operator.getStringValue(), is("=="));
         assertThat(criteria.value.getStringValue(), is(""));
 
-        FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(false).withRejectSchema(false);
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
-        checkSimpleInputNoOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(false);
-        fnTester = DoFnTester.of(function);
-        checkNumericInputValidOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(true);
-        fnTester = DoFnTester.of(function);
+        FilterRowDoFn function = new FilterRowDoFn(properties);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
         checkSimpleInputValidOutput(fnTester);
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(false).withRejectSchema(true);
-        fnTester = DoFnTester.of(function);
-        checkSimpleInputNoOutput(fnTester);
     }
 
     @Test
@@ -336,67 +256,6 @@ public class FilterRowDoFnTest {
         properties.filters.addRow(filterProp);
         // Will throw an exception
         runSimpleTestInvalidSession(properties);
-    }
-
-    @Test
-    public void test_FilterSimple_utf8() throws Exception {
-
-        FilterRowProperties properties = new FilterRowProperties("test");
-        properties.init();
-        FilterRowCriteriaProperties filterProp = new FilterRowCriteriaProperties("filter");
-        filterProp.init();
-        properties.schemaListener.afterSchema();
-        filterProp.columnName.setValue("a");
-        filterProp.value.setValue("aaa");
-        properties.filters.addRow(filterProp);
-
-        FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(false).withRejectSchema(false);
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
-        checkSimpleInputNoOutput(fnTester);
-
-        Schema inputSimpleSchema = SchemaBuilder.record("inputRow") //
-                .fields() //
-                .name("a").type().optional().stringType() //
-                .name("b").type().optional().stringType() //
-                .name("c").type().optional().stringType() //
-                .endRecord();
-
-        GenericRecord inputSimpleRecord = new GenericRecordBuilder(inputSimpleSchema) //
-                .set("a", new Utf8("aaa")) //
-                .set("b", new Utf8("BBB")) //
-                .set("c", new Utf8("Ccc")) //
-                .build();
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(false);
-        fnTester = DoFnTester.of(function);
-        List<IndexedRecord> outputs = fnTester.processBundle(inputSimpleRecord);
-        assertEquals(1, outputs.size());
-        assertEquals(new Utf8("aaa"), outputs.get(0).get(0));
-        assertEquals(new Utf8("BBB"), outputs.get(0).get(1));
-        assertEquals(new Utf8("Ccc"), outputs.get(0).get(2));
-        List<IndexedRecord> rejects = fnTester.peekOutputElements(FilterRowRuntime.rejectOutput);
-        assertEquals(0, rejects.size());
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(true);
-        fnTester = DoFnTester.of(function);
-        outputs = fnTester.processBundle(inputSimpleRecord);
-        assertEquals(1, outputs.size());
-        assertEquals(new Utf8("aaa"), outputs.get(0).get(0));
-        assertEquals(new Utf8("BBB"), outputs.get(0).get(1));
-        assertEquals(new Utf8("Ccc"), outputs.get(0).get(2));
-        rejects = fnTester.peekOutputElements(FilterRowRuntime.rejectOutput);
-        assertEquals(0, rejects.size());
-
-        function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(false).withRejectSchema(true);
-        fnTester = DoFnTester.of(function);
-        outputs = fnTester.processBundle(inputSimpleRecord);
-        assertEquals(0, outputs.size());
-        rejects = fnTester.peekOutputElements(FilterRowRuntime.rejectOutput);
-        assertEquals(0, rejects.size());
     }
 
     /** Test every function possible */
@@ -736,9 +595,8 @@ public class FilterRowDoFnTest {
         filterLess.value.setValue("30");
         properties.filters.addRow(filterLess);
 
-        FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(true);
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
+        FilterRowDoFn function = new FilterRowDoFn(properties);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
 
         List<IndexedRecord> outputs = fnTester.processBundle(input_30_300_3000_Record, input_10_100_1000_Record,
                 input_20_200_2000_Record);
@@ -882,9 +740,8 @@ public class FilterRowDoFnTest {
         condition2.value.setValue("300");
         properties.filters.addRow(condition2);
 
-        FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(true);
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
+        FilterRowDoFn function = new FilterRowDoFn(properties);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
 
         List<IndexedRecord> outputs = fnTester.processBundle(input_30_300_3000_Record, input_10_100_1000_Record,
                 input_20_200_2000_Record);
@@ -921,9 +778,8 @@ public class FilterRowDoFnTest {
         condition3.value.setValue("20");
         properties.filters.addRow(condition3);
 
-        FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
-                .withOutputSchema(true).withRejectSchema(true);
-        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
+        FilterRowDoFn function = new FilterRowDoFn(properties);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
 
         List<IndexedRecord> outputs = fnTester.processBundle(input_30_300_3000_Record, input_10_100_1000_Record,
                 input_20_200_2000_Record);
