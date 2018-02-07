@@ -1,6 +1,7 @@
 package org.talend.components.jdbc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -16,6 +17,7 @@ import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.StringProperty;
 
 public class CommonUtilsTest {
 
@@ -106,38 +108,55 @@ public class CommonUtilsTest {
     @Test
     public void testMergeRuntimeSchema2DesignSchema4Dynamic() {
         Schema runtimeSchema = SchemaBuilder.builder().record("schema").prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true")
-                .prop(ComponentConstants.TALEND6_DYNAMIC_COLUMN_POSITION, "1").fields()
-                .name("ID").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ID_DB").type(AvroUtils._string()).noDefault()
-                .name("NAME").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "NAME_DB").type(AvroUtils._string()).noDefault()
-                .name("AGE").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "AGE_DB").type(AvroUtils._string()).noDefault()
-                .name("SCORE").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "SCORE_DB").type(AvroUtils._string()).noDefault()
-                .name("ADDRESS").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ADDRESS_DB").type(AvroUtils._string()).noDefault()
-                .endRecord();
-        
+                .prop(ComponentConstants.TALEND6_DYNAMIC_COLUMN_POSITION, "1").fields().name("ID")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ID_DB").type(AvroUtils._string()).noDefault().name("NAME")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "NAME_DB").type(AvroUtils._string()).noDefault().name("AGE")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "AGE_DB").type(AvroUtils._string()).noDefault().name("SCORE")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "SCORE_DB").type(AvroUtils._string()).noDefault()
+                .name("ADDRESS").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ADDRESS_DB").type(AvroUtils._string())
+                .noDefault().endRecord();
+
         Schema designSchema = SchemaBuilder.builder().record("schema").prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true")
                 .prop(ComponentConstants.TALEND6_DYNAMIC_COLUMN_POSITION, "1").fields().name("ID")
-                .prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ID_WRONG").type(AvroUtils._string()).noDefault().name("ADDRESS")
-                .prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ADDRESS_WRONG").type(AvroUtils._string()).noDefault()
-                .endRecord();
+                .prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ID_WRONG").type(AvroUtils._string()).noDefault()
+                .name("ADDRESS").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ADDRESS_WRONG").type(AvroUtils._string())
+                .noDefault().endRecord();
 
         Schema result = CommonUtils.mergeRuntimeSchema2DesignSchema4Dynamic(designSchema, runtimeSchema);
         List<Field> fields = result.getFields();
-        Assert.assertEquals(5,fields.size());
-        
-        Assert.assertEquals("ID",fields.get(0).name());
-        Assert.assertEquals("ID_WRONG",fields.get(0).getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        
-        Assert.assertEquals("NAME",fields.get(1).name());
-        Assert.assertEquals("NAME_DB",fields.get(1).getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        
-        Assert.assertEquals("AGE",fields.get(2).name());
-        Assert.assertEquals("AGE_DB",fields.get(2).getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        
-        Assert.assertEquals("SCORE",fields.get(3).name());
-        Assert.assertEquals("SCORE_DB",fields.get(3).getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        
-        Assert.assertEquals("ADDRESS",fields.get(4).name());
-        Assert.assertEquals("ADDRESS_WRONG",fields.get(4).getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+        Assert.assertEquals(5, fields.size());
+
+        Assert.assertEquals("ID", fields.get(0).name());
+        Assert.assertEquals("ID_WRONG", fields.get(0).getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+
+        Assert.assertEquals("NAME", fields.get(1).name());
+        Assert.assertEquals("NAME_DB", fields.get(1).getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+
+        Assert.assertEquals("AGE", fields.get(2).name());
+        Assert.assertEquals("AGE_DB", fields.get(2).getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+
+        Assert.assertEquals("SCORE", fields.get(3).name());
+        Assert.assertEquals("SCORE_DB", fields.get(3).getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+
+        Assert.assertEquals("ADDRESS", fields.get(4).name());
+        Assert.assertEquals("ADDRESS_WRONG", fields.get(4).getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+    }
+
+    @Test
+    public void testUpdatePossibleValues() {
+        StringProperty property = new StringProperty("names");
+        property.setPossibleValues(Arrays.asList("a", "b", "c"));
+        property.setStoredValue("a");
+
+        List<String> newPossibleValues = Arrays.asList("a1", "b1", "c1");
+        CommonUtils.updatePossibleValues(property, newPossibleValues);
+        Assert.assertEquals("a1", property.getValue());
+        Assert.assertEquals(newPossibleValues, property.getPossibleValues());
+
+        newPossibleValues = Arrays.asList("b1", "a1", "c1", "d1", "e1", "f1");
+        CommonUtils.updatePossibleValues(property, newPossibleValues);
+        Assert.assertEquals("a1", property.getValue());
+        Assert.assertEquals(newPossibleValues, property.getPossibleValues());
     }
 
 }

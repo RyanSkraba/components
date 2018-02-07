@@ -143,7 +143,7 @@ public class TJDBCSPProperties extends FixedConnectorsComponentProperties implem
     }
 
     private void updateReturnResultIn() {
-        returnResultIn.setPossibleValues(CommonUtils.getAllSchemaFieldNames(main.schema.getValue()));
+        CommonUtils.updatePossibleValues(returnResultIn, CommonUtils.getAllSchemaFieldNames(main.schema.getValue()));
     }
 
     private void updateSpParameterTable() {

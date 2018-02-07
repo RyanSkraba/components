@@ -37,16 +37,13 @@ import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.query.EDatabase4DriverClassName;
 import org.talend.components.jdbc.query.EDatabaseTypeName;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
-
-import org.talend.daikon.exception.TalendRuntimeException;
-
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
-
 import org.talend.daikon.avro.SchemaConstants;
-
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
 
 public class CommonUtils {
 
@@ -507,6 +504,16 @@ public class CommonUtils {
             }
         }
         return null;
+    }
+
+    public static void updatePossibleValues(Property<String> property, List<String> possibleValues) {
+        property.setPossibleValues(possibleValues);
+        String oldValue = property.getValue();
+        if (possibleValues != null && !possibleValues.isEmpty() && !possibleValues.contains(oldValue)) {
+            property.setStoredValue(possibleValues.get(0));
+        } else if ((possibleValues == null) || possibleValues.isEmpty()) {
+            property.setStoredValue(null);
+        }
     }
 
 }

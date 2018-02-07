@@ -246,7 +246,7 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
     }
 
     private void updateUseColumn() {
-        useColumn.setPossibleValues(getFieldNames(main.schema));
+        CommonUtils.updatePossibleValues(useColumn, getFieldNames(main.schema));
     }
 
     private List<String> getFieldNames(Property<Schema> schema) {
