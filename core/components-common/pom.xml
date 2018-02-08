@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -18,6 +17,7 @@
         <dependency>
             <groupId>net.sourceforge.javacsv</groupId>
             <artifactId>javacsv</artifactId>
+            <version>2.0</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -53,9 +53,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-        </dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+		</dependency>
 
     </dependencies>
     <build>
@@ -80,18 +80,18 @@
                                 <scope>test</scope>
                             </dependencySet>
                             <artifacts>
-                                <artifact>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <classifier>bundle</classifier>
-                                    <version>${project.version}</version>
-                                </artifact>
-                            </artifacts>
+                              <artifact>
+                                  <groupId>${project.groupId}</groupId>
+                                  <artifactId>${project.artifactId}</artifactId>
+                                  <classifier>bundle</classifier>
+                                  <version>${project.version}</version>
+                              </artifact>
+                           </artifacts>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
+            </plugin>          
+			<plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <executions>
@@ -116,17 +116,14 @@
                         </goals>
                         <configuration>
                             <classifier>tests</classifier>
-                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded
-                            </outputDirectory>
+                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
                             <instructions>
-                                <Import-Package>
-                                    !*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*,org.hamcrest*
-                                </Import-Package>
+                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*,org.hamcrest*</Import-Package>
                                 <Bundle-SymbolicName>org.talend.components.common.test</Bundle-SymbolicName>
                                 <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
                                 <Fragment-Host>org.talend.components.common</Fragment-Host>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Embed-Dependency/>
+                                <Embed-Dependency />
                                 <Export-Package>*</Export-Package>
                                 <Include-Resource>=target/test-classes/
                                 </Include-Resource>
@@ -143,16 +140,13 @@
                             <classifier>bundle</classifier>
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.common</Bundle-SymbolicName>
-                                <Import-Package>
-                                    org.talend*,org.slf4j*,org.apache.commons*,org.apache.avro*,javax.inject*
-                                </Import-Package>
+                                <Import-Package>org.talend*,org.slf4j*,org.apache.commons*,org.apache.avro*,javax.inject*</Import-Package>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>!components*,*;scope=compile|runtime;artifactId=avro;inline=false
-                                </Embed-Dependency>
-                                <!--                                 <Embed-Dependency> -->
-                                <!--                                     !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon -->
-                                <!--                                 </Embed-Dependency> -->
-
+                                <Embed-Dependency>!components*,*;scope=compile|runtime;artifactId=avro;inline=false</Embed-Dependency>
+<!--                                 <Embed-Dependency> -->
+<!--                                     !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon -->
+<!--                                 </Embed-Dependency> -->
+                                
                             </instructions>
                         </configuration>
                     </execution>

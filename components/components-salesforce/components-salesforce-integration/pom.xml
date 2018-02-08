@@ -1,211 +1,215 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.talend.components</groupId>
-        <artifactId>components-parent</artifactId>
-        <version>0.22.0-SNAPSHOT</version>
-        <relativePath>../../../components-parent/pom.xml</relativePath>
-    </parent>
+	<parent>
+		<groupId>org.talend.components</groupId>
+		<artifactId>components-parent</artifactId>
+		<version>0.22.0-SNAPSHOT</version>
+		<relativePath>../../../components-parent/pom.xml</relativePath>
+	</parent>
 
-    <artifactId>components-salesforce-integration</artifactId>
+	<artifactId>components-salesforce-integration</artifactId>
 
-    <name>Components - Salesforce Integration Tests</name>
-    <packaging>jar</packaging>
+	<name>Components - Salesforce Integration Tests</name>
+	<packaging>jar</packaging>
 
-    <properties>
-        <!-- skip the deployment for integration tests, not necessary -->
-        <maven.deploy.skip>true</maven.deploy.skip>
-        <jetty.version>9.2.19.v20160908</jetty.version>
-        <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
-    </properties>
+	<properties>
+		<!-- skip the deployment for integration tests, not necessary -->
+		<maven.deploy.skip>true</maven.deploy.skip>
+		<jetty.version>9.2.19.v20160908</jetty.version>
+		<coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
+	</properties>
 
-    <dependencies>
-        <!-- should only depend on definition dependency, but now the test case
-            need a big refactor if miss the runtime dependency, so add runtime now, after
-            refactor the tests, we will remove the runtime dependency -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-salesforce-definition</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-salesforce-runtime</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+	<dependencies>
+		<!-- should only depend on definition dependency, but now the test case 
+			need a big refactor if miss the runtime dependency, so add runtime now, after 
+			refactor the tests, we will remove the runtime dependency -->
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-salesforce-definition</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-salesforce-runtime</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
-        <!-- Tests -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-osgitest</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<!-- Tests -->
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-osgitest</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.ops4j.pax.url</groupId>
-            <artifactId>pax-url-aether</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.ops4j.pax.url</groupId>
+			<artifactId>pax-url-aether</artifactId>
+			<version>2.4.7</version>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api</artifactId>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common</artifactId>
-            <classifier>bundle</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common</artifactId>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-common</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-common</artifactId>
+			<classifier>bundle</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-common</artifactId>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-rest</artifactId>
-            <classifier>lib</classifier>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-rest</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api-service-rest</artifactId>
+			<classifier>lib</classifier>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api-service-rest</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common-oauth</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common-oauth</artifactId>
-            <classifier>bundle</classifier>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-common-oauth</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-common-oauth</artifactId>
+			<classifier>bundle</classifier>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.commons-collections</artifactId>
-            <version>3.2.1_3</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.commons-collections</artifactId>
+			<version>3.2.1_3</version>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-http</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-io</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-util</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-http</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-io</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-util</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-    </dependencies>
+	</dependencies>
 
-    <build>
-        <plugins>
-            <!-- only generate the bundle link for test -->
-            <plugin>
-                <groupId>com.github.veithen.alta</groupId>
-                <artifactId>alta-maven-plugin</artifactId>
-                <version>0.4.2-Talend</version>
-                <executions>
-                    <execution>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>generate-test-resources</goal>
-                        </goals>
-                        <configuration>
-                            <name>%groupId%-%artifactId%%dashClassifier%.link</name>
-                            <value>%url%</value>
-                            <separator>${line.separator}</separator>
-                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
-                            <dependencySet>
-                                <scope>test</scope>
-                            </dependencySet>
-                            <artifacts>
-                                <artifact>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>components-salesforce-definition</artifactId>
-                                    <classifier>bundle</classifier>
-                                    <version>${project.version}</version>
-                                </artifact>
-                                <!-- no need at final, but need to refactor the test before removing
-                                    it -->
-                                <artifact>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>components-salesforce-runtime</artifactId>
-                                    <classifier>bundle</classifier>
-                                    <version>${project.version}</version>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+	<build>
+		<plugins>
+			<!-- only generate the bundle link for test -->
+			<plugin>
+				<groupId>com.github.veithen.alta</groupId>
+				<artifactId>alta-maven-plugin</artifactId>
+				<version>0.4.2-Talend</version>
+				<executions>
+					<execution>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>generate-test-resources</goal>
+						</goals>
+						<configuration>
+							<name>%groupId%-%artifactId%%dashClassifier%.link</name>
+							<value>%url%</value>
+							<separator>${line.separator}</separator>
+							<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+							<dependencySet>
+								<scope>test</scope>
+							</dependencySet>
+							<artifacts>
+								<artifact>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>components-salesforce-definition</artifactId>
+									<classifier>bundle</classifier>
+									<version>${project.version}</version>
+								</artifact>
+								<!-- no need at final, but need to refactor the test before removing 
+									it -->
+								<artifact>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>components-salesforce-runtime</artifactId>
+									<classifier>bundle</classifier>
+									<version>${project.version}</version>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.20-PAXEXAM-PATCH</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
-                    <systemPropertyVariables>
-                        <salesforce.user>${salesforce.user}</salesforce.user>
-                        <salesforce.password>${salesforce.password}</salesforce.password>
-                        <salesforce.key>${salesforce.key}</salesforce.key>
-                        <salesforce.user.expired>${salesforce.user.expired}</salesforce.user.expired>
-                        <salesforce.password.expired>${salesforce.password.expired}</salesforce.password.expired>
-                        <salesforce.key.expired>${salesforce.key.expired}</salesforce.key.expired>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.20-PAXEXAM-PATCH</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
+					<systemPropertyVariables>
+						<salesforce.user>${salesforce.user}</salesforce.user>
+						<salesforce.password>${salesforce.password}</salesforce.password>
+						<salesforce.key>${salesforce.key}</salesforce.key>
+						<salesforce.user.expired>${salesforce.user.expired}</salesforce.user.expired>
+						<salesforce.password.expired>${salesforce.password.expired}</salesforce.password.expired>
+						<salesforce.key.expired>${salesforce.key.expired}</salesforce.key.expired>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>

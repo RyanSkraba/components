@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -18,23 +17,25 @@
     </properties>
 
     <dependencies>
-        <dependency>
+    	<dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-definition</artifactId>
-            <version>${project.version}</version>
+			<version>${project.version}</version>
         </dependency>
 
-        <dependency>
+    	<dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
+            <version>10.12.1.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derbyclient</artifactId>
+            <version>10.12.1.1</version>
             <scope>test</scope>
         </dependency>
-
+        
         <!--
         <dependency>
             <groupId>oracle</groupId>
@@ -43,10 +44,11 @@
             <scope>test</scope>
         </dependency>
         -->
-
+        
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derbynet</artifactId>
+            <version>10.12.1.1</version>
             <scope>test</scope>
         </dependency>
 
@@ -55,16 +57,17 @@
             <artifactId>daikon-spring-utils</artifactId>
             <scope>test</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
             <exclusions>
-                <exclusion>
+                <exclusion>  
                     <groupId>junit</groupId>
                     <artifactId>junit</artifactId>
                 </exclusion>
-            </exclusions>
+            </exclusions> 			
         </dependency>
 
         <dependency>
@@ -100,15 +103,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-library</artifactId>
-            <scope>test</scope>
+        	<groupId>org.hamcrest</groupId>
+        	<artifactId>hamcrest-library</artifactId>
+        	<version>1.3</version>
+        	<scope>test</scope>
         </dependency>
-        <!--         <dependency> -->
-        <!--             <groupId>org.talend.components</groupId> -->
-        <!--             <artifactId>components-adapter-beam</artifactId> -->
-        <!--             <version>${project.version}</version> -->
-        <!--         </dependency> -->
+<!--         <dependency> -->
+<!--             <groupId>org.talend.components</groupId> -->
+<!--             <artifactId>components-adapter-beam</artifactId> -->
+<!--             <version>${project.version}</version> -->
+<!--         </dependency> -->
     </dependencies>
 
     <build>
@@ -117,7 +121,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <systemPropertyVariables>
+                    <systemPropertyVariables>  
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -135,11 +139,9 @@
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.jdbc.runtime.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
-                                <Service-Component>*</Service-Component>
+                                <Service-Component>*</Service-Component>                                
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
-                                </Include-Resource>
+                                <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
                             </instructions>
                         </configuration>
                     </execution>
@@ -151,18 +153,15 @@
                         </goals>
                         <configuration>
                             <classifier>tests</classifier>
-                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded
-                            </outputDirectory>
+                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
                             <instructions>
-                                <Import-Package>
-                                    !*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*,org.hamcrest*
-                                </Import-Package>
+                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*,org.hamcrest*</Import-Package>
                                 <Bundle-SymbolicName>org.talend.components.jdbc.runtime.test</Bundle-SymbolicName>
                                 <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
                                 <Fragment-Host>org.talend.components.jdbc</Fragment-Host>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <DynamicImport-Package>*</DynamicImport-Package>
-                                <Embed-Dependency/>
+                                <Embed-Dependency />
                                 <Export-Package>*</Export-Package>
                                 <Include-Resource>=target/test-classes/</Include-Resource>
                             </instructions>
@@ -178,15 +177,11 @@
                             <classifier>bundle</classifier>
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.jdbc.runtime</Bundle-SymbolicName>
-                                <Import-Package>
-                                    !*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*
-                                </Import-Package>
+                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*</Import-Package>
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
-                                </Include-Resource>
+                                <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
                             </instructions>
                         </configuration>
                     </execution>

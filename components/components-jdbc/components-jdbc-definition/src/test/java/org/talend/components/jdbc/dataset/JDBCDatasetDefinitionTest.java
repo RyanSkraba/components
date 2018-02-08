@@ -1,8 +1,8 @@
 package org.talend.components.jdbc.dataset;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
@@ -10,15 +10,13 @@ import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
- * The class <code>JDBCDatasetDefinitionTest</code> contains tests for the class
- * <code>{@link JDBCDatasetDefinition}</code>.
+ * The class <code>JDBCDatasetDefinitionTest</code> contains tests for the class <code>{@link JDBCDatasetDefinition}</code>.
  *
  * @generatedBy CodePro at 17-6-23 PM2:33
  * @author wangwei
  * @version $Revision: 1.0 $
  */
 public class JDBCDatasetDefinitionTest {
-
     /**
      * Run the JDBCDatasetDefinition() constructor test.
      *
@@ -26,9 +24,9 @@ public class JDBCDatasetDefinitionTest {
      *
      * @generatedBy CodePro at 17-6-23 PM2:33
      */
-    @Ignore
     @Test
-    public void testJDBCDatasetDefinition() throws Exception {
+    public void testJDBCDatasetDefinition()
+        throws Exception {
         JDBCDatasetDefinition result = new JDBCDatasetDefinition();
 
         assertEquals("JDBCDataset_icon32.png", result.getImagePath());
@@ -55,7 +53,7 @@ public class JDBCDatasetDefinitionTest {
         Mockito.when(allSetting.getDriverClass()).thenReturn("anyDriverClass");
         JDBCDatasetProperties properties = Mockito.mock(JDBCDatasetProperties.class);
         Mockito.when(properties.getRuntimeSetting()).thenReturn(allSetting);
-
+        
         JDBCDatasetDefinition fixture = new JDBCDatasetDefinition();
 
         RuntimeInfo result = fixture.getRuntimeInfo(properties);

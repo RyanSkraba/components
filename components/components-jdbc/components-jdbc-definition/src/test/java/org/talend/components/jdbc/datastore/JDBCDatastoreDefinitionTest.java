@@ -1,8 +1,8 @@
 package org.talend.components.jdbc.datastore;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.talend.components.common.dataset.DatasetProperties;
@@ -11,8 +11,7 @@ import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
- * The class <code>JDBCDatastoreDefinitionTest</code> contains tests for the class
- * <code>{@link JDBCDatastoreDefinition}</code>.
+ * The class <code>JDBCDatastoreDefinitionTest</code> contains tests for the class <code>{@link JDBCDatastoreDefinition}</code>.
  *
  * @generatedBy CodePro at 17-6-23 PM2:14
  * @author wangwei
@@ -27,7 +26,6 @@ public class JDBCDatastoreDefinitionTest {
      *
      * @generatedBy CodePro at 17-6-23 PM2:14
      */
-    @Ignore
     @Test
     public void testJDBCDatastoreDefinition() throws Exception {
         JDBCDatastoreDefinition result = new JDBCDatastoreDefinition();
@@ -77,7 +75,7 @@ public class JDBCDatastoreDefinitionTest {
         Mockito.when(allSetting.getDriverClass()).thenReturn("anyDriverClass");
         JDBCDatastoreProperties properties = Mockito.mock(JDBCDatastoreProperties.class);
         Mockito.when(properties.getRuntimeSetting()).thenReturn(allSetting);
-
+        
         JDBCDatastoreDefinition fixture = new JDBCDatastoreDefinition();
 
         RuntimeInfo result = fixture.getRuntimeInfo(properties);

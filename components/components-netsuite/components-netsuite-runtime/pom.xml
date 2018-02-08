@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -12,8 +11,9 @@
     <artifactId>components-netsuite-runtime</artifactId>
     <name>Components - NetSuite Runtime</name>
     <packaging>jar</packaging>
-
+    
     <properties>
+        <cxf.version>3.2.1</cxf.version>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
 
@@ -28,31 +28,38 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-jaxb</artifactId>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>2.5.3</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
         </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
+            <version>1.8.3</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -61,12 +68,14 @@
         <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
+            <version>1.8.0</version>
         </dependency>
 
         <!-- Tests -->
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
+            <version>${hamcrest.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -78,6 +87,7 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <version>${cxf.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -136,13 +146,10 @@
                                     <wsdl>${basedir}/src/test/resources/wsdl/2016.2/netsuite.wsdl</wsdl>
                                     <serviceName>NetSuiteService</serviceName>
                                     <extraargs>
-                                        <extraarg>-xjc-b,${basedir}/src/test/resources/wsdl/2016.2/bindings.jaxb
-                                        </extraarg>
+                                        <extraarg>-xjc-b,${basedir}/src/test/resources/wsdl/2016.2/bindings.jaxb</extraarg>
                                         <extraarg>-xjc-Xbg</extraarg>
                                         <extraarg>-p</extraarg>
-                                        <extraarg>
-                                            urn:platform_2016_2.webservices.netsuite.com=com.netsuite.webservices.test.platform
-                                        </extraarg>
+                                        <extraarg>urn:platform_2016_2.webservices.netsuite.com=com.netsuite.webservices.test.platform</extraarg>
                                     </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
@@ -215,9 +222,7 @@
         <profile>
             <id>tos-dev-local</id>
             <activation>
-                <property>
-                    <name>tos.home</name>
-                </property>
+                <property><name>tos.home</name></property>
             </activation>
             <properties>
                 <maven.javadoc.skip>true</maven.javadoc.skip>

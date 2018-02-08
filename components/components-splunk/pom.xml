@@ -1,68 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.talend.components</groupId>
-        <artifactId>components-parent</artifactId>
-        <version>0.22.0-SNAPSHOT</version>
-        <relativePath>../../components-parent/pom.xml</relativePath>
-    </parent>
+	<parent>
+		<groupId>org.talend.components</groupId>
+		<artifactId>components-parent</artifactId>
+		<version>0.22.0-SNAPSHOT</version>
+		<relativePath>../../components-parent/pom.xml</relativePath>
+	</parent>
 
-    <name>Components - tSplunkEventCollector</name>
-    <groupId>org.talend.components</groupId>
-    <artifactId>components-splunk</artifactId>
-    <packaging>bundle</packaging>
-    <dependencies>
+	<name>Components - tSplunkEventCollector</name>
+	<groupId>org.talend.components</groupId>
+	<artifactId>components-splunk</artifactId>
+	<packaging>bundle</packaging>
+	<dependencies>
 
-        <!-- APIs for all Components -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
-        </dependency>
+		<!-- APIs for all Components -->
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api</artifactId>
+		</dependency>
 
-        <!-- Annotation processing -->
-        <dependency>
-            <groupId>biz.aQute.bnd</groupId>
-            <artifactId>annotation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
-        </dependency>
+		<!-- Annotation processing -->
+		<dependency>
+			<groupId>biz.aQute.bnd</groupId>
+			<artifactId>annotation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.auto.service</groupId>
+			<artifactId>auto-service</artifactId>
+		</dependency>
 
-        <!-- Shared component properties such as Use/Password or Schema -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common</artifactId>
-        </dependency>
+		<!-- Shared component properties such as Use/Password or Schema -->
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-common</artifactId>
+		</dependency>
 
-        <!-- Jar containing Test utils methods -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
+		<!-- Jar containing Test utils methods -->
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.2.6</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-
-        <!-- spring jar for integration tests -->
+		<!-- spring jar for integration tests -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
             <classifier>lib</classifier>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-            </exclusions>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -70,138 +70,132 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>lib-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <instructions>
-                                <Bundle-SymbolicName>org.talend.components.splunk.lib</Bundle-SymbolicName>
-                                <Bundle-Name>${project.name} lib</Bundle-Name>
-                                <Include-Resource>
-                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
-                                </Include-Resource>
-                                <Service-Component>*</Service-Component>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-bundle</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>tests</classifier>
-                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded
-                            </outputDirectory>
-                            <instructions>
-                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*
-                                </Import-Package>
-                                <Bundle-SymbolicName>org.talend.components.splunk.test</Bundle-SymbolicName>
-                                <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
-                                <Fragment-Host>org.talend.components.splunk</Fragment-Host>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <DynamicImport-Package>*</DynamicImport-Package>
-                                <Embed-Dependency/>
-                                <Export-Package>*</Export-Package>
-                                <Include-Resource>=target/test-classes/</Include-Resource>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>osgi-bundle</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>bundle</classifier>
-                            <instructions>
-                                <Bundle-SymbolicName>org.talend.components.splunk</Bundle-SymbolicName>
-                                <Service-Component>*</Service-Component>
-                                <Import-Package>*,aQute.bnd.annotation.component</Import-Package>
-                                <Embed-Dependency>
-                                    *;scope=compile|runtime;inline=false;artifactId=!components*|auto-service
-                                </Embed-Dependency>
-                                <Include-Resource>
-                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
-                                </Include-Resource>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <splunk.ec.address>http://${docker.host.address}:${splunk.ec.port}</splunk.ec.address>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>io.fabric8</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.15.1</version>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>lib-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+						<configuration>
+							<instructions>
+								<Bundle-SymbolicName>org.talend.components.splunk.lib</Bundle-SymbolicName>
+								<Bundle-Name>${project.name} lib</Bundle-Name>
+								<Include-Resource>
+									{maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+								</Include-Resource>
+								<Service-Component>*</Service-Component>
+								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+							</instructions>
+						</configuration>
+					</execution>
+					<execution>
+						<id>test-bundle</id>
+						<phase>package</phase>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+						<configuration>
+							<classifier>tests</classifier>
+							<outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
+							<instructions>
+								<Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*</Import-Package>
+								<Bundle-SymbolicName>org.talend.components.splunk.test</Bundle-SymbolicName>
+								<Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
+								<Fragment-Host>org.talend.components.splunk</Fragment-Host>
+								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+								<DynamicImport-Package>*</DynamicImport-Package>
+								<Embed-Dependency />
+								<Export-Package>*</Export-Package>
+								<Include-Resource>=target/test-classes/</Include-Resource>
+							</instructions>
+						</configuration>
+					</execution>
+					<execution>
+						<id>osgi-bundle</id>
+						<phase>package</phase>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+						<configuration>
+							<classifier>bundle</classifier>
+							<instructions>
+								<Bundle-SymbolicName>org.talend.components.splunk</Bundle-SymbolicName>
+								<Service-Component>*</Service-Component>
+								<Import-Package>*,aQute.bnd.annotation.component</Import-Package>
+								<Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|auto-service</Embed-Dependency>
+								<Include-Resource>
+									{maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+								</Include-Resource>
+								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+							</instructions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<splunk.ec.address>http://${docker.host.address}:${splunk.ec.port}</splunk.ec.address>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.15.1</version>
 
-                <executions>
-                    <execution>
-                        <id>start</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>start</goal>
-                        </goals>
-                        <configuration>
+				<executions>
+					<execution>
+						<id>start</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+						<configuration>
+						    <skip>${really.skip.tests}</skip>
+							<images>
+								<image>
+									<name>dchmyga/splunk</name>
+									<run>
+										<env>
+											<SPLUNK_START_ARGS>--accept-license</SPLUNK_START_ARGS>
+										</env>
+										<ports>
+											<port>splunk.webui.port:8000</port>
+											<port>splunk.ec.port:8088</port>
+										</ports>
+										<wait>
+											<http>
+												<url>http://${docker.host.address}:${splunk.webui.port}/en-US/account/login?return_to=%2Fen-US%2F</url>
+											</http>
+											<time>30000</time>
+										</wait>
+									</run>
+								</image>
+							</images>
+						</configuration>
+					</execution>
+					<execution>
+						<id>stop</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+						<configuration>
                             <skip>${really.skip.tests}</skip>
-                            <images>
-                                <image>
-                                    <name>dchmyga/splunk</name>
-                                    <run>
-                                        <env>
-                                            <SPLUNK_START_ARGS>--accept-license</SPLUNK_START_ARGS>
-                                        </env>
-                                        <ports>
-                                            <port>splunk.webui.port:8000</port>
-                                            <port>splunk.ec.port:8088</port>
-                                        </ports>
-                                        <wait>
-                                            <http>
-                                                <url>
-                                                    http://${docker.host.address}:${splunk.webui.port}/en-US/account/login?return_to=%2Fen-US%2F
-                                                </url>
-                                            </http>
-                                            <time>30000</time>
-                                        </wait>
-                                    </run>
-                                </image>
-                            </images>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>stop</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${really.skip.tests}</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
