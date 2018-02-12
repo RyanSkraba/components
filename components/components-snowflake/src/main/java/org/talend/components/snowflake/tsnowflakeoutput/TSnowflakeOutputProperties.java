@@ -54,7 +54,7 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
 
-    public Property<Boolean> convertColumnsToUppercase = newBoolean("convertColumnsToUppercase");
+    public Property<Boolean> convertColumnsAndTableToUppercase = newBoolean("convertColumnsAndTableToUppercase");
 
     // Have to use an explicit class to get the override of afterTableName(), an anonymous
     // class cannot be public and thus cannot be called.
@@ -115,7 +115,7 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         table.setSchemaListener(listener);
         table.setupProperties();
 
-        convertColumnsToUppercase.setValue(true);
+        convertColumnsAndTableToUppercase.setValue(true);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         mainForm.addColumn(widget(upsertKeyColumn).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
 
         Form advancedForm = getForm(Form.ADVANCED);
-        advancedForm.addRow(convertColumnsToUppercase);
+        advancedForm.addRow(convertColumnsAndTableToUppercase);
     }
 
     public void afterOutputAction() {
