@@ -80,7 +80,12 @@ public class BulkResultAdapterFactory implements IndexedRecordConverter<BulkResu
                     fieldConverter[j] = SalesforceAvroRegistry.get().getConverterFromString(f);
                 }
             }
-            return fieldConverter[i].convertToAvro(value.getValue(names[i]));
+            Object resultValue = value.getValue(names[i]);
+            if (resultValue == null) {
+                String columnName = names[i].substring(names[i].indexOf("_") + 1);
+                resultValue = value.getValue(columnName);
+            }
+            return fieldConverter[i].convertToAvro(resultValue);
         }
 
         @Override
