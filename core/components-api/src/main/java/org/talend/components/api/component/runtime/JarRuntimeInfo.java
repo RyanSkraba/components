@@ -17,6 +17,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
@@ -28,6 +30,8 @@ import org.talend.daikon.sandbox.SandboxControl;
  */
 public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JarRuntimeInfo.class);
+    
     private final String runtimeClassName;
 
     private final URL jarUrl;
@@ -98,8 +102,9 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
         try {
             return new URL(jarUrlString);
         } catch (MalformedURLException e) {
-            throw TalendRuntimeException.createUnexpectedException(e);
+            LOG.debug(e.getMessage());
         }
+        return null;
     }
 
     public JarRuntimeInfo cloneWithNewJarUrlString(String newJarUrlString) {
