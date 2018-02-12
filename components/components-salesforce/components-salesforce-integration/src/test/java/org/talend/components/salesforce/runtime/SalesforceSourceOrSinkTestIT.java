@@ -125,14 +125,14 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         sourceOrSink.initialize(container, connectionProperties);
         // Creating and saving PartnerConnection + BulkConnection(holder) inside container.
         sourceOrSink.validate(container);
-        ConnectionHolder expectedHolder = (ConnectionHolder) container.getComponentData(connectionProperties.getName(),
+        PartnerConnection partnerConnection = (PartnerConnection) container.getComponentData(connectionProperties.getName(),
                 SalesforceSourceOrSink.KEY_CONNECTION);
         TSalesforceInputProperties inputProperties = new TSalesforceInputProperties("input");
         inputProperties.connection.referencedComponent.componentInstanceId.setValue(connectionProperties.getName());
         sourceOrSink.initialize(container, inputProperties);
         ConnectionHolder actualHolder = sourceOrSink.connect(container);
 
-        Assert.assertEquals(expectedHolder, actualHolder);
+        Assert.assertEquals(partnerConnection, actualHolder.connection);
         if (isBulk) {
             Assert.assertNotNull(actualHolder.bulkConnection);
         } else {

@@ -82,6 +82,8 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
 
     protected static final String KEY_CONNECTION = "Connection";
 
+    protected static final String KEY_CONNECTION_BULK = "ConnectionBulk";
+
     private String sessionFilePath;
 
     private String sessionId;
@@ -221,23 +223,18 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
         final ConnectionHolder ch = new ConnectionHolder();
         SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         String refComponentId = connProps.getReferencedComponentId();
-        Object sharedConn = null;
         // Using another component's connection
         if (refComponentId != null) {
             // In a runtime container
             if (container != null) {
-                sharedConn = container.getComponentData(refComponentId, KEY_CONNECTION);
-                if (sharedConn != null) {
-                    if (sharedConn instanceof PartnerConnection) {
-                        ch.connection = (PartnerConnection) sharedConn;
-                    } else if (sharedConn instanceof BulkConnection) {
-                        ch.bulkConnection = (BulkConnection) sharedConn;
-                    } else if (sharedConn instanceof ConnectionHolder) {
-                        return (ConnectionHolder) sharedConn;
-                    }
-                    return ch;
+                // PartnerConnection must be created. BulkConnection is optional.
+                PartnerConnection connection = (PartnerConnection) container.getComponentData(refComponentId, KEY_CONNECTION);
+                if (connection == null) {
+                    throw new IOException("Referenced component: " + refComponentId + " not connected");
                 }
-                throw new IOException("Referenced component: " + refComponentId + " not connected");
+                ch.connection = connection;
+                ch.bulkConnection = (BulkConnection) container.getComponentData(refComponentId, KEY_CONNECTION_BULK);
+                return ch;
             }
             // Design time
             connProps = connProps.getReferencedConnectionProperties();
@@ -309,7 +306,10 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
             }
 
             if (container != null) {
-                container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, ch);
+                container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, ch.connection);
+                if (ch.bulkConnection != null) {
+                    container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION_BULK, ch.bulkConnection);
+                }
             }
             return ch;
         } catch (ConnectionException e) {
