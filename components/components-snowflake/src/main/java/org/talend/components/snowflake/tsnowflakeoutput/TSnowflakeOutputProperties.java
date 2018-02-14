@@ -34,8 +34,12 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperties {
+public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperties implements SerializeSetVersion {
+
+    private static final int CONVERT_COLUMNS_AND_TABLE_TO_UPPERCASE_VERSION = 1;
 
     public enum OutputAction {
         INSERT,
@@ -215,5 +219,18 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         beforeUpsertKeyColumn();
     }
 
+    @Override
+    public int getVersionNumber() {
+        return 1;
+    }
 
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated = super.postDeserialize(version, setup, persistent);
+        if (version < CONVERT_COLUMNS_AND_TABLE_TO_UPPERCASE_VERSION) {
+            convertColumnsAndTableToUppercase.setValue(false);
+            migrated = true;
+        }
+        return migrated;
+    }
 }
