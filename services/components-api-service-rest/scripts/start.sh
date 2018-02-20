@@ -18,7 +18,6 @@ writeAppInfoInTty() {
     echo "Using java:           $JAVA_BIN"
     echo "Using CLASSPATH:      $APP_CLASSPATH"
     echo "launching :           $THE_CMD"
-    
   fi
 }
 
@@ -41,7 +40,7 @@ fi
 
 APP_CLASS="org.talend.components.service.rest.Application"
 
-JAVA_OPTS="-Xmx2048m -Dfile.encoding=UTF-8 -Dorg.ops4j.pax.url.mvn.localRepository=\"$PWD/.m2\" -Dorg.ops4j.pax.url.mvn.settings=\"$PWD/config/settings.xml\" -Dcomponent.default.config.folder=\"$PWD/config/default\""
+SCRIPT_JAVA_OPTS=" -Dfile.encoding=UTF-8 -Dorg.ops4j.pax.url.mvn.localRepository=\"$PWD/.m2\" -Dorg.ops4j.pax.url.mvn.settings=\"$PWD/config/settings.xml\" -Dcomponent.default.config.folder=\"$PWD/config/default\" $JAVA_OPTS "
 
 # If HADOOP_CONF_DIR is not set, try to get it from in the application properties, then add it to the classpath.
 if [ -z "$HADOOP_CONF_DIR" ] ; then
@@ -58,20 +57,19 @@ if [ -z "$KRB5_CONFIG" ] ; then
       export KRB5_CONFIG=$(expr $KRB5_CONFIG : '.*=\(.*\)')
 fi
 if [ ! -z "$KRB5_CONFIG" ] ; then
-  JAVA_OPTS="$JAVA_OPTS -Djava.security.krb5.conf=$KRB5_CONFIG"
+  SCRIPT_JAVA_OPTS="$SCRIPT_JAVA_OPTS -Djava.security.krb5.conf=$KRB5_CONFIG"
 fi
 
-
-# If PAX_MVN_REPO is not set, try to get it from the application properties, then add it to the java options. 
+# If PAX_MVN_REPO is not set, try to get it from the application properties, then add it to the java options.
 if [ -z "$PAX_MVN_REPO" ] ; then
   PAX_MVN_REPO=$(grep "^pax.mvn.repo=" config/application.properties) && \
       export PAX_MVN_REPO=$(expr $PAX_MVN_REPO : 'pax.mvn.repo=\(.*\)')
 fi
 if [ ! -z "$PAX_MVN_REPO" ] ; then
-  JAVA_OPTS="$JAVA_OPTS -Dorg.ops4j.pax.url.mvn.repositories=$PAX_MVN_REPO"
+  SCRIPT_JAVA_OPTS="$SCRIPT_JAVA_OPTS -Dorg.ops4j.pax.url.mvn.repositories=$PAX_MVN_REPO"
 fi
 
-THE_CMD="$JAVA_BIN $JAVA_OPTS -cp \"$APP_CLASSPATH\" $APP_CLASS $*"  
+THE_CMD="$JAVA_BIN $SCRIPT_JAVA_OPTS -cp \"$APP_CLASSPATH\" $APP_CLASS $*"
 
 writeAppInfoInTty
 
