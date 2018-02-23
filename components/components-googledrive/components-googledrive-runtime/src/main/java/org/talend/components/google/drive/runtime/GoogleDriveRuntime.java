@@ -14,13 +14,13 @@ package org.talend.components.google.drive.runtime;
 
 import static java.net.InetSocketAddress.createUnresolved;
 import static java.net.Proxy.Type.HTTP;
-import static org.talend.components.google.drive.connection.GoogleDriveConnectionProperties.OAuthMethod.InstalledApplicationWithIdAndSecret;
-import static org.talend.components.google.drive.connection.GoogleDriveConnectionProperties.OAuthMethod.InstalledApplicationWithJSON;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Proxy;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.Locale;
@@ -36,6 +36,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.google.drive.GoogleDriveProvideConnectionProperties;
 import org.talend.components.google.drive.GoogleDriveProvideRuntime;
 import org.talend.components.google.drive.connection.GoogleDriveConnectionProperties;
+import org.talend.components.google.drive.connection.GoogleDriveConnectionProperties.OAuthMethod;
 import org.talend.components.google.drive.runtime.client.GoogleDriveCredentialWithAccessToken;
 import org.talend.components.google.drive.runtime.client.GoogleDriveCredentialWithInstalledApplication;
 import org.talend.components.google.drive.runtime.client.GoogleDriveCredentialWithServiceAccount;
@@ -57,7 +58,16 @@ import com.google.api.services.drive.model.User;
 public class GoogleDriveRuntime extends GoogleDriveValidator
         implements RuntimableRuntime<ComponentProperties>, GoogleDriveProvideConnectionProperties, GoogleDriveProvideRuntime {
 
+    protected static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(GoogleDriveSourceOrSink.class);
+
     private static final String APPLICATION_SUFFIX_GPN_TALEND = " (GPN:Talend)";
+
+    private transient static final Logger LOG = LoggerFactory.getLogger(GoogleDriveRuntime.class);
+
+    public RuntimeContainer container;
+
+    protected GoogleDriveProvideConnectionProperties properties;
 
     private Drive service;
 
@@ -65,17 +75,23 @@ public class GoogleDriveRuntime extends GoogleDriveValidator
 
     private NetHttpTransport httpTransport;
 
-    protected GoogleDriveProvideConnectionProperties properties;
+    public static String getStudioName(final String inputString) {
+        if (inputString == null || inputString.isEmpty()) {
+            return "";
+        }
 
-    private transient static final Logger LOG = LoggerFactory.getLogger(GoogleDriveRuntime.class);
-
-    protected static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
-            .getI18nMessages(GoogleDriveSourceOrSink.class);
+        StringBuilder outputString = new StringBuilder();
+        for (int i = 0; i < inputString.length(); i++) {
+            Character c = inputString.charAt(i);
+            outputString.append(Character.isUpperCase(c) && i > 0 ? "_" + c : c); //$NON-NLS-1$
+        }
+        return outputString.toString().toUpperCase(Locale.ENGLISH);
+    }
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         this.properties = (GoogleDriveProvideConnectionProperties) properties;
-
+        this.container = container;
         return validateConnectionProperties(getConnectionProperties());
     }
 
@@ -165,15 +181,13 @@ public class GoogleDriveRuntime extends GoogleDriveValidator
     }
 
     public ValidationResult validateConnection(GoogleDriveConnectionProperties connectionProperties) {
+        if ((OAuthMethod.InstalledApplicationWithIdAndSecret.equals(connectionProperties.oAuthMethod.getValue())
+                || OAuthMethod.InstalledApplicationWithJSON.equals(connectionProperties.oAuthMethod.getValue()))
+                && container == null) {
+            cleanupCredentialsStore(connectionProperties.datastorePath.getValue() + "/StoredCredential");
+        }
         ValidationResultMutable vr = new ValidationResultMutable(validateConnectionProperties(connectionProperties));
         if (Result.ERROR.equals(vr.getStatus())) {
-            return vr;
-        }
-        // Skip check effective connection to GoogleDrive when using Installed Application OAuth methods
-        // TODO Find how to fix problem in studio - see my comment in TDI-39455.
-        if (InstalledApplicationWithIdAndSecret.equals(connectionProperties.oAuthMethod.getValue())
-                || InstalledApplicationWithJSON.equals(connectionProperties.oAuthMethod.getValue())) {
-            // should return Result.OK if we're here...
             return vr;
         }
         try {
@@ -191,17 +205,13 @@ public class GoogleDriveRuntime extends GoogleDriveValidator
         return vr;
     }
 
-    public static String getStudioName(final String inputString) {
-        if (inputString == null || inputString.isEmpty()) {
-            return inputString;
+    private void cleanupCredentialsStore(String store) {
+        LOG.debug("[cleanupCredentialsStore] Deleting stored credentials [{}].", store);
+        try {
+            Files.deleteIfExists(Paths.get(store));
+        } catch (IOException e) {
+            LOG.warn("[cleanupCredentialsStore] Could not delete {} : {}", store, e.getMessage());
         }
-
-        StringBuilder outputString = new StringBuilder();
-        for (int i = 0; i < inputString.length(); i++) {
-            Character c = inputString.charAt(i);
-            outputString.append(Character.isUpperCase(c) && i > 0 ? "_" + c : c); //$NON-NLS-1$
-        }
-        return outputString.toString().toUpperCase(Locale.ENGLISH);
     }
 
 }

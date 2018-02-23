@@ -11,8 +11,9 @@
     <name>Components - Google Drive Runtime</name>
     <packaging>jar</packaging>
     <properties>
-		<httpcomponents.version>4.5.4</httpcomponents.version>
+        <httpcomponents.version>4.5.4</httpcomponents.version>
         <httpcore.version>4.4.9</httpcore.version>
+        <swt.version>[3.103.1.v20140903-1938,)</swt.version>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
     <dependencies>
@@ -37,15 +38,21 @@
             <artifactId>google-api-services-drive</artifactId>
             <version>v3-rev97-1.23.0</version>
         </dependency>
+        <!-- needed by org.eclipse.swt.Program.launch -->
+        <dependency>
+            <groupId>org.eclipse.swt</groupId>
+            <artifactId>org.eclipse.swt.gtk.linux.x86_64</artifactId>
+            <version>${swt.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-			<version>${httpcore.version}</version>
+            <version>${httpcore.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-			<version>${httpcomponents.version}</version>
+            <version>${httpcomponents.version}</version>
         </dependency>
         <!-- -->
         <dependency>

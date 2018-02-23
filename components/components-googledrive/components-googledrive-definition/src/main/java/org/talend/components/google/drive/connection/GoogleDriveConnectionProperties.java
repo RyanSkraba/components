@@ -124,9 +124,9 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
         clientSecretFile.setValue("");
         serviceAccountFile.setValue("");
         //
-        String dsPath = ".credentials/talend-google-drive";
+        String dsPath = ".credentials/talend-googledrive";
         try {
-            dsPath = Paths.get(System.getProperty("user.home"), ".credentials/talend-google-drive").toAbsolutePath().toString();
+            dsPath = Paths.get(System.getProperty("user.home"), ".credentials/talend-googledrive").toAbsolutePath().toString();
             dsPath = dsPath.replace("\\", "/");
         } catch (Exception e) {
             // env not set
@@ -290,7 +290,7 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
             GoogleDriveProvideRuntime sos = (GoogleDriveProvideRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
             ValidationResultMutable vr = new ValidationResultMutable(sos.validateConnection(this));
-            if (vr.getStatus() == ValidationResult.Result.OK) {
+            if (Result.OK.equals(vr.getStatus())) {
                 getForm(FORM_WIZARD).setAllowFinish(true);
             } else {
                 getForm(FORM_WIZARD).setAllowFinish(false);

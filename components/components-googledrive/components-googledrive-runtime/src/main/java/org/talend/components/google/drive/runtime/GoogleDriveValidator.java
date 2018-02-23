@@ -14,6 +14,7 @@ package org.talend.components.google.drive.runtime;
 
 import static org.talend.components.google.drive.put.GoogleDrivePutProperties.UploadMode.UPLOAD_LOCAL_FILE;
 
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.google.drive.GoogleDriveProvideConnectionProperties;
 import org.talend.components.google.drive.connection.GoogleDriveConnectionProperties;
 import org.talend.components.google.drive.copy.GoogleDriveCopyProperties;
@@ -61,7 +62,7 @@ public class GoogleDriveValidator {
     public ValidationResult validateConnectionProperties(GoogleDriveConnectionProperties properties) {
         ValidationResultMutable vr = new ValidationResultMutable(Result.OK, messages.getMessage("message.parameters.OK"));
         /* validate GoogleDriveConnection settings */
-        if (properties.applicationName.getValue().isEmpty()) {
+        if (StringUtils.isEmpty(properties.applicationName.getValue())) {
             vr = new ValidationResultMutable(Result.ERROR)
                     .setMessage(messages.getMessage("error.validation.connection.applicationName.empty"));
             return vr;
@@ -69,38 +70,38 @@ public class GoogleDriveValidator {
         // OAuth settings
         switch (properties.oAuthMethod.getValue()) {
         case AccessToken:
-            if (properties.accessToken.getValue().isEmpty()) {
+            if (StringUtils.isEmpty(properties.accessToken.getValue())) {
                 vr = new ValidationResultMutable(Result.ERROR)
                         .setMessage(messages.getMessage("error.validation.connection.accessToken.empty"));
                 return vr;
             }
             break;
         case InstalledApplicationWithIdAndSecret:
-            if (properties.clientId.getValue().isEmpty() || properties.clientSecret.getValue().isEmpty()) {
+            if (StringUtils.isEmpty(properties.clientId.getValue()) || StringUtils.isEmpty(properties.clientSecret.getValue())) {
                 vr = new ValidationResultMutable(Result.ERROR)
                         .setMessage(messages.getMessage("error.validation.connection.clientIdOrClientSecret.empty"));
                 return vr;
             }
-            if (properties.datastorePath.getValue().isEmpty()) {
+            if (StringUtils.isEmpty(properties.datastorePath.getValue())) {
                 vr = new ValidationResultMutable(Result.ERROR)
                         .setMessage(messages.getMessage("error.validation.connection.datastorePath.empty"));
                 return vr;
             }
             break;
         case InstalledApplicationWithJSON:
-            if (properties.clientSecretFile.getValue().isEmpty()) {
+            if (StringUtils.isEmpty(properties.clientSecretFile.getValue())) {
                 vr = new ValidationResultMutable(Result.ERROR)
                         .setMessage(messages.getMessage("error.validation.connection.clientSecretFile.empty"));
                 return vr;
             }
-            if (properties.datastorePath.getValue().isEmpty()) {
+            if (StringUtils.isEmpty(properties.datastorePath.getValue())) {
                 vr = new ValidationResultMutable(Result.ERROR)
                         .setMessage(messages.getMessage("error.validation.connection.datastorePath.empty"));
                 return vr;
             }
             break;
         case ServiceAccount:
-            if (properties.serviceAccountFile.getValue().isEmpty()) {
+            if (StringUtils.isEmpty(properties.serviceAccountFile.getValue())) {
                 vr = new ValidationResultMutable(Result.ERROR)
                         .setMessage(messages.getMessage("error.validation.connection.serviceAccountFile.empty"));
                 return vr;
@@ -109,7 +110,7 @@ public class GoogleDriveValidator {
         }
         // Proxy settings
         if (properties.useProxy.getValue()) {
-            if (properties.proxyHost.getValue().isEmpty()) {
+            if (StringUtils.isEmpty(properties.proxyHost.getValue())) {
                 vr = new ValidationResultMutable(Result.ERROR)
                         .setMessage(messages.getMessage("error.validation.connection.proxyHost.empty"));
                 return vr;
@@ -122,12 +123,12 @@ public class GoogleDriveValidator {
         }
         // SSL settings
         if (properties.useSSL.getValue()) {
-            if (properties.sslAlgorithm.getValue().isEmpty()) {
+            if (StringUtils.isEmpty(properties.sslAlgorithm.getValue())) {
                 vr = new ValidationResultMutable(Result.ERROR)
                         .setMessage(messages.getMessage("error.validation.connection.sslAlgorithm.empty"));
                 return vr;
             }
-            if (properties.sslTrustStore.getValue().isEmpty()) {
+            if (StringUtils.isEmpty(properties.sslTrustStore.getValue())) {
                 vr = new ValidationResultMutable(Result.ERROR)
                         .setMessage(messages.getMessage("error.validation.connection.sslTrustStore.empty"));
                 return vr;
@@ -139,12 +140,12 @@ public class GoogleDriveValidator {
 
     public ValidationResult validateCreateProperties(GoogleDriveCreateProperties properties) {
         ValidationResultMutable vr = new ValidationResultMutable(Result.OK);
-        if (properties.parentFolder.getValue().isEmpty()) {
+        if (StringUtils.isEmpty(properties.parentFolder.getValue())) {
             vr.setStatus(Result.ERROR);
             vr.setMessage(messages.getMessage("error.validation.parentfolder.empty"));
             return vr;
         }
-        if (properties.newFolder.getValue().isEmpty()) {
+        if (StringUtils.isEmpty(properties.newFolder.getValue())) {
             vr.setStatus(Result.ERROR);
             vr.setMessage(messages.getMessage("error.validation.newfolder.empty"));
             return vr;
@@ -154,7 +155,7 @@ public class GoogleDriveValidator {
 
     public ValidationResult validateDeleteProperties(GoogleDriveDeleteProperties properties) {
         ValidationResultMutable vr = new ValidationResultMutable(Result.OK);
-        if (properties.file.getValue().isEmpty()) {
+        if (StringUtils.isEmpty(properties.file.getValue())) {
             vr.setStatus(Result.ERROR);
             vr.setMessage(messages.getMessage("error.validation.delete.file.empty"));
             return vr;
@@ -164,7 +165,7 @@ public class GoogleDriveValidator {
 
     public ValidationResult validateListProperties(GoogleDriveListProperties properties) {
         ValidationResultMutable vr = new ValidationResultMutable(Result.OK);
-        if (properties.folder.getValue().isEmpty()) {
+        if (StringUtils.isEmpty(properties.folder.getValue())) {
             vr.setStatus(Result.ERROR);
             vr.setMessage(messages.getMessage("error.validation.folder.empty"));
             return vr;
@@ -174,7 +175,7 @@ public class GoogleDriveValidator {
 
     public ValidationResult validateGetProperties(GoogleDriveGetProperties properties) {
         ValidationResultMutable vr = new ValidationResultMutable(Result.OK);
-        if (properties.file.getValue().isEmpty()) {
+        if (StringUtils.isEmpty(properties.file.getValue())) {
             vr.setStatus(Result.ERROR);
             vr.setMessage(messages.getMessage("error.validation.filename.empty"));
             return vr;
@@ -184,7 +185,7 @@ public class GoogleDriveValidator {
 
     public ValidationResult validatePutProperties(GoogleDrivePutProperties properties) {
         ValidationResultMutable vr = new ValidationResultMutable(Result.OK);
-        if (properties.fileName.getValue().isEmpty()) {
+        if (StringUtils.isEmpty(properties.fileName.getValue())) {
             vr.setStatus(Result.ERROR);
             vr.setMessage(messages.getMessage("error.validation.filename.empty"));
             return vr;
@@ -194,12 +195,12 @@ public class GoogleDriveValidator {
             vr.setMessage(messages.getMessage("error.validation.put.invalid.flow"));
             return vr;
         }
-        if (properties.destinationFolder.getValue().isEmpty()) {
+        if (StringUtils.isEmpty(properties.destinationFolder.getValue())) {
             vr.setStatus(Result.ERROR);
             vr.setMessage(messages.getMessage("error.validation.parentfolder.empty"));
             return vr;
         }
-        if (properties.localFilePath.getValue().isEmpty()) {
+        if (StringUtils.isEmpty(properties.localFilePath.getValue())) {
             vr.setStatus(Result.ERROR);
             vr.setMessage(messages.getMessage("error.validation.local.filename.empty"));
             return vr;
@@ -209,18 +210,18 @@ public class GoogleDriveValidator {
 
     public ValidationResult validateCopyProperties(GoogleDriveCopyProperties properties) {
         ValidationResultMutable vr = new ValidationResultMutable(Result.OK);
-        if (properties.destinationFolder.getValue().isEmpty()) {
+        if (StringUtils.isEmpty(properties.destinationFolder.getValue())) {
             vr.setStatus(Result.ERROR);
             vr.setMessage(messages.getMessage("error.validation.destinationFolderName.empty"));
             return vr;
         }
-        if (properties.source.getValue().isEmpty()) {
+        if (StringUtils.isEmpty(properties.source.getValue())) {
             vr.setStatus(Result.ERROR);
             vr.setMessage(messages.getMessage("error.validation.source.empty"));
             return vr;
         }
         if (properties.rename.getValue()) {
-            if (properties.newName.getValue().isEmpty()) {
+            if (StringUtils.isEmpty(properties.newName.getValue())) {
                 vr.setStatus(Result.ERROR);
                 vr.setMessage(messages.getMessage("error.validation.newname.empty"));
                 return vr;

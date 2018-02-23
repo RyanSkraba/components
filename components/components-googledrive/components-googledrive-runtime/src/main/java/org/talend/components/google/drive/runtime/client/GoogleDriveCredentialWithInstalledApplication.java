@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
@@ -43,17 +42,27 @@ public class GoogleDriveCredentialWithInstalledApplication {
         return new BuilderWithIdAndSecret(transport, dataStoreDir);
     }
 
+    public interface ClientSecretFile {
+
+        Build clientSecretFile(File file);
+    }
+
+    public interface ClientId {
+
+        ClientSecret clientId(String id);
+    }
+
+    public interface ClientSecret {
+
+        Build clientSecret(String secret);
+    }
+
+    public interface Build {
+
+        Credential build() throws IOException, GeneralSecurityException;
+    }
+
     private abstract static class Builder implements Build {
-
-        /**
-         * instance of the HTTP transport.
-         */
-        protected HttpTransport httpTransport;
-
-        /**
-         * instance of the {@link FileDataStoreFactory} to store user credentials for this application.
-         */
-        protected FileDataStoreFactory dataStoreFactory;
 
         /**
          * instance of the scopes.
@@ -66,6 +75,16 @@ public class GoogleDriveCredentialWithInstalledApplication {
          * instance of the JSON factory.
          */
         protected final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+
+        /**
+         * instance of the HTTP transport.
+         */
+        protected HttpTransport httpTransport;
+
+        /**
+         * instance of the {@link FileDataStoreFactory} to store user credentials for this application.
+         */
+        protected FileDataStoreFactory dataStoreFactory;
 
         public Builder(NetHttpTransport transport, File storeDir) throws GeneralSecurityException, IOException {
             httpTransport = transport;
@@ -90,10 +109,12 @@ public class GoogleDriveCredentialWithInstalledApplication {
         @Override
         public Credential build() throws IOException {
             GoogleClientSecrets secrets = GoogleClientSecrets.load(JSON_FACTORY, new FileReader(clientSecretFile));
+            // make a sanity check (check this.installed) before authorizing
+            secrets.getDetails().getClientId();
             // Build flow and trigger user authorization request.
             GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, secrets,
                     scopes).setDataStoreFactory(dataStoreFactory).setAccessType("offline").build();
-            return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+            return new AuthorizationCodeInstalledAppTalend(flow, new LocalServerReceiver()).authorize("user");
         }
     }
 
@@ -123,27 +144,7 @@ public class GoogleDriveCredentialWithInstalledApplication {
         public Credential build() throws IOException {
             GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientId,
                     clientSecret, scopes).setDataStoreFactory(dataStoreFactory).setAccessType("offline").build();
-            return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+            return new AuthorizationCodeInstalledAppTalend(flow, new LocalServerReceiver()).authorize("user");
         }
-    }
-
-    public interface ClientSecretFile {
-
-        Build clientSecretFile(File file);
-    }
-
-    public interface ClientId {
-
-        ClientSecret clientId(String id);
-    }
-
-    public interface ClientSecret {
-
-        Build clientSecret(String secret);
-    }
-
-    public interface Build {
-
-        Credential build() throws IOException, GeneralSecurityException;
     }
 }
