@@ -175,6 +175,13 @@
         may be included to manage versions -->
     <build>
         <plugins>
+            <!-- To get the GIT information for version endpoint. -->
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>2.2.4</version>
+            </plugin>
+
             <plugin>
                 <!-- prevent spring plugin to create a big startable jar -->
                 <groupId>org.springframework.boot</groupId>
