@@ -305,4 +305,44 @@ public class SampleAvpathSchemas {
             return result;
         }
     }
+    
+
+    /**
+     * Same as SyntheticDatasets, but with nullable data 
+     */
+    public static class NullableSyntheticDatasets {
+
+        public final static String STRING_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        public final static Schema RECORD_A2 = getDefaultRecord("a2").endRecord();
+
+        public final static Schema RECORD_A1 = getDefaultRecord("a1") //
+                .name("a2").type(RECORD_A2).noDefault().endRecord();
+
+        public final static Schema RECORD_A = getDefaultRecord("a") //
+                .name("a1").type(RECORD_A1).noDefault().endRecord();
+
+        public final static Schema RECORD_B2 = getDefaultRecord("b2").endRecord();
+
+        public final static Schema RECORD_B1 = getDefaultRecord("b1") //
+                .name("b2").type(RECORD_B2).noDefault().endRecord();
+
+        public final static Schema RECORD_B = getDefaultRecord("b") //
+                .name("b1").type().array().items().type(RECORD_B1).noDefault().endRecord();
+
+        public final static Schema RECORD_C2 = getDefaultRecord("c2").endRecord();
+
+        public final static Schema RECORD_C1 = getDefaultRecord("c1") //
+                .name("c2").type().array().items().type(RECORD_C2).noDefault().endRecord();
+
+        public final static Schema RECORD_C = getDefaultRecord("b") //
+                .name("c1").type().array().items().type(RECORD_C1).noDefault().endRecord();
+
+        /**
+         * Starts a builder for the default record with the given name.
+         */
+        private static SchemaBuilder.FieldAssembler<Schema> getDefaultRecord(String name) {
+            return SchemaBuilder.record(name).fields().optionalInt("id").optionalString("name").optionalDouble("value");
+        }
+    }
 }

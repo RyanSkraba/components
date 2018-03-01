@@ -76,8 +76,8 @@ public enum ProcessingErrorCode implements ErrorCode {
      * @return An exception corresponding to the error code.
      */
     public static TalendRuntimeException createFieldNotFoundException(Throwable cause, String field) {
-        return new TalendMsgRuntimeException(cause, FIELD_NOT_FOUND, ExceptionContext.withBuilder().put("field", field).build(),
-                "The field '" + field + "' was not found.");
+        return new TalendMsgRuntimeException(cause, FIELD_NOT_FOUND,
+                ExceptionContext.withBuilder().put("field", field).build(), "The field '" + field + "' was not found.");
     }
 
     /**
@@ -99,14 +99,32 @@ public enum ProcessingErrorCode implements ErrorCode {
     }
 
     /**
+     * Create a {@link #AVPATH_SYNTAX_ERROR} exception for when the user entered a bad avpath expression.
+     *
+     * @param query The avpath query that failed.
+     * @return An exception corresponding to the error code.
+     */
+    public static TalendRuntimeException createAvpathSyntaxError(String query) {
+        String msg = "The avpath query '" + query + "' contains unknown element.";
+        return new TalendMsgRuntimeException(AVPATH_SYNTAX_ERROR,
+                ExceptionContext.withBuilder().put("query", query).put("position", -1).build(), msg);
+    }
+
+    /**
      * {@link TalendRuntimeException} with a reasonable user-friendly message in English.
      */
     private static class TalendMsgRuntimeException extends TalendRuntimeException {
 
         private final String localizedMessage;
 
-        public TalendMsgRuntimeException(Throwable cause, ErrorCode code, ExceptionContext context, String localizedMessage) {
+        public TalendMsgRuntimeException(Throwable cause, ErrorCode code, ExceptionContext context,
+                String localizedMessage) {
             super(code, cause, context);
+            this.localizedMessage = localizedMessage;
+        }
+
+        public TalendMsgRuntimeException(ErrorCode code, ExceptionContext context, String localizedMessage) {
+            super(code, context);
             this.localizedMessage = localizedMessage;
         }
 
