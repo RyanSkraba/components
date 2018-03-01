@@ -58,7 +58,7 @@
 		{
 		"id" : "SNOWFLAKE",
 		"class" : "net.snowflake.client.jdbc.SnowflakeDriver",
-		"url" : "jdbc:snowflake://account.snowflakecomputing.com/?warehouse=warehouse&db=db",
+		"url" : "jdbc:snowflake://account.snowflakecomputing.com/?warehouse=warehouse&db=db&schema=public",
 		"paths" : 
 	 	[
 	 		{"path" : "mvn:net.snowflake/snowflake-jdbc/3.3.1"}
