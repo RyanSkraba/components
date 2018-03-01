@@ -52,7 +52,7 @@ public class MarkLogicBulkLoadDefinition extends AbstractMarkLogicComponentDefin
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
         if (connectorTopology == ConnectorTopology.NONE) {
-            return RuntimeInfoProvider.getCommonRuntimeInfo("org.talend.components.marklogic.runtime.MarkLogicBulkLoad");
+            return RuntimeInfoProvider.getCommonRuntimeInfo("org.talend.components.marklogic.runtime.bulkload.MarkLogicBulkLoad");
         } else {
             return null;
         }

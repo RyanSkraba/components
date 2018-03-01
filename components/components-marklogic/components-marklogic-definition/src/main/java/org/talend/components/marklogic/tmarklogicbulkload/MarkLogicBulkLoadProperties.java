@@ -18,6 +18,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 public class MarkLogicBulkLoadProperties extends ComponentPropertiesImpl {
@@ -34,6 +35,8 @@ public class MarkLogicBulkLoadProperties extends ComponentPropertiesImpl {
 
     public Property<String> mlcpParams = newString("mlcpParams");
 
+    public Property<Boolean> useExternalMLCP = newBoolean("useExternalMLCP");
+
     @Override
     public void setupLayout() {
         super.setupLayout();
@@ -45,6 +48,7 @@ public class MarkLogicBulkLoadProperties extends ComponentPropertiesImpl {
 
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(mlcpParams);
+        advancedForm.addRow(useExternalMLCP);
     }
 
     @Override
@@ -53,6 +57,7 @@ public class MarkLogicBulkLoadProperties extends ComponentPropertiesImpl {
         connection.setupProperties();
 
         loadFolder.setRequired();
+        useExternalMLCP.setValue(false); // use internal mlcp library by default
     }
 
     @Override
@@ -65,5 +70,9 @@ public class MarkLogicBulkLoadProperties extends ComponentPropertiesImpl {
             }
             connection.getForm(Form.MAIN).getWidget(connection.authentication).setHidden();
         }
+    }
+
+    public MarkLogicConnectionProperties getConnection() {
+        return connection.isReferencedConnectionUsed() ? connection.referencedComponent.getReference() : connection;
     }
 }

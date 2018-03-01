@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.daikon.properties.presentation.Form;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -44,6 +45,9 @@ public class MarkLogicBulkLoadPropertiesTest {
 
         assertNotNull(bulkLoadProperties.mlcpParams);
         assertNull(bulkLoadProperties.mlcpParams.getStringValue());
+
+        assertNotNull(bulkLoadProperties.useExternalMLCP);
+        assertFalse(bulkLoadProperties.useExternalMLCP.getValue());
     }
 
     @Test
@@ -54,5 +58,9 @@ public class MarkLogicBulkLoadPropertiesTest {
         assertNotNull(mainForm.getWidget(bulkLoadProperties.connection));
         assertNotNull(mainForm.getChildForm(bulkLoadProperties.connection.getName())
                 .getChildForm(bulkLoadProperties.connection.getName()));
+
+        Form advancedForm = bulkLoadProperties.getForm(Form.ADVANCED);
+        assertNotNull(advancedForm.getWidget(bulkLoadProperties.mlcpParams));
+        assertNotNull(advancedForm.getWidget(bulkLoadProperties.useExternalMLCP));
     }
 }

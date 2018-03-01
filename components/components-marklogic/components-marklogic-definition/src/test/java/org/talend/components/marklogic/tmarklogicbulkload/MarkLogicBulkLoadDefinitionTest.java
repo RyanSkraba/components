@@ -66,7 +66,7 @@ public class MarkLogicBulkLoadDefinitionTest {
     public void testGetRuntimeInfo() {
         RuntimeInfo runtimeInfo = bulkLoadDefinition.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.NONE);
 
-        assertEquals("org.talend.components.marklogic.runtime.MarkLogicBulkLoad", runtimeInfo.getRuntimeClassName());
+        assertEquals("org.talend.components.marklogic.runtime.bulkload.MarkLogicBulkLoad", runtimeInfo.getRuntimeClassName());
     }
 
     @Test
