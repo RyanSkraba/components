@@ -26,10 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.exception.ComponentException;
@@ -44,6 +40,9 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JDBCDatastoreProperties extends PropertiesImpl implements DatastoreProperties, RuntimeSettingProvider {
 
@@ -71,24 +70,19 @@ public class JDBCDatastoreProperties extends PropertiesImpl implements Datastore
             } // else already set.
         }
         try {
-            JSONParser parser = new JSONParser();
-            JSONArray ja = null;
-            try {
-                ja = (JSONArray) parser.parse(new InputStreamReader(is));
-            } catch (ParseException e) {
-                throw new ComponentException(e);
-            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = null;
+            jsonNode = objectMapper.readTree(new InputStreamReader(is));
 
-            for (Object o : ja) {
+            for (JsonNode jo : jsonNode) {
                 DBType type = new DBType();
-                JSONObject jo = (JSONObject) o;
-                type.id = (String) jo.get("id");
-                type.clazz = (String) jo.get("class");
-                type.url = (String) jo.get("url");
-                JSONArray paths = (JSONArray) jo.get("paths");
-                for (Object path : paths) {
-                    JSONObject jo_path = (JSONObject) path;
-                    type.paths.add((String) jo_path.get("path"));
+                type.id = jo.get("id").asText();
+                type.clazz = jo.get("class").asText();
+                type.url = jo.get("url").asText();
+                JsonNode paths = jo.get("paths");
+                for (JsonNode path : paths) {
+                    JsonNode jo_path = (JsonNode) path;
+                    type.paths.add(jo_path.get("path").asText());
                 }
 
                 dyTypesInfo.put(type.id, type);
