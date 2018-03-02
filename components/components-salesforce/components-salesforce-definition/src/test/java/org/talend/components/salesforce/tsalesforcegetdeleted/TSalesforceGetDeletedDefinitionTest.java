@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -35,6 +35,7 @@ import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -82,10 +83,11 @@ public class TSalesforceGetDeletedDefinitionTest extends SalesforceTestBase {
 
     @Test
     public void testNestedCompatibleComponentPropertiesClass() {
-        assertThat(definition.getNestedCompatibleComponentPropertiesClass().length, is(1));
+        assertThat(definition.getNestedCompatibleComponentPropertiesClass().length, is(2));
         Collection<Class<? extends ComponentProperties>> properties = Arrays.asList(
                 definition.getNestedCompatibleComponentPropertiesClass());
         assertTrue(properties.contains(SalesforceConnectionProperties.class));
+        assertTrue(properties.contains(SalesforceModuleProperties.class));
     }
 
     @Test
