@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -12,22 +12,20 @@
 // ============================================================================
 package org.talend.components.processing.definition;
 
+import aQute.bnd.annotation.component.Component;
+import com.google.auto.service.AutoService;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.processing.definition.aggregate.AggregateDefinition;
-import org.talend.components.processing.definition.fieldselector.FieldSelectorDefinition;
 import org.talend.components.processing.definition.filterrow.FilterRowDefinition;
+import org.talend.components.processing.definition.limit.LimitDefinition;
 import org.talend.components.processing.definition.normalize.NormalizeDefinition;
 import org.talend.components.processing.definition.pythonrow.PythonRowDefinition;
 import org.talend.components.processing.definition.replicate.ReplicateDefinition;
 import org.talend.components.processing.definition.typeconverter.TypeConverterDefinition;
 import org.talend.components.processing.definition.window.WindowDefinition;
-
-import com.google.auto.service.AutoService;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * Install all of the definitions provided for the processing family of
@@ -47,9 +45,8 @@ public class ProcessingFamilyDefinition extends AbstractComponentFamilyDefinitio
         super(NAME,
                 // Components
                 new FilterRowDefinition(), new PythonRowDefinition(), new ReplicateDefinition(),
-                new TypeConverterDefinition(), new FieldSelectorDefinition(),
-                new WindowDefinition(), new NormalizeDefinition(), new AggregateDefinition()
-        // Component wizards
+                new TypeConverterDefinition(), new WindowDefinition(), new NormalizeDefinition(),
+                new AggregateDefinition(), new LimitDefinition()
         );
     }
 
