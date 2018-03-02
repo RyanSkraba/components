@@ -19,6 +19,7 @@ import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.processing.definition.aggregate.AggregateDefinition;
+import org.talend.components.processing.definition.fieldselector.FieldSelectorDefinition;
 import org.talend.components.processing.definition.filterrow.FilterRowDefinition;
 import org.talend.components.processing.definition.limit.LimitDefinition;
 import org.talend.components.processing.definition.normalize.NormalizeDefinition;
@@ -45,7 +46,9 @@ public class ProcessingFamilyDefinition extends AbstractComponentFamilyDefinitio
         super(NAME,
                 // Components
                 new FilterRowDefinition(), new PythonRowDefinition(), new ReplicateDefinition(),
-                new TypeConverterDefinition(), new WindowDefinition(), new NormalizeDefinition(),
+                new FieldSelectorDefinition(),
+                // new TypeConverterDefinition(), 
+                new WindowDefinition(), new NormalizeDefinition(),
                 new AggregateDefinition(), new LimitDefinition()
         );
     }
