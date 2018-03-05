@@ -432,8 +432,8 @@ public class AggregateCombineFn
             if (avroSchemaStr != null) {
                 valueCoder = AvroCoder.of(new Schema.Parser().parse(avroSchemaStr));
             }
-            return avroSchemaStr == null ? ListCoder.of(NullableCoder.of(StringUtf8Coder.of()))
-                    : ListCoder.of(NullableCoder.of(valueCoder));
+            return (Coder<List>) (avroSchemaStr == null ? ListCoder.of(NullableCoder.of(StringUtf8Coder.of()))
+                    : ListCoder.of(NullableCoder.of(valueCoder)));
         }
     }
 

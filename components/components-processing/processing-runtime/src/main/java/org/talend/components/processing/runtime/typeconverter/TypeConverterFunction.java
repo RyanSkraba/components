@@ -1,28 +1,37 @@
 package org.talend.components.processing.runtime.typeconverter;
 
+import java.util.Stack;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.beam.sdk.transforms.DoFn;
+import org.talend.components.api.component.runtime.RuntimableRuntime;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.processing.definition.typeconverter.TypeConverterProperties;
+import org.talend.daikon.java8.SerializableFunction;
+import org.talend.daikon.properties.ValidationResult;
 
-import java.util.Stack;
-
-public class TypeConverterDoFn extends DoFn<IndexedRecord, IndexedRecord> {
+public class TypeConverterFunction
+        implements SerializableFunction<IndexedRecord, IndexedRecord>, RuntimableRuntime<TypeConverterProperties> {
 
     private TypeConverterProperties properties;
 
-    @ProcessElement
-    public void processElement(ProcessContext context) {
+    @Override
+    public ValidationResult initialize(RuntimeContainer container, TypeConverterProperties properties) {
+        this.properties = properties;
+        return ValidationResult.OK;
+    }
 
-        IndexedRecord inputRecord = context.element();
+    @Override
+    public IndexedRecord apply(IndexedRecord inputRecord) {
         Schema inputSchema = inputRecord.getSchema();
 
         // Compute new schema
         Schema outputSchema = inputSchema;
 
         for (TypeConverterProperties.TypeConverterPropertiesInner currentPathConverter : properties.converters.subProperties) {
-            if (currentPathConverter.field != null && currentPathConverter.field.getValue() != null && !currentPathConverter.field.getValue().isEmpty() && currentPathConverter.outputType != null && currentPathConverter.outputType.getValue() != null) {
+            if (currentPathConverter.field.getValue() != null && !currentPathConverter.field.getValue().isEmpty()
+                    && currentPathConverter.outputType.getValue() != null) {
                 Stack<String> pathSteps = TypeConverterUtils.getPathSteps(currentPathConverter.field.getValue());
                 outputSchema = TypeConverterUtils.convertSchema(outputSchema, pathSteps,
                         TypeConverterProperties.TypeConverterOutputTypes.valueOf(currentPathConverter.outputType.getValue()),
@@ -37,19 +46,15 @@ public class TypeConverterDoFn extends DoFn<IndexedRecord, IndexedRecord> {
         // Convert values
         for (TypeConverterProperties.TypeConverterPropertiesInner currentValueConverter : properties.converters.subProperties) {
             // Loop on converters
-            if (currentValueConverter.field != null && currentValueConverter.field.getValue() != null && !currentValueConverter.field.getValue().isEmpty() && currentValueConverter.outputType != null && currentValueConverter.outputType.getValue() != null) {
+            if (currentValueConverter.field.getValue() != null && !currentValueConverter.field.getValue().isEmpty()
+                    && currentValueConverter.outputType.getValue() != null) {
                 Stack<String> pathSteps = TypeConverterUtils.getPathSteps(currentValueConverter.field.getValue());
-                TypeConverterUtils.convertValue(outputRecordBuilder, pathSteps,
+                TypeConverterUtils.convertValue(inputSchema, outputRecordBuilder, pathSteps,
                         TypeConverterProperties.TypeConverterOutputTypes.valueOf(currentValueConverter.outputType.getValue()),
                         currentValueConverter.outputFormat.getValue());
             }
         }
 
-        context.output(outputRecordBuilder.build());
-    }
-
-    public TypeConverterDoFn withProperties(TypeConverterProperties properties) {
-        this.properties = properties;
-        return this;
+        return outputRecordBuilder.build();
     }
 }

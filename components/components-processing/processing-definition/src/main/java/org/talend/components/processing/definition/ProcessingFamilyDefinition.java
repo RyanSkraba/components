@@ -45,12 +45,9 @@ public class ProcessingFamilyDefinition extends AbstractComponentFamilyDefinitio
     public ProcessingFamilyDefinition() {
         super(NAME,
                 // Components
-                new FilterRowDefinition(), new PythonRowDefinition(), new ReplicateDefinition(),
-                new FieldSelectorDefinition(),
-                // new TypeConverterDefinition(), 
-                new WindowDefinition(), new NormalizeDefinition(),
-                new AggregateDefinition(), new LimitDefinition()
-        );
+                new AggregateDefinition(), new FieldSelectorDefinition(), new FilterRowDefinition(), new LimitDefinition(),
+                new NormalizeDefinition(), new PythonRowDefinition(), new ReplicateDefinition(), new TypeConverterDefinition(),
+                new WindowDefinition());
     }
 
     @Override

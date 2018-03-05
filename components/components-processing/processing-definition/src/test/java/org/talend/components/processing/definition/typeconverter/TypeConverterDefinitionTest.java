@@ -1,5 +1,11 @@
 package org.talend.components.processing.definition.typeconverter;
 
+import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,8 +17,6 @@ import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.runtime.RuntimeInfo;
-
-import static org.hamcrest.Matchers.*;
 
 public class TypeConverterDefinitionTest {
 
@@ -44,7 +48,7 @@ public class TypeConverterDefinitionTest {
     public void testRuntimeInfo() {
         RuntimeInfo runtimeInfo = def.getRuntimeInfo(ExecutionEngine.BEAM, null, ConnectorTopology.INCOMING_AND_OUTGOING);
         Assert.assertThat(runtimeInfo.getRuntimeClassName(),
-                is("org.talend.components.processing.runtime.typeconverter.TypeConverterRuntime"));
+                is("org.talend.components.processing.runtime.typeconverter.TypeConverterFunction"));
         // The integration module tests things that aren't available in the RuntimeInfo module until after it is
         // installed in the local maven repository.
     }

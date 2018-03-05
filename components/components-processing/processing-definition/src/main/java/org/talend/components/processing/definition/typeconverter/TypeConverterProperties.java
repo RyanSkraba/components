@@ -12,6 +12,10 @@
 // ============================================================================
 package org.talend.components.processing.definition.typeconverter;
 
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
@@ -26,14 +30,6 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
-
 public class TypeConverterProperties extends FixedConnectorsComponentProperties implements Serializable {
 
     /**
@@ -41,15 +37,14 @@ public class TypeConverterProperties extends FixedConnectorsComponentProperties 
      */
     public enum TypeConverterOutputTypes {
         Boolean(Schema.Type.BOOLEAN, Boolean.class),
-        Decimal(Schema.Type.BYTES, BigDecimal.class),
         Double(Schema.Type.DOUBLE, Double.class),
         Float(Schema.Type.FLOAT, Float.class),
         Integer(Schema.Type.INT, Integer.class),
         Long(Schema.Type.LONG, Long.class),
         String(Schema.Type.STRING, String.class),
-        Date(Schema.Type.INT, LocalDate.class),
-        Time(Schema.Type.INT, LocalTime.class),
-        DateTime(Schema.Type.LONG, LocalDateTime.class);
+        Date(Schema.Type.INT, Integer.class),
+        Time(Schema.Type.INT, Integer.class),
+        DateTime(Schema.Type.LONG, Long.class);
 
         // Avro schema output type
         private Schema.Type targetType;
@@ -63,15 +58,10 @@ public class TypeConverterProperties extends FixedConnectorsComponentProperties 
         }
 
         public Schema.Type getTargetType() {
-
             return this.targetType;
         }
 
-        public Class getTargetClass(){
-            return this.targetClass;
-        }
-
-        public Converter getConverter(){
+        public Converter getConverter() {
             return TypeConverter.as(this.targetClass);
         }
     }

@@ -1,10 +1,10 @@
 package org.talend.components.processing.definition.typeconverter;
 
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.notNullValue;
+
+import org.junit.Test;
 
 public class TypeConverterPropertiesTest {
 

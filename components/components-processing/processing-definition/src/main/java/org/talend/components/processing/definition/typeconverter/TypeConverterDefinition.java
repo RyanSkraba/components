@@ -63,7 +63,7 @@ public class TypeConverterDefinition extends AbstractComponentDefinition {
             return new JarRuntimeInfo(new URL("mvn:org.talend.components/processing-runtime"),
                     DependenciesReader.computeDependenciesFilePath(ProcessingFamilyDefinition.MAVEN_GROUP_ID,
                             ProcessingFamilyDefinition.MAVEN_ARTIFACT_ID),
-                    "org.talend.components.processing.runtime.typeconverter.TypeConverterRuntime");
+                    "org.talend.components.processing.runtime.typeconverter.TypeConverterFunction");
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }
