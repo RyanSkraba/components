@@ -261,4 +261,20 @@ public class SnowflakeConnectionPropertiesTest {
                 snowflakeConnectionProperties.getForm(Form.ADVANCED).getWidget(snowflakeConnectionProperties.role).isHidden());
     }
 
+    @Test
+    public void testPostDeserialize() {
+        //Missing value from 0 version.
+        snowflakeConnectionProperties.loginTimeout.setValue(null);
+
+        snowflakeConnectionProperties.postDeserialize(0, null, false);
+
+        Assert.assertEquals(SnowflakeConnectionProperties.DEFAULT_LOGIN_TIMEOUT, snowflakeConnectionProperties.loginTimeout.getValue().intValue());
+
+        snowflakeConnectionProperties.loginTimeout.setValue(0);
+        //In 1 version value exists, no need to change it to default.
+        snowflakeConnectionProperties.postDeserialize(1, null, false);
+
+        Assert.assertEquals(0, snowflakeConnectionProperties.loginTimeout.getValue().intValue());
+    }
+
 }

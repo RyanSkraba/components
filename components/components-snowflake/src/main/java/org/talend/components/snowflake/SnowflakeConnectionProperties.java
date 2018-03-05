@@ -32,11 +32,17 @@ import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class SnowflakeConnectionProperties extends ComponentPropertiesImpl implements SnowflakeProvideConnectionProperties {
+public class SnowflakeConnectionProperties extends ComponentPropertiesImpl implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
 
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(SnowflakeConnectionProperties.class);
+
+    private static final int SPECIFY_LOGIN_TIMEOUT_VERSION_NUMBER = 1;
+
+    protected static final int DEFAULT_LOGIN_TIMEOUT = 15;
 
     private static final String USERPASSWORD = "userPassword";
 
@@ -94,7 +100,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
     @Override
     public void setupProperties() {
         super.setupProperties();
-        loginTimeout.setValue(1);
+        loginTimeout.setValue(DEFAULT_LOGIN_TIMEOUT);
         tracing.setValue(Tracing.OFF);
     }
 
@@ -252,6 +258,21 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
             }
             builder.append(propertyName).append("=").append(propertyValue);
         }
+    }
+
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated = super.postDeserialize(version, setup, persistent);
+        if (version < SPECIFY_LOGIN_TIMEOUT_VERSION_NUMBER && loginTimeout.getValue() == null) {
+            loginTimeout.setValue(DEFAULT_LOGIN_TIMEOUT);
+            migrated = true;
+        }
+        return migrated;
+    }
+
+    @Override
+    public int getVersionNumber() {
+        return 1;
     }
 
 }
