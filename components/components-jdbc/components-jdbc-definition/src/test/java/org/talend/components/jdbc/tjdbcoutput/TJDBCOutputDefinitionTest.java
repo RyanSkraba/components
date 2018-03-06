@@ -42,7 +42,7 @@ public class TJDBCOutputDefinitionTest {
         assertEquals(null, result.getIconKey());
         assertEquals(null, result.getPartitioning());
         assertEquals(false, result.isDataAutoPropagate());
-        assertEquals(false, result.isSchemaAutoPropagate());
+        assertEquals(true, result.isSchemaAutoPropagate());
         assertEquals(false, result.isRejectAfterClose());
         assertEquals("JDBC Output", result.getDisplayName());
         assertEquals("JDBC Output", result.getTitle());

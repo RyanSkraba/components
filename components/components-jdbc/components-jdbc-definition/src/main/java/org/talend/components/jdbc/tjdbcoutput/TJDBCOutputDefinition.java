@@ -96,6 +96,11 @@ public class TJDBCOutputDefinition extends AbstractComponentDefinition {
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return new Class[] { JDBCConnectionWizardProperties.class};
     }
+    
+    @Override
+    public boolean isSchemaAutoPropagate() {
+        return true;
+    }
 
     @Override
     public boolean isParallelize() {
