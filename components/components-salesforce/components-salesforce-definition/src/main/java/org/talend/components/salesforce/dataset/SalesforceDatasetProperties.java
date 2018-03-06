@@ -18,7 +18,10 @@ import static org.talend.daikon.properties.property.PropertyFactory.newStringLis
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.commons.lang3.StringUtils;
@@ -107,15 +110,42 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
         }
     }
     
+    static Set<String> MODULE_LIST_WHICH_NOT_SUPPORT_BULK_API = new HashSet<String>(Arrays.asList(
+        "AcceptedEventRelation",
+        "ActivityHistory",
+        "AggregateResult",
+        "AttachedContentDocument",
+        "CaseStatus",
+        "CombinedAttachment",
+        "ContractStatus",
+        "DeclinedEventRelation",
+        "EmailStatus",
+        "LookedUpFromActivity",
+        "Name",
+        "NoteAndAttachment",
+        "OpenActivity",
+        "OwnedContentDocument",
+        "PartnerRole",
+        "ProcessInstanceHistory",
+        "RecentlyViewed",
+        "SolutionStatus",
+        "TaskPriority",
+        "TaskStatus",
+        "UndecidedEventRelation",
+        "UserRecordAccess"
+     )); 
+    
     private List<NamedThing> filter(List<NamedThing> moduleNames) {
+        List<NamedThing> result = new ArrayList<NamedThing>();
         if (moduleNames != null) {
             for (int i = 0; i < moduleNames.size(); i++) {
-                if ("AcceptedEventRelation".equalsIgnoreCase(moduleNames.get(i).getName())) {
-                    moduleNames.remove(i);
+                NamedThing module = moduleNames.get(i);
+                if (!MODULE_LIST_WHICH_NOT_SUPPORT_BULK_API.contains(module.getName())) {
+                    result.add(module);
                 }
             }
         }
-        return moduleNames;
+        return result;
     }
 
     private interface Consumer {
