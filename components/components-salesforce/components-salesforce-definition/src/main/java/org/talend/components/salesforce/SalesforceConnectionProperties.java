@@ -49,7 +49,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
     protected static final I18nMessages MESSAGES =
             GlobalI18N.getI18nMessageProvider().getI18nMessages(SalesforceConnectionProperties.class);
 
-    public static final String DEFAULT_API_VERSION = "39.0";
+    public static final String DEFAULT_API_VERSION = "42.0";
 
     public static final String URL = "https://www.salesforce.com/services/Soap/u/" + DEFAULT_API_VERSION;
 

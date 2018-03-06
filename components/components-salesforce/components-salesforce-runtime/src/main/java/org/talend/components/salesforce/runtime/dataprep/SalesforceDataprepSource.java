@@ -226,8 +226,12 @@ public class SalesforceDataprepSource
          */
         String soapEndpoint = config.getServiceEndpoint();
         // set it by a default property file
-        String api_version = "34.0";
-        String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + api_version;
+
+        // Service endpoint should be like this:
+        // https://ap1.salesforce.com/services/Soap/u/37.0/00D90000000eSq3
+        String apiVersion = soapEndpoint.substring(soapEndpoint.lastIndexOf("/services/Soap/u/") + 17);
+        apiVersion = apiVersion.substring(0, apiVersion.indexOf("/"));
+        String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + apiVersion;
         bulkConfig.setRestEndpoint(restEndpoint);
         bulkConfig.setCompression(true);// This should only be false when doing debugging.
         bulkConfig.setTraceMessage(false);

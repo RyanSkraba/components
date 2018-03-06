@@ -9,7 +9,7 @@
 	</parent>
 	<properties>
 	    <antlr4.version>4.6</antlr4.version>
-		<partner.version>39.0.0</partner.version>
+		<partner.version>42.0.0</partner.version>
 		<jetty.version>9.2.19.v20160908</jetty.version>
 		<coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
 	</properties>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>com.force.api</groupId>
 			<artifactId>force-wsc</artifactId>
-			<version>39.0.5</version>
+			<version>42.0.0</version>
             <exclusions>
 				<!--  exclude those dependencies cause they have know CVEs -->
 				<exclusion>
