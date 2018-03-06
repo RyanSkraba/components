@@ -470,7 +470,30 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         if (input.getSchema().equals(outSchema)) {
             successfulWrites.add(input);
         } else {
-            IndexedRecord successful = new GenericData.Record(outSchema);
+            IndexedRecord successful = null;
+            if (AvroUtils.isIncludeAllFields(outSchema)) {
+                Schema runtimeSchema = input.getSchema();
+                List<Schema.Field> addedFields = new ArrayList<>();
+                // Check whether design schema has additional field
+                Schema.Field idField = outSchema.getField(TSalesforceOutputProperties.FIELD_SALESFORCE_ID);
+                Schema.Field statusField = outSchema.getField(TSalesforceOutputProperties.FIELD_STATUS);
+                if (idField != null) {
+                    addedFields.add(
+                            new Schema.Field(idField.name(), idField.schema(), idField.doc(), idField.defaultVal()));
+                }
+                if (statusField != null) {
+                    addedFields.add(new Schema.Field(statusField.name(), statusField.schema(), statusField.doc(),
+                            statusField.defaultVal()));
+                }
+                if (addedFields.size() > 0) {
+                    // Append additional fields to the runtime schema
+                    runtimeSchema = AvroUtils.appendFields(runtimeSchema,
+                            addedFields.toArray(new Schema.Field[addedFields.size()]));
+                }
+                successful = new GenericData.Record(runtimeSchema);
+            } else {
+                successful = new GenericData.Record(outSchema);
+            }
             for (Schema.Field outField : successful.getSchema().getFields()) {
                 Object outValue = null;
                 Schema.Field inField = input.getSchema().getField(outField.name());
@@ -517,7 +540,35 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             if (input.getSchema().equals(outSchema)) {
                 rejectedWrites.add(input);
             } else {
-                IndexedRecord reject = new GenericData.Record(outSchema);
+                IndexedRecord reject = null;
+                if (AvroUtils.isIncludeAllFields(outSchema)) {
+                    Schema runtimeSchema = input.getSchema();
+                    List<Schema.Field> addedFields = new ArrayList<>();
+                    // Check whether design schema has additional field
+                    Schema.Field errorCodeField = outSchema.getField(TSalesforceOutputProperties.FIELD_ERROR_CODE);
+                    Schema.Field errorField = outSchema.getField(TSalesforceOutputProperties.FIELD_ERROR_FIELDS);
+                    Schema.Field errorMsgField = outSchema.getField(TSalesforceOutputProperties.FIELD_ERROR_MESSAGE);
+                    if (errorCodeField != null) {
+                        addedFields.add(new Schema.Field(errorCodeField.name(), errorCodeField.schema(),
+                                errorCodeField.doc(), errorCodeField.defaultVal()));
+                    }
+                    if (errorField != null) {
+                        addedFields.add(new Schema.Field(errorField.name(), errorField.schema(), errorField.doc(),
+                                errorField.defaultVal()));
+                    }
+                    if (errorMsgField != null) {
+                        addedFields.add(new Schema.Field(errorMsgField.name(), errorMsgField.schema(),
+                                errorMsgField.doc(), errorMsgField.defaultVal()));
+                    }
+                    if (addedFields.size() > 0) {
+                        // Append additional fields to the runtime schema
+                        runtimeSchema = AvroUtils.appendFields(runtimeSchema,
+                                addedFields.toArray(new Schema.Field[addedFields.size()]));
+                    }
+                    reject = new GenericData.Record(runtimeSchema);
+                } else {
+                    reject = new GenericData.Record(outSchema);
+                }
                 for (Schema.Field outField : reject.getSchema().getFields()) {
                     Object outValue = null;
                     Schema.Field inField = input.getSchema().getField(outField.name());

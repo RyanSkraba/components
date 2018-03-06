@@ -19,7 +19,14 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.FIELD_SALESFORCE_ID;
 
 import java.io.File;
@@ -55,6 +62,7 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinit
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+import org.talend.daikon.avro.SchemaConstants;
 
 import com.sforce.ws.util.Base64;
 
@@ -1310,6 +1318,111 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         } finally {
             deleteRows(inpuRecords, sfInputProps);
         }
+    }
+
+    /**
+     * Test write dynamic with feedback
+     */
+    @Test
+    public void testWriteDynamicWithFeedback() throws Exception {
+
+        // Component framework objects.
+        ComponentDefinition sfDef = new TSalesforceOutputDefinition();
+
+        TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
+        SalesforceTestBase.setupProps(sfProps.connection, false);
+        sfProps.module.setValue("moduleName", "Account");
+        Schema dynamicSchema=SchemaBuilder.builder().record("Schema") //
+                .prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true") //
+                .prop("di.dynamic.column.position","1").fields() //
+                .name("Name").type().stringType().noDefault() //
+                .endRecord();
+
+        Schema dynamicRuntimeSchema=SchemaBuilder.builder().record("Schema") //
+                .prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true") //
+                .prop("di.dynamic.column.position","1").fields() //
+                .name("Name").type().stringType().noDefault() //
+                .name("BillingStreet").type().stringType().noDefault() //
+                .name("BillingCity").type().stringType().noDefault() //
+                .name("BillingState").type().stringType().noDefault()//
+                .endRecord();
+        sfProps.module.main.schema.setValue(dynamicSchema);
+
+        sfProps.extendInsert.setValue(false);
+        sfProps.ceaseForError.setValue(false);
+        // Automatically generate the out schemas.
+        sfProps.module.schemaListener.afterSchema();
+
+        DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
+
+        // Initialize the Sink, WriteOperation and Writer
+        SalesforceSink sfSink = new SalesforceSink();
+        sfSink.initialize(container, sfProps);
+        sfSink.validate(container);
+
+        SalesforceWriteOperation sfWriteOp = sfSink.createWriteOperation();
+        sfWriteOp.initialize(container);
+
+        SalesforceWriter sfWriter = sfSink.createWriteOperation().createWriter(container);
+        sfWriter.open("uid1");
+
+        // Write one record, which should fail for missing name.
+        IndexedRecord r1 = new GenericData.Record(dynamicRuntimeSchema);
+        r1.put(0, "test");
+        r1.put(1, "deleteme");
+        r1.put(2, "deleteme");
+        r1.put(3, "deleteme");
+        sfWriter.write(r1);
+
+        // Check success
+        assertThat(sfWriter.getSuccessfulWrites(), hasSize(1));
+        IndexedRecord success = sfWriter.getSuccessfulWrites().get(0);
+        assertThat(success.getSchema().getFields(), hasSize(4));
+        // Check the values copied from the incoming record.
+        for (int i = 0; i < r1.getSchema().getFields().size(); i++) {
+            assertThat(success.getSchema().getFields().get(i), is(r1.getSchema().getFields().get(i)));
+            assertThat(success.get(i), is(r1.get(i)));
+        }
+        // The success fields.
+        assertThat(success.getSchema().getFields().get(0).name(), is("Name"));
+        assertThat(success.getSchema().getFields().get(1).name(), is("BillingStreet"));
+        assertThat(success.getSchema().getFields().get(2).name(), is("BillingCity"));
+        assertThat(success.getSchema().getFields().get(3).name(), is("BillingState"));
+        assertThat(success.get(0), is((Object) "test"));
+        assertThat(success.get(1), is((Object) "deleteme"));
+        assertThat(success.get(2), is((Object) "deleteme"));
+        assertThat(success.get(3), is((Object) "deleteme"));
+
+        // Check reject
+        IndexedRecord r2 = new GenericData.Record(dynamicRuntimeSchema);
+        r2.put(1, "deleteme");
+        r2.put(2, "deleteme");
+        r2.put(3, "deleteme");
+        sfWriter.write(r2);
+
+        assertThat(sfWriter.getRejectedWrites(), hasSize(1));
+        IndexedRecord rejected = sfWriter.getRejectedWrites().get(0);
+        assertThat(rejected.getSchema().getFields(), hasSize(7));
+        // The rejected fields.
+        assertThat(rejected.getSchema().getFields().get(0).name(), is("Name"));
+        assertThat(rejected.getSchema().getFields().get(1).name(), is("BillingStreet"));
+        assertThat(rejected.getSchema().getFields().get(2).name(), is("BillingCity"));
+        assertThat(rejected.getSchema().getFields().get(3).name(), is("BillingState"));
+        assertThat(rejected.getSchema().getFields().get(4).name(), is(TSalesforceOutputProperties.FIELD_ERROR_CODE));
+        assertThat(rejected.getSchema().getFields().get(5).name(), is(TSalesforceOutputProperties.FIELD_ERROR_FIELDS));
+        assertThat(rejected.getSchema().getFields().get(6).name(), is(TSalesforceOutputProperties.FIELD_ERROR_MESSAGE));
+        assertNull(rejected.get(0));
+        assertThat(rejected.get(1), is((Object) "deleteme"));
+        assertThat(rejected.get(2), is((Object) "deleteme"));
+        assertThat(rejected.get(3), is((Object) "deleteme"));
+        assertNotNull(rejected.get(4));
+        assertNotNull(rejected.get(5));
+        assertNotNull(rejected.get(6));
+
+        // Finish the Writer, WriteOperation and Sink.
+        Result wr1 = sfWriter.close();
+        sfWriteOp.finalize(Arrays.asList(wr1), container);
+
     }
 
     public String getFirstCreatedAccountRecordId() throws Exception {
