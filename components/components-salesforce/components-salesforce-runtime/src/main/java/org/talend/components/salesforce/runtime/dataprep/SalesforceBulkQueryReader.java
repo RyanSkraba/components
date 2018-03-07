@@ -147,7 +147,11 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
 
     @Override
     public void close() throws IOException {
-        // TODO no need to close it? we keep the same with di runtime only now
+        try {
+            bulkRuntime.closeJob();
+        } catch (AsyncApiException | ConnectionException e) {
+            throw new IOException(e);
+        }
     }
 
     private String getQueryString() throws IOException {
