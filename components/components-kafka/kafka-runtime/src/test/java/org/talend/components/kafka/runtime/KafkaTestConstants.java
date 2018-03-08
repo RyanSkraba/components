@@ -47,11 +47,12 @@ public class KafkaTestConstants {
     }
 
     public static KafkaDatasetProperties createDatasetCSV(KafkaDatastoreProperties datastore, String topic,
-            String filedDelimited) {
+            KafkaDatasetProperties.FieldDelimiterType fieldDelimiter, String specificFieldDelimiter) {
         KafkaDatasetProperties dataset = createDataset(datastore);
         dataset.topic.setValue(topic);
         dataset.valueFormat.setValue(KafkaDatasetProperties.ValueFormat.CSV);
-        dataset.fieldDelimiter.setValue(filedDelimited);
+        dataset.fieldDelimiter.setValue(fieldDelimiter);
+        dataset.specificFieldDelimiter.setValue(specificFieldDelimiter);
         return dataset;
     }
 }

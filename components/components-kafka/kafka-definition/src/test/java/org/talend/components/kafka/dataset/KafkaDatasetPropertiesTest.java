@@ -54,6 +54,7 @@ public class KafkaDatasetPropertiesTest {
         assertTrue(main.getWidget(dataset.main).isVisible());
         assertTrue(main.getWidget(dataset.valueFormat).isVisible());
         assertTrue(main.getWidget(dataset.fieldDelimiter).isVisible());
+        assertTrue(main.getWidget(dataset.specificFieldDelimiter).isHidden());
         assertTrue(main.getWidget(dataset.isHierarchy).isHidden());
         assertTrue(main.getWidget(dataset.avroSchema).isHidden());
 
@@ -63,6 +64,17 @@ public class KafkaDatasetPropertiesTest {
         assertTrue(main.getWidget(dataset.main).isVisible());
         assertTrue(main.getWidget(dataset.valueFormat).isVisible());
         assertTrue(main.getWidget(dataset.fieldDelimiter).isVisible());
+        assertTrue(main.getWidget(dataset.specificFieldDelimiter).isHidden());
+        assertTrue(main.getWidget(dataset.isHierarchy).isHidden());
+        assertTrue(main.getWidget(dataset.avroSchema).isHidden());
+
+        dataset.fieldDelimiter.setValue(KafkaDatasetProperties.FieldDelimiterType.OTHER);
+        PropertiesDynamicMethodHelper.afterProperty(dataset, dataset.fieldDelimiter.getName());
+        assertTrue(main.getWidget(dataset.topic).isVisible());
+        assertTrue(main.getWidget(dataset.main).isVisible());
+        assertTrue(main.getWidget(dataset.valueFormat).isVisible());
+        assertTrue(main.getWidget(dataset.fieldDelimiter).isVisible());
+        assertTrue(main.getWidget(dataset.specificFieldDelimiter).isVisible());
         assertTrue(main.getWidget(dataset.isHierarchy).isHidden());
         assertTrue(main.getWidget(dataset.avroSchema).isHidden());
 
@@ -74,6 +86,7 @@ public class KafkaDatasetPropertiesTest {
         assertTrue(main.getWidget(dataset.main).isVisible());
         assertTrue(main.getWidget(dataset.valueFormat).isVisible());
         assertTrue(main.getWidget(dataset.fieldDelimiter).isHidden());
+        assertTrue(main.getWidget(dataset.specificFieldDelimiter).isHidden());
         assertTrue(main.getWidget(dataset.isHierarchy).isVisible());
         assertTrue(main.getWidget(dataset.avroSchema).isVisible());
 
@@ -85,8 +98,9 @@ public class KafkaDatasetPropertiesTest {
         List<Schema.Field> fields = schema.getFields();
         assertEquals(0, fields.size());
         assertEquals(KafkaDatasetProperties.ValueFormat.CSV, dataset.valueFormat.getValue());
-        assertEquals(";", dataset.fieldDelimiter.getValue());
-        assertFalse(dataset.isHierarchy.getValue());
+        assertEquals(KafkaDatasetProperties.FieldDelimiterType.SEMICOLON, dataset.fieldDelimiter.getValue());
+        assertEquals(";", dataset.specificFieldDelimiter.getValue());
+        assertTrue(dataset.isHierarchy.getValue());
         assertNull(dataset.avroSchema.getValue());
     }
 
@@ -96,5 +110,6 @@ public class KafkaDatasetPropertiesTest {
         assertTrue(main.getWidget(dataset.topic).isCallBeforePresent());
         assertTrue(main.getWidget(dataset.valueFormat).isCallAfter());
         assertTrue(main.getWidget(dataset.isHierarchy).isCallAfter());
+        assertTrue(main.getWidget(dataset.fieldDelimiter).isCallAfter());
     }
 }

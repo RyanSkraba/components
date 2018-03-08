@@ -46,10 +46,13 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
     public EnumProperty<ValueFormat> valueFormat = PropertyFactory.newEnum("valueFormat", ValueFormat.class);
 
     // Property for csv
-    public Property<String> fieldDelimiter = PropertyFactory.newString("fieldDelimiter", ";");
+    public Property<FieldDelimiterType> fieldDelimiter =
+            PropertyFactory.newEnum("fieldDelimiter", FieldDelimiterType.class).setValue(FieldDelimiterType.SEMICOLON);
+
+    public Property<String> specificFieldDelimiter = PropertyFactory.newString("specificFieldDelimiter", ";");
 
     // Property for avro
-    public Property<Boolean> isHierarchy = PropertyFactory.newBoolean("isHierarchy", false);
+    public Property<Boolean> isHierarchy = PropertyFactory.newBoolean("isHierarchy", true);
 
     public Property<String> avroSchema = PropertyFactory.newString("avroSchema");
 
@@ -65,6 +68,7 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
         mainForm.addRow(widget(topic).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
         mainForm.addRow(valueFormat);
         mainForm.addRow(fieldDelimiter);
+        mainForm.addRow(specificFieldDelimiter);
         mainForm.addRow(isHierarchy);
         mainForm.addRow(widget(avroSchema).setWidgetType(Widget.CODE_WIDGET_TYPE)
                 .setConfigurationValue(Widget.CODE_SYNTAX_WIDGET_CONF, "json"));
@@ -86,13 +90,31 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
         refreshLayout(getForm(Form.MAIN));
     }
 
+    public void afterFieldDelimiter() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    public String getFieldDelimiter() {
+        if (FieldDelimiterType.OTHER.equals(fieldDelimiter.getValue())) {
+            return specificFieldDelimiter.getValue();
+        } else {
+            return fieldDelimiter.getValue().getDelimiter();
+        }
+    }
+
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
-            form.getWidget(fieldDelimiter).setVisible(valueFormat.getValue() == ValueFormat.CSV);
+            form.getWidget(fieldDelimiter).setVisible(ValueFormat.CSV.equals(valueFormat.getValue()));
+            fieldDelimiter.setRequired(ValueFormat.CSV.equals(valueFormat.getValue()));
+            form.getWidget(specificFieldDelimiter).setVisible(ValueFormat.CSV.equals(valueFormat.getValue())
+                    && fieldDelimiter.getValue().equals(FieldDelimiterType.OTHER));
+            specificFieldDelimiter.setRequired(ValueFormat.CSV.equals(valueFormat.getValue())
+                    && fieldDelimiter.getValue().equals(FieldDelimiterType.OTHER));
             form.getWidget(isHierarchy).setVisible(valueFormat.getValue() == ValueFormat.AVRO);
             form.getWidget(avroSchema).setVisible(valueFormat.getValue() == ValueFormat.AVRO && isHierarchy.getValue());
+            avroSchema.setRequired(ValueFormat.AVRO.equals(valueFormat.getValue()));
         }
     }
 
@@ -122,6 +144,24 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
     public enum ValueFormat {
         CSV,
         AVRO
+    }
+
+    public enum FieldDelimiterType {
+        SEMICOLON(";"),
+        COMMA(","),
+        TABULATION("\t"),
+        SPACE(" "),
+        OTHER("Other");
+
+        private final String value;
+
+        FieldDelimiterType(final String value) {
+            this.value = value;
+        }
+
+        public String getDelimiter() {
+            return value;
+        }
     }
 
 }

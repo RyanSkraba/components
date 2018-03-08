@@ -69,7 +69,7 @@ public class KafkaOutputPTransformRuntime extends PTransform<PCollection<Indexed
                         .apply(kafkaWrite);
             } else { // csv
                 return ((PCollection<KV<byte[], byte[]>>) pc1.apply(
-                        MapElements.via(new FormatCsvKV(properties.getDatasetProperties().fieldDelimiter.getValue()))))
+                        MapElements.via(new FormatCsvKV(properties.getDatasetProperties().getFieldDelimiter()))))
                                 .apply(kafkaWrite);
             }
         }
@@ -81,7 +81,7 @@ public class KafkaOutputPTransformRuntime extends PTransform<PCollection<Indexed
             } else { // csv
                 return (PDone) objectPCollection
                         .apply(MapElements
-                                .via(new FormatCsv(properties.getDatasetProperties().fieldDelimiter.getValue())))
+                                .via(new FormatCsv(properties.getDatasetProperties().getFieldDelimiter())))
                         .apply(kafkaWrite.values());
             }
         }

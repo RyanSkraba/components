@@ -123,7 +123,7 @@
                                             <KAFKA_ADVERTISED_PORT>9092</KAFKA_ADVERTISED_PORT>
                                             <KAFKA_ZOOKEEPER_CONNECT>zookeeper:2181</KAFKA_ZOOKEEPER_CONNECT>
                                             <KAFKA_CREATE_TOPICS>
-                                                test_in:1:1,test_out:1:1,test_avro_in:1:1,test_avro_out:1:1
+                                                test_in:1:1,test_out:1:1,test_avro_in:1:1,test_avro_out:1:1,test_in1:1:1,test_in2:1:1,test_in3:1:1,test_in4:1:1,test_out1:1:1,test_out2:1:1,test_out3:1:1,test_out4:1:1
                                             </KAFKA_CREATE_TOPICS>
                                         </env>
                                         <ports>

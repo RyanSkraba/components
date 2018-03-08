@@ -52,7 +52,9 @@ public class KafkaCsvBeamRuntimeTestIT {
 
     Integer maxRecords = 10;
 
-    String fieldDelimiter = ";";
+    String fieldDelimiter = KafkaDatasetProperties.FieldDelimiterType.SEMICOLON.getDelimiter();
+
+    String otherFieldDelimiter = "=";
 
     List<Person> expectedPersons = new ArrayList<>();
 
@@ -70,7 +72,6 @@ public class KafkaCsvBeamRuntimeTestIT {
         inputDatasetProperties.setDatastoreProperties(datastoreProperties);
         inputDatasetProperties.topic.setValue(TOPIC_IN);
         inputDatasetProperties.valueFormat.setValue(KafkaDatasetProperties.ValueFormat.CSV);
-        inputDatasetProperties.fieldDelimiter.setValue(fieldDelimiter);
         // no schema defined
 
         outputDatasetProperties = new KafkaDatasetProperties("outputDataset");
@@ -78,16 +79,63 @@ public class KafkaCsvBeamRuntimeTestIT {
         outputDatasetProperties.setDatastoreProperties(datastoreProperties);
         outputDatasetProperties.topic.setValue(TOPIC_OUT);
         outputDatasetProperties.valueFormat.setValue(KafkaDatasetProperties.ValueFormat.CSV);
-        outputDatasetProperties.fieldDelimiter.setValue(fieldDelimiter);
         // no schema defined
     }
 
     /**
      * Read csv format value and write csv format value without schema and do not write key
+     * using standard field delimiter
      */
     @Test
     public void csvBasicTest() {
-        String testID = "csvBasicTest" + new Random().nextInt();
+        inputDatasetProperties.fieldDelimiter.setValue(KafkaDatasetProperties.FieldDelimiterType.SEMICOLON);
+        outputDatasetProperties.fieldDelimiter.setValue(KafkaDatasetProperties.FieldDelimiterType.SEMICOLON);
+
+        basicTest("csvBasicTest", "1", fieldDelimiter);
+    }
+
+    /**
+     * Read csv format value and write csv format value without schema and do not write key
+     * using standard field delimiter
+     */
+    @Test
+    public void csvBasicTest2() {
+        inputDatasetProperties.fieldDelimiter.setValue(KafkaDatasetProperties.FieldDelimiterType.SEMICOLON);
+        outputDatasetProperties.fieldDelimiter.setValue(KafkaDatasetProperties.FieldDelimiterType.SEMICOLON);
+
+        basicTest2("csvBasicTest2", "2", fieldDelimiter);
+    }
+
+    /**
+     * Read csv format value and write csv format value without schema and do not write key
+     * using standard field delimiter
+     */
+    @Test
+    public void csvBasicTestWithOtherFieldDelimiter() {
+        inputDatasetProperties.fieldDelimiter.setValue(KafkaDatasetProperties.FieldDelimiterType.OTHER);
+        inputDatasetProperties.specificFieldDelimiter.setValue(otherFieldDelimiter);
+        outputDatasetProperties.fieldDelimiter.setValue(KafkaDatasetProperties.FieldDelimiterType.OTHER);
+        outputDatasetProperties.specificFieldDelimiter.setValue(otherFieldDelimiter);
+
+        basicTest("csvBasicTestWithOtherFieldDelimiter", "3", otherFieldDelimiter);
+    }
+
+    /**
+     * Read csv format value and write csv format value without schema and do not write key
+     * using standard field delimiter
+     */
+    @Test
+    public void csvBasicTest2WithOtherFieldDelimiter() {
+        inputDatasetProperties.fieldDelimiter.setValue(KafkaDatasetProperties.FieldDelimiterType.OTHER);
+        inputDatasetProperties.specificFieldDelimiter.setValue(otherFieldDelimiter);
+        outputDatasetProperties.fieldDelimiter.setValue(KafkaDatasetProperties.FieldDelimiterType.OTHER);
+        outputDatasetProperties.specificFieldDelimiter.setValue(otherFieldDelimiter);
+
+        basicTest2("csvBasicTest2WithOtherFieldDelimiter", "4", otherFieldDelimiter);
+    }
+
+    public void basicTest(String title, String topicSuffix, String fieldDelim) {
+        String testID = title + new Random().nextInt();
 
         expectedPersons = Person.genRandomList(testID, maxRecords);
 
@@ -99,7 +147,7 @@ public class KafkaCsvBeamRuntimeTestIT {
 
         Producer<Void, String> producer = new KafkaProducer<>(props);
         for (Person person : expectedPersons) {
-            ProducerRecord<Void, String> message = new ProducerRecord<>(TOPIC_IN, person.toCSV(fieldDelimiter));
+            ProducerRecord<Void, String> message = new ProducerRecord<>(TOPIC_IN + topicSuffix, person.toCSV(fieldDelim));
             producer.send(message);
         }
         producer.close();
@@ -119,6 +167,9 @@ public class KafkaCsvBeamRuntimeTestIT {
         outputProperties.setDatasetProperties(outputDatasetProperties);
         outputProperties.partitionType.setValue(KafkaOutputProperties.PartitionType.ROUND_ROBIN);
         outputProperties.useCompress.setValue(false);
+
+        inputDatasetProperties.topic.setValue(TOPIC_IN + topicSuffix);
+        outputDatasetProperties.topic.setValue(TOPIC_OUT + topicSuffix);
 
         KafkaInputPTransformRuntime inputRuntime = new KafkaInputPTransformRuntime();
         inputRuntime.initialize(null, inputProperties);
@@ -140,12 +191,12 @@ public class KafkaCsvBeamRuntimeTestIT {
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("auto.offset.reset", "earliest");
         KafkaConsumer<Void, String> consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(Arrays.asList(TOPIC_OUT));
+        consumer.subscribe(Arrays.asList(TOPIC_OUT + topicSuffix));
         List<Person> results = new ArrayList<>();
         while (true) {
             ConsumerRecords<Void, String> records = consumer.poll(100);
             for (ConsumerRecord<Void, String> record : records) {
-                Person person = Person.fromCSV(record.value(), fieldDelimiter);
+                Person person = Person.fromCSV(record.value(), fieldDelim);
                 if (testID.equals(person.group)) {
                     results.add(person);
                 }
@@ -159,12 +210,8 @@ public class KafkaCsvBeamRuntimeTestIT {
         assertEquals(expectedPersons, results);
     }
 
-    /**
-     * Read csv format value and write csv format value without schema and do not write key
-     */
-    @Test
-    public void csvBasicTest2() {
-        String testID = "csvBasicTest2" + new Random().nextInt();
+    public void basicTest2(String title, String topicSuffix, String fieldDelim) {
+        String testID = title + new Random().nextInt();
 
         expectedPersons = Person.genRandomList(testID, maxRecords);
 
@@ -176,7 +223,7 @@ public class KafkaCsvBeamRuntimeTestIT {
 
         Producer<Void, String> producer = new KafkaProducer<>(props);
         for (Person person : expectedPersons) {
-            ProducerRecord<Void, String> message = new ProducerRecord<>(TOPIC_IN, person.toCSV(fieldDelimiter));
+            ProducerRecord<Void, String> message = new ProducerRecord<>(TOPIC_IN + topicSuffix, person.toCSV(fieldDelim));
             producer.send(message);
         }
         producer.close();
@@ -198,6 +245,9 @@ public class KafkaCsvBeamRuntimeTestIT {
         outputProperties.keyColumn.setValue("field1"); // name generated by KafkaAvroRegistry
         outputProperties.useCompress.setValue(false);
 
+        inputDatasetProperties.topic.setValue(TOPIC_IN + topicSuffix);
+        outputDatasetProperties.topic.setValue(TOPIC_OUT + topicSuffix);
+
         KafkaInputPTransformRuntime inputRuntime = new KafkaInputPTransformRuntime();
         inputRuntime.initialize(null, inputProperties);
 
@@ -218,13 +268,13 @@ public class KafkaCsvBeamRuntimeTestIT {
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("auto.offset.reset", "earliest");
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(Arrays.asList(TOPIC_OUT));
+        consumer.subscribe(Arrays.asList(TOPIC_OUT + topicSuffix));
         List<Person> results = new ArrayList<>();
         List<String> keys = new ArrayList<>();
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(100);
             for (ConsumerRecord<String, String> record : records) {
-                Person person = Person.fromCSV(record.value(), fieldDelimiter);
+                Person person = Person.fromCSV(record.value(), fieldDelim);
                 if (testID.equals(person.group)) {
                     keys.add(record.key());
                     results.add(person);

@@ -77,7 +77,7 @@ public class KafkaInputPTransformRuntime extends PTransform<PBegin, PCollection<
             // FIXME(bchen) KafkaAvroRegistry do not have way to record adaptation, it infer schema by the data rather
             // than use the defined schema
             return kafkaRecords
-                    .apply(ParDo.of(new ExtractCsvSplit(properties.getDatasetProperties().fieldDelimiter.getValue())))
+                    .apply(ParDo.of(new ExtractCsvSplit(properties.getDatasetProperties().getFieldDelimiter())))
                     .apply(ConvertToIndexedRecord.<String[]>of());
         }
         default:

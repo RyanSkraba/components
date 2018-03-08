@@ -12,25 +12,6 @@
 // ============================================================================
 package org.talend.components.kafka.runtime;
 
-import static org.hamcrest.Matchers.hasItems;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.talend.components.kafka.runtime.KafkaTestConstants.BOOTSTRAP_HOST;
-import static org.talend.components.kafka.runtime.KafkaTestConstants.TOPIC_IN;
-import static org.talend.components.kafka.runtime.KafkaTestConstants.TOPIC_OUT;
-import static org.talend.components.kafka.runtime.KafkaTestConstants.createDataset;
-import static org.talend.components.kafka.runtime.KafkaTestConstants.createDatasetCSV;
-import static org.talend.components.kafka.runtime.KafkaTestConstants.createDatastore;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.TimeoutException;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -41,7 +22,17 @@ import org.junit.Test;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
 import org.talend.daikon.java8.Consumer;
 
-public class KafkaDatasetTestIT {
+import java.util.*;
+import java.util.concurrent.TimeoutException;
+
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.Assert.*;
+import static org.talend.components.kafka.runtime.KafkaTestConstants.*;
+
+// Same tests as in KafkaDatasetTestIT except that we use a specific field delimiter
+public class KafkaDatasetOtherDelimTestIT {
+
+    public final static String fieldDelimiter = "=";
 
     @Before
     public void init() throws TimeoutException {
@@ -59,7 +50,7 @@ public class KafkaDatasetTestIT {
 
         Producer<Void, String> producer = new KafkaProducer<>(props);
         for (Person person : expectedPersons) {
-            ProducerRecord<Void, String> message = new ProducerRecord<>(TOPIC_IN, person.toCSV(";"));
+            ProducerRecord<Void, String> message = new ProducerRecord<>(TOPIC_IN, person.toCSV(fieldDelimiter));
             producer.send(message);
         }
         producer.close();
@@ -85,7 +76,7 @@ public class KafkaDatasetTestIT {
     @Test
     public void getSampleTest() {
         KafkaDatasetRuntime runtime = new KafkaDatasetRuntime();
-        runtime.initialize(null, createDatasetCSV(createDatastore(), TOPIC_IN, KafkaDatasetProperties.FieldDelimiterType.SEMICOLON, ";"));
+        runtime.initialize(null, createDatasetCSV(createDatastore(), TOPIC_IN, KafkaDatasetProperties.FieldDelimiterType.OTHER, fieldDelimiter));
         final List<String> actual = new ArrayList<>();
         runtime.getSample(10, new Consumer<IndexedRecord>() {
 
@@ -100,11 +91,11 @@ public class KafkaDatasetTestIT {
     @Test
     public void getSchemaTest() {
         KafkaDatasetRuntime runtime = new KafkaDatasetRuntime();
-        runtime.initialize(null, createDatasetCSV(createDatastore(), TOPIC_IN, KafkaDatasetProperties.FieldDelimiterType.SEMICOLON,";"));
+        runtime.initialize(null, createDatasetCSV(createDatastore(), TOPIC_IN, KafkaDatasetProperties.FieldDelimiterType.OTHER,fieldDelimiter));
         Schema schema = runtime.getSchema();
         assertNotNull(schema);
         assertNotEquals(0, schema.getFields().size());
-        runtime.initialize(null, createDatasetCSV(createDatastore(), "fake", KafkaDatasetProperties.FieldDelimiterType.SEMICOLON,";"));
+        runtime.initialize(null, createDatasetCSV(createDatastore(), "fake", KafkaDatasetProperties.FieldDelimiterType.OTHER,fieldDelimiter));
         schema = runtime.getSchema();
         assertNotNull(schema);
         assertEquals(0, schema.getFields().size());
