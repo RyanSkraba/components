@@ -21,8 +21,19 @@ public class AggregateUtilsTest {
             Schema.Field f1 = new Schema.Field("f1", AvroUtils._string(), "", "");
             AggregateOperationProperties funcProps = new AggregateOperationProperties("");
             funcProps.operation.setValue(AggregateFieldOperationType.COUNT);
+            funcProps.fieldPath.setValue("inputRecord");
             Schema.Field newField = AggregateUtils.genField(f1, funcProps);
-            Assert.assertEquals("f1_COUNT", newField.name());
+            Assert.assertEquals("inputRecord_COUNT", newField.name());
+            Assert.assertEquals(AvroUtils._long(), AvroUtils.unwrapIfNullable(newField.schema()));
+        }
+
+        {
+            Schema.Field f1 = new Schema.Field("f1", AvroUtils._string(), "", "");
+            AggregateOperationProperties funcProps = new AggregateOperationProperties("");
+            funcProps.operation.setValue(AggregateFieldOperationType.COUNT);
+            funcProps.fieldPath.setValue("inputRecord.hierachical.valueToCatch");
+            Schema.Field newField = AggregateUtils.genField(f1, funcProps);
+            Assert.assertEquals("valueToCatch_COUNT", newField.name());
             Assert.assertEquals(AvroUtils._long(), AvroUtils.unwrapIfNullable(newField.schema()));
         }
 

@@ -71,7 +71,8 @@ public class AggregateUtils {
     }
 
     private static String genOutputFieldNameByOpt(String originalName, AggregateFieldOperationType operationType) {
-        return originalName + "_" + operationType.toString();
+        return (originalName.contains(".") ? StringUtils.substringAfterLast(originalName, ".") : originalName) //
+                + "_" + operationType.toString();
     }
 
     private static void fillNewFieldTreeByAggFunc(Map<String, Set<Object>> container,
@@ -107,8 +108,8 @@ public class AggregateUtils {
      * if the user did not set an output field path, use the input field name and the operation name
      * if the user set an output field path, use the name of the last element in the path.
      *
-     * @param originalField
-     * @param operationProps
+     * @param originalField the field to copy
+     * @param operationProps the operation to execute
      * @return
      */
     public static Schema.Field genField(Schema.Field originalField, AggregateOperationProperties operationProps) {
@@ -116,12 +117,15 @@ public class AggregateUtils {
                 AvroUtils.wrapAsNullable(genFieldType(originalField.schema(), operationProps.operation.getValue()));
         String outputFieldPath = operationProps.outputFieldPath.getValue();
         String newFieldName;
+
         if (StringUtils.isEmpty(outputFieldPath)) {
-            newFieldName = genOutputFieldNameByOpt(originalField.name(), operationProps.operation.getValue());
+            newFieldName =
+                    genOutputFieldNameByOpt(operationProps.fieldPath.getValue(), operationProps.operation.getValue());
         } else {
             newFieldName = outputFieldPath.contains(".") ? StringUtils.substringAfterLast(outputFieldPath, ".")
                     : outputFieldPath;
         }
+
         return new Schema.Field(newFieldName, newFieldSchema, originalField.doc(), originalField.defaultVal());
     }
 
