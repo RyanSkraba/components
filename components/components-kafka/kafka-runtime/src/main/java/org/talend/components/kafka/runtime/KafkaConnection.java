@@ -51,15 +51,15 @@ public class KafkaConnection {
                 props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class.getName());
                 props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class.getName());
             }
-            if (datastore.ssl.useSsl.getValue()) {
+            if (datastore.useSsl.getValue()) {
                 props.put("security.protocol", "SSL");
-                props.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, datastore.ssl.trustStoreType.getValue().toString());
-                props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, datastore.ssl.trustStorePath.getValue());
-                props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, datastore.ssl.trustStorePassword.getValue());
-                if (datastore.ssl.needClientAuth.getValue()) {
-                    props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, datastore.ssl.keyStoreType.getValue().toString());
-                    props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, datastore.ssl.keyStorePath.getValue());
-                    props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, datastore.ssl.keyStorePassword.getValue());
+                props.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, datastore.trustStoreType.getValue().toString());
+                props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, datastore.trustStorePath.getValue());
+                props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, datastore.trustStorePassword.getValue());
+                if (datastore.needClientAuth.getValue()) {
+                    props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, datastore.keyStoreType.getValue().toString());
+                    props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, datastore.keyStorePath.getValue());
+                    props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, datastore.keyStorePassword.getValue());
                 }
             }
         }
