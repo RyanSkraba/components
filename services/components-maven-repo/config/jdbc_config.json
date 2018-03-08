@@ -1,6 +1,17 @@
 [
 
 	{
+		"id" : "MARIADB",
+		"class" : "org.mariadb.jdbc.Driver",
+		"url" : "jdbc:mysql://localhost:3306/db",
+		"paths" :
+	 	[
+	 		{"path" : "mvn:org.mariadb.jdbc/mariadb-java-client/2.0.2"}
+	 	]
+
+	},
+
+	{
 		"id" : "MYSQL",
 		"class" : "org.mariadb.jdbc.Driver",
 		"url" : "jdbc:mysql://localhost:3306/db",
