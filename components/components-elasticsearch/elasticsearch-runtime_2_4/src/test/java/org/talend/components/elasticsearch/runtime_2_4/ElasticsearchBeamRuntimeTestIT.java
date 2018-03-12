@@ -14,8 +14,6 @@
 package org.talend.components.elasticsearch.runtime_2_4;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -29,21 +27,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Create;
-import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.SimpleFunction;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.http.message.BasicHeader;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.index.translog.Translog;
-import org.hamcrest.Matcher;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,6 +48,8 @@ import org.talend.components.elasticsearch.ElasticsearchDatasetProperties;
 import org.talend.components.elasticsearch.ElasticsearchDatastoreProperties;
 import org.talend.components.elasticsearch.input.ElasticsearchInputProperties;
 import org.talend.components.elasticsearch.output.ElasticsearchOutputProperties;
+import org.talend.daikon.avro.converter.JsonGenericRecordConverter;
+import org.talend.daikon.avro.inferrer.JsonSchemaInferrer;
 import org.talend.daikon.java8.Consumer;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -68,6 +65,8 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
     ElasticsearchDatastoreProperties datastoreProperties;
 
     Client client;
+
+    JsonGenericRecordConverter jsonGenericRecordConverter = null;
 
     @Before
     public void init() throws IOException, ExecutionException, InterruptedException {
@@ -190,11 +189,17 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
     public void basicTest() throws MalformedURLException {
         final String TYPE_NAME = "basictest";
 
-        List<String> records = Arrays.asList("r1", "r2", "r3");
+        List<String> records = Arrays.asList("{\"field\":\"r1\"}", "{\"field\":\"r2\"}", "{\"field\":\"r3\"}");
 
         List<IndexedRecord> avroRecords = new ArrayList<>();
         for (String record : records) {
-            avroRecords.add(ConvertToIndexedRecord.convertToAvro(record));
+            if (jsonGenericRecordConverter == null) {
+                JsonSchemaInferrer jsonSchemaInferrer = new JsonSchemaInferrer(new ObjectMapper());
+                Schema jsonSchema = jsonSchemaInferrer.inferSchema(record);
+                jsonGenericRecordConverter = new JsonGenericRecordConverter(jsonSchema);
+            }
+            GenericRecord outputRecord = jsonGenericRecordConverter.convertToAvro(record);
+            avroRecords.add(outputRecord);
         }
 
         ElasticsearchDatasetProperties datasetProperties = new ElasticsearchDatasetProperties("datasetProperties");
@@ -237,17 +242,30 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
     public void filterTest() throws MalformedURLException {
         final String TYPE_NAME = "filtertest";
 
-        List<String> records = Arrays.asList("r1", "r2", "r3", "q1", "q2");
-        List<String> expectedRecords = Arrays.asList("r1", "r2", "r3");
+        List<String> records = Arrays.asList("{\"field\":\"r1\"}", "{\"field\":\"r2\"}", "{\"field\":\"r3\"}",
+                "{\"field\":\"q1\"}", "{\"field\":\"q2\"}");
+        List<String> expectedRecords = Arrays.asList("{\"field\":\"r1\"}", "{\"field\":\"r2\"}", "{\"field\":\"r3\"}");
 
         List<IndexedRecord> expectedRecord = new ArrayList<>();
         for (String record : expectedRecords) {
-            expectedRecord.add(ConvertToIndexedRecord.convertToAvro(record));
+            if (jsonGenericRecordConverter == null) {
+                JsonSchemaInferrer jsonSchemaInferrer = new JsonSchemaInferrer(new ObjectMapper());
+                Schema jsonSchema = jsonSchemaInferrer.inferSchema(record);
+                jsonGenericRecordConverter = new JsonGenericRecordConverter(jsonSchema);
+            }
+            GenericRecord outputRecord = jsonGenericRecordConverter.convertToAvro(record);
+            expectedRecord.add(outputRecord);
         }
 
         List<IndexedRecord> avroRecords = new ArrayList<>();
         for (String record : records) {
-            avroRecords.add(ConvertToIndexedRecord.convertToAvro(record));
+            if (jsonGenericRecordConverter == null) {
+                JsonSchemaInferrer jsonSchemaInferrer = new JsonSchemaInferrer(new ObjectMapper());
+                Schema jsonSchema = jsonSchemaInferrer.inferSchema(record);
+                jsonGenericRecordConverter = new JsonGenericRecordConverter(jsonSchema);
+            }
+            GenericRecord outputRecord = jsonGenericRecordConverter.convertToAvro(record);
+            avroRecords.add(outputRecord);
         }
 
         ElasticsearchDatasetProperties datasetProperties = new ElasticsearchDatasetProperties("datasetProperties");

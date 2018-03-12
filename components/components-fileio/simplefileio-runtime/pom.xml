@@ -14,24 +14,16 @@
     <packaging>jar</packaging>
 
     <properties>
-        <hadoop.version>2.7.0</hadoop.version>
+        <hadoop.version>2.7.3</hadoop.version>
         <!-- See below on information for hadoop-aws. -->
         <hadoop.aws.artifactId>hadoop-aws-tlnd</hadoop.aws.artifactId>
         <hadoop.aws.version>2.7.3.1</hadoop.aws.version>
         <parquet.version>1.9.0</parquet.version>
-        <spark.version>1.6.0</spark.version>
+        <spark.version>2.2.1</spark.version>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
 
     <dependencies>
-
-        <!-- I'm not sure why this is necessary for the Spark runner tests. -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.4.4</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -170,13 +162,13 @@
         <!-- necessary for Spark unit tests -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.10</artifactId>
+            <artifactId>spark-core_2.11</artifactId>
             <version>${spark.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming_2.10</artifactId>
+            <artifactId>spark-streaming_2.11</artifactId>
             <version>${spark.version}</version>
             <scope>test</scope>
         </dependency>
@@ -188,7 +180,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-yarn_2.10</artifactId>
+            <artifactId>spark-yarn_2.11</artifactId>
             <version>${spark.version}</version>
             <scope>test</scope>
         </dependency>
@@ -223,6 +215,8 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+
     <build>
         <plugins>
             <plugin>

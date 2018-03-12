@@ -19,11 +19,14 @@ import org.apache.beam.sdk.io.kinesis.auth.BasicAWSCredentialsProvider;
 import com.amazonaws.auth.AWSCredentialsProviderChain;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
 import com.amazonaws.services.kinesis.AmazonKinesis;
-import com.amazonaws.services.kinesis.AmazonKinesisClient;
+import com.amazonaws.services.kinesis.AmazonKinesisClientBuilder;
 
-public class TalendKinesisProvider implements KinesisClientProvider {
+public class TalendKinesisProvider implements AWSClientsProvider {
 
     private final boolean specifyCredentials;
 
@@ -71,8 +74,7 @@ public class TalendKinesisProvider implements KinesisClientProvider {
         this.stsEndpoint = stsEndpoint;
     }
 
-    @Override
-    public AmazonKinesis get() {
+    private AWSCredentialsProviderChain getCredentialsProvier() {
         AWSCredentialsProviderChain credentials = null;
         if (specifyCredentials) {
             credentials = new AWSCredentialsProviderChain(new BasicAWSCredentialsProvider(accessKey, secretKey),
@@ -94,11 +96,32 @@ public class TalendKinesisProvider implements KinesisClientProvider {
             }
             credentials = new AWSCredentialsProviderChain(builder.build());
         }
-        AmazonKinesisClient client = new AmazonKinesisClient(credentials);
-        client.withRegion(region);
+        return credentials;
+    }
+
+    @Override
+    public AmazonKinesis getKinesisClient() {
+        AmazonKinesisClientBuilder clientBuilder =
+                AmazonKinesisClientBuilder.standard().withCredentials(getCredentialsProvier());
         if (specifyEndpoint) {
-            client.setEndpoint(endpoint);
+            clientBuilder
+                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, region.getName()));
+        } else {
+            clientBuilder.setRegion(region.getName());
         }
-        return client;
+        return clientBuilder.build();
+    }
+
+    @Override
+    public AmazonCloudWatch getCloudWatchClient() {
+        AmazonCloudWatchClientBuilder clientBuilder =
+                AmazonCloudWatchClientBuilder.standard().withCredentials(getCredentialsProvier());
+        if (specifyEndpoint) {
+            clientBuilder
+                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, region.getName()));
+        } else {
+            clientBuilder.setRegion(region.getName());
+        }
+        return clientBuilder.build();
     }
 }

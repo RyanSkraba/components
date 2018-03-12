@@ -8,21 +8,14 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.beam.runners.spark.SparkContextOptions;
-import org.apache.beam.runners.spark.SparkRunner;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.spark.SparkConf;
-import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.talend.components.adapter.beam.utils.SparkRunnerTestUtils;
 import org.talend.components.processing.definition.aggregate.AggregateFieldOperationType;
 import org.talend.components.processing.definition.aggregate.AggregateGroupByProperties;
 import org.talend.components.processing.definition.aggregate.AggregateOperationProperties;
@@ -320,19 +313,31 @@ public class AggregateRuntimeTest {
 
             .name("array1_COUNT")
             .type()
+            .unionOf()
             .longType()
+            .and()
+            .nullType()
+            .endUnion()
             .noDefault()
 
             .name("g2_list_value")
             .type()
+            .unionOf()
             .array()
             .items()
             .stringType()
+            .and()
+            .nullType()
+            .endUnion()
             .noDefault()
 
             .name("g1_count_number")
             .type()
+            .unionOf()
             .longType()
+            .and()
+            .nullType()
+            .endUnion()
             .noDefault()
 
             .endRecord();
@@ -418,6 +423,7 @@ public class AggregateRuntimeTest {
     static {
         nullArray.add(null);
     }
+
     private final IndexedRecord basicResult4 = new GenericRecordBuilder(basicResultSchema) //
             .set("g1", "teamC")
             .set("g2", "sub1")
@@ -485,9 +491,8 @@ public class AggregateRuntimeTest {
     }
 
     @Test
-    @Ignore("scala version conflict")
     public void basicTest_Spark() {
-        basicTest(createSparkRunnerPipeline());
+        basicTest(new SparkRunnerTestUtils(this.getClass().getName()).createPipeline());
     }
 
     public void basicTest(Pipeline pipeline) {
@@ -525,19 +530,4 @@ public class AggregateRuntimeTest {
         pipeline.run();
     }
 
-    private Pipeline createSparkRunnerPipeline() {
-        PipelineOptions o = PipelineOptionsFactory.create();
-        SparkContextOptions options = o.as(SparkContextOptions.class);
-
-        SparkConf conf = new SparkConf();
-        conf.setAppName("Aggregate");
-        conf.setMaster("local[2]");
-        conf.set("spark.driver.allowMultipleContexts", "true");
-        JavaSparkContext jsc = new JavaSparkContext(new SparkContext(conf));
-        options.setProvidedSparkContext(jsc);
-        options.setUsesProvidedSparkContext(true);
-        options.setRunner(SparkRunner.class);
-
-        return Pipeline.create(options);
-    }
 }

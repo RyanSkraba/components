@@ -71,8 +71,9 @@ public class KinesisInputRuntime extends PTransform<PBegin, PCollection<IndexedR
     public PCollection<IndexedRecord> expand(PBegin in) {
         KinesisIO.Read kinesisRead = KinesisIO
                 .read()
-                .from(dataset.streamName.getValue(), convertToPosition(properties.position.getValue()))
-                .withClientProvider(KinesisClient.getProvider(dataset));
+                .withStreamName(dataset.streamName.getValue())
+                .withInitialPositionInStream(convertToPosition(properties.position.getValue()))
+                .withAWSClientsProvider(KinesisClient.getProvider(dataset));
         if (properties.useMaxReadTime.getValue()) {
             kinesisRead = kinesisRead.withMaxReadTime(new Duration(properties.maxReadTime.getValue()));
         }
@@ -88,9 +89,8 @@ public class KinesisInputRuntime extends PTransform<PBegin, PCollection<IndexedR
                     getDefaultOutputCoder());
         }
         case CSV: {
-            return kinesisRecordPCollection
-                    .apply(ParDo.of(new CsvConverter(dataset.getFieldDelimiter())))
-                    .setCoder(getDefaultOutputCoder());
+            return kinesisRecordPCollection.apply(ParDo.of(new CsvConverter(dataset.getFieldDelimiter()))).setCoder(
+                    getDefaultOutputCoder());
         }
         default:
             throw new RuntimeException("To be implemented: " + dataset.valueFormat.getValue());
