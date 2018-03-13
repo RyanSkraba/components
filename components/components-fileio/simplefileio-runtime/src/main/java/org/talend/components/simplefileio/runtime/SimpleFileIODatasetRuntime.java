@@ -18,6 +18,7 @@ import org.apache.beam.runners.direct.DirectOptions;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.transforms.Sample;
 import org.talend.components.adapter.beam.BeamLocalRunnerOption;
+import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.transform.DirectConsumerCollector;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.dataset.runtime.DatasetRuntime;
@@ -26,7 +27,6 @@ import org.talend.components.simplefileio.SimpleFileIODatastoreProperties;
 import org.talend.components.simplefileio.input.SimpleFileIOInputProperties;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 import org.talend.components.simplefileio.runtime.ugi.UgiExceptionHandler;
-import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
@@ -70,7 +70,7 @@ public class SimpleFileIODatasetRuntime implements DatasetRuntime<SimpleFileIODa
     @Override
     public Schema getSchema() {
         // Simple schema container.
-        final Schema[] s = new Schema[] { AvroUtils.createEmptySchema() };
+        final Schema[] s = new Schema[1];
         // Try to get one record and determine its schema in a callback.
         getSample(1, new Consumer<IndexedRecord>() {
 

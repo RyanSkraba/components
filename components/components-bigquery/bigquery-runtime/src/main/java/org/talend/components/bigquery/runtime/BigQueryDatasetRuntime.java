@@ -35,7 +35,7 @@ import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.google.api.gax.paging.Page;
+import com.google.cloud.Page;
 import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.Dataset;
 import com.google.cloud.bigquery.DatasetId;
@@ -74,10 +74,8 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
 
         try (DirectConsumerCollector<IndexedRecord> collector = DirectConsumerCollector.of(consumer)) {
             // Collect a sample of the input records.
-            p
-                    .apply(inputRuntime) //
-                    .apply(Sample.<IndexedRecord> any(limit))
-                    .apply(collector);
+            p.apply(inputRuntime) //
+                    .apply(Sample.<IndexedRecord> any(limit)).apply(collector);
             PipelineResult pr = p.run();
             pr.waitUntilFinish();
         }
@@ -89,7 +87,7 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
         Page<Dataset> datasets = bigquery.listDatasets(properties.getDatastoreProperties().projectName.getValue(),
                 BigQuery.DatasetListOption.pageSize(100));
         Set<String> datasetsName = new HashSet<>();
-        Iterator<Dataset> datasetIterator = datasets.iterateAll().iterator();
+        Iterator<Dataset> datasetIterator = datasets.iterateAll();
         while (datasetIterator.hasNext()) {
             datasetsName.add(datasetIterator.next().getDatasetId().getDataset());
         }
@@ -103,7 +101,7 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
                 properties.bqDataset.getValue());
         Page<Table> tables = bigquery.listTables(datasetId, BigQuery.TableListOption.pageSize(100));
         Set<String> tablesName = new HashSet<>();
-        Iterator<Table> tableIterator = tables.iterateAll().iterator();
+        Iterator<Table> tableIterator = tables.iterateAll();
         while (tableIterator.hasNext()) {
             tablesName.add(tableIterator.next().getTableId().getTable());
         }
@@ -127,17 +125,15 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
                     properties.bqDataset.getValue(), properties.tableName.getValue());
             Table table = bigquery.getTable(tableId);
             if (table == null) {
-                ComponentException.build(CommonErrorCodes.UNEXPECTED_EXCEPTION).setAndThrow(
-                        "Table not found:" + tableId.toString());
+                ComponentException.build(CommonErrorCodes.UNEXPECTED_EXCEPTION)
+                        .setAndThrow("Table not found:" + tableId.toString());
             }
             bqRowSchema = table.getDefinition().getSchema();
             break;
         }
         case QUERY: {
-            QueryRequest queryRequest = QueryRequest
-                    .newBuilder(properties.query.getValue())
-                    .setUseLegacySql(properties.useLegacySql.getValue())
-                    .build();
+            QueryRequest queryRequest = QueryRequest.newBuilder(properties.query.getValue())
+                    .setUseLegacySql(properties.useLegacySql.getValue()).build();
             QueryResponse queryResponse = bigquery.query(queryRequest);
             bqRowSchema = queryResponse.getResult().getSchema();
             break;

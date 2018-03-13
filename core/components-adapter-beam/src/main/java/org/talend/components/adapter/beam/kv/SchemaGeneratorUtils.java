@@ -12,7 +12,6 @@
 // ============================================================================
 package org.talend.components.adapter.beam.kv;
 
-import static org.talend.components.adapter.beam.kv.KeyValueRecordConstant.RECORD_KEYVALUE_PREFIX;
 import static org.talend.components.adapter.beam.kv.KeyValueRecordConstant.RECORD_KEY_PREFIX;
 import static org.talend.components.adapter.beam.kv.KeyValueRecordConstant.RECORD_VALUE_PREFIX;
 
@@ -46,17 +45,12 @@ public class SchemaGeneratorUtils {
      */
     public static Schema extractKeys(Schema inputSchema, List<String> keyPaths) {
         if (inputSchema == null) {
-            return AvroUtils.createEmptySchema();
+            return Schema.createRecord(new ArrayList<Field>());
         }
         // Generate the subSchema as a tree
         Map<String, Set<Object>> tree = generateTree(inputSchema, keyPaths);
         // use the generated tree to create an avro Schema
-        Schema schema = convertTreeToAvroSchema(tree, TREE_ROOT_DEFAULT_VALUE, inputSchema);
-        if (schema.getName() == null) {
-            schema = Schema.createRecord(RECORD_KEY_PREFIX, schema.getDoc(), schema.getNamespace(), schema.isError(),
-                    schema.getFields());
-        }
-        return schema;
+        return convertTreeToAvroSchema(tree, TREE_ROOT_DEFAULT_VALUE, inputSchema);
     }
 
     /**
@@ -210,17 +204,15 @@ public class SchemaGeneratorUtils {
      */
     public static Schema extractValues(Schema inputSchema, List<String> keyPaths) {
         if (inputSchema == null) {
-            return AvroUtils.createEmptySchema();
+            return Schema.createRecord(new ArrayList<Field>());
         }
-        Schema schema = extractValues(inputSchema, keyPaths, "");
-        if (schema == null) {
-            return AvroUtils.createEmptySchema();
+        Schema outputSchema = extractValues(inputSchema, keyPaths, "");
+        if (outputSchema == null) {
+            return Schema.createRecord("value_" + inputSchema.getName(), inputSchema.getDoc(),
+                    inputSchema.getNamespace(), inputSchema.isError(), new ArrayList<Schema.Field>());
+        } else {
+            return outputSchema;
         }
-        if (schema.getName() == null) {
-            schema = Schema.createRecord(RECORD_VALUE_PREFIX, schema.getDoc(), schema.getNamespace(), schema.isError(),
-                    schema.getFields());
-        }
-        return schema;
     }
 
     /**
@@ -280,7 +272,8 @@ public class SchemaGeneratorUtils {
         fieldList.add(new Field(RECORD_KEY_PREFIX, keySchema, "", ""));
         Schema valueSchema = extractValues(inputSchema, keyPaths);
         fieldList.add(new Field(RECORD_VALUE_PREFIX, valueSchema, "", ""));
-        return Schema.createRecord(RECORD_KEYVALUE_PREFIX, null, null, false, fieldList);
+
+        return Schema.createRecord(fieldList);
     }
 
     /**
@@ -321,7 +314,7 @@ public class SchemaGeneratorUtils {
                 return Schema.createRecord(fieldList);
             }
         } else {
-            return AvroUtils.createEmptySchema();
+            return Schema.createRecord(fieldList);
         }
     }
 

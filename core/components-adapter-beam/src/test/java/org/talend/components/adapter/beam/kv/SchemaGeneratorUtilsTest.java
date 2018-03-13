@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.adapter.beam.kv;
 
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +24,6 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Test;
-import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.GenericDataRecordHelper;
 
 public class SchemaGeneratorUtilsTest {
@@ -61,18 +58,17 @@ public class SchemaGeneratorUtilsTest {
     public void test_nullSchema() throws Exception {
         List<String> keyList = new ArrayList<String>();
 
-        assertThat(SchemaGeneratorUtils.extractKeys(null, keyList), is(AvroUtils.createEmptySchema()));
+        String keyOutput = ("{'type':'record','fields':[]}").replaceAll("\\'", "\"");
+        assertEquals(keyOutput, SchemaGeneratorUtils.extractKeys(null, keyList).toString());
 
-        assertThat(SchemaGeneratorUtils.extractValues(null, keyList), is(AvroUtils.createEmptySchema()));
+        String valueOutput = ("{'type':'record','fields':[]}".replaceAll("\\'", "\""));
+        assertEquals(valueOutput, SchemaGeneratorUtils.extractValues(null, keyList).toString());
 
         Schema kvSchema = SchemaGeneratorUtils.extractKeyValues(null, keyList);
-        String kvSchemaExpected = ("{'type':'record','name':'keyvalue','fields':["
-                + "{'name':'key','type':{'type':'record','name':'EmptySchema','fields':[]},'doc':'','default':''},"
-                + "{'name':'value','type':'EmptySchema','doc':'','default':''}]}").replace('\'', '"');
-        System.out.println(kvSchema);
-        assertThat(kvSchema.toString(), is(kvSchemaExpected));
+        assertEquals(generateKVOutput(keyOutput, valueOutput), kvSchema.toString());
 
-        assertThat(SchemaGeneratorUtils.mergeKeyValues(kvSchema), is(AvroUtils.createEmptySchema()));
+        String mergedSchema = ("{'type':'record','fields':[]}").replaceAll("\\'", "\"");
+        assertEquals(mergedSchema, SchemaGeneratorUtils.mergeKeyValues(kvSchema).toString());
     }
 
     /**
@@ -102,10 +98,11 @@ public class SchemaGeneratorUtilsTest {
                 + "{'name':'c','type':['null','string'],'default':null}]}").replaceAll("\\'", "\"");
         assertEquals(keyOutput, SchemaGeneratorUtils.extractKeys(inputRecord.getSchema(), keyList).toString());
 
-        assertThat(SchemaGeneratorUtils.extractValues(inputRecord.getSchema(), keyList), is(AvroUtils.createEmptySchema()));
+        String valueOutput = ("{'type':'record','name':'value_inputRow','fields':[]}").replaceAll("\\'", "\"");
+        assertEquals(valueOutput, SchemaGeneratorUtils.extractValues(inputRecord.getSchema(), keyList).toString());
 
         Schema kvSchema = SchemaGeneratorUtils.extractKeyValues(inputRecord.getSchema(), keyList);
-        assertEquals(generateKVOutput(keyOutput, AvroUtils.createEmptySchema().toString()), kvSchema.toString());
+        assertEquals(generateKVOutput(keyOutput, valueOutput), kvSchema.toString());
 
         String mergedSchema = ("{'type':'record','name':'inputRow','fields':[{'name':'a','type':['null','string'],'default':null},"
                 + "{'name':'b','type':['null','string'],'default':null},{'name':'c','type':['null','string'],'default':null}]}")
@@ -226,10 +223,11 @@ public class SchemaGeneratorUtilsTest {
                 + "{'name':'c','type':['null','string'],'default':null}]}],'default':null}]}").replaceAll("\\'", "\"");
         assertEquals(keyOutput, SchemaGeneratorUtils.extractKeys(inputRecord.getSchema(), keyList).toString());
 
-        assertThat(SchemaGeneratorUtils.extractValues(inputRecord.getSchema(), keyList), is(AvroUtils.createEmptySchema()));
+        String valueOutput = ("{'type':'record','name':'value_inputRow','fields':[]}").replaceAll("\\'", "\"");
+        assertEquals(valueOutput, SchemaGeneratorUtils.extractValues(inputRecord.getSchema(), keyList).toString());
 
         Schema kvSchema = SchemaGeneratorUtils.extractKeyValues(inputRecord.getSchema(), keyList);
-        assertEquals(generateKVOutput(keyOutput, AvroUtils.createEmptySchema().toString()), kvSchema.toString());
+        assertEquals(generateKVOutput(keyOutput, valueOutput), kvSchema.toString());
 
         String mergedSchema = ("{'type':'record','name':'inputRow','fields':[{'name':'name','type':['null','string'],'default':null},"
                 + "{'name':'data','type':['null',{'type':'record','name':'data','fields':[{'name':'a','type':['null','string'],'default':null},"
@@ -410,10 +408,11 @@ public class SchemaGeneratorUtilsTest {
                 + "{'name':'e1','type':'string'},{'name':'e2','type':'string'}]}}]}}]}").replaceAll("\\'", "\"");
         assertEquals(keyOutput, SchemaGeneratorUtils.extractKeys(inputRecord.getSchema(), keyList).toString());
 
-        assertThat(SchemaGeneratorUtils.extractValues(inputRecord.getSchema(), keyList), is(AvroUtils.createEmptySchema()));
+        String valueOutput = ("{'type':'record','name':'value_InRecord','fields':[]}").replaceAll("\\'", "\"");
+        assertEquals(valueOutput, SchemaGeneratorUtils.extractValues(inputRecord.getSchema(), keyList).toString());
 
         Schema kvSchema = SchemaGeneratorUtils.extractKeyValues(inputRecord.getSchema(), keyList);
-        assertEquals(generateKVOutput(keyOutput, AvroUtils.createEmptySchema().toString()), kvSchema.toString());
+        assertEquals(generateKVOutput(keyOutput, valueOutput), kvSchema.toString());
 
         String mergedSchema = ("{'type':'record','name':'InRecord','fields':[{'name':'a1','type':'string'},"
                 + "{'name':'B','type':{'type':'record','name':'BRecord','fields':["
@@ -461,10 +460,11 @@ public class SchemaGeneratorUtilsTest {
                         "\"");
         assertEquals(keyOutput, SchemaGeneratorUtils.extractKeys(inputRecord.getSchema(), keyList).toString());
 
-        assertThat(SchemaGeneratorUtils.extractValues(inputRecord.getSchema(), keyList), is(AvroUtils.createEmptySchema()));
+        String valueOutput = ("{'type':'record','name':'value_InRecord','fields':[]}").replaceAll("\\'", "\"");
+        assertEquals(valueOutput, SchemaGeneratorUtils.extractValues(inputRecord.getSchema(), keyList).toString());
 
         Schema kvSchema = SchemaGeneratorUtils.extractKeyValues(inputRecord.getSchema(), keyList);
-        assertEquals(generateKVOutput(keyOutput, AvroUtils.createEmptySchema().toString()), kvSchema.toString());
+        assertEquals(generateKVOutput(keyOutput, valueOutput), kvSchema.toString());
 
         String mergedSchema = ("{'type':'record','name':'InRecord','fields':[{'name':'a1','type':'string'},"
                 + "{'name':'B','type':{'type':'record','name':'BRecord','fields':["
@@ -509,10 +509,11 @@ public class SchemaGeneratorUtilsTest {
                         .replaceAll("\\'", "\"");
         assertEquals(keyOutput, SchemaGeneratorUtils.extractKeys(inputRecord.getSchema(), keyList).toString());
 
-        assertThat(SchemaGeneratorUtils.extractValues(inputRecord.getSchema(), keyList), is(AvroUtils.createEmptySchema()));
+        String valueOutput = ("{'type':'record','name':'value_InRecord','fields':[]}").replaceAll("\\'", "\"");
+        assertEquals(valueOutput, SchemaGeneratorUtils.extractValues(inputRecord.getSchema(), keyList).toString());
 
         Schema kvSchema = SchemaGeneratorUtils.extractKeyValues(inputRecord.getSchema(), keyList);
-        assertEquals(generateKVOutput(keyOutput, AvroUtils.createEmptySchema().toString()), kvSchema.toString());
+        assertEquals(generateKVOutput(keyOutput, valueOutput), kvSchema.toString());
 
         String mergedSchema = ("{'type':'record','name':'InRecord','fields':[{'name':'B','type':{'type':'record','name':'BRecord','fields':["
                 + "{'name':'C','type':{'type':'record','name':'CRecord','fields':[{'name':'c1','type':'string'},"
@@ -598,7 +599,7 @@ public class SchemaGeneratorUtilsTest {
     }
 
     private String generateKVOutput(String keyOutput, String valueOutput) {
-        return ("{'type':'record','name':'keyvalue','fields':[{'name':'key','type':" + keyOutput + ",'doc':'','default':''},"
+        return ("{'type':'record','fields':[{'name':'key','type':" + keyOutput + ",'doc':'','default':''},"
                 + "{'name':'value','type':" + valueOutput + ",'doc':'','default':''}]}") //
                         .replaceAll("\\'", "\"");
     }

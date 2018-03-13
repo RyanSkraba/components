@@ -33,7 +33,7 @@ public class KinesisClient {
     }
 
     public static AmazonKinesis create(KinesisDatastoreProperties datastore) {
-        return getProvider(datastore).getKinesisClient();
+        return getProvider(datastore).get();
     }
 
     public static TalendKinesisProvider getProvider(KinesisDatasetProperties dataset) {
@@ -51,6 +51,6 @@ public class KinesisClient {
     }
 
     public static AmazonKinesis create(KinesisDatasetProperties dataset) {
-        return getProvider(dataset).getKinesisClient();
+        return getProvider(dataset).get();
     }
 }

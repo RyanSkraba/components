@@ -18,6 +18,7 @@ import static org.talend.components.bigquery.runtime.BigQueryTestConstants.creat
 import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createInput;
 import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createOutput;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -27,23 +28,27 @@ import java.util.UUID;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.beam.runners.spark.SparkContextOptions;
+import org.apache.beam.runners.spark.SparkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.gcp.bigquery.TableRowJsonCoder;
+import org.apache.beam.sdk.options.PipelineOptions;
+import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
+import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.adapter.beam.BeamJobRuntimeContainer;
-import org.talend.components.adapter.beam.BeamLocalRunnerOption;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.io.rowgenerator.RowGeneratorIO;
-import org.talend.components.adapter.beam.utils.SparkRunnerTestUtils;
 import org.talend.components.bigquery.BigQueryDatastoreProperties;
 import org.talend.components.bigquery.input.BigQueryInputProperties;
 import org.talend.components.bigquery.output.BigQueryOutputProperties;
@@ -60,14 +65,17 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
 
     final static String datasetName = "bqcomponentio" + uuid;
 
+    @Rule
+    public final TestPipeline pipeline = TestPipeline.create();
+
+    private final static JavaSparkContext jsc = new JavaSparkContext("local[2]", BigQueryBeamRuntimeTestIT.class.getName());
+
     BigQueryDatastoreProperties datastore;
 
     BeamJobRuntimeContainer runtimeContainer;
 
-    SparkRunnerTestUtils sparkRunner;
-
     @BeforeClass
-    public static void initDataset() {
+    public static void initDataset() throws IOException {
         BigQuery bigquery = BigQueryConnection.createClient(createDatastore());
         DatasetId datasetId = DatasetId.of(BigQueryTestConstants.PROJECT, datasetName);
         bigquery.create(DatasetInfo.of(datasetId));
@@ -83,52 +91,53 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
     @Before
     public void init() {
         datastore = createDatastore();
-        runtimeContainer = new BeamJobRuntimeContainer(BeamLocalRunnerOption.getOptions());
+        runtimeContainer = new BeamJobRuntimeContainer(pipeline.getOptions());
     }
 
     @Test
-    @Ignore("TestPipeline cause conflict issue, but when using direct runner, assert for bytes type is not working well")
     public void testAllTypesInputOutput_Local() throws UnsupportedEncodingException {
-        testAllTypesInputOutput(Pipeline.create(BeamLocalRunnerOption.getOptions()));
+        testAllTypesInputOutput(pipeline);
     }
 
     @Test
     public void testAllTypesInputOutput_Spark() throws UnsupportedEncodingException {
-        sparkRunner = new SparkRunnerTestUtils(this.getClass().getName());
-        runtimeContainer = sparkRunner.createRuntimeContainer();
-        testAllTypesInputOutput(sparkRunner.createPipeline());
+        testAllTypesInputOutput(createSparkRunnerPipeline());
     }
 
-    /**
-     *
-     * Use direct runner instead of TestPipeline to avoid this issue, when upgrade to Beam 2.3.0
-     *
-     * Pipeline update will not be possible because the following transforms do not have stable unique names:
-     * BigQueryOutputRuntime/BigQueryIO.Write/BatchLoads/TempFilePrefixView/Combine.GloballyAsSingletonView/Combine.globally(Singleton)/Combine.perKey(Singleton)/GroupByKey,
-     * BigQueryOutputRuntime/BigQueryIO.Write/BatchLoads/View.AsSingleton/Combine.GloballyAsSingletonView/Combine.globally(Singleton)/Combine.perKey(Singleton)/GroupByKey.
-     */
     @Test
     public void testPrimitivesRequiredInputOutput_Local() {
-        testInputOutput(Pipeline.create(BeamLocalRunnerOption.getOptions()), "testPrimitiveRequiredLocal",
-                SampleSchemas.recordPrimitivesRequired());
+        testInputOutput(pipeline, "testPrimitiveRequiredLocal", SampleSchemas.recordPrimitivesRequired());
     }
 
     @Test
     public void testPrimitivesNullableInputOutput_Local() {
-        testInputOutput(Pipeline.create(BeamLocalRunnerOption.getOptions()), "testPrimitiveNullableLocal",
-                SampleSchemas.recordPrimitivesNullable());
+        testInputOutput(pipeline, "testPrimitiveNullableLocal", SampleSchemas.recordPrimitivesNullable());
     }
 
     @Test
     public void testCompositesRequired_Local() {
-        testInputOutput(Pipeline.create(BeamLocalRunnerOption.getOptions()), "testCompositesRequiredLocal",
-                SampleSchemas.recordCompositesRequired());
+        testInputOutput(pipeline, "testCompositesRequiredLocal", SampleSchemas.recordCompositesRequired());
+    }
+
+    @Test
+    public void testCompositesRequired_Spark() {
+        testInputOutput(pipeline, "testCompositesRequiredSpark", SampleSchemas.recordCompositesRequired());
+    }
+
+    // TODO extract this to utils
+    private Pipeline createSparkRunnerPipeline() {
+        PipelineOptions o = PipelineOptionsFactory.create();
+        SparkContextOptions options = o.as(SparkContextOptions.class);
+        options.setProvidedSparkContext(jsc);
+        options.setUsesProvidedSparkContext(true);
+        options.setRunner(SparkRunner.class);
+        runtimeContainer = new BeamJobRuntimeContainer(options);
+        return Pipeline.create(options);
     }
 
     private void testAllTypesInputOutput(Pipeline pipeline) throws UnsupportedEncodingException {
         String tableName = "testalltypes";
-        BigQueryOutputProperties outputProperties =
-                createOutput(createDatasetFromTable(datastore, datasetName, tableName));
+        BigQueryOutputProperties outputProperties = createOutput(createDatasetFromTable(datastore, datasetName, tableName));
         outputProperties.tableOperation.setValue(BigQueryOutputProperties.TableOperation.DROP_IF_EXISTS_AND_CREATE);
 
         Schema schema = new Schema.Parser().parse(
@@ -185,26 +194,20 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
 
         }
 
-        pipeline
-                .apply(Create.of(rows).withCoder(TableRowJsonCoder.of()))
-                .apply(ParDo.of(new BigQueryInputRuntime.TableRowToIndexedRecordFn(schema)))
-                .setCoder(LazyAvroCoder.of())
+        pipeline.apply(Create.of(rows).withCoder(TableRowJsonCoder.of()))
+                .apply(ParDo.of(new BigQueryInputRuntime.TableRowToIndexedRecordFn(schema))).setCoder(LazyAvroCoder.of())
                 .apply(outputRuntime);
 
         pipeline.run().waitUntilFinish();
-
         // finish output
         // start input
-        BigQueryInputProperties inputProperties =
-                createInput(createDatasetFromTable(datastore, datasetName, tableName));
+        BigQueryInputProperties inputProperties = createInput(createDatasetFromTable(datastore, datasetName, tableName));
 
         BigQueryInputRuntime inputRuntime = new BigQueryInputRuntime();
         inputRuntime.initialize(runtimeContainer, inputProperties);
 
-        PCollection<TableRow> tableRowPCollection = pipeline
-                .apply(inputRuntime)
-                .apply(ParDo.of(new BigQueryOutputRuntime.IndexedRecordToTableRowFn()))
-                .setCoder(TableRowJsonCoder.of());
+        PCollection<TableRow> tableRowPCollection = pipeline.apply(inputRuntime)
+                .apply(ParDo.of(new BigQueryOutputRuntime.IndexedRecordToTableRowFn())).setCoder(TableRowJsonCoder.of());
 
         PAssert.that(tableRowPCollection).containsInAnyOrder(rows);
 
@@ -214,16 +217,14 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
     private void testInputOutput(Pipeline pipeline, String tableName, Schema schema) {
         // Write 10 rows of generated records to BigQuery.
         {
-            BigQueryOutputProperties outputProperties =
-                    createOutput(createDatasetFromTable(datastore, datasetName, tableName));
+            BigQueryOutputProperties outputProperties = createOutput(createDatasetFromTable(datastore, datasetName, tableName));
             outputProperties.tableOperation.setValue(BigQueryOutputProperties.TableOperation.DROP_IF_EXISTS_AND_CREATE);
             outputProperties.getDatasetProperties().main.schema.setValue(schema);
             BigQueryOutputRuntime outputRuntime = new BigQueryOutputRuntime();
             outputRuntime.initialize(runtimeContainer, outputProperties);
 
             // Generate 10 rows.
-            PCollection<IndexedRecord> pc1 =
-                    pipeline.apply(RowGeneratorIO.read().withSchema(schema).withRows(10).withSeed(0L));
+            PCollection<IndexedRecord> pc1 = pipeline.apply(RowGeneratorIO.read().withSchema(schema).withRows(10).withSeed(0L));
 
             pc1.apply(outputRuntime);
             pipeline.run().waitUntilFinish();
@@ -231,8 +232,7 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
 
         // Read the 10 rows back from BigQuery.
         {
-            BigQueryInputProperties inputProperties =
-                    createInput(createDatasetFromTable(datastore, datasetName, tableName));
+            BigQueryInputProperties inputProperties = createInput(createDatasetFromTable(datastore, datasetName, tableName));
             BigQueryInputRuntime inputRuntime = new BigQueryInputRuntime();
             inputRuntime.initialize(runtimeContainer, inputProperties);
             PCollection<IndexedRecord> pc2 = pipeline.apply(inputRuntime);

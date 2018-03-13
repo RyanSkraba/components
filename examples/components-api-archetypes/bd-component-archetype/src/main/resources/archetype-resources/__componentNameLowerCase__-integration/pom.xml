@@ -16,7 +16,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <beam.version>2.3.0</beam.version>
+        <beam.version>2.0.0</beam.version>
         <tcomp.version>${version}</tcomp.version>
     </properties>
 

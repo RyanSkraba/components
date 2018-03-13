@@ -17,6 +17,7 @@ import java.io.IOException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.coders.AvroCoder;
+import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.transforms.DoFn;
@@ -51,7 +52,7 @@ public class BigQueryInputRuntime extends PTransform<PBegin, PCollection<Indexed
 
     private BigQueryDatastoreProperties datastore = null;
 
-    private AvroCoder defaultOutputCoder;
+    private AvroCoder<?> defaultOutputCoder;
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, BigQueryInputProperties properties) {
@@ -89,18 +90,18 @@ public class BigQueryInputRuntime extends PTransform<PBegin, PCollection<Indexed
 
     @Override
     public PCollection<IndexedRecord> expand(PBegin in) {
-        BigQueryIO.TypedRead<TableRow> bigQueryIOPTransform;
+        BigQueryIO.Read bigQueryIOPTransform;
         switch (dataset.sourceType.getValue()) {
         case TABLE_NAME: {
             TableReference table = new TableReference();
             table.setProjectId(datastore.projectName.getValue());
             table.setDatasetId(dataset.bqDataset.getValue());
             table.setTableId(dataset.tableName.getValue());
-            bigQueryIOPTransform = BigQueryIO.readTableRows().from(table);
+            bigQueryIOPTransform = BigQueryIO.read().from(table);
             break;
         }
         case QUERY: {
-            bigQueryIOPTransform = BigQueryIO.readTableRows().fromQuery(dataset.query.getValue());
+            bigQueryIOPTransform = BigQueryIO.read().fromQuery(dataset.query.getValue());
             if (!dataset.useLegacySql.getValue()) {
                 bigQueryIOPTransform = bigQueryIOPTransform.usingStandardSql();
             } else {
@@ -113,10 +114,12 @@ public class BigQueryInputRuntime extends PTransform<PBegin, PCollection<Indexed
             throw new RuntimeException("To be implemented: " + dataset.sourceType.getValue());
         }
 
-        return in
-                .apply(bigQueryIOPTransform)
-                .apply(ParDo.of(new TableRowToIndexedRecordFn(defaultOutputCoder.getSchema())))
-                .setCoder(defaultOutputCoder);
+        return in.apply(bigQueryIOPTransform).apply(ParDo.of(new TableRowToIndexedRecordFn(defaultOutputCoder.getSchema())));
+    }
+
+    @Override
+    public Coder getDefaultOutputCoder() {
+        return defaultOutputCoder;
     }
 
     public static class TableRowToIndexedRecordFn extends DoFn<TableRow, IndexedRecord> {

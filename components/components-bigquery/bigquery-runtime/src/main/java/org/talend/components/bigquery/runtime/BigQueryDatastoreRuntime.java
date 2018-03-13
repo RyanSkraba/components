@@ -12,14 +12,21 @@
 // ============================================================================
 package org.talend.components.bigquery.runtime;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.bigquery.BigQueryDatastoreProperties;
 import org.talend.components.common.datastore.runtime.DatastoreRuntime;
 import org.talend.daikon.properties.ValidationResult;
 
+import com.google.cloud.Page;
 import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.Dataset;
+import com.google.cloud.bigquery.DatasetId;
 
 public class BigQueryDatastoreRuntime implements DatastoreRuntime<BigQueryDatastoreProperties> {
 

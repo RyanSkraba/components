@@ -97,11 +97,9 @@ public class BigQueryOutputRuntime extends PTransform<PCollection<IndexedRecord>
     private BigQueryIO.Write setTableOperation(BigQueryIO.Write bigQueryIOPTransform) {
         TableSchema bqSchema = null;
         if (properties.tableOperation.getValue() == BigQueryOutputProperties.TableOperation.CREATE_IF_NOT_EXISTS
-                || properties.tableOperation
-                        .getValue() == BigQueryOutputProperties.TableOperation.DROP_IF_EXISTS_AND_CREATE) {
+                || properties.tableOperation.getValue() == BigQueryOutputProperties.TableOperation.DROP_IF_EXISTS_AND_CREATE) {
             Schema designSchema = properties.getDatasetProperties().main.schema.getValue();
-            if (designSchema != null && !AvroUtils.isSchemaEmpty(designSchema)
-                    && !AvroUtils.isIncludeAllFields(designSchema)) {
+            if (designSchema != null && !AvroUtils.isSchemaEmpty(designSchema) && !AvroUtils.isIncludeAllFields(designSchema)) {
                 bqSchema = BigQueryAvroRegistry.get().guessBigQuerySchema(designSchema);
             }
             if (bqSchema == null) {
@@ -111,23 +109,18 @@ public class BigQueryOutputRuntime extends PTransform<PCollection<IndexedRecord>
 
         switch (properties.tableOperation.getValue()) {
         case NONE:
-            bigQueryIOPTransform =
-                    bigQueryIOPTransform.withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_NEVER);
+            bigQueryIOPTransform = bigQueryIOPTransform.withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_NEVER);
             break;
         case CREATE_IF_NOT_EXISTS:
-            bigQueryIOPTransform = bigQueryIOPTransform
-                    .withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_IF_NEEDED)
+            bigQueryIOPTransform = bigQueryIOPTransform.withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_IF_NEEDED)
                     .withSchema(bqSchema);
             break;
         case DROP_IF_EXISTS_AND_CREATE:
-            bigQueryIOPTransform = bigQueryIOPTransform
-                    .withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_TRUNCATE)
-                    .withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_IF_NEEDED)
-                    .withSchema(bqSchema);
+            bigQueryIOPTransform = bigQueryIOPTransform.withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_TRUNCATE)
+                    .withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_IF_NEEDED).withSchema(bqSchema);
             break;
         case TRUNCATE:
-            bigQueryIOPTransform = bigQueryIOPTransform
-                    .withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_TRUNCATE)
+            bigQueryIOPTransform = bigQueryIOPTransform.withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_TRUNCATE)
                     .withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_NEVER);
             break;
         default:
@@ -138,24 +131,21 @@ public class BigQueryOutputRuntime extends PTransform<PCollection<IndexedRecord>
 
     private BigQueryIO.Write setWriteOperation(BigQueryIO.Write bigQueryIOPTransform) {
         if (properties.tableOperation.getValue() == BigQueryOutputProperties.TableOperation.NONE
-                || properties.tableOperation
-                        .getValue() == BigQueryOutputProperties.TableOperation.CREATE_IF_NOT_EXISTS) {
+                || properties.tableOperation.getValue() == BigQueryOutputProperties.TableOperation.CREATE_IF_NOT_EXISTS) {
             switch (properties.writeOperation.getValue()) {
             case APPEND:
-                bigQueryIOPTransform =
-                        bigQueryIOPTransform.withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_APPEND);
+                bigQueryIOPTransform = bigQueryIOPTransform.withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_APPEND);
                 break;
             case WRITE_TO_EMPTY:
-                bigQueryIOPTransform =
-                        bigQueryIOPTransform.withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_EMPTY);
+                bigQueryIOPTransform = bigQueryIOPTransform.withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_EMPTY);
                 break;
             default:
                 throw new RuntimeException("To be implemented: " + properties.writeOperation.getValue());
             }
         } else {
             if (properties.writeOperation.getValue() != null) {
-                LOG.info("Write operation " + properties.writeOperation.getValue()
-                        + " be ignored when Table operation is " + properties.tableOperation.getValue());
+                LOG.info("Write operation " + properties.writeOperation.getValue() + " be ignored when Table operation is "
+                        + properties.tableOperation.getValue());
             }
         }
         return bigQueryIOPTransform;

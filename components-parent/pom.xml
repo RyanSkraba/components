@@ -401,7 +401,7 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<!-- used for generating the dependencies.properties file located in
+				<!-- used for generating the dependencies.properties file located in 
 					the META-INF -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -449,7 +449,7 @@
 				<configuration>
 					<argLine>${jacoco.agent.it.argLine}</argLine>
 					<systemProperties>
-						<!-- settings.xml and repo are used for pax tests on branch build that
+						<!-- settings.xml and repo are used for pax tests on branch build that 
 							mirror the talend_nexus repo -->
 						<org.ops4j.pax.url.mvn.repositories>+https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot@snapshots@noreleases@id=talend_nexus,https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease@id=talrelease</org.ops4j.pax.url.mvn.repositories>
 					</systemProperties>
@@ -509,7 +509,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- this was supposed to deploy only when all the modules are succesfully
+			<!-- this was supposed to deploy only when all the modules are succesfully 
 				build -->
 			<!-- but it seems not to be working on jenkins -->
 			<!-- <plugin> -->
