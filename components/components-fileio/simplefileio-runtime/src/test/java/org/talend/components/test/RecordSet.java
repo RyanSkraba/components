@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.talend.daikon.avro.AvroUtils;
 
 /**
  * Contains multiple partitions of {@link IndexedRecord} reusable for testing.
@@ -35,7 +36,7 @@ public class RecordSet {
 
     public RecordSet(String name, List<IndexedRecord>... data) {
         this.uid = name;
-        Schema s = null;
+        Schema s = AvroUtils.createEmptySchema();
         if (data.length > 0 && data[0].size() > 0)
             s = data[0].get(0).getSchema();
         schema = s;
