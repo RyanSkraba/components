@@ -1,13 +1,24 @@
 package org.talend.components.pubsub.runtime;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.*;
-import static org.talend.components.pubsub.runtime.PubSubTestConstants.*;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.talend.components.pubsub.runtime.PubSubTestConstants.addSubscriptionForDataset;
+import static org.talend.components.pubsub.runtime.PubSubTestConstants.createDataset;
+import static org.talend.components.pubsub.runtime.PubSubTestConstants.createDatasetFromAvro;
+import static org.talend.components.pubsub.runtime.PubSubTestConstants.createDatasetFromCSV;
+import static org.talend.components.pubsub.runtime.PubSubTestConstants.createDatastore;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
-import com.google.api.services.pubsub.model.PubsubMessage;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
@@ -17,16 +28,14 @@ import org.junit.Test;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.daikon.java8.Consumer;
 
-import com.google.api.services.pubsub.Pubsub;
-import com.google.api.services.pubsub.model.Subscription;
-import com.google.api.services.pubsub.model.Topic;
+import com.google.api.services.pubsub.model.PubsubMessage;
 
 public class PubSubDatasetRuntimeTestIT {
 
     final static String uuid = UUID.randomUUID().toString();
 
     final static List<String> topics = Arrays.asList("tcomp-pubsub-datasettest1" + uuid, "tcomp-pubsub-datasettest2" + uuid,
-            "tcomp-pubsub-datasettest3" + uuid);
+                    "tcomp-pubsub-datasettest3" + uuid, "tcomp-pubsub-datasettest4" + uuid);
 
     final static List<String> subscriptionsForTP1 = Arrays.asList("tcomp-pubsub-datasettest1-sub1" + uuid,
             "tcomp-pubsub-datasettest1-sub2" + uuid, "tcomp-pubsub-datasettest1-sub3" + uuid);
@@ -40,6 +49,8 @@ public class PubSubDatasetRuntimeTestIT {
     final static String subForTP3 = "tcomp-pubsub-datasettest3-sub" + uuid;
 
     final static String sub2ForTP3 = "tcomp-pubsub-datasettest3-subschema" + uuid;
+
+    final static String subForTP4 = "tcomp-pubsub-datasettest4-sub" + uuid;
 
     final static String fieldDelimited = ";";
 
@@ -61,6 +72,7 @@ public class PubSubDatasetRuntimeTestIT {
         client.createSubscription(topics.get(1), sub2ForTP2);
         client.createSubscription(topics.get(2), subForTP3);
         client.createSubscription(topics.get(2), sub2ForTP3);
+        client.createSubscription(topics.get(3), subForTP4);
 
         Integer maxRecords = 10;
         String testID = "sampleTest" + new Random().nextInt();
@@ -93,6 +105,7 @@ public class PubSubDatasetRuntimeTestIT {
         client.deleteSubscription(sub2ForTP2);
         client.deleteSubscription(subForTP3);
         client.deleteSubscription(sub2ForTP3);
+        client.deleteSubscription(subForTP4);
     }
 
     @Before
@@ -182,6 +195,21 @@ public class PubSubDatasetRuntimeTestIT {
     @Test
     public void getSampleAvro2() {
         getSampleAvro();
+    }
+
+    @Test
+    public void getEmptySample() {
+        runtime.initialize(null, addSubscriptionForDataset(
+                createDatasetFromAvro(createDatastore(), topics.get(3), Person.schema.toString()), subForTP4));
+        final List<String> actual = new ArrayList<>();
+        runtime.getSample(10, new Consumer<IndexedRecord>() {
+
+            @Override
+            public void accept(IndexedRecord indexedRecord) {
+                actual.add(indexedRecord.toString());
+            }
+        });
+        assertThat(actual.size(), is(0));
     }
 
 }
