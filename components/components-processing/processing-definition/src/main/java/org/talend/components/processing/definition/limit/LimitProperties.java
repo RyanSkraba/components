@@ -50,7 +50,7 @@ public class LimitProperties extends FixedConnectorsComponentProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
-        limit.setValue(1000000L);
+        limit.setValue(100000000L);
     }
 
     @Override
