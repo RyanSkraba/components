@@ -1,14 +1,11 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>components-implementation-aggregator</artifactId>
-        <groupId>org.talend.components</groupId>
-        <version>0.22.0-SNAPSHOT</version>
-        <relativePath>../../components/pom.xml</relativePath>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
 
+    <modelVersion>4.0.0</modelVersion>
+        <groupId>org.talend.components</groupId>
     <artifactId>components-marklogic-aggregator</artifactId>
+        <version>0.22.0-SNAPSHOT</version>
+
 
     <name>Components - MarkLogic Aggregator</name>
     <packaging>pom</packaging>
