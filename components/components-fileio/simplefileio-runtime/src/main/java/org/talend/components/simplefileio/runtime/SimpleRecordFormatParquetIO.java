@@ -26,6 +26,7 @@ import org.apache.beam.sdk.values.PDone;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.simplefileio.runtime.beamcopy.Write;
 import org.talend.components.simplefileio.runtime.sinks.ParquetHdfsFileSink;
+import org.talend.components.simplefileio.runtime.sinks.UnboundedWrite;
 import org.talend.components.simplefileio.runtime.sources.ParquetHdfsFileSource;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
@@ -63,7 +64,11 @@ public class SimpleRecordFormatParquetIO extends SimpleRecordFormatBase {
 
         PCollection<KV<Void, IndexedRecord>> pc1 = in.apply(ParDo.of(new FormatParquet()));
         pc1 = pc1.setCoder(KvCoder.of(VoidCoder.of(), LazyAvroCoder.of()));
-        return pc1.apply(Write.to(sink));
+        if (in.isBounded() == PCollection.IsBounded.BOUNDED) {
+            return pc1.apply(Write.to(sink));
+        } else {
+            return pc1.apply(UnboundedWrite.of(sink));
+        }
     }
 
     public static class FormatParquet extends DoFn<IndexedRecord, KV<Void, IndexedRecord>> {

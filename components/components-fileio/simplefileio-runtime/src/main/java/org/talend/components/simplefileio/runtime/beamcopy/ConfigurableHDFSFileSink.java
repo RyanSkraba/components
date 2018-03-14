@@ -29,7 +29,6 @@ import static org.apache.beam.sdk.repackaged.com.google.common.base.Precondition
 
 import java.io.IOException;
 import java.net.URI;
-import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -40,8 +39,6 @@ import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.repackaged.com.google.common.collect.Lists;
 import org.apache.beam.sdk.repackaged.com.google.common.collect.Maps;
 import org.apache.beam.sdk.repackaged.com.google.common.collect.Sets;
-import org.apache.beam.sdk.transforms.windowing.BoundedWindow;
-import org.apache.beam.sdk.transforms.windowing.PaneInfo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -325,6 +322,36 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
             return writeOperation;
         }
 
+        /**
+         * Perform a manual commit of the result file. This should be avoided in almost all
+         * normal operations, but is necessary for TFD-3404 for now.
+         */
+        public void commitManually(String committed, String rewriteFile) throws IOException {
+            Path srcDir = outputCommitter.getCommittedTaskPath(context);
+            Path src = new Path(srcDir, committed);
+            Path dst = new Path(path, rewriteFile);
+
+            FileSystem fs = src.getFileSystem(context.getConfiguration());
+
+            if (fs.exists(dst) && !fs.delete(dst, true)) {
+                throw new IOException("Could not delete " + dst);
+            }
+
+            if (!fs.exists(src)) {
+                // check if the file exists with a glob (sometimes extensions are added).
+                FileStatus[] matches = fs.globStatus(new Path(src.getParent(), committed + "*"));
+                if (matches != null && matches.length == 1)
+                    src = matches[0].getPath();
+                else
+                    throw new IOException("Could not find committed file " + src);
+            }
+
+            if (!fs.rename(src, dst)) {
+                throw new IOException("Could not rename " + src + " to " + dst);
+            }
+
+            fs.delete(srcDir, true);
+        }
     }
 
 }

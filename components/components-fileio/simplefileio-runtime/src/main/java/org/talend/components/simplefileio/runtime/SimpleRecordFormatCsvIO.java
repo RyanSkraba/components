@@ -20,8 +20,10 @@ import java.nio.ByteBuffer;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.coders.KvCoder;
+import org.apache.beam.sdk.io.FileIO;
 import org.apache.beam.sdk.io.Read;
 import org.apache.beam.sdk.io.TextIO;
+import org.apache.beam.sdk.io.WriteFilesResult;
 import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
@@ -46,6 +48,7 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.ReflectionUtils;
 import org.talend.components.simplefileio.runtime.beamcopy.Write;
 import org.talend.components.simplefileio.runtime.sinks.UgiFileSinkBase;
+import org.talend.components.simplefileio.runtime.sinks.UnboundedWrite;
 import org.talend.components.simplefileio.runtime.sources.CsvHdfsFileSource;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
@@ -103,23 +106,36 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
     public PDone write(PCollection<IndexedRecord> in) {
 
         if (path.startsWith("gs://")) {
-            TextIO.Write b = TextIO.write().to(path);
+            // The Google Storage case is a special workaround. We expect all filesystems to use the Beam unified
+            // file system eventually in the same way.
+            PCollection<String> pc1 =
+                    in.apply("FormatCSVRecord", ParDo.of(new FormatCsvRecord2(fieldDelimiter.charAt(0))));
 
-            PCollection<String> pc1 = in.apply(ParDo.of(new FormatCsvRecord2(fieldDelimiter.charAt(0))));
-            return pc1.apply(b);
+            if (in.isBounded() == PCollection.IsBounded.BOUNDED) {
+                return pc1.apply(TextIO.write().to(path));
+            } else {
+                pc1 = UnboundedWrite.ofDefaultWindow(pc1);
+                WriteFilesResult results =
+                        pc1.apply(FileIO.<String> write().withNumShards(1).via(TextIO.sink()).to(path));
+                return PDone.in(results.getPipeline());
+            }
 
         } else {
             ExtraHadoopConfiguration conf = new ExtraHadoopConfiguration();
             conf.set(CsvTextOutputFormat.RECORD_DELIMITER, recordDelimiter);
             conf.set(CsvTextOutputFormat.ENCODING, CsvTextOutputFormat.UTF_8);
-            UgiFileSinkBase<NullWritable, Text> sink = new UgiFileSinkBase<>(doAs, path, overwrite, mergeOutput, CsvTextOutputFormat.class,
-                    conf);
+            UgiFileSinkBase<NullWritable, Text> sink =
+                    new UgiFileSinkBase<>(doAs, path, overwrite, mergeOutput, CsvTextOutputFormat.class, conf);
             sink.getExtraHadoopConfiguration().addFrom(getExtraHadoopConfiguration());
 
             PCollection<KV<NullWritable, Text>> pc1 = in.apply(ParDo.of(new FormatCsvRecord(fieldDelimiter.charAt(0))))
                     .setCoder(KvCoder.of(WritableCoder.of(NullWritable.class), WritableCoder.of(Text.class)));
 
-            return pc1.apply(Write.to(sink));
+            if (in.isBounded() == PCollection.IsBounded.BOUNDED) {
+                return pc1.apply(Write.to(sink));
+            } else {
+                return pc1.apply(UnboundedWrite.of(sink));
+            }
         }
 
     }
@@ -204,7 +220,9 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
         protected static class CsvRecordWriter extends RecordWriter<NullWritable, Text> {
 
             public final String encoding;
+
             private final byte[] recordDelimiter;
+
             protected DataOutputStream out;
 
             public CsvRecordWriter(DataOutputStream out, String encoding, String recordDelimiter) {
