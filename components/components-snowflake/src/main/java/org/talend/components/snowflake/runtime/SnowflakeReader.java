@@ -22,6 +22,7 @@ import java.util.NoSuchElementException;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.Result;
@@ -92,16 +93,19 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
             condition = properties.condition.getStringValue();
         }
         StringBuilder sb = new StringBuilder();
+        boolean isUpperCase = properties.convertColumnsAndTableToUppercase.getValue();
         sb.append("select "); //$NON-NLS-1$
         int count = 0;
         for (Schema.Field se : getSchema().getFields()) {
             if (count++ > 0) {
                 sb.append(", "); //$NON-NLS-1$
             }
-            sb.append(se.name());
+            String fName = isUpperCase ? se.name() : StringUtils.wrap(se.name(), '"');
+            sb.append(fName);
         }
         sb.append(" from "); //$NON-NLS-1$
-        sb.append(properties.table.tableName.getStringValue());
+        String tableName = isUpperCase ? properties.getTableName() : StringUtils.wrap(properties.getTableName(), '"');
+        sb.append(tableName);
         if (condition != null && condition.trim().length() > 0) {
             sb.append(" where ");
             sb.append(condition);

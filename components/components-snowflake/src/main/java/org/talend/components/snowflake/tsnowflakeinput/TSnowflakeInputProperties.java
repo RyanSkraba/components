@@ -39,6 +39,8 @@ public class TSnowflakeInputProperties extends SnowflakeConnectionTablePropertie
 
     public Property<String> query = newProperty("query"); //$NON-NLS-1$
 
+    public Property<Boolean> convertColumnsAndTableToUppercase = newBoolean("convertColumnsAndTableToUppercase", true);
+
     public TSnowflakeInputProperties(@JsonProperty("name") String name) {
         super(name);
     }
@@ -66,6 +68,9 @@ public class TSnowflakeInputProperties extends SnowflakeConnectionTablePropertie
         mainForm.addRow(manualQuery);
         mainForm.addRow(condition);
         mainForm.addRow(widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
+
+        Form advancedForm = getForm(Form.ADVANCED);
+        advancedForm.addRow(convertColumnsAndTableToUppercase);
     }
 
     @Override
@@ -74,6 +79,8 @@ public class TSnowflakeInputProperties extends SnowflakeConnectionTablePropertie
         if (form.getName().equals(Form.MAIN)) {
             form.getWidget(query.getName()).setHidden(!manualQuery.getValue());
             form.getWidget(condition.getName()).setHidden(manualQuery.getValue());
+        } else if (form.getName().equals(Form.ADVANCED)) {
+            form.getWidget(convertColumnsAndTableToUppercase.getName()).setHidden(manualQuery.getValue());
         }
     }
 

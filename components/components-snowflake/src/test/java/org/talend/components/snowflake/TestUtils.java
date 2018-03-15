@@ -17,12 +17,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
 import org.apache.commons.io.IOUtils;
 
 /**
- *
+ * Class for tests util methods.
  */
 public abstract class TestUtils {
 

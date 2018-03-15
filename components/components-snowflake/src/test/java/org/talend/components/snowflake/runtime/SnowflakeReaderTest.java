@@ -30,6 +30,8 @@ public class SnowflakeReaderTest {
 
     private static final String WHERE_TEST_QUERY = "select field, column from Table where id = 1";
 
+    private static final String TEST_LOWERCASE_NAMES_QUERY = "select \"field\", \"column\" from \"Table\"";
+
     @Mock
     private RuntimeContainer runtimeContainerMock = Mockito.mock(RuntimeContainer.class);
 
@@ -146,6 +148,26 @@ public class SnowflakeReaderTest {
         snowflakeReader.properties.manualQuery.setValue(true);
         snowflakeReader.properties.query.setValue(query);
         Assert.assertEquals(query, snowflakeReader.getQueryString());
+    }
+
+    @Test
+    public void testLowercaseNamesQuery() throws Exception {
+        snowflakeReader.properties.convertColumnsAndTableToUppercase.setValue(false);
+        Statement statementMock = Mockito.mock(Statement.class);
+        Connection connectionMock = Mockito.mock(Connection.class);
+        ResultSet resultSetMock = Mockito.mock(ResultSet.class);
+
+        Mockito.when(resultSetMock.next()).thenReturn(true);
+        Mockito.when(resultSetMock.getMetaData()).thenReturn(Mockito.mock(ResultSetMetaData.class));
+        Mockito.when(resultSetMock.getMetaData().getColumnCount()).thenReturn(2);
+        Mockito.when(resultSetMock.getString(0)).thenReturn("row1field", "row1column");
+        Mockito.when((snowflakeSourceMock).createConnection(runtimeContainerMock)).thenReturn(connectionMock);
+        Mockito.when(connectionMock.createStatement()).thenReturn(statementMock);
+        Mockito.when(statementMock.executeQuery(TEST_LOWERCASE_NAMES_QUERY)).thenReturn(resultSetMock);
+
+        snowflakeReader.start();
+        snowflakeReader.getCurrent();
+        Assert.assertEquals(1, snowflakeReader.getReturnValues().get("totalRecordCount"));
     }
 
     @Test(expected = IOException.class)

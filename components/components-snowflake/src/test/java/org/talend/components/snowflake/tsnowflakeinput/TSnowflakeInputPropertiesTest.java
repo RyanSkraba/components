@@ -58,15 +58,18 @@ public class TSnowflakeInputPropertiesTest {
         boolean defaultManualQueryValue;
         boolean isQueryPropertyHidden;
         boolean isConditionPropertyHidden;
+        boolean defaultConvertColumnsAndTableToUppercase;
 
         main = inputProperties.getForm(Form.MAIN);
         defaultManualQueryValue = inputProperties.manualQuery.getValue();
         isQueryPropertyHidden = main.getWidget(inputProperties.query.getName()).isHidden();
         isConditionPropertyHidden = main.getWidget(inputProperties.condition.getName()).isHidden();
+        defaultConvertColumnsAndTableToUppercase = inputProperties.convertColumnsAndTableToUppercase.getValue();
 
         assertFalse(defaultManualQueryValue);
         assertTrue(isQueryPropertyHidden);
         assertFalse(isConditionPropertyHidden);
+        assertTrue(defaultConvertColumnsAndTableToUppercase);
 
     }
 
