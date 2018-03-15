@@ -152,6 +152,7 @@ public class JDBCInputTestIT {
     private JDBCInputProperties createCommonJDBCInputProperties(JDBCInputDefinition definition) {
         JDBCDatastoreDefinition datastore_def = new JDBCDatastoreDefinition();
         JDBCDatastoreProperties datastore_props = new JDBCDatastoreProperties("datastore");
+        datastore_props.init();
 
         datastore_props.dbTypes.setValue("DERBY");
         datastore_props.afterDbTypes();

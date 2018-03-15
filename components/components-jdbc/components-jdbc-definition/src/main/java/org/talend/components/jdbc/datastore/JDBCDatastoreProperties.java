@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc.datastore;
 
+import static org.talend.daikon.properties.presentation.Widget.PLACEHOLDER_WIDGET_CONF;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
@@ -123,8 +124,7 @@ public class JDBCDatastoreProperties extends PropertiesImpl implements Datastore
 
         dbTypes.setPossibleValues(dbTypesId);
         dbTypes.setValue(defaultDBType.id);
-
-        jdbcUrl.setValue(defaultDBType.url);
+        jdbcUrl.setValue("");
     }
 
     @Override
@@ -134,7 +134,8 @@ public class JDBCDatastoreProperties extends PropertiesImpl implements Datastore
         Form mainForm = CommonUtils.addForm(this, Form.MAIN);
 
         mainForm.addRow(Widget.widget(dbTypes).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
-        mainForm.addRow(Widget.widget(jdbcUrl).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
+        mainForm.addRow(Widget.widget(jdbcUrl).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE).setConfigurationValue(
+                PLACEHOLDER_WIDGET_CONF, this.getCurrentDBType().url));
 
         mainForm.addRow(userId);
         mainForm.addRow(widget(password).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
@@ -142,7 +143,8 @@ public class JDBCDatastoreProperties extends PropertiesImpl implements Datastore
 
     public void afterDbTypes() {
         DBType currentDBType = this.getCurrentDBType();
-        jdbcUrl.setValue(currentDBType.url);
+        Widget jdbcUrlWIdget = getForm(Form.MAIN).getWidget(jdbcUrl);
+        jdbcUrlWIdget.setConfigurationValue(PLACEHOLDER_WIDGET_CONF, currentDBType.url);
     }
 
     @Override

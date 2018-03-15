@@ -148,6 +148,7 @@ public class JDBCDatasetTestIT {
     private JDBCDatasetProperties createDatasetProperties(boolean updateSchema) {
         JDBCDatastoreDefinition def = new JDBCDatastoreDefinition();
         JDBCDatastoreProperties datastore = new JDBCDatastoreProperties("datastore");
+        datastore.init();
 
         datastore.dbTypes.setValue("DERBY");
         datastore.afterDbTypes();
