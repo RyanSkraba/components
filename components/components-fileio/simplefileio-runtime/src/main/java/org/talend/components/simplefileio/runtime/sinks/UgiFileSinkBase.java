@@ -15,23 +15,28 @@ package org.talend.components.simplefileio.runtime.sinks;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
+import java.util.Arrays;
 
-import org.talend.components.simplefileio.runtime.beamcopy.ConfigurableHDFSFileSink;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.values.KV;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.simplefileio.runtime.ExtraHadoopConfiguration;
+import org.talend.components.simplefileio.runtime.beamcopy.ConfigurableHDFSFileSink;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
 /**
@@ -51,12 +56,13 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
     /** Additional information to configure the OutputFormat */
     private final ExtraHadoopConfiguration extraConfig;
 
-    public UgiFileSinkBase(UgiDoAs doAs, String path, boolean overwrite, boolean mergeOutput, Class<? extends FileOutputFormat<K, V>> formatClass) {
+    public UgiFileSinkBase(UgiDoAs doAs, String path, boolean overwrite, boolean mergeOutput,
+            Class<? extends FileOutputFormat<K, V>> formatClass) {
         this(doAs, path, overwrite, mergeOutput, formatClass, new ExtraHadoopConfiguration());
     }
 
-    public UgiFileSinkBase(UgiDoAs doAs, String path, boolean overwrite, boolean mergeOutput, Class<? extends FileOutputFormat<K, V>> formatClass,
-            ExtraHadoopConfiguration extraConfig) {
+    public UgiFileSinkBase(UgiDoAs doAs, String path, boolean overwrite, boolean mergeOutput,
+            Class<? extends FileOutputFormat<K, V>> formatClass, ExtraHadoopConfiguration extraConfig) {
         super(path, mergeOutput, formatClass);
         this.doAs = doAs;
         this.overwrite = overwrite;
@@ -127,11 +133,42 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
     protected boolean mergeOutput(FileSystem fs, String sourceFolder, String targetFile) {
         // implement how to merge files, different between format
         try {
-           return FileUtil.copyMerge(fs, new Path(sourceFolder), fs, new Path(targetFile), false, fs.getConf(), "");
+            return copyMerge(fs, new Path(sourceFolder), fs, new Path(targetFile), fs.getConf());
         } catch (Exception e) {
             LOG.error("Error when merging files in {}.\n{}", sourceFolder, e.getMessage());
             return false;
         }
+    }
+
+    /** Copy all files in a directory to one output file (merge). */
+    private static boolean copyMerge(FileSystem srcFS, Path srcDir, FileSystem dstFS, Path dstFile, Configuration conf)
+            throws IOException {
+
+        if (!srcFS.getFileStatus(srcDir).isDirectory())
+            return false;
+
+        // Unlike org.apache.hadoop.fs.FileUtil#copyMerge, make sure that we list the contents of the input directory
+        // BEFORE creating the destination file. Otherwise we might end in a loop that generates an output file of
+        // infinite size when the dstFile is in the srcDir.
+        FileStatus contents[] = srcFS.listStatus(srcDir);
+        OutputStream out = dstFS.create(dstFile);
+
+        try {
+            Arrays.sort(contents);
+            for (int i = 0; i < contents.length; i++) {
+                if (contents[i].isFile()) {
+                    InputStream in = srcFS.open(contents[i].getPath());
+                    try {
+                        IOUtils.copyBytes(in, out, conf, false);
+                    } finally {
+                        in.close();
+                    }
+                }
+            }
+        } finally {
+            out.close();
+        }
+        return true;
     }
 
     public static class UgiWriteOperation<K, V> extends HDFSWriteOperation<K, V> {
