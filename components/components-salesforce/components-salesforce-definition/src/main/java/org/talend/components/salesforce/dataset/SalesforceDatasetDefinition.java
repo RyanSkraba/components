@@ -14,6 +14,7 @@ package org.talend.components.salesforce.dataset;
 
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.salesforce.SalesforceDefinition;
+import org.talend.components.salesforce.SalesforceFamilyDefinition;
 import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -24,7 +25,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class SalesforceDatasetDefinition extends I18nDefinition implements DatasetDefinition<SalesforceDatasetProperties> {
 
-    public static final String NAME = "SalesforceDataset";
+    public static final String NAME = SalesforceFamilyDefinition.NAME + "Dataset";
 
     public SalesforceDatasetDefinition() {
         super(NAME);
@@ -54,7 +55,7 @@ public class SalesforceDatasetDefinition extends I18nDefinition implements Datas
 
     @Override
     public String getIconKey() {
-        return null;
+        return "file-salesforce";
     }
 
     @Override

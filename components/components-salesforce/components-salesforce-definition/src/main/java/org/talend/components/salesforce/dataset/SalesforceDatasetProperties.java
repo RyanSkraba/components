@@ -47,7 +47,8 @@ import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.properties.property.StringProperty;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
-public class SalesforceDatasetProperties extends PropertiesImpl implements DatasetProperties<SalesforceDatastoreProperties> {
+public class SalesforceDatasetProperties extends PropertiesImpl
+        implements DatasetProperties<SalesforceDatastoreProperties> {
 
     /**
      * 
@@ -56,8 +57,8 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceDatasetProperties.class);
 
-    public ReferenceProperties<SalesforceDatastoreProperties> datastore = new ReferenceProperties<>("datastore",
-            SalesforceDatastoreDefinition.NAME);
+    public ReferenceProperties<SalesforceDatastoreProperties> datastore =
+            new ReferenceProperties<>("datastore", SalesforceDatastoreDefinition.NAME);
 
     public Property<SourceType> sourceType = PropertyFactory.newEnum("sourceType", SourceType.class).setRequired();
 
@@ -74,31 +75,25 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
     }
 
     private void retrieveModules() throws IOException {
-        // refresh the module list
-        if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
-            Consumer consumer = new Consumer() {
+        Consumer consumer = new Consumer() {
 
-                @Override
-                public void accept(SalesforceRuntimeSourceOrSink runtime) throws IOException {
-                    List<NamedThing> moduleNames = runtime.getSchemaNames(null);
-                    moduleName.setPossibleNamedThingValues(filter(moduleNames));
-                }
-            };
-            runtimeTask(consumer);
-        }
+            @Override
+            public void accept(SalesforceRuntimeSourceOrSink runtime) throws IOException {
+                List<NamedThing> moduleNames = runtime.getSchemaNames(null);
+                moduleName.setPossibleNamedThingValues(filter(moduleNames));
+            }
+        };
+        runtimeTask(consumer);
     }
 
-    private void retrieveModuleFields() throws IOException {
+    private void retrieveModuleFields(final String moduleNameStr) throws IOException {
         // refresh the module list
-        if (sourceType.getValue() == SourceType.MODULE_SELECTION && StringUtils.isNotEmpty(moduleName.getValue())) {
+        if (StringUtils.isNotEmpty(moduleNameStr)) {
             Consumer consumer = new Consumer() {
 
                 @Override
                 public void accept(SalesforceRuntimeSourceOrSink runtime) throws IOException {
-                    List<NamedThing> moduleNames = runtime.getSchemaNames(null);
-                    moduleName.setPossibleNamedThingValues(filter(moduleNames));
-
-                    Schema schema = runtime.getEndpointSchema(null, moduleName.getValue());
+                    Schema schema = runtime.getEndpointSchema(null, moduleNameStr);
                     List<NamedThing> columns = new ArrayList<>();
                     for (Schema.Field field : schema.getFields()) {
                         columns.add(new SimpleNamedThing(field.name(), field.name()));
@@ -109,32 +104,14 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
             runtimeTask(consumer);
         }
     }
-    
-    static Set<String> MODULE_LIST_WHICH_NOT_SUPPORT_BULK_API = new HashSet<String>(Arrays.asList(
-        "AcceptedEventRelation",
-        "ActivityHistory",
-        "AggregateResult",
-        "AttachedContentDocument",
-        "CaseStatus",
-        "CombinedAttachment",
-        "ContractStatus",
-        "DeclinedEventRelation",
-        "EmailStatus",
-        "LookedUpFromActivity",
-        "Name",
-        "NoteAndAttachment",
-        "OpenActivity",
-        "OwnedContentDocument",
-        "PartnerRole",
-        "ProcessInstanceHistory",
-        "RecentlyViewed",
-        "SolutionStatus",
-        "TaskPriority",
-        "TaskStatus",
-        "UndecidedEventRelation",
-        "UserRecordAccess"
-     )); 
-    
+
+    static Set<String> MODULE_LIST_WHICH_NOT_SUPPORT_BULK_API =
+            new HashSet<String>(Arrays.asList("AcceptedEventRelation", "ActivityHistory", "AggregateResult",
+                    "AttachedContentDocument", "CaseStatus", "CombinedAttachment", "ContractStatus",
+                    "DeclinedEventRelation", "EmailStatus", "LookedUpFromActivity", "Name", "NoteAndAttachment",
+                    "OpenActivity", "OwnedContentDocument", "PartnerRole", "ProcessInstanceHistory", "RecentlyViewed",
+                    "SolutionStatus", "TaskPriority", "TaskStatus", "UndecidedEventRelation", "UserRecordAccess"));
+
     private List<NamedThing> filter(List<NamedThing> moduleNames) {
         List<NamedThing> result = new ArrayList<NamedThing>();
         if (moduleNames != null) {
@@ -178,36 +155,43 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
     }
 
     public void afterSourceType() throws IOException {
-        // refresh the module list
-        retrieveModules();
-        moduleName.setValue(null);
-        selectColumnIds.setValue(null);
-        query.setValue(null);
+        if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
+            retrieveModules();
+        }
         refreshLayout(getForm(Form.MAIN));
     }
 
     public void afterModuleName() throws IOException {
         // refresh the module list
-        retrieveModuleFields();
+        retrieveModuleFields(moduleName.getValue());
         selectColumnIds.setValue(null);
-        query.setValue(null);
         refreshLayout(getForm(Form.MAIN));
     }
 
     @Override
     public void setupProperties() {
-        sourceType.setValue(SourceType.MODULE_SELECTION);
+        super.setupProperties();
+        sourceType.setValue(SourceType.SOQL_QUERY);
     }
 
     @Override
     public void setupLayout() {
+        super.setupLayout();
         Form mainForm = Form.create(this, Form.MAIN);
+        // mainForm.addRow(Widget.widget(sourceType).setWidgetType(Widget.RADIO_WIDGET_TYPE));
+        // mainForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
+        mainForm.addRow(Widget.widget(query).setWidgetType(Widget.CODE_WIDGET_TYPE).setConfigurationValue(
+                Widget.CODE_SYNTAX_WIDGET_CONF, "sql"));
+        // mainForm.addRow(Widget.widget(selectColumnIds).setWidgetType(Widget.MULTIPLE_VALUE_SELECTOR_WIDGET_TYPE));
 
-        mainForm.addRow(Widget.widget(sourceType).setWidgetType(Widget.RADIO_WIDGET_TYPE));
-        mainForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
-        mainForm.addRow(Widget.widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
-        mainForm.addRow(Widget.widget(selectColumnIds).setWidgetType(Widget.MULTIPLE_VALUE_SELECTOR_WIDGET_TYPE));
-        mainForm.getWidget(selectColumnIds).setVisible(false);
+        // For Data Prep
+        Form citizenUserForm = Form.create(this, Form.CITIZEN_USER);
+        citizenUserForm.addRow(Widget.widget(sourceType).setWidgetType(Widget.RADIO_WIDGET_TYPE));
+        citizenUserForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
+        citizenUserForm.addRow(Widget.widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
+        citizenUserForm
+                .addRow(Widget.widget(selectColumnIds).setWidgetType(Widget.MULTIPLE_VALUE_SELECTOR_WIDGET_TYPE));
+        citizenUserForm.getWidget(selectColumnIds).setVisible(false);
         selectColumnIds.setRequired(false);
     }
 
@@ -217,30 +201,24 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
      */
     @Override
     public void refreshLayout(Form form) {
-        if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
-            form.getWidget(moduleName).setVisible(true);
-            moduleName.setRequired(true);
-            // We can not have a hidden field which is required
-            form.getWidget(query).setVisible(false);
-            query.setRequired(false);
-            if (StringUtils.isNotEmpty(moduleName.getValue())) {
-                form.getWidget(selectColumnIds).setVisible();
-                selectColumnIds.setRequired(true);
-            } else {
-                form.getWidget(selectColumnIds).setVisible(false);
-                selectColumnIds.setRequired(false);
-            }
-
-        } else if (sourceType.getValue() == SourceType.SOQL_QUERY) {
-            form.getWidget(query).setVisible(true);
-            query.setRequired();
-            // We can not have a hidden field which is required
-            form.getWidget(moduleName).setVisible(false);
-            moduleName.setRequired(false);
-            form.getWidget(selectColumnIds).setVisible(false);
-            selectColumnIds.setRequired(false);
-        }
         super.refreshLayout(form);
+        // if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
+        // form.getWidget(moduleName).setVisible();
+        // moduleName.setRequired();
+        // form.getWidget(selectColumnIds).setVisible();
+        // selectColumnIds.setRequired();
+        // // We can not have a hidden field which is required
+        // form.getWidget(query).setVisible(false);
+        // query.setRequired(false);
+        // } else if (sourceType.getValue() == SourceType.SOQL_QUERY) {
+        // form.getWidget(query).setVisible();
+        // query.setRequired();
+        // // We can not have a hidden field which is required
+        // form.getWidget(moduleName).setVisible(false);
+        // moduleName.setRequired(false);
+        // form.getWidget(selectColumnIds).setVisible(false);
+        // selectColumnIds.setRequired(false);
+        // }
     }
 
     @Override
@@ -248,22 +226,35 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
         return datastore.getReference();
     }
 
+    /**
+     * It's the entrypoint for ui-spec, when the source type is module
+     * create new: retrieve the possible value of module, and set the module with the first possible, retrieve field
+     * list by module name
+     * editor: retrieve the possible value of module, the module name should be exist, retrieve field list by module
+     * name
+     */
     public void afterDatastore() {
-        try {
-            retrieveModules();
-        } catch (IOException e) {
-            LOGGER.error("error getting salesforce modules", e);
-            throw new TalendRuntimeException(SalesforceErrorCodes.UNABLE_TO_RETRIEVE_MODULES, e);
-        }
-        if (StringUtils.isNotEmpty(moduleName.getValue())) {
-            try {
-                retrieveModuleFields();
-            } catch (IOException e) {
-                LOGGER.error("error getting salesforce modules fields", e);
-                throw new TalendRuntimeException(SalesforceErrorCodes.UNABLE_TO_RETRIEVE_MODULE_FIELDS, e);
+        if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
+            if (moduleName.getPossibleValues().isEmpty()) {
+                try {
+                    retrieveModules();
+                } catch (IOException e) {
+                    LOGGER.error("error getting salesforce modules", e);
+                    throw new TalendRuntimeException(SalesforceErrorCodes.UNABLE_TO_RETRIEVE_MODULES, e);
+                }
             }
-        } // else no module set so no reason to update fields
-
+            if (StringUtils.isEmpty(moduleName.getValue()) && !moduleName.getPossibleValues().isEmpty()) {
+                moduleName.setValue(String.valueOf(moduleName.getPossibleValues().get(0)));
+            }
+            if (StringUtils.isNotEmpty(moduleName.getValue())) {
+                try {
+                    retrieveModuleFields(moduleName.getValue());
+                } catch (IOException e) {
+                    LOGGER.error("error getting salesforce modules fields", e);
+                    throw new TalendRuntimeException(SalesforceErrorCodes.UNABLE_TO_RETRIEVE_MODULE_FIELDS, e);
+                }
+            } // else no module set so no reason to update fields
+        }
     }
 
     @Override

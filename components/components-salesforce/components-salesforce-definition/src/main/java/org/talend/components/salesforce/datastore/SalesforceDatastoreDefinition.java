@@ -1,4 +1,3 @@
-
 // ============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
@@ -16,7 +15,9 @@ package org.talend.components.salesforce.datastore;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.salesforce.SalesforceDefinition;
+import org.talend.components.salesforce.SalesforceFamilyDefinition;
 import org.talend.components.salesforce.dataprep.SalesforceInputDefinition;
+import org.talend.components.salesforce.dataset.SalesforceDatasetDefinition;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties;
 import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
@@ -26,9 +27,10 @@ import org.talend.daikon.runtime.RuntimeInfo;
  * the salesforce data store work for dataprep
  *
  */
-public class SalesforceDatastoreDefinition extends I18nDefinition implements DatastoreDefinition<SalesforceDatastoreProperties> {
+public class SalesforceDatastoreDefinition extends I18nDefinition
+        implements DatastoreDefinition<SalesforceDatastoreProperties> {
 
-    public static final String NAME = "SalesforceDatastore";
+    public static final String NAME = SalesforceFamilyDefinition.NAME + "Datastore";
 
     public SalesforceDatastoreDefinition() {
         super(NAME);
@@ -42,7 +44,8 @@ public class SalesforceDatastoreDefinition extends I18nDefinition implements Dat
     @SuppressWarnings("rawtypes")
     @Override
     public DatasetProperties createDatasetProperties(SalesforceDatastoreProperties storeProp) {
-        SalesforceDatasetProperties datasetProperties = new SalesforceDatasetProperties("dataset");
+        SalesforceDatasetProperties datasetProperties =
+                new SalesforceDatasetProperties(SalesforceDatasetDefinition.NAME);
         datasetProperties.init();
         datasetProperties.setDatastoreProperties(storeProp);
         return datasetProperties;
@@ -78,7 +81,7 @@ public class SalesforceDatastoreDefinition extends I18nDefinition implements Dat
 
     @Override
     public String getIconKey() {
-        return null;
+        return "file-salesforce";
     }
 
     @Override

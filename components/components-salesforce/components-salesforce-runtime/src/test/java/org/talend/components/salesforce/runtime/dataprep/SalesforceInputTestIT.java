@@ -21,7 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang.SerializationUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.SupportedProduct;
 import org.talend.components.api.component.runtime.Reader;
@@ -35,6 +37,18 @@ import org.talend.components.salesforce.datastore.SalesforceDatastoreProperties;
 public class SalesforceInputTestIT {
 
     @Test
+    public void testSerialization() throws IOException {
+        SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
+        properties.getDatasetProperties().selectColumnIds.setValue(Arrays.asList("IsDeleted", "Id"));
+
+        SalesforceDataprepSource source = new SalesforceDataprepSource();
+        source.initialize(null, properties);
+        source.getConnectionHolder();
+        SerializationUtils.serialize(source);
+    }
+
+    @Test
+    @Ignore
     public void testReaderForModule() {
         Reader reader = null;
         try {
@@ -74,6 +88,7 @@ public class SalesforceInputTestIT {
     }
 
     @Test
+    @Ignore
     public void testTypeForModule() throws Exception {
         SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
 
@@ -100,6 +115,7 @@ public class SalesforceInputTestIT {
     }
 
     @Test(expected = RuntimeException.class)
+    @Ignore
     public void testTypeForModuleWithBadQuery() throws Exception {
         SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
 
@@ -115,6 +131,7 @@ public class SalesforceInputTestIT {
     }
 
     @Test
+    @Ignore
     public void testTypeForModuleWithoutSpecifiedFields() throws Exception {
         SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
 
@@ -138,6 +155,7 @@ public class SalesforceInputTestIT {
     }
 
     @Test(expected = ComponentException.class)
+    @Ignore
     public void testTypeForModuleWithCompoundType() throws Exception {
         SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
 
@@ -153,6 +171,7 @@ public class SalesforceInputTestIT {
     }
 
     @Test
+    @Ignore
     public void testTypeForModuleWithPickListType() throws Exception {
         SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
 
@@ -270,8 +289,8 @@ public class SalesforceInputTestIT {
 
         CommonTestUtils.setValueForDatastoreProperties(datastore_props);
 
-        SalesforceDatasetProperties dataset = (SalesforceDatasetProperties) datastore_def
-                .createDatasetProperties(datastore_props);
+        SalesforceDatasetProperties dataset =
+                (SalesforceDatasetProperties) datastore_def.createDatasetProperties(datastore_props);
         dataset.moduleName.setValue("Account");
 
         SalesforceInputDefinition input_def = new SalesforceInputDefinition();
@@ -291,8 +310,8 @@ public class SalesforceInputTestIT {
 
         CommonTestUtils.setValueForDatastoreProperties(datastore_props);
 
-        SalesforceDatasetProperties dataset = (SalesforceDatasetProperties) datastore_def
-                .createDatasetProperties(datastore_props);
+        SalesforceDatasetProperties dataset =
+                (SalesforceDatasetProperties) datastore_def.createDatasetProperties(datastore_props);
         dataset.sourceType.setValue(SalesforceDatasetProperties.SourceType.SOQL_QUERY);
         dataset.query.setValue("SELECT Id, Name FROM Account");
 
