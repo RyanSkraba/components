@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferenceProperties.ReferenceType;
@@ -40,7 +41,10 @@ import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.CommonErrorCodes;
+import org.talend.daikon.exception.error.ErrorCode;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
@@ -514,6 +518,50 @@ public class CommonUtils {
         } else if ((possibleValues == null) || possibleValues.isEmpty()) {
             property.setStoredValue(null);
         }
+    }
+    
+    public static String getClearExceptionInfo(Exception e) {
+        if(e.getCause() != null) {
+            return correctExceptionInfo(e.getCause());
+        }
+      
+        return correctExceptionInfo(e);
+    }
+    
+    public static String correctExceptionInfo(Throwable e) {
+        if(e instanceof ClassNotFoundException) {
+            return "can't find the jdbc driver class : \"" + e.getMessage() + "\"";
+        }
+        
+        String message = e.getMessage();
+        if((message == null) || message.isEmpty()) {
+            return e.getClass().getName();
+        }
+        
+        return message;
+    }
+    
+    public static ComponentException newComponentException(Throwable cause) {
+        ExceptionContext context = createExceptionContext(cause);
+        return new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, cause, context);
+    }
+    
+    public static ComponentException newComponentException(ErrorCode errorCode, Throwable cause) {
+        ExceptionContext context = createExceptionContext(cause);
+        return new ComponentException(errorCode, cause, context);
+    }
+    
+    public static ComponentException newComponentException(ErrorCode errorCode, ExceptionContext context) {
+        return new ComponentException(errorCode, context);
+    }
+    
+    public static ComponentException newComponentException(ErrorCode errorCode, Throwable cause, ExceptionContext context) {
+        return new ComponentException(errorCode, cause, context);
+    }
+    
+    private static ExceptionContext createExceptionContext(Throwable cause) {
+        String message = correctExceptionInfo(cause);
+        return ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE, message);
     }
 
 }

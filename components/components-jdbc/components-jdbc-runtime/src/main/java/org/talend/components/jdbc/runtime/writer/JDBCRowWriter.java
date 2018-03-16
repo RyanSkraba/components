@@ -31,7 +31,6 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.components.jdbc.CommonUtils;
@@ -142,7 +141,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
                 statement = conn.createStatement();
             }
         } catch (SQLException | ClassNotFoundException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 
@@ -177,7 +176,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
             handleSuccess(input);
         } catch (SQLException e) {
             if (dieOnError) {
-                throw new ComponentException(e);
+                throw CommonUtils.newComponentException(e);
             } else {
                 LOG.warn(e.getMessage());
                 // TODO should not print it when reject line, but we can't know the information at the runtime
@@ -191,7 +190,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
             executeCommit();
         } catch (SQLException e) {
             if (dieOnError) {
-                throw new ComponentException(e);
+                throw CommonUtils.newComponentException(e);
             } else {
                 LOG.warn(e.getMessage());
             }
@@ -238,7 +237,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
                 conn = null;
             }
         } catch (SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 

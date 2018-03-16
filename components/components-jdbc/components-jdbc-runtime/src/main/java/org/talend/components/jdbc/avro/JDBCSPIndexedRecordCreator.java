@@ -161,7 +161,7 @@ public class JDBCSPIndexedRecordCreator {
                     // the other fields in the output indexed record is null
                 }
             } catch (Exception e) {
-                TalendRuntimeException.unexpectedException(e);
+                throw CommonUtils.newComponentException(e);
             }
         }
 

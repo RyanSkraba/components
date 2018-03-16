@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.sql.Connection;
 import java.sql.SQLException;

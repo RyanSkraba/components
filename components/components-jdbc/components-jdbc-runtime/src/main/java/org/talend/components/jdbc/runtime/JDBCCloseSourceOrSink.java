@@ -16,6 +16,7 @@ import java.sql.SQLException;
 
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.setting.JdbcRuntimeSourceOrSinkDefault;
@@ -46,7 +47,7 @@ public class JDBCCloseSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
             doCloseAction(runtime);
         } catch (Exception ex) {
             vr.setStatus(Result.ERROR);
-            vr.setMessage(ex.getMessage());
+            vr.setMessage(CommonUtils.correctExceptionInfo(ex));
         }
         return vr;
     }

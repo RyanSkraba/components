@@ -23,7 +23,6 @@ import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.RuntimeSettingProvider;
@@ -70,7 +69,7 @@ public class JDBCSPReader extends AbstractBoundedReader<IndexedRecord> {
         try {
             conn = source.getConnection(container);
         } catch (ClassNotFoundException | SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
 
         return true;
@@ -105,7 +104,7 @@ public class JDBCSPReader extends AbstractBoundedReader<IndexedRecord> {
 
             return outputRecord;
         } catch (SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 
@@ -122,7 +121,7 @@ public class JDBCSPReader extends AbstractBoundedReader<IndexedRecord> {
                 conn = null;
             }
         } catch (SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 

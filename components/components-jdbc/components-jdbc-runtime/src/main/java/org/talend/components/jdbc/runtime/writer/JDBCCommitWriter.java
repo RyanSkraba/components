@@ -20,7 +20,7 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
+import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.runtime.JDBCCommitSink;
 
 /**
@@ -57,7 +57,7 @@ public class JDBCCommitWriter implements Writer<Result> {
         try {
             sink.doCommitAction(runtime);
         } catch (Exception e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 

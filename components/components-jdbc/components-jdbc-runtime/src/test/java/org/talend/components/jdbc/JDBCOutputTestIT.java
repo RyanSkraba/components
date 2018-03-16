@@ -40,6 +40,7 @@ import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputDefinition;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
+import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.java8.Supplier;
 
 public class JDBCOutputTestIT {
@@ -813,6 +814,13 @@ public class JDBCOutputTestIT {
             writer.close();
 
             Assert.fail("should not run here");
+        } catch(ComponentException e) {
+            ExceptionContext context = e.getContext();
+            Assert.assertTrue(context!=null);
+            String contextMessage = context.toString();
+            Assert.assertTrue(contextMessage!=null && !contextMessage.isEmpty());
+            Assert.assertNotNull(e.getCause());
+            throw e;
         } finally {
             writer.close();
         }

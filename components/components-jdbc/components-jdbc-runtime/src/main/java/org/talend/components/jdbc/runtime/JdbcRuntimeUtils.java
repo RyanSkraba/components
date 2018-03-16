@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.runtime.SharedConnectionsPool;
+import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.module.PreparedStatementTable;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
@@ -75,7 +76,7 @@ public class JdbcRuntimeUtils {
             ss.initConnection(runtime);
         } catch (Exception ex) {
             vr.setStatus(Result.ERROR);
-            vr.setMessage(ex.getMessage());
+            vr.setMessage(CommonUtils.correctExceptionInfo(ex));
         }
         return vr;
     }

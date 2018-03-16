@@ -267,7 +267,7 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
                 main.schema.setValue(schema);
             } catch (Exception e) {
                 LOG.error("failed to retrieve the schema :", e);
-                return new ValidationResult(ValidationResult.Result.ERROR, e.getCause().getMessage());
+                return new ValidationResult(ValidationResult.Result.ERROR, CommonUtils.getClearExceptionInfo(e));
             }
         }
         return ValidationResult.OK;

@@ -120,7 +120,13 @@ public class JDBCInputTestIT {
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
-        source.getSchemaNames(null);
+        try {
+            source.getSchemaNames(null);
+        } catch(ComponentException e) {
+            String message = CommonUtils.getClearExceptionInfo(e);
+            assertTrue(message.contains("notexist"));
+            throw e;
+        }
     }
 
     @Test(expected = ComponentException.class)
@@ -132,7 +138,13 @@ public class JDBCInputTestIT {
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
-        source.getEndpointSchema(null, tablename);
+        try {
+            source.getEndpointSchema(null, tablename);
+        } catch(ComponentException e) {
+            String message = CommonUtils.getClearExceptionInfo(e);
+            assertTrue(message.contains("notexist"));
+            throw e;
+        }
     }
 
     @Test(expected = ComponentException.class)
@@ -142,7 +154,13 @@ public class JDBCInputTestIT {
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
-        source.getSchemaFromQuery(null, "select * from notexist");
+        try {
+            source.getSchemaFromQuery(null, "select * from notexist");
+        } catch(ComponentException e) {
+            String message = CommonUtils.getClearExceptionInfo(e);
+            assertTrue(message!=null && !message.isEmpty());
+            throw e;
+        }
     }
 
     @Test(expected = ComponentException.class)
@@ -154,7 +172,13 @@ public class JDBCInputTestIT {
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
-        source.getSchemaFromQuery(null, "select * from " + tablename);
+        try {
+            source.getSchemaFromQuery(null, "select * from " + tablename);
+        } catch(ComponentException e) {
+            String message = CommonUtils.getClearExceptionInfo(e);
+            assertTrue(message.contains("notexist"));
+            throw e;
+        }
     }
 
     @Test(expected = ComponentException.class)
@@ -165,8 +189,14 @@ public class JDBCInputTestIT {
         properties.connection.jdbcUrl.setValue("wrongone");
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
-
-        source.getSchemaFromQuery(null, "select * from " + tablename);
+        
+        try {
+            source.getSchemaFromQuery(null, "select * from " + tablename);
+        } catch(ComponentException e) {
+            String message = CommonUtils.getClearExceptionInfo(e);
+            assertTrue(message!=null && !message.isEmpty());
+            throw e;
+        }
     }
 
     @Test

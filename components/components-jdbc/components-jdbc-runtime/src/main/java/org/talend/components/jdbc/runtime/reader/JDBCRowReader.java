@@ -28,7 +28,6 @@ import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.CommonUtils;
@@ -100,7 +99,7 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
         try {
             conn = source.getConnection(container);
         } catch (ClassNotFoundException | SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
 
         return true;
@@ -148,7 +147,7 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
             return output;
         } catch (SQLException e) {
             if (setting.getDieOnError()) {
-                throw new ComponentException(e);
+                throw CommonUtils.newComponentException(e);
             } else {
                 // no need to print it as we will print the error message in component_begin.javajet for the reader if no reject
                 // line
@@ -219,7 +218,7 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
                 conn = null;
             }
         } catch (SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 

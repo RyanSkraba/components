@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
+import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.runtime.setting.JDBCSQLBuilder;
 import org.talend.components.jdbc.runtime.type.RowWriter;
 
@@ -46,7 +46,7 @@ public class JDBCOutputInsertWriter extends JDBCOutputWriter {
             sql = JDBCSQLBuilder.getInstance().generateSQL4Insert(setting.getTablename(), columnList);
             statement = conn.prepareStatement(sql);
         } catch (SQLException | ClassNotFoundException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 
@@ -85,14 +85,14 @@ public class JDBCOutputInsertWriter extends JDBCOutputWriter {
                 runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
             }
         } catch (SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
 
         try {
             insertCount += execute(input, statement);
         } catch (SQLException e) {
             if (dieOnError) {
-                throw new ComponentException(e);
+                throw CommonUtils.newComponentException(e);
             } else {
                 // TODO when use reject, should not print it, but now no method to know if we use the reject line in the job
                 // design at run time.
@@ -110,7 +110,7 @@ public class JDBCOutputInsertWriter extends JDBCOutputWriter {
             insertCount += executeCommit(statement);
         } catch (SQLException e) {
             if (dieOnError) {
-                throw new ComponentException(e);
+                throw CommonUtils.newComponentException(e);
             } else {
                 LOG.warn(e.getMessage());
             }

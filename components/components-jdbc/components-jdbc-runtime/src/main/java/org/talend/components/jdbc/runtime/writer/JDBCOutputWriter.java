@@ -31,7 +31,6 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.components.jdbc.CommonUtils;
@@ -157,7 +156,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
                 deleteCount += statement.executeUpdate(sql);
             }
         } catch (ClassNotFoundException | SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
 
     }
@@ -210,7 +209,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
                 conn = null;
             }
         } catch (SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 
@@ -394,7 +393,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
                 return executeBatchAndGetCount(statement);
             } catch (SQLException e) {
                 if (dieOnError) {
-                    throw new ComponentException(e);
+                    throw CommonUtils.newComponentException(e);
                 } else {
                     LOG.warn(e.getMessage());
                 }

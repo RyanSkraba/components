@@ -141,7 +141,7 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
                 }
             }
         } catch (Exception e) {
-            throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e,
+            throw CommonUtils.newComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e,
                     ExceptionContext.withBuilder().put("message", e.getMessage()).build());
         }
         return result;
@@ -190,7 +190,7 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
             tableMetadata.setDatabaseMetaData(conn.getMetaData()).setTablename(tableName);
             return infer(tableMetadata, runtime);
         } catch (Exception e) {
-            throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e,
+            throw CommonUtils.newComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e,
                     ExceptionContext.withBuilder().put("message", e.getMessage()).build());
         }
     }
@@ -202,11 +202,11 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
             ResultSetMetaData metadata = resultset.getMetaData();
             return infer(metadata, runtime);
         } catch (SQLSyntaxErrorException sqlSyntaxException) {
-            throw new ComponentException(JdbcComponentErrorsCode.SQL_SYNTAX_ERROR, sqlSyntaxException);
+            throw CommonUtils.newComponentException(JdbcComponentErrorsCode.SQL_SYNTAX_ERROR, sqlSyntaxException);
         } catch (SQLException e) {
-            throw new ComponentException(JdbcComponentErrorsCode.SQL_ERROR, e);
+            throw CommonUtils.newComponentException(JdbcComponentErrorsCode.SQL_ERROR, e);
         } catch (ClassNotFoundException e) {
-            throw new ComponentException(JdbcComponentErrorsCode.DRIVER_NOT_PRESENT_ERROR, e);
+            throw CommonUtils.newComponentException(JdbcComponentErrorsCode.DRIVER_NOT_PRESENT_ERROR, e);
         }
     }
 

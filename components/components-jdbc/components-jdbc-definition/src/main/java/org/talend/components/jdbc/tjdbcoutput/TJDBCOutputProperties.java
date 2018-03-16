@@ -365,7 +365,7 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
                 ss.setDBTypeMapping(CommonUtils.getMapping((String) mappingFileLocation, this.getRuntimeSetting(), null, null));
                 schema = ss.getEndpointSchema(null, tableSelection.tablename.getValue());
             } catch (Exception e) {
-                return new ValidationResult(ValidationResult.Result.ERROR, e.getCause().getMessage());
+                return new ValidationResult(ValidationResult.Result.ERROR, CommonUtils.getClearExceptionInfo(e));
             }
             main.schema.setValue(schema);
             updateOutputSchemas();

@@ -30,7 +30,6 @@ import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.ComponentConstants;
@@ -200,9 +199,9 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
             return haveNext();
         } catch (SQLException e) {
-            throw new ComponentException(JdbcComponentErrorsCode.SQL_ERROR, e);
+            throw CommonUtils.newComponentException(JdbcComponentErrorsCode.SQL_ERROR, e);
         } catch (Exception e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 
@@ -222,7 +221,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
         try {
             return haveNext();
         } catch (SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 
@@ -253,7 +252,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
                 conn = null;
             }
         } catch (SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 

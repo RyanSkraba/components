@@ -48,6 +48,7 @@ import org.talend.components.jdbc.tjdbcinput.TJDBCInputDefinition;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
 import org.talend.components.jdbc.tjdbcrow.TJDBCRowDefinition;
 import org.talend.components.jdbc.tjdbcrow.TJDBCRowProperties;
+import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.properties.ValidationResult;
 
 public class JDBCRowTestIT {
@@ -510,6 +511,10 @@ public class JDBCRowTestIT {
 
             writer.close();
         } catch (ComponentException e) {
+            ExceptionContext context = e.getContext();
+            Assert.assertTrue(context!=null);
+            String contextMessage = context.toString();
+            Assert.assertTrue(contextMessage!=null && !contextMessage.isEmpty());
             Assert.assertNotNull(e.getCause());
         } finally {
             writer.close();

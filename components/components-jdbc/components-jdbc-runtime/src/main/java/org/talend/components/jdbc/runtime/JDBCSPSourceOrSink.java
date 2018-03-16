@@ -64,7 +64,7 @@ public class JDBCSPSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
         try {
             conn = connect(runtime);
         } catch (ClassNotFoundException | SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
 
         Schema componentSchema = CommonUtils.getMainSchemaFromInputConnector((ComponentProperties) properties);
@@ -77,7 +77,7 @@ public class JDBCSPSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
             }
         } catch (Exception ex) {
             vr.setStatus(Result.ERROR);
-            vr.setMessage(ex.getMessage());
+            vr.setMessage(CommonUtils.correctExceptionInfo(ex));
         } finally {
             if (!useExistedConnection) {
                 try {
@@ -122,7 +122,7 @@ public class JDBCSPSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
                         Schema.Field inFieldInInput = CommonUtils.getField(inputSchema, columnName);
                         JDBCMapping.setValue(i, cs, inField, inputRecord.get(inFieldInInput.pos()));
                     } else {
-                        throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, ExceptionContext.withBuilder()
+                        throw CommonUtils.newComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, ExceptionContext.withBuilder()
                                 .put("message", "input must exists for IN or INOUT parameters").build());
                     }
                 }

@@ -29,7 +29,6 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.components.jdbc.CommonUtils;
@@ -89,7 +88,7 @@ public class JDBCSPWriter implements WriterWithFeedback<Result, IndexedRecord, I
             conn = sink.getConnection(runtime);
             cs = conn.prepareCall(sink.getSPStatement(setting));
         } catch (SQLException | ClassNotFoundException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 
@@ -119,7 +118,7 @@ public class JDBCSPWriter implements WriterWithFeedback<Result, IndexedRecord, I
 
             successfulWrites.add(outputRecord);
         } catch (Exception e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
 
     }
@@ -144,7 +143,7 @@ public class JDBCSPWriter implements WriterWithFeedback<Result, IndexedRecord, I
                 conn = null;
             }
         } catch (SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
     }
 

@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
+import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.runtime.setting.JDBCSQLBuilder;
 import org.talend.components.jdbc.runtime.type.RowWriter;
 
@@ -66,7 +66,7 @@ public class JDBCOutputInsertOrUpdateWriter extends JDBCOutputWriter {
             statementUpdate = conn.prepareStatement(sqlUpdate);
 
         } catch (ClassNotFoundException | SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
 
     }
@@ -157,7 +157,7 @@ public class JDBCOutputInsertOrUpdateWriter extends JDBCOutputWriter {
             }
 
         } catch (SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
 
         try {
@@ -168,7 +168,7 @@ public class JDBCOutputInsertOrUpdateWriter extends JDBCOutputWriter {
                         runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
                     }
                 } catch (SQLException e) {
-                    throw new ComponentException(e);
+                    throw CommonUtils.newComponentException(e);
                 }
 
                 updateCount += execute(input, statementUpdate);
@@ -179,14 +179,14 @@ public class JDBCOutputInsertOrUpdateWriter extends JDBCOutputWriter {
                         runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
                     }
                 } catch (SQLException e) {
-                    throw new ComponentException(e);
+                    throw CommonUtils.newComponentException(e);
                 }
 
                 insertCount += execute(input, statementInsert);
             }
         } catch (SQLException e) {
             if (dieOnError) {
-                throw new ComponentException(e);
+                throw CommonUtils.newComponentException(e);
             } else {
                 result.totalCount++;
 
@@ -201,7 +201,7 @@ public class JDBCOutputInsertOrUpdateWriter extends JDBCOutputWriter {
             executeCommit(null);
         } catch (SQLException e) {
             if (dieOnError) {
-                throw new ComponentException(e);
+                throw CommonUtils.newComponentException(e);
             } else {
                 LOG.warn(e.getMessage());
             }

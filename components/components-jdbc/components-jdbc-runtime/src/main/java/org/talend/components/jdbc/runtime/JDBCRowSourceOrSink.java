@@ -18,7 +18,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.ComponentConstants;
@@ -76,7 +75,7 @@ public class JDBCRowSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
         try {
             conn = connect(runtime);
         } catch (ClassNotFoundException | SQLException e) {
-            throw new ComponentException(e);
+            throw CommonUtils.newComponentException(e);
         }
 
         try {
@@ -97,16 +96,16 @@ public class JDBCRowSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
         } catch (Exception ex) {
             if (dieOnError) {
                 vr.setStatus(Result.ERROR);
-                vr.setMessage(ex.getMessage());
+                vr.setMessage(CommonUtils.correctExceptionInfo(ex));
             } else {
-                System.err.println(ex.getMessage());
+                System.err.println(CommonUtils.correctExceptionInfo(ex));
             }
         } finally {
             if (!useExistedConnection) {
                 try {
                     conn.close();
                 } catch (SQLException e) {
-                    throw new ComponentException(e);
+                    throw CommonUtils.newComponentException(e);
                 }
             }
         }
