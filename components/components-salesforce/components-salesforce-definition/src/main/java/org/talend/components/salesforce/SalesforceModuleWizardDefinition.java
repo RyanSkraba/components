@@ -62,7 +62,7 @@ public class SalesforceModuleWizardDefinition extends AbstractComponentWizardDef
     public String getImagePath(DefinitionImageType type) {
         switch (type) {
             case TREE_ICON_16X16:
-                return "connectionWizardIcon.png"; //$NON-NLS-1$
+                return "table.gif"; //$NON-NLS-1$
             case WIZARD_BANNER_75X66:
                 return "salesforceWizardBanner.png"; //$NON-NLS-1$
             default:

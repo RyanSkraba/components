@@ -73,6 +73,6 @@ public class SalesforceModuleWizardDefinitionTest {
     @Test
     public void testGetMenuItemName() {
         SalesforceModuleWizardDefinition definition = new SalesforceModuleWizardDefinition();
-        assertEquals("Salesforce Modules", definition.getMenuItemName());
+        assertEquals("Retrieve Salesforce Modules", definition.getMenuItemName());
     }
 }

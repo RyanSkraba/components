@@ -388,7 +388,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         assertEquals("Edit Salesforce", subWizards[1].getDefinition().getMenuItemName());
         
         assertFalse(subWizards[2].getDefinition().isTopLevel());
-        assertEquals("Salesforce Modules", subWizards[2].getDefinition().getMenuItemName());
+        assertEquals("Retrieve Salesforce Modules", subWizards[2].getDefinition().getMenuItemName());
     }
 
     @Test
