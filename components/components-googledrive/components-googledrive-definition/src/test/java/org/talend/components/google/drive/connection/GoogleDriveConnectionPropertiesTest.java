@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.google.drive.connection;
 
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -19,6 +20,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.talend.components.google.drive.connection.GoogleDriveConnectionProperties.FORM_WIZARD;
+
+import java.io.File;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -185,4 +188,14 @@ public class GoogleDriveConnectionPropertiesTest extends GoogleDriveTestBase {
         assertThat(vr.getStatus(), is(Result.ERROR));
     }
 
+    @Test
+    public void testAfterApplicationName() throws Exception {
+        String baseDS = ".credentials" + File.separator + "talend-googledrive";
+        String appName = "";
+        assertThat(properties.datastorePath.getValue(), endsWith(baseDS));
+        appName = "GoogleDriveTests";
+        properties.applicationName.setValue(appName);
+        properties.afterApplicationName();
+        assertThat(properties.datastorePath.getValue(), endsWith(baseDS + File.separator + appName));
+    }
 }

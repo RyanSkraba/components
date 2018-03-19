@@ -22,6 +22,7 @@ import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumSet;
 
@@ -48,9 +49,13 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
 
     public static final String FORM_WIZARD = "Wizard";
 
+    public static final String PATH_CREDENTIALS_TALEND_GOOGLEDRIVE = ".credentials/talend-googledrive";
+
     public Property<String> name = newString("name").setRequired();
 
     public Property<String> applicationName = newString("applicationName").setRequired();
+
+    private Path dsPath;
 
     private String repositoryLocation;
 
@@ -124,14 +129,8 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
         clientSecretFile.setValue("");
         serviceAccountFile.setValue("");
         //
-        String dsPath = ".credentials/talend-googledrive";
-        try {
-            dsPath = Paths.get(System.getProperty("user.home"), ".credentials/talend-googledrive").toAbsolutePath().toString();
-            dsPath = dsPath.replace("\\", "/");
-        } catch (Exception e) {
-            // env not set
-        }
-        datastorePath.setValue(dsPath);
+        dsPath = Paths.get(System.getProperty("user.home", "."), PATH_CREDENTIALS_TALEND_GOOGLEDRIVE);
+        datastorePath.setValue(dsPath.toAbsolutePath().toString());
         //
         useProxy.setValue(false);
         proxyHost.setValue("127.0.0.1");
@@ -282,6 +281,10 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
         refreshLayout(getForm(FORM_WIZARD));
+    }
+
+    public void afterApplicationName() {
+        datastorePath.setValue(dsPath.resolve(applicationName.getValue()).toAbsolutePath().toString());
     }
 
     public ValidationResult validateTestConnection() throws Exception {
