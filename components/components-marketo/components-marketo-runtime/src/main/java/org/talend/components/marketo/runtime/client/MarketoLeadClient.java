@@ -360,6 +360,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
     @Override
     public MarketoRecordResult getLead(TMarketoInputProperties parameters, String offset) {
         String filter = parameters.leadKeyTypeREST.getValue().toString();
+        if ("Custom".equals(filter)) {
+            filter = parameters.customLeadKeyType.getValue();
+        }
         String filterValue = parameters.leadKeyValue.getValue();
         String[] fields = parameters.mappingInput.getMarketoColumns(parameters.schemaInput.schema.getValue())
                 .toArray(new String[] {});
@@ -397,6 +400,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
 
         if (parameters.leadSelectorREST.getValue().equals(LeadKeySelector)) {
             filter = parameters.leadKeyTypeREST.getValue().toString();
+            if ("Custom".equals(filter)) {
+                filter = parameters.customLeadKeyType.getValue();
+            }
             filterValues = parameters.leadKeyValues.getValue().split(",");
             current_uri = new StringBuilder(basicPath)//
                     .append(API_PATH_LEADS) //
@@ -611,6 +617,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
     public MarketoSyncResult syncMultipleLeads(TMarketoOutputProperties parameters, List<IndexedRecord> leads) {
         String action = parameters.operationType.getValue().name();
         String lookupField = parameters.lookupField.getValue().name();
+        if ("Custom".equals(lookupField)) {
+            lookupField = parameters.customLookupField.getValue();
+        }
         if (parameters.deDupeEnabled.getValue()) {
             action = null;
             lookupField = null;

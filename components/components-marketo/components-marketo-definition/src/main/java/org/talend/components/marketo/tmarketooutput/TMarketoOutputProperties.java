@@ -76,12 +76,15 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
         sfdcContactId,
         sfdcLeadId,
         sfdcLeadOwnerId,
-        sfdcOpptyId
+        sfdcOpptyId,
+        Custom
     }
 
     public Property<OperationType> operationType = newEnum("operationType", OperationType.class);
 
     public Property<RESTLookupFields> lookupField = newEnum("lookupField", RESTLookupFields.class);
+
+    public Property<String> customLookupField = newString("customLookupField");
 
     /*
      * Select this check box to de-duplicate and update lead records using email address. Deselect this check box to create
@@ -141,6 +144,7 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
         operationType.setValue(OperationType.createOnly);
         lookupField.setPossibleValues((Object[]) RESTLookupFields.values());
         lookupField.setValue(RESTLookupFields.email);
+        customLookupField.setValue("");
         deDupeEnabled.setValue(false);
         deleteLeadsInBatch.setValue(false);
         // Custom Objects
@@ -177,6 +181,7 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
         mainForm.addRow(customObjectName);
         //
         mainForm.addRow(lookupField);
+        mainForm.addColumn(customLookupField);
         mainForm.addRow(widget(mappingInput).setWidgetType(Widget.TABLE_WIDGET_TYPE));
         mainForm.addRow(deDupeEnabled);
         mainForm.addRow(deleteLeadsInBatch);
@@ -193,6 +198,7 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
             form.getWidget(mappingInput.getName()).setVisible(false);
             form.getWidget(operationType.getName()).setVisible(false);
             form.getWidget(lookupField.getName()).setVisible(false);
+            form.getWidget(customLookupField.getName()).setVisible(false);
             form.getWidget(deDupeEnabled.getName()).setVisible(false);
             form.getWidget(batchSize.getName()).setVisible(false);
             form.getWidget(deleteLeadsInBatch.getName()).setVisible(false);
@@ -216,6 +222,10 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
                     form.getWidget(deDupeEnabled.getName()).setVisible(true);
                     form.getWidget(operationType.getName()).setHidden(deDupeEnabled.getValue());
                     form.getWidget(lookupField.getName()).setHidden(deDupeEnabled.getValue());
+                    if (form.getWidget(lookupField.getName()).isVisible()
+                            && RESTLookupFields.Custom.equals(lookupField.getValue())) {
+                        form.getWidget(customLookupField.getName()).setVisible(true);
+                    }
                     break;
                 case deleteLeads:
                     form.getWidget(deleteLeadsInBatch.getName()).setVisible(true);
@@ -297,6 +307,10 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
 
     public void afterBatchSize() {
         updateOutputSchemas();
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterLookupField() {
         refreshLayout(getForm(Form.MAIN));
     }
 

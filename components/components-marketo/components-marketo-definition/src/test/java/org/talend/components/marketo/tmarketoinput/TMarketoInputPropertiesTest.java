@@ -1045,4 +1045,22 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertFalse(f.getWidget(tl_excludeTypes).isVisible());
         assertFalse(f.getWidget(tl_includeTypes).isVisible());
     }
+
+    @Test
+    public void testAfterLeadKeyType() throws Exception {
+        Form f = props.getForm(Form.MAIN);
+        props.refreshLayout(f);
+        assertFalse(f.getWidget(props.customLeadKeyType.getName()).isVisible());
+        props.leadKeyTypeREST.setValue(LeadKeyTypeREST.sfdcAccountId);
+        props.afterLeadKeyTypeREST();
+        assertFalse(f.getWidget(props.customLeadKeyType.getName()).isVisible());
+        props.leadKeyTypeREST.setValue(LeadKeyTypeREST.Custom);
+        props.afterLeadKeyTypeREST();
+        assertTrue(f.getWidget(props.customLeadKeyType.getName()).isVisible());
+        props.inputOperation.setValue(InputOperation.getLeadActivity);
+        props.afterLeadKeyTypeREST();
+        assertFalse(f.getWidget(props.leadKeyTypeREST.getName()).isVisible());
+        assertFalse(f.getWidget(props.customLeadKeyType.getName()).isVisible());
+    }
+
 }
