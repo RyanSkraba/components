@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -8,7 +9,7 @@
 		<relativePath>../../../components-parent/pom.xml</relativePath>
 	</parent>
 	<properties>
-	    <antlr4.version>4.6</antlr4.version>
+		<antlr4.version>4.6</antlr4.version>
 		<partner.version>42.0.0</partner.version>
 		<jetty.version>9.2.19.v20160908</jetty.version>
 		<coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
@@ -19,16 +20,16 @@
 	<packaging>bundle</packaging>
 	<dependencies>
 		<dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-salesforce-definition</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-salesforce-definition</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.force.api</groupId>
 			<artifactId>force-wsc</artifactId>
 			<version>42.0.0</version>
-            <exclusions>
+			<exclusions>
 				<!--  exclude those dependencies cause they have know CVEs -->
 				<exclusion>
 					<groupId>org.codehaus.jackson</groupId>
@@ -38,18 +39,16 @@
 					<groupId>org.codehaus.jackson</groupId>
 					<artifactId>jackson-mapper-asl</artifactId>
 				</exclusion>
-			</exclusions> 
+			</exclusions>
 		</dependency>
 		<!-- include the avro dependencies manually with fixes for those know CVEs -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-core-asl</artifactId>
-			<version>1.9.14-TALEND</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.9.14-TALEND</version>
 		</dependency>
 		<!-- the following 2 deps are required for the com.force.api above -->
 		<dependency>
@@ -68,13 +67,13 @@
 			<artifactId>force-partner-api</artifactId>
 			<version>${partner.version}</version>
 		</dependency>
-		
+
 		<!-- guess schema feature dependency -->
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
-            <version>${antlr4.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>${antlr4.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -91,12 +90,12 @@
 			<artifactId>components-api-service-rest</artifactId>
 			<classifier>lib</classifier>
 			<scope>test</scope>
-            <exclusions>
-            	<exclusion>
-            		<groupId>ch.qos.logback</groupId>
-            		<artifactId>logback-classic</artifactId>
-            	</exclusion>
-            </exclusions>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -184,7 +183,7 @@
 		</dependency>
 
 	</dependencies>
-	
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -209,7 +208,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-			
+
 	<build>
 
 		<plugins>
@@ -268,9 +267,13 @@
 							<classifier>bundle</classifier>
 							<instructions>
 								<Bundle-SymbolicName>org.talend.components.salesforce.runtime</Bundle-SymbolicName>
-								<Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*,org.apache.oltu.oauth2*,org.codehaus.jackson*</Import-Package>
+								<Import-Package>
+									!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*,org.apache.oltu.oauth2*,org.codehaus.jackson*
+								</Import-Package>
 								<Service-Component>*</Service-Component>
-								<Embed-Dependency>!components*|auto-service,*;scope=compile|runtime;artifactId=!commons-beanutils|commons-collections</Embed-Dependency>
+								<Embed-Dependency>
+									!components*|auto-service,*;scope=compile|runtime;artifactId=!commons-beanutils|commons-collections
+								</Embed-Dependency>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 								<Include-Resource>
 									{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
@@ -281,22 +284,23 @@
 				</executions>
 			</plugin>
 			<!-- used to generate soql antlr4 parser; is not included to lifecycle -->
-            <plugin>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-maven-plugin</artifactId>
-                <version>${antlr4.version}</version>
-                <executions>
-                    <execution>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>antlr4</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <outputDirectory>${project.build.sourceDirectory}/org/talend/components/salesforce/soql/parser</outputDirectory>
-                </configuration>
-            </plugin>
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-maven-plugin</artifactId>
+				<version>${antlr4.version}</version>
+				<executions>
+					<execution>
+						<phase>none</phase>
+						<goals>
+							<goal>antlr4</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<outputDirectory>${project.build.sourceDirectory}/org/talend/components/salesforce/soql/parser
+					</outputDirectory>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>

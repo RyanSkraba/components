@@ -15,7 +15,7 @@ package org.apache.ambari.api;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.json.Annotations;
+import com.fasterxml.jackson.jaxrs.cfg.Annotations;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 /*
@@ -24,8 +24,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 public class TextJacksonJsonProvider extends JacksonJsonProvider {
 
     /**
-     * Default constructor, usually used when provider is automatically configured to be used with JAX-RS
-     * implementation.
+     * Default constructor, usually used when provider is automatically configured to be used with JAX-RS implementation.
      */
     public TextJacksonJsonProvider() {
         super(null, BASIC_ANNOTATIONS);
@@ -55,9 +54,9 @@ public class TextJacksonJsonProvider extends JacksonJsonProvider {
     @Override
     protected boolean isJsonType(MediaType mediaType) {
         /*
-         * As suggested by Stephen D, there are 2 ways to check: either being as inclusive as possible (if subtype is
-         * "json"), or exclusive (major type "application", minor type "json"). Let's start with inclusive one, hard to
-         * know which major types we should cover aside from "application".
+         * As suggested by Stephen D, there are 2 ways to check: either being as inclusive as possible (if subtype is "json"),
+         * or exclusive (major type "application", minor type "json"). Let's start with inclusive one, hard to know which major
+         * types we should cover aside from "application".
          */
         if (mediaType != null) {
             // Ok: there are also "xxx+json" subtypes, which count as well

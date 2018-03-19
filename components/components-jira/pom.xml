@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -63,10 +64,10 @@
             <classifier>lib</classifier>
             <scope>test</scope>
             <exclusions>
-            	<exclusion>
-            		<groupId>ch.qos.logback</groupId>
-            		<artifactId>logback-classic</artifactId>
-            	</exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -80,7 +81,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-       <dependency>
+        <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
             <scope>test</scope>
@@ -99,7 +100,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -142,7 +142,7 @@
     <build>
         <plugins>
             <plugin>
-            <!-- This plugin is used to generate .link files used for the OSGI test execution with PaxExam -->
+                <!-- This plugin is used to generate .link files used for the OSGI test execution with PaxExam -->
                 <groupId>com.github.veithen.alta</groupId>
                 <artifactId>alta-maven-plugin</artifactId>
                 <version>0.4.2-Talend</version>
@@ -161,17 +161,17 @@
                                 <scope>test</scope>
                             </dependencySet>
                             <artifacts>
-                              <artifact>
-                                  <groupId>${project.groupId}</groupId>
-                                  <artifactId>${project.artifactId}</artifactId>
-                                  <classifier>bundle</classifier>
-                                  <version>${project.version}</version>
-                              </artifact>
-                           </artifacts>
+                                <artifact>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <classifier>bundle</classifier>
+                                    <version>${project.version}</version>
+                                </artifact>
+                            </artifacts>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>                  
+            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -210,7 +210,7 @@
                                 <Fragment-Host>org.talend.components.jira</Fragment-Host>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <DynamicImport-Package>*</DynamicImport-Package>
-                                <Embed-Dependency />
+                                <Embed-Dependency/>
                                 <Export-Package>*</Export-Package>
                                 <Include-Resource>=target/test-classes/</Include-Resource>
                             </instructions>
@@ -298,7 +298,9 @@
         <profile>
             <id>tos-dev-local</id>
             <activation>
-                <property><name>tos.home</name></property>
+                <property>
+                    <name>tos.home</name>
+                </property>
             </activation>
             <properties>
                 <maven.javadoc.skip>true</maven.javadoc.skip>
