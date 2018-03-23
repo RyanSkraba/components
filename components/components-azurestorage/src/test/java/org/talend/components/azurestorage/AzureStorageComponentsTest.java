@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.azurestorage;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -66,7 +64,6 @@ public class AzureStorageComponentsTest {// extends AzureStorageGenericBase {
         return sos.initialize(runtime, properties);
     }
 
-
     @Test
     public void testBlobListSchema() {
         Schema s = SchemaBuilder.record("Main").fields().name("BlobName").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "300")// $NON-NLS-3$
@@ -91,7 +88,7 @@ public class AzureStorageComponentsTest {// extends AzureStorageGenericBase {
     public void testAzureStorageDefinition() {
         AzureStorageDefinition def = new TAzureStorageConnectionDefinition();
         assertEquals(EnumSet.of(ConnectorTopology.NONE), def.getSupportedConnectorTopologies());
-        assertFalse(def.isStartable());
+        assertTrue(def.isStartable());
     }
 
     @Test

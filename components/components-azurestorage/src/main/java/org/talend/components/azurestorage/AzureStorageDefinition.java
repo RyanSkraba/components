@@ -20,7 +20,6 @@ import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.daikon.properties.property.Property;
-import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
@@ -39,18 +38,18 @@ public abstract class AzureStorageDefinition extends AbstractComponentDefinition
      */
     public AzureStorageDefinition(String componentName) {
         super(componentName, true);
-        setupI18N(new Property<?>[]{RETURN_ERROR_MESSAGE_PROP});
+        setupI18N(new Property<?>[] { RETURN_ERROR_MESSAGE_PROP });
     }
 
     @Override
     public String[] getFamilies() {
-        return new String[]{"Cloud/Azure Storage"}; //$NON-NLS-1$
+        return new String[] { "Cloud/Azure Storage" }; //$NON-NLS-1$
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
-        return new Property[]{RETURN_ERROR_MESSAGE_PROP};
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP };
     }
 
     @Override
@@ -61,7 +60,7 @@ public abstract class AzureStorageDefinition extends AbstractComponentDefinition
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
-        return new Class[]{TAzureStorageConnectionProperties.class};
+        return new Class[] { TAzureStorageConnectionProperties.class };
     }
 
     /**
@@ -78,6 +77,6 @@ public abstract class AzureStorageDefinition extends AbstractComponentDefinition
 
     @Override
     public boolean isStartable() {
-        return false;
+        return true;
     }
 }
