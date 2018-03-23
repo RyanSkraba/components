@@ -17,6 +17,7 @@ import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PA
 import static org.talend.components.marketo.MarketoConstants.getRESTSchemaForGetLeadActivity;
 import static org.talend.components.marketo.MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads;
 import static org.talend.components.marketo.MarketoConstants.getSOAPSchemaForGetLeadActivity;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction.describe;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.CustomObject;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLead;
@@ -41,6 +42,7 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
@@ -346,9 +348,9 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
         inputOperation.setPossibleValues((Object[]) InputOperation.values());
         inputOperation.setValue(getLead);
         leadSelectorSOAP.setPossibleValues((Object[]) LeadSelector.values());
-        leadSelectorSOAP.setValue(LeadSelector.LeadKeySelector);
-        leadSelectorREST.setPossibleValues(LeadSelector.LeadKeySelector, LeadSelector.StaticListSelector);
-        leadSelectorREST.setValue(LeadSelector.LeadKeySelector);
+        leadSelectorSOAP.setValue(LeadKeySelector);
+        leadSelectorREST.setPossibleValues(LeadKeySelector, LeadSelector.StaticListSelector);
+        leadSelectorREST.setValue(LeadKeySelector);
         customLeadKeyType.setValue("");
         setIncludeTypes.setValue(false);
         includeTypes.type.setPossibleValues((Object[]) IncludeExcludeFieldsREST.values());
@@ -817,6 +819,32 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
             migrated = super.postDeserialize(version, setup, false); // don't initLayout
         }
         checkForInvalidStoredProperties();
+        // migrate CustomLookup
+        if (isApiREST() && (getMultipleLeads.equals(inputOperation.getValue()) || getLead.equals(inputOperation.getValue()))
+                && (LeadKeySelector.equals(leadSelectorREST.getValue()))) {
+            String value = getEnumStoredValue(leadKeyTypeREST.getStoredValue());
+            boolean correctValue = false;
+            for (LeadKeyTypeREST lkt : LeadKeyTypeREST.values()) {
+                if (lkt.name().equals(value)) {
+                    correctValue = true;
+                }
+            }
+            // since `Custom` was added before, we update the Enum for the latest
+            leadKeyTypeREST = newEnum("leadKeyTypeREST", LeadKeyTypeREST.class);
+            leadKeyTypeREST.setPossibleValues(LeadKeyTypeREST.class.getEnumConstants());
+            if (correctValue) {
+                if (value != null) {
+                    leadKeyTypeREST.setValue(Enum.valueOf(LeadKeyTypeREST.class, value));
+                    leadKeyTypeREST.setStoredValue(Enum.valueOf(LeadKeyTypeREST.class, value));
+                }
+            } else {
+                leadKeyTypeREST.setValue(LeadKeyTypeREST.Custom);
+                customLeadKeyType.setValue(value != null ? StringUtils.wrap(value, '"') : "");
+                LOG.warn("[postDeserialize] Fixing Custom leadKeyType with {}", customLeadKeyType.getValue());
+            }
+            migrated = true;
+        }
+        //
         if (version < this.getVersionNumber()) {
             if (getMultipleLeads.equals(inputOperation.getValue())
                     && ((LeadSelector.StaticListSelector.equals(leadSelectorREST.getValue()) && isApiREST())

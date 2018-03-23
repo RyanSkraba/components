@@ -32,6 +32,7 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.ISchemaListener;
@@ -425,6 +426,30 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
             migrated = super.postDeserialize(version, setup, false); // don't initLayout
         }
         checkForInvalidStoredProperties();
+        // migrate CustomLookup
+        if (isApiREST()
+                && (syncMultipleLeads.equals(outputOperation.getValue()) || syncLead.equals(outputOperation.getValue()))) {
+            String value = getEnumStoredValue(lookupField.getStoredValue());
+            boolean correctValue = false;
+            for (RESTLookupFields lkt : RESTLookupFields.values()) {
+                if (lkt.name().equals(value)) {
+                    correctValue = true;
+                }
+            }
+            // since `Custom` was added before, we update the Enum for the latest
+            lookupField = newEnum("lookupField", RESTLookupFields.class);
+            lookupField.setPossibleValues(RESTLookupFields.class.getEnumConstants());
+            if (correctValue) {
+                if (value != null) {
+                    lookupField.setValue(Enum.valueOf(RESTLookupFields.class, value));
+                    lookupField.setStoredValue(Enum.valueOf(RESTLookupFields.class, value));
+                }
+            } else {
+                lookupField.setValue(RESTLookupFields.Custom);
+                customLookupField.setValue(value != null ? StringUtils.wrap(value, '"') : "");
+                LOG.warn("[postDeserialize] Fixing Custom lookupField with {}", customLookupField.getValue());
+            }
+        }
 
         return migrated;
     }

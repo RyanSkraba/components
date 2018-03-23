@@ -112,25 +112,25 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
         return APIMode.REST.equals(getConnectionProperties().apiMode.getValue());
     }
 
+    protected String getEnumStoredValue(Object storedValue) {
+        if (storedValue instanceof LinkedHashMap) {
+            return String.valueOf(((LinkedHashMap) storedValue).get("name"));
+        }
+        if (storedValue instanceof String || storedValue instanceof Enum) {
+            return String.valueOf(storedValue);
+        }
+        return null;
+    }
+
     protected <T extends Enum<T>> Property<T> checkForInvalidStoredEnumProperty(Property<T> property, Class<T> fixEnum) {
         String name = property.getName();
-        Object o;
-        String value = null;
-        LinkedHashMap ov;
         if (property.getStoredValue() instanceof Enum && fixEnum.getCanonicalName().equals(property.getType())) {
             return property;
         }
-        o = property.getStoredValue();
-        if (o instanceof LinkedHashMap) {
-            ov = (LinkedHashMap) o;
-            value = String.valueOf(ov.get("name"));
-        }
-        if (o instanceof String || o instanceof Enum) {
-            value = String.valueOf(o);
-        }
+        String value = getEnumStoredValue(property.getStoredValue());
         if (value == null) {
-            LOG.warn("[checkForInvalidStoredEnumProperty] Cannot determine value for enum {} stored value: {} ({}).", name, o,
-                    o.getClass().getCanonicalName());
+            LOG.warn("[checkForInvalidStoredEnumProperty] Cannot determine value for enum {} stored value: {} ({}).", name,
+                    property.getStoredValue(), property.getStoredValue().getClass().getCanonicalName());
             // don't break everything for that...
             return property;
         }
