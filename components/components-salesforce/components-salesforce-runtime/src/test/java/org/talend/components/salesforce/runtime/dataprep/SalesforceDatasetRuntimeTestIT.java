@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreDefinition;
@@ -15,7 +14,6 @@ import org.talend.daikon.java8.Consumer;
 public class SalesforceDatasetRuntimeTestIT {
 
     @Test
-    @Ignore
     public void testGetSchemaForModule() {
         SalesforceDatasetProperties dataset = createDatasetPropertiesForModule();
         dataset.selectColumnIds.setValue(Arrays.asList("IsDeleted", "Id"));
@@ -41,7 +39,6 @@ public class SalesforceDatasetRuntimeTestIT {
     }
 
     @Test
-    @Ignore
     public void testGetSampleForModule() {
         SalesforceDatasetProperties dataset = createDatasetPropertiesForModule();
         dataset.selectColumnIds.setValue(Arrays.asList("IsDeleted", "Id"));
@@ -104,6 +101,7 @@ public class SalesforceDatasetRuntimeTestIT {
         CommonTestUtils.setValueForDatastoreProperties(datastore);
 
         SalesforceDatasetProperties dataset = (SalesforceDatasetProperties) def.createDatasetProperties(datastore);
+        dataset.sourceType.setValue(SalesforceDatasetProperties.SourceType.MODULE_SELECTION);
         dataset.moduleName.setValue("Account");
 
         return dataset;

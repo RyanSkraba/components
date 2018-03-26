@@ -23,9 +23,9 @@ import java.util.List;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.SupportedProduct;
+import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.dataprep.SalesforceInputDefinition;
@@ -48,7 +48,6 @@ public class SalesforceInputTestIT {
     }
 
     @Test
-    @Ignore
     public void testReaderForModule() {
         Reader reader = null;
         try {
@@ -88,7 +87,6 @@ public class SalesforceInputTestIT {
     }
 
     @Test
-    @Ignore
     public void testTypeForModule() throws Exception {
         SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
 
@@ -115,7 +113,6 @@ public class SalesforceInputTestIT {
     }
 
     @Test(expected = RuntimeException.class)
-    @Ignore
     public void testTypeForModuleWithBadQuery() throws Exception {
         SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
 
@@ -131,7 +128,6 @@ public class SalesforceInputTestIT {
     }
 
     @Test
-    @Ignore
     public void testTypeForModuleWithoutSpecifiedFields() throws Exception {
         SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
 
@@ -155,7 +151,6 @@ public class SalesforceInputTestIT {
     }
 
     @Test(expected = ComponentException.class)
-    @Ignore
     public void testTypeForModuleWithCompoundType() throws Exception {
         SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
 
@@ -171,7 +166,6 @@ public class SalesforceInputTestIT {
     }
 
     @Test
-    @Ignore
     public void testTypeForModuleWithPickListType() throws Exception {
         SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
 
@@ -191,6 +185,23 @@ public class SalesforceInputTestIT {
                 }
             }
 
+        }
+    }
+
+    @Test
+    public void testConditionForModule() throws IOException {
+        SalesforceInputProperties properties = createCommonSalesforceInputPropertiesForModule();
+
+        SalesforceDataprepSource source = new SalesforceDataprepSource();
+        source.initialize(null, properties);
+        properties.getDatasetProperties().selectColumnIds.setValue(Arrays.asList("Id", "Name", "BillingState"));
+        properties.getDatasetProperties().condition.setValue("BillingState='NC'");
+
+        try (BoundedReader reader = source.createReader(null)) {
+            for (boolean available = reader.start(); available; available = reader.advance()) {
+                IndexedRecord record = (IndexedRecord) reader.getCurrent();
+                assertEquals("NC", record.get(record.getSchema().getField("BillingState").pos()));
+            }
         }
     }
 
@@ -291,6 +302,7 @@ public class SalesforceInputTestIT {
 
         SalesforceDatasetProperties dataset =
                 (SalesforceDatasetProperties) datastore_def.createDatasetProperties(datastore_props);
+        dataset.sourceType.setValue(SalesforceDatasetProperties.SourceType.MODULE_SELECTION);
         dataset.moduleName.setValue("Account");
 
         SalesforceInputDefinition input_def = new SalesforceInputDefinition();
