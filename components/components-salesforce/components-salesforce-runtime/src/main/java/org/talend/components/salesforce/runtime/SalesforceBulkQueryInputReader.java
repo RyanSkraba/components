@@ -52,6 +52,7 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
                 bulkRuntime.setChunkProperties((TSalesforceInputProperties) properties);
             }
             bulkRuntime.setSafetySwitch(((TSalesforceInputProperties) properties).safetySwitch.getValue());
+            bulkRuntime.setJobTimeout((TSalesforceInputProperties) properties);
         }
         try {
             executeSalesforceBulkQuery();
