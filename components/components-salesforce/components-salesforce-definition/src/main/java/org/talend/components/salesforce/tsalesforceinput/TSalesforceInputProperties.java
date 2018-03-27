@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -79,6 +79,8 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     public static final int DEFAULT_CHUNK_SLEEP_TIME = 15;
 
+    public Property<Boolean> safetySwitch = newBoolean("safetySwitch", true);
+
     public Property<Boolean> pkChunking = newBoolean("pkChunking", false);
 
     public Property<Integer> chunkSize = newInteger("chunkSize", DEFAULT_CHUNK_SIZE);
@@ -115,6 +117,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         mainForm.addRow(includeDeleted);
 
         Form advancedForm = getForm(Form.ADVANCED);
+        advancedForm.addRow(safetySwitch);
         advancedForm.addRow(pkChunking);
         advancedForm.addRow(chunkSize);
         advancedForm.addRow(chunkSleepTime);
@@ -218,6 +221,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         }
         if (Form.ADVANCED.equals(form.getName())) {
             boolean isBulkQuery = queryMode.getValue().equals(QueryMode.Bulk);
+            form.getWidget(safetySwitch.getName()).setVisible(isBulkQuery);
             form.getWidget(pkChunking.getName()).setVisible(isBulkQuery);
             form.getWidget(chunkSize.getName()).setVisible(isBulkQuery && pkChunking.getValue());
             form.getWidget(chunkSleepTime.getName()).setVisible(isBulkQuery && pkChunking.getValue());

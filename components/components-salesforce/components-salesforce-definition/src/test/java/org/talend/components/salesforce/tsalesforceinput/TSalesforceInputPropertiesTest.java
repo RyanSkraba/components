@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -86,6 +86,7 @@ public class TSalesforceInputPropertiesTest extends SalesforceTestBase {
         // check the result of setup layout
         mainForm = properties.getForm(Form.MAIN);
         advancedForm = properties.getForm(Form.ADVANCED);
+        Assert.assertNotNull(advancedForm.getWidget(properties.safetySwitch));
         Assert.assertNotNull(mainForm);
         Assert.assertNotNull(advancedForm);
     }
@@ -108,6 +109,7 @@ public class TSalesforceInputPropertiesTest extends SalesforceTestBase {
         Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.normalizeDelimiter.getName()).isHidden());
         Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.columnNameDelimiter.getName()).isHidden());
         Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.batchSize.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.safetySwitch).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.pkChunking.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.chunkSize.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getChildForm(properties.connection.getName())
@@ -127,6 +129,7 @@ public class TSalesforceInputPropertiesTest extends SalesforceTestBase {
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.normalizeDelimiter.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.columnNameDelimiter.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.batchSize.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.safetySwitch).isVisible());
         Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.pkChunking.getName()).isHidden());
         Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.chunkSize.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getChildForm(properties.connection.getName())
