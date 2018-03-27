@@ -13,6 +13,7 @@
 package org.talend.components.marketo.tmarketoconnection;
 
 import static org.talend.components.marketo.MarketoComponentDefinition.RUNTIME_SOURCEORSINK_CLASS;
+import static org.talend.components.marketo.MarketoComponentDefinition.USE_CURRENT_JVM_PROPS;
 import static org.talend.components.marketo.MarketoComponentDefinition.getSandboxedInstance;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
@@ -177,8 +178,7 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
     }
 
     public ValidationResult validateTestConnection() {
-        try {
-            SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance();
+        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
             ValidationResult vr = sos.validateConnection(this);
@@ -188,25 +188,25 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
             } else {
                 getForm(FORM_WIZARD).setAllowForward(false);
             }
+
             return vr;
-        } catch (Exception e) {
-            return new ValidationResult(Result.ERROR, e.getMessage());
         }
     }
 
     public ValidationResult afterFormFinishWizard(Repository<Properties> repo) {
-        try {
-            SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance();
+        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
             ValidationResult vr = sos.validateConnection(this);
             if (vr.getStatus() != ValidationResult.Result.OK) {
                 return vr;
             }
-            repo.storeProperties(this, this.name.getValue(), repositoryLocation, null);
-            return ValidationResult.OK;
-        } catch (Exception e) {
-            return new ValidationResult(Result.ERROR, e.getMessage());
+            try {
+                repo.storeProperties(this, this.name.getValue(), repositoryLocation, null);
+                return ValidationResult.OK;
+            } catch (Exception e) {
+                return new ValidationResult(Result.ERROR, e.getMessage());
+            }
         }
     }
 
@@ -232,10 +232,6 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
     public TMarketoConnectionProperties setRepositoryLocation(String repositoryLocation) {
         this.repositoryLocation = repositoryLocation;
         return this;
-    }
-
-    protected SandboxedInstance getRuntimeSandboxedInstance() {
-        return getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS);
     }
 
 }

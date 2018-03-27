@@ -14,6 +14,7 @@ package org.talend.components.marketo.wizard;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.talend.components.marketo.MarketoComponentDefinition.RUNTIME_SOURCEORSINK_CLASS;
+import static org.talend.components.marketo.MarketoComponentDefinition.USE_CURRENT_JVM_PROPS;
 import static org.talend.components.marketo.MarketoComponentDefinition.getSandboxedInstance;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
@@ -88,14 +89,10 @@ public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesIm
 
     public void beforeFormPresentCustomObjects() throws IOException {
         List<NamedThing> customObjectsNames;
-        try {
-            SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance();
+        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
             customObjectsNames = sos.getSchemaNames(null);
-        } catch (IOException e) {
-            LOG.error(e.getMessage());
-            throw e;
         }
         selectedCustomObjectsNames.setPossibleValues(customObjectsNames);
         getForm(FORM_CUSTOMOBJECTS).setAllowBack(true);
@@ -103,38 +100,36 @@ public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesIm
     }
 
     public ValidationResult afterFormFinishCustomObjects(Repository<Properties> repo) throws Exception {
-        try {
-            SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance();
+        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
-            String repoLoc = repo.storeProperties(connection, connection.name.getValue(), repositoryLocation, null);
-            String storeId;
-            for (NamedThing nl : selectedCustomObjectsNames.getValue()) {
-                String customObjectId = nl.getName();
-                storeId = nl.getName().replaceAll("-", "_").replaceAll(" ", "_");
-                MarketoComponentWizardBaseProperties customObjectProps = new MarketoComponentWizardBaseProperties(customObjectId);
-                customObjectProps.init();
-                customObjectProps.connection = connection;
-                customObjectProps.inputOperation.setValue(InputOperation.CustomObject);
-                customObjectProps.outputOperation.setValue(OutputOperation.syncCustomObjects);
-                customObjectProps.customObjectAction.setValue(CustomObjectAction.get);
-                customObjectProps.customObjectSyncAction.setValue(CustomObjectSyncAction.createOrUpdate);
-                customObjectProps.schemaInput.schema.setValue(sos.getEndpointSchema(null, customObjectId));
-                customObjectProps.customObjectName.setValue(nl.getName());
-                repo.storeProperties(customObjectProps, storeId, repoLoc, "schemaInput.schema");
+            try {
+                String repoLoc = repo.storeProperties(connection, connection.name.getValue(), repositoryLocation, null);
+                String storeId;
+                for (NamedThing nl : selectedCustomObjectsNames.getValue()) {
+                    String customObjectId = nl.getName();
+                    storeId = nl.getName().replaceAll("-", "_").replaceAll(" ", "_");
+                    MarketoComponentWizardBaseProperties customObjectProps = new MarketoComponentWizardBaseProperties(
+                            customObjectId);
+                    customObjectProps.init();
+                    customObjectProps.connection = connection;
+                    customObjectProps.inputOperation.setValue(InputOperation.CustomObject);
+                    customObjectProps.outputOperation.setValue(OutputOperation.syncCustomObjects);
+                    customObjectProps.customObjectAction.setValue(CustomObjectAction.get);
+                    customObjectProps.customObjectSyncAction.setValue(CustomObjectSyncAction.createOrUpdate);
+                    customObjectProps.schemaInput.schema.setValue(sos.getEndpointSchema(null, customObjectId));
+                    customObjectProps.customObjectName.setValue(nl.getName());
+                    repo.storeProperties(customObjectProps, storeId, repoLoc, "schemaInput.schema");
+                }
+            } catch (Exception e) {
+                ValidationResultMutable vr = new ValidationResultMutable();
+                vr.setStatus(Result.ERROR);
+                vr.setMessage(e.getMessage());
+                return vr;
             }
-        } catch (IOException e) {
-            LOG.error(e.getMessage());
-            ValidationResultMutable vr = new ValidationResultMutable();
-            vr.setStatus(Result.ERROR);
-            vr.setMessage(e.getMessage());
-            return vr;
         }
-        return ValidationResult.OK;
-    }
 
-    protected SandboxedInstance getRuntimeSandboxedInstance() {
-        return getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS);
+        return ValidationResult.OK;
     }
 
 }

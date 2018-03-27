@@ -13,6 +13,9 @@
 package org.talend.components.marketo.tmarketoinput;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.talend.components.marketo.MarketoComponentDefinition.RUNTIME_SOURCEORSINK_CLASS;
+import static org.talend.components.marketo.MarketoComponentDefinition.USE_CURRENT_JVM_PROPS;
+import static org.talend.components.marketo.MarketoComponentDefinition.getSandboxedInstance;
 import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PARAM;
 import static org.talend.components.marketo.MarketoConstants.getRESTSchemaForGetLeadActivity;
 import static org.talend.components.marketo.MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads;
@@ -629,51 +632,53 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
 
     public ValidationResult validateFetchCustomObjectSchema() {
         ValidationResultMutable vr = new ValidationResultMutable();
-        try {
-            SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance();
+        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
             ValidationResult vConn = sos.validateConnection(this);
             if (!Result.OK.equals(vConn.getStatus())) {
                 return vConn;
             }
-            Schema schema = ((MarketoSourceOrSinkSchemaProvider) sos).getSchemaForCustomObject(customObjectName.getValue());
-            if (schema == null) {
+            try {
+                Schema schema = ((MarketoSourceOrSinkSchemaProvider) sos).getSchemaForCustomObject(customObjectName.getValue());
+                if (schema == null) {
+                    vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages.getMessage(
+                            "error.validation.customobjects.fetchcustomobjectschema", customObjectName.getValue(), "NULL"));
+                    return vr;
+                }
+                schemaInput.schema.setValue(schema);
+                vr.setStatus(ValidationResult.Result.OK);
+            } catch (RuntimeException | IOException e) {
                 vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages.getMessage(
-                        "error.validation.customobjects.fetchcustomobjectschema", customObjectName.getValue(), "NULL"));
-                return vr;
+                        "error.validation.customobjects.fetchcustomobjectschema", customObjectName.getValue(), e.getMessage()));
             }
-            schemaInput.schema.setValue(schema);
-            vr.setStatus(ValidationResult.Result.OK);
-        } catch (RuntimeException | IOException e) {
-            vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages.getMessage(
-                    "error.validation.customobjects.fetchcustomobjectschema", customObjectName.getValue(), e.getMessage()));
         }
         return vr;
     }
 
     public ValidationResult validateFetchCompoundKey() {
         ValidationResultMutable vr = new ValidationResultMutable();
-        try {
-            SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance();
+        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
             ValidationResult vConn = sos.validateConnection(this);
             if (!Result.OK.equals(vConn.getStatus())) {
                 return vConn;
             }
-            List<String> keys = ((MarketoSourceOrSinkSchemaProvider) sos).getCompoundKeyFields(customObjectName.getValue());
-            if (keys == null) {
-                vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages
-                        .getMessage("error.validation.customobjects.fetchcompoundkey", customObjectName.getValue(), "NULL"));
-                return vr;
+            try {
+                List<String> keys = ((MarketoSourceOrSinkSchemaProvider) sos).getCompoundKeyFields(customObjectName.getValue());
+                if (keys == null) {
+                    vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages
+                            .getMessage("error.validation.customobjects.fetchcompoundkey", customObjectName.getValue(), "NULL"));
+                    return vr;
+                }
+                compoundKey.keyName.setValue(keys);
+                compoundKey.keyValue.setValue(Arrays.asList(new String[keys.size()]));
+                vr.setStatus(ValidationResult.Result.OK);
+            } catch (RuntimeException | IOException e) {
+                vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages.getMessage(
+                        "error.validation.customobjects.fetchcompoundkey", customObjectName.getValue(), e.getMessage()));
             }
-            compoundKey.keyName.setValue(keys);
-            compoundKey.keyValue.setValue(Arrays.asList(new String[keys.size()]));
-            vr.setStatus(ValidationResult.Result.OK);
-        } catch (RuntimeException | IOException e) {
-            vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages
-                    .getMessage("error.validation.customobjects.fetchcompoundkey", customObjectName.getValue(), e.getMessage()));
         }
         return vr;
     }

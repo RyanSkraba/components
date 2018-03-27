@@ -26,6 +26,8 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 
 public abstract class MarketoComponentDefinition extends AbstractComponentDefinition {
 
+    public static final boolean USE_CURRENT_JVM_PROPS = true;
+
     public static final String MAVEN_DEFINITION_ARTIFACT_ID = "components-marketo-definition";
 
     public static final String MAVEN_RUNTIME_ARTIFACT_ID = "components-marketo-runtime";
