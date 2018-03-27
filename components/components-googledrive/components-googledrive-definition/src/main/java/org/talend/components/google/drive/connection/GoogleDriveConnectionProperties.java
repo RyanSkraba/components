@@ -22,7 +22,6 @@ import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumSet;
 
@@ -54,8 +53,6 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
     public Property<String> name = newString("name").setRequired();
 
     public Property<String> applicationName = newString("applicationName").setRequired();
-
-    private Path dsPath;
 
     private String repositoryLocation;
 
@@ -129,8 +126,8 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
         clientSecretFile.setValue("");
         serviceAccountFile.setValue("");
         //
-        dsPath = Paths.get(System.getProperty("user.home", "."), PATH_CREDENTIALS_TALEND_GOOGLEDRIVE);
-        datastorePath.setValue(dsPath.toAbsolutePath().toString());
+        datastorePath.setValue(Paths.get(System.getProperty("user.home", "."), PATH_CREDENTIALS_TALEND_GOOGLEDRIVE)
+                .toAbsolutePath().toString().replace("\\", "/"));
         //
         useProxy.setValue(false);
         proxyHost.setValue("127.0.0.1");
@@ -281,10 +278,6 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
         refreshLayout(getForm(FORM_WIZARD));
-    }
-
-    public void afterApplicationName() {
-        datastorePath.setValue(dsPath.resolve(applicationName.getValue()).toAbsolutePath().toString());
     }
 
     public ValidationResult validateTestConnection() throws Exception {

@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Proxy;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -141,22 +142,24 @@ public class GoogleDriveRuntime extends GoogleDriveValidator
         return appName;
     }
 
+    private File getDatastoreFile(GoogleDriveConnectionProperties connection) {
+        return new File(Paths.get(connection.datastorePath.getValue()).resolve(connection.applicationName.getValue())
+                .toAbsolutePath().toString());
+    }
+
     private Credential getCredential(NetHttpTransport httpTransport) throws IOException, GeneralSecurityException {
         GoogleDriveConnectionProperties conn = getConnectionProperties();
         /* get rid of warning on windows until fixed... https://github.com/google/google-http-java-client/issues/315 */
         final java.util.logging.Logger dsLogger = java.util.logging.Logger.getLogger(FileDataStoreFactory.class.getName());
         dsLogger.setLevel(java.util.logging.Level.SEVERE);
-        File dataStore;
         switch (conn.oAuthMethod.getValue()) {
         case AccessToken:
             return GoogleDriveCredentialWithAccessToken.builder().accessToken(conn.accessToken.getValue()).build();
         case InstalledApplicationWithIdAndSecret:
-            dataStore = new File(conn.datastorePath.getValue());
-            return GoogleDriveCredentialWithInstalledApplication.builderWithIdAndSecret(httpTransport, dataStore)
+            return GoogleDriveCredentialWithInstalledApplication.builderWithIdAndSecret(httpTransport, getDatastoreFile(conn))
                     .clientId(conn.clientId.getValue()).clientSecret(conn.clientSecret.getValue()).build();
         case InstalledApplicationWithJSON:
-            dataStore = new File(conn.datastorePath.getValue());
-            return GoogleDriveCredentialWithInstalledApplication.builderWithJSON(httpTransport, dataStore)
+            return GoogleDriveCredentialWithInstalledApplication.builderWithJSON(httpTransport, getDatastoreFile(conn))
                     .clientSecretFile(new File(conn.clientSecretFile.getValue())).build();
         case ServiceAccount:
             return GoogleDriveCredentialWithServiceAccount.builder()
@@ -184,7 +187,7 @@ public class GoogleDriveRuntime extends GoogleDriveValidator
         if ((OAuthMethod.InstalledApplicationWithIdAndSecret.equals(connectionProperties.oAuthMethod.getValue())
                 || OAuthMethod.InstalledApplicationWithJSON.equals(connectionProperties.oAuthMethod.getValue()))
                 && container == null) {
-            cleanupCredentialsStore(connectionProperties.datastorePath.getValue() + "/StoredCredential");
+            cleanupCredentialsStore(getDatastoreFile(connectionProperties).toPath().resolve("StoredCredential"));
         }
         ValidationResultMutable vr = new ValidationResultMutable(validateConnectionProperties(connectionProperties));
         if (Result.ERROR.equals(vr.getStatus())) {
@@ -205,10 +208,10 @@ public class GoogleDriveRuntime extends GoogleDriveValidator
         return vr;
     }
 
-    private void cleanupCredentialsStore(String store) {
+    private void cleanupCredentialsStore(Path store) {
         LOG.debug("[cleanupCredentialsStore] Deleting stored credentials [{}].", store);
         try {
-            Files.deleteIfExists(Paths.get(store));
+            Files.deleteIfExists(store);
         } catch (IOException e) {
             LOG.warn("[cleanupCredentialsStore] Could not delete {} : {}", store, e.getMessage());
         }
