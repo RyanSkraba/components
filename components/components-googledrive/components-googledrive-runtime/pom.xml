@@ -41,9 +41,10 @@
         <!-- needed by org.eclipse.swt.Program.launch -->
         <dependency>
             <groupId>org.eclipse.swt</groupId>
-            <artifactId>org.eclipse.swt.gtk.linux.x86_64</artifactId>
+            <artifactId>${swt.artifactId}</artifactId>
             <version>${swt.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
@@ -118,6 +119,121 @@
             <version>2.5</version>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>mac_x86</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                    <arch>x86</arch>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.cocoa.macosx</swt.artifactId>
+            </properties>
+        </profile>
+        <profile>
+            <id>mac_x86_64</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                    <arch>x86_64</arch>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.cocoa.macosx.x86_64</swt.artifactId>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows_x86</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                    <arch>x86</arch>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.win32.win32.x86</swt.artifactId>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows_x86_64</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                    <arch>x86_64</arch>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.win32.win32.x86_64</swt.artifactId>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows_amd64</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.win32.win32.x86_64</swt.artifactId>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix_x86</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>x86</arch>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.gtk.linux.x86</swt.artifactId>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix_x86_x64</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>x86_64</arch>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</swt.artifactId>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix_x64</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>x64</arch>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</swt.artifactId>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix_amd64</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</swt.artifactId>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>

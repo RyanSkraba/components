@@ -143,8 +143,7 @@ public class GoogleDriveRuntime extends GoogleDriveValidator
     }
 
     private File getDatastoreFile(GoogleDriveConnectionProperties connection) {
-        return new File(Paths.get(connection.datastorePath.getValue()).resolve(connection.applicationName.getValue())
-                .toAbsolutePath().toString());
+        return Paths.get(connection.datastorePath.getValue()).resolve(connection.applicationName.getValue()).toFile();
     }
 
     private Credential getCredential(NetHttpTransport httpTransport) throws IOException, GeneralSecurityException {

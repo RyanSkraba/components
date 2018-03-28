@@ -281,20 +281,21 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
     }
 
     public ValidationResult validateTestConnection() throws Exception {
-        try {
-            SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS);
+        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS, true)) {
             GoogleDriveProvideRuntime sos = (GoogleDriveProvideRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
-            ValidationResultMutable vr = new ValidationResultMutable(sos.validateConnection(this));
-            if (Result.OK.equals(vr.getStatus())) {
-                getForm(FORM_WIZARD).setAllowFinish(true);
-            } else {
-                getForm(FORM_WIZARD).setAllowFinish(false);
+            try {
+                ValidationResultMutable vr = new ValidationResultMutable(sos.validateConnection(this));
+                if (Result.OK.equals(vr.getStatus())) {
+                    getForm(FORM_WIZARD).setAllowFinish(true);
+                } else {
+                    getForm(FORM_WIZARD).setAllowFinish(false);
+                }
+                return vr;
+            } catch (Exception e) {
+                LOG.error("[validateTestConnection] {}.", e.getMessage());
+                return new ValidationResultMutable(Result.ERROR, e.getMessage());
             }
-            return vr;
-        } catch (Exception e) {
-            LOG.error("[validateTestConnection] {}.", e.getMessage());
-            return new ValidationResultMutable(Result.ERROR, e.getMessage());
         }
     }
 

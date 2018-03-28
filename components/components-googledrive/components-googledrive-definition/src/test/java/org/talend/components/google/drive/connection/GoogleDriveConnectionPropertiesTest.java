@@ -121,12 +121,12 @@ public class GoogleDriveConnectionPropertiesTest extends GoogleDriveTestBase {
 
     @Test
     public void testValidateTestConnection() throws Exception {
-        assertEquals(Result.ERROR, properties.validateTestConnection().getStatus());
         try (SandboxedInstanceTestFixture sandboxedInstanceTestFixture = new SandboxedInstanceTestFixture()) {
             sandboxedInstanceTestFixture.setUp();
             properties.validateTestConnection();
             assertTrue(properties.getForm(FORM_WIZARD).isAllowFinish());
             sandboxedInstanceTestFixture.changeValidateConnectionResult(Result.ERROR);
+            assertEquals(Result.ERROR, properties.validateTestConnection().getStatus());
             properties.validateTestConnection();
             assertFalse(properties.getForm(FORM_WIZARD).isAllowFinish());
             sandboxedInstanceTestFixture.changeValidateConnectionToThrowException();
