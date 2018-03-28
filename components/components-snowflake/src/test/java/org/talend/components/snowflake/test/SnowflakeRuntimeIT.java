@@ -55,6 +55,7 @@ import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputDefinition;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
@@ -127,18 +128,19 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
 
     public Schema getMakeRowSchema() {
         SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.builder().record("MakeRowRecord").fields() //
-                .name("ID").type(AvroUtils._decimal()).noDefault() //
-                .name("C1").type().nullable().stringType().noDefault() //
-                .name("C2").type().nullable().booleanType().noDefault() //
-                .name("C3").type().nullable().doubleType().noDefault() //
+                .name("ID").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ID").type(AvroUtils._decimal()).noDefault() //
+                .name("C1").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C1").type().nullable().stringType().noDefault() //
+                .name("C2").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C2").type().nullable().booleanType().noDefault() //
+                .name("C3").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C3").type().nullable().doubleType().noDefault() //
                 // date
-                .name("C4").type(AvroUtils._logicalDate()).noDefault() //
+                .name("C4").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C4").type(AvroUtils._logicalDate()).noDefault() //
                 // time
-                .name("C5").type(AvroUtils._logicalTime()).noDefault() //
+                .name("C5").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C5").type(AvroUtils._logicalTime()).noDefault() //
                 // timestamp
-                .name("C6").type(AvroUtils._logicalTimestamp()).noDefault() //
+                .name("C6").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C6").type(AvroUtils._logicalTimestamp())
+                .noDefault() //
                 // variant
-                .name("C7").type().nullable().stringType().noDefault();
+                .name("C7").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C7").type().nullable().stringType().noDefault();
         return fa.endRecord();
     }
 
@@ -207,21 +209,24 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
             assertEquals(Double.valueOf(checkCount), row.get(iC3));
 
             Object date = row.get(iC4);
-            if (date instanceof Integer)
+            if (date instanceof Integer) {
                 date = new Date(TimeUnit.DAYS.toMillis((Integer) date));
+            }
             assertEquals(testDate, date);
 
             Object time = row.get(iC5);
-            if (time instanceof Integer)
+            if (time instanceof Integer) {
                 time = new Date((Integer) time);
+            }
             // Do millisecond compare to avoid timezone issues
             assertEquals(testTime.getTime(), ((Date) time).getTime());
 
             Object timeStamp = row.get(iC6);
-            if (timeStamp instanceof Date)
+            if (timeStamp instanceof Date) {
                 assertEquals(testTimestamp, row.get(iC6));
-            else
+            } else {
                 assertEquals(testTimestamp.getTime(), timeStamp);
+            }
             // The database reformats the JSON in this column
             assertThat((String) row.get(iC7), containsString("\"bar\": " + checkCount));
             checkedRows.add(row);
@@ -238,10 +243,11 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
     protected List<IndexedRecord> readRows(SnowflakeConnectionTableProperties props, RuntimeContainer container)
             throws IOException {
         TSnowflakeInputProperties inputProps = null;
-        if (props instanceof TSnowflakeInputProperties)
+        if (props instanceof TSnowflakeInputProperties) {
             inputProps = (TSnowflakeInputProperties) props;
-        else
+        } else {
             inputProps = (TSnowflakeInputProperties) new TSnowflakeInputProperties("bar").init();
+        }
         inputProps.connection = props.connection;
         inputProps.table = props.table;
         BoundedReader<IndexedRecord> reader = (SnowflakeReader) createBoundedReader(inputProps, container);

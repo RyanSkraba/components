@@ -21,6 +21,7 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.avro.JDBCAvroRegistry;
+import org.talend.daikon.avro.AvroNamesValidationHelper;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
@@ -41,7 +42,7 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
             Object defaultValue, boolean isKey) {
         Field field = null;
         Schema schema = null;
-
+        name = AvroNamesValidationHelper.getAvroCompatibleName(dbColumnName);
         switch (dbtype) {
         case java.sql.Types.VARCHAR:
         case java.sql.Types.LONGVARCHAR:

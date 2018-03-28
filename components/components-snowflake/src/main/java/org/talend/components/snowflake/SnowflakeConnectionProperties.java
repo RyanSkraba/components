@@ -156,8 +156,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        String refComponentIdValue = getReferencedComponentId();
-        boolean useOtherConnection = refComponentIdValue != null;
+        boolean useOtherConnection = getReferencedComponentId() != null;
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
             if (useOtherConnection) {
                 setHiddenProps(form, true);

@@ -139,7 +139,8 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         List<String> keyStr = new ArrayList<>();
         List<String> columnsStr = new ArrayList<>();
         for (Field f : columns) {
-            String fName = isUpperCase ? f.name().toUpperCase() : f.name();
+            String dbColumnName = f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+            String fName = isUpperCase ? dbColumnName.toUpperCase() : dbColumnName;
             columnsStr.add(fName);
             if (null != f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY)) {
                 keyStr.add(fName);

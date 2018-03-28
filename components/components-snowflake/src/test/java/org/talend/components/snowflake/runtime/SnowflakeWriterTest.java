@@ -74,8 +74,11 @@ public class SnowflakeWriterTest {
         writer = new SnowflakeWriter(writeOperation, null);
 
         Schema schema = SchemaBuilder.record("record").fields().name("id")
-                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, Boolean.TRUE.toString()).type().stringType().noDefault()
-                .requiredString("column").requiredString("field").endRecord();
+                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, Boolean.TRUE.toString())
+                .prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "id").type().stringType().noDefault().requiredString("column")
+                .requiredString("field").endRecord();
+        schema.getField("column").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "column");
+        schema.getField("field").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "field");
         Mockito.when(sink.createConnection(null)).thenReturn(Mockito.mock(Connection.class));
         Mockito.when(sink.getRuntimeSchema(null)).thenReturn(schema);
         properties.table.main.schema.setValue(schema);
@@ -180,6 +183,8 @@ public class SnowflakeWriterTest {
 
         Schema snowflakeRuntimeSchema = SchemaBuilder.record("runtime").fields().requiredString("NAME")
                 .requiredString("ORGANIZATION").endRecord();
+        snowflakeRuntimeSchema.getField("NAME").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "NAME");
+        snowflakeRuntimeSchema.getField("ORGANIZATION").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ORGANIZATION");
         Mockito.when(sink.getRuntimeSchema(Mockito.any(RuntimeContainer.class))).thenReturn(snowflakeRuntimeSchema);
 
         Object[] row = new Object[] { "my_name", "talend" };
@@ -203,12 +208,15 @@ public class SnowflakeWriterTest {
 
         Schema snowflakeRuntimeSchema = SchemaBuilder.record("runtime").fields().requiredString("name")
                 .requiredString("organization").endRecord();
+        snowflakeRuntimeSchema.getField("name").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "name");
+        snowflakeRuntimeSchema.getField("organization").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "organization");
         Mockito.when(sink.getRuntimeSchema(Mockito.any(RuntimeContainer.class))).thenReturn(snowflakeRuntimeSchema);
 
         Object[] row = new Object[] { "my_name", "talend" };
 
         Schema incomingSchema = SchemaBuilder.record("incoming").fields().requiredInt("age").requiredString("name")
                 .requiredString("organization").endRecord();
+
         IndexedRecord record = new GenericRecordBuilder(incomingSchema).set("age", 10).set("name", "my_name")
                 .set("organization", "talend").build();
 
@@ -227,6 +235,9 @@ public class SnowflakeWriterTest {
                 .name("age").type().intType().intDefault(0)
                 .requiredString("name")
                 .requiredString("organization").endRecord();
+        snowflakeRuntimeSchema.getField("age").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "age");
+        snowflakeRuntimeSchema.getField("name").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "name");
+        snowflakeRuntimeSchema.getField("organization").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "organization");
         Mockito.when(sink.getRuntimeSchema(Mockito.any(RuntimeContainer.class))).thenReturn(snowflakeRuntimeSchema);
 
         Object[] row = new Object[] { 0, "my_name", "talend" };
@@ -248,16 +259,18 @@ public class SnowflakeWriterTest {
         schema.addProp(SchemaConstants.INCLUDE_ALL_FIELDS, "true");
         properties.table.main.schema.setValue(schema);
 
-        Schema snowflakeRuntimeSchema = SchemaBuilder.record("runtime").fields()
-                .name("ageDifferent").type().intType().intDefault(0)
-                .requiredString("nameDifferent")
-                .requiredString("organizationDifferent").endRecord();
+        Schema snowflakeRuntimeSchema = SchemaBuilder.record("runtime").fields().name("ageDifferent")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ageDifferent").type().intType().intDefault(0)
+                .requiredString("nameDifferent").requiredString("organizationDifferent").endRecord();
+        snowflakeRuntimeSchema.getField("nameDifferent").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "nameDifferent");
+        snowflakeRuntimeSchema.getField("organizationDifferent").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME,
+                "organizationDifferent");
         Mockito.when(sink.getRuntimeSchema(Mockito.any(RuntimeContainer.class))).thenReturn(snowflakeRuntimeSchema);
 
-        Schema incomingSchema = SchemaBuilder.record("incoming").fields().requiredString("name")
-                .requiredString("organization").endRecord();
-        IndexedRecord record = new GenericRecordBuilder(incomingSchema).set("name", "my_name")
-                .set("organization", "talend").build();
+        Schema incomingSchema = SchemaBuilder.record("incoming").fields().requiredString("name").requiredString("organization")
+                .endRecord();
+        IndexedRecord record = new GenericRecordBuilder(incomingSchema).set("name", "my_name").set("organization", "talend")
+                .build();
 
         writer.open("");
         writer.write(record);

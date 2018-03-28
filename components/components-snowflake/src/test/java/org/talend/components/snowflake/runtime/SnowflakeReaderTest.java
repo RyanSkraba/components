@@ -18,6 +18,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
@@ -48,6 +49,8 @@ public class SnowflakeReaderTest {
                 .requiredString("field")
                 .requiredString("column")
                 .endRecord();
+        schema.getField("field").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "field");
+        schema.getField("column").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "column");
 
         TSnowflakeInputProperties tSnowflakeInputProperties = new TSnowflakeInputProperties("test");
         tSnowflakeInputProperties.setupProperties();

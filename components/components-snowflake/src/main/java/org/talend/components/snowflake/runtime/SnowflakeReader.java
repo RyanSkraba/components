@@ -32,6 +32,7 @@ import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
@@ -100,8 +101,8 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
             if (count++ > 0) {
                 sb.append(", "); //$NON-NLS-1$
             }
-            String fName = isUpperCase ? se.name() : StringUtils.wrap(se.name(), '"');
-            sb.append(fName);
+            String columnName = se.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+            sb.append(isUpperCase ? columnName : StringUtils.wrap(columnName, '"'));
         }
         sb.append(" from "); //$NON-NLS-1$
         String tableName = isUpperCase ? properties.getTableName() : StringUtils.wrap(properties.getTableName(), '"');
