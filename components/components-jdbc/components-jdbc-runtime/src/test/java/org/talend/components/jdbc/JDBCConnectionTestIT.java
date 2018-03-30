@@ -81,6 +81,40 @@ public class JDBCConnectionTestIT {
             Assert.fail(e.getMessage());
         }
     }
+    
+    @Test
+    public void testConnectionWithEmptyJDBCURL() {
+        TJDBCConnectionDefinition definition = new TJDBCConnectionDefinition();
+        TJDBCConnectionProperties properties = (TJDBCConnectionProperties) definition.createRuntimeProperties();
+
+        properties.connection.jdbcUrl.setValue("");
+        properties.connection.driverClass.setValue(allSetting.getDriverClass());
+        properties.connection.userPassword.userId.setValue(allSetting.getUsername());
+        properties.connection.userPassword.password.setValue(allSetting.getPassword());
+
+        JDBCSourceOrSink sourceOrSink = new JDBCSourceOrSink();
+        sourceOrSink.initialize(null, properties);
+        ValidationResult result = sourceOrSink.validate(null);
+        assertTrue(result.getStatus() == ValidationResult.Result.ERROR);
+        assertTrue(result.getMessage() != null && result.getMessage().contains("JDBC URL"));
+    }
+    
+    @Test
+    public void testConnectionWithEmptyDriver() {
+        TJDBCConnectionDefinition definition = new TJDBCConnectionDefinition();
+        TJDBCConnectionProperties properties = (TJDBCConnectionProperties) definition.createRuntimeProperties();
+
+        properties.connection.jdbcUrl.setValue(allSetting.getJdbcUrl());
+        properties.connection.driverClass.setValue(null);
+        properties.connection.userPassword.userId.setValue(allSetting.getUsername());
+        properties.connection.userPassword.password.setValue(allSetting.getPassword());
+
+        JDBCSourceOrSink sourceOrSink = new JDBCSourceOrSink();
+        sourceOrSink.initialize(null, properties);
+        ValidationResult result = sourceOrSink.validate(null);
+        assertTrue(result.getStatus() == ValidationResult.Result.ERROR);
+        assertTrue(result.getMessage() != null && result.getMessage().contains("Driver Class"));
+    }
 
     @Test
     public void testConnectionWithWrongDriver() {

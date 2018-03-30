@@ -52,8 +52,20 @@ public class JdbcRuntimeUtils {
      * @throws SQLException
      */
     public static Connection createConnection(AllSetting setting) throws ClassNotFoundException, SQLException {
+        if(!valid(setting.getJdbcUrl())) {
+            throw new RuntimeException("JDBC URL should not be empty, please set it");
+        }
+        
+        if(!valid(setting.getDriverClass())) {
+            throw new RuntimeException("Driver Class should not be empty, please set it");
+        }
+        
         java.lang.Class.forName(setting.getDriverClass());
         return java.sql.DriverManager.getConnection(setting.getJdbcUrl(), setting.getUsername(), setting.getPassword());
+    }
+    
+    private static boolean valid(String value) {
+        return value!=null && !value.isEmpty();
     }
 
     public static Connection fetchConnectionFromContextOrCreateNew(AllSetting setting, RuntimeContainer runtime)
