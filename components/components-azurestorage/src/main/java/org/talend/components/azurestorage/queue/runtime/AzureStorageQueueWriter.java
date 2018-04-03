@@ -16,17 +16,19 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
+import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.queue.AzureStorageQueueProperties;
@@ -40,7 +42,7 @@ import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.queue.CloudQueue;
 import com.microsoft.azure.storage.queue.CloudQueueMessage;
 
-public class AzureStorageQueueWriter implements Writer<Result> {
+public class AzureStorageQueueWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
     private AzureStorageQueueWriteOperation wope;
 
@@ -57,6 +59,8 @@ public class AzureStorageQueueWriter implements Writer<Result> {
     private Result result;
 
     private List<QueueMessage> messagesBuffer;
+
+    private List<IndexedRecord> successfulWrites = new ArrayList<>();
 
     private static final int MAX_MSG_TO_ENQUEUE = 1000;
 
@@ -99,6 +103,7 @@ public class AzureStorageQueueWriter implements Writer<Result> {
         String content;
         if (object == null)
             return;
+        cleanWrites();
         result.totalCount++;
         if (writeSchema == null) {
             writeSchema = ((IndexedRecord) object).getSchema();
@@ -141,6 +146,9 @@ public class AzureStorageQueueWriter implements Writer<Result> {
                     queue.addMessage(queueMessage.getMsg(), queueMessage.getTimeToLiveInSeconds(),
                             queueMessage.getInitialVisibilityDelayInSeconds(), null, null);
                     result.successCount++;
+                    IndexedRecord record = new Record(writeSchema);
+                    record.put(0, queueMessage.getMsg().getMessageContentAsString());
+                    successfulWrites.add(record);
                 } catch (StorageException e) {
                     result.rejectCount++;
                     LOGGER.error(e.getLocalizedMessage());
@@ -154,5 +162,20 @@ public class AzureStorageQueueWriter implements Writer<Result> {
     @Override
     public WriteOperation<Result> getWriteOperation() {
         return wope;
+    }
+
+    @Override
+    public Iterable<IndexedRecord> getSuccessfulWrites() {
+        return Collections.unmodifiableList(successfulWrites);
+    }
+
+    @Override
+    public Iterable<IndexedRecord> getRejectedWrites() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void cleanWrites() {
+        successfulWrites.clear();
     }
 }
