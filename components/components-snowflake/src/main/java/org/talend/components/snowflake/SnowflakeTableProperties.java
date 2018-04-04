@@ -15,6 +15,7 @@ package org.talend.components.snowflake;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.talend.components.api.component.ISchemaListener;
@@ -91,6 +92,7 @@ public class SnowflakeTableProperties extends ComponentPropertiesImpl implements
         ValidationResultMutable vr = new ValidationResultMutable();
         try {
             main.schema.setValue(SnowflakeSourceOrSink.getSchema(null, connection, tableName.getValue()));
+            tableName.setPossibleValues(Collections.emptyList());
         } catch (Exception ex) {
             vr.setMessage(ex.getMessage());
             vr.setStatus(ValidationResult.Result.ERROR);

@@ -18,6 +18,7 @@ import static org.talend.components.salesforce.SalesforceDefinition.getSandboxed
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -112,6 +113,7 @@ public class SalesforceModuleProperties extends ComponentPropertiesImpl implemen
                 try {
                     Schema schema = ss.getEndpointSchema(null, moduleName.getStringValue());
                     main.schema.setValue(schema);
+                    moduleName.setPossibleValues(Collections.emptyList());
                 } catch (Exception ex) {
                     throw new ComponentException(ExceptionUtil.exceptionToValidationResult(ex));
                 }
