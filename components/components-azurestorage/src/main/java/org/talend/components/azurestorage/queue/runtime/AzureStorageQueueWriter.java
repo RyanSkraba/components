@@ -137,7 +137,7 @@ public class AzureStorageQueueWriter implements WriterWithFeedback<Result, Index
         return result;
     }
 
-    private void sendParallelMessages() {
+    private synchronized void sendParallelMessages() {
         messagesBuffer.parallelStream().forEach(new Consumer<QueueMessage>() {
 
             @Override
