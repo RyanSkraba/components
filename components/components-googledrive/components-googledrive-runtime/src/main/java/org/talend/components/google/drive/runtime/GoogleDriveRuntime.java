@@ -25,6 +25,12 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.Locale;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -182,6 +188,32 @@ public class GoogleDriveRuntime extends GoogleDriveValidator
         return utils;
     }
 
+    public ValidationResult testGetDriveUser() {
+        ValidationResultMutable vr = new ValidationResultMutable(Result.OK, messages.getMessage("message.connectionSuccessful"));
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<String> future = executor.submit(new Callable() {
+
+            public String call() throws Exception {
+                // make a dummy call to check drive's connection...
+                User u = getDriveService().about().get().setFields("user").execute().getUser();
+                return u.toPrettyString();
+            }
+        });
+        try {
+            String user = future.get(30, java.util.concurrent.TimeUnit.SECONDS);
+            LOG.debug("[testGetDriveUser] Testing User properties: {}.", user);
+        } catch (ExecutionException ee) {
+            vr.setStatus(Result.ERROR).setMessage(messages.getMessage("error.testConnection.failure", ee.getMessage()));
+            LOG.error("[testGetDriveUser] Execution error: {}.", ee.getMessage());
+        } catch (TimeoutException | InterruptedException e) {
+            vr.setStatus(Result.ERROR).setMessage(messages.getMessage("error.testConnection.timeout"));
+            LOG.error("[testGetDriveUser] Operation Timeout.");
+        }
+        executor.shutdownNow();
+
+        return vr;
+    }
+
     public ValidationResult validateConnection(GoogleDriveConnectionProperties connectionProperties) {
         if ((OAuthMethod.InstalledApplicationWithIdAndSecret.equals(connectionProperties.oAuthMethod.getValue())
                 || OAuthMethod.InstalledApplicationWithJSON.equals(connectionProperties.oAuthMethod.getValue()))
@@ -192,19 +224,8 @@ public class GoogleDriveRuntime extends GoogleDriveValidator
         if (Result.ERROR.equals(vr.getStatus())) {
             return vr;
         }
-        try {
-            // make a dummy call to check drive's connection..
-            User u = getDriveService().about().get().setFields("user").execute().getUser();
-            LOG.debug("[validateConnection] Testing User Properties: {}.", u);
-        } catch (Exception ex) {
-            LOG.error("[validateConnection] {}.", ex.getMessage());
-            vr.setStatus(Result.ERROR);
-            vr.setMessage(ex.getMessage());
-            return vr;
-        }
-        vr.setStatus(Result.OK);
-        vr.setMessage(messages.getMessage("message.connectionSuccessful"));
-        return vr;
+
+        return testGetDriveUser();
     }
 
     private void cleanupCredentialsStore(Path store) {
