@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +48,7 @@ public class JDBCDatastoreProperties extends PropertiesImpl implements Datastore
 
     public static final Logger LOG = LoggerFactory.getLogger(JDBCDatastoreProperties.class);
 
-    private transient Map<String, DBType> dyTypesInfo = new HashMap<String, DBType>();
+    private transient Map<String, DBType> dyTypesInfo = new LinkedHashMap<String, DBType>();
 
     private final static String CONFIG_FILE_lOCATION_KEY = "org.talend.component.jdbc.config.file";
 
