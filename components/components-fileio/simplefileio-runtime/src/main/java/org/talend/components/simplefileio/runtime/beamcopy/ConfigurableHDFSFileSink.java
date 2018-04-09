@@ -164,61 +164,62 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
             Job job = ((ConfigurableHDFSFileSink<K, V>) getSink()).jobInstance();
             FileSystem fs = FileSystem.get(new URI(path), job.getConfiguration());
 
-            // Get expected output shards. Nulls indicate that the task was launched, but didn't
-            // process any records.
-            Set<String> expected = Sets.newHashSet(writerResults);
-            expected.remove(null);
+            // Finalize can be called several times. Don't try to recommit if the first part has already succeeded.
+            boolean isCommitted = fs.exists(new Path(path, FileOutputCommitter.SUCCEEDED_FILE_NAME));
+            if (!isCommitted) {
+                // Get expected output shards. Nulls indicate that the task was launched, but didn't
+                // process any records.
+                Set<String> expected = Sets.newHashSet(writerResults);
+                expected.remove(null);
 
-            // If there are 0 output shards, just create output folder.
-            if (!expected.iterator().hasNext()) {
-                fs.mkdirs(new Path(path));
-                return;
-            }
+                // If there are 0 output shards, just create output folder.
+                if (!expected.iterator().hasNext()) {
+                    fs.mkdirs(new Path(path));
+                    return;
+                }
 
-            // job successful
-            JobContext context = new JobContextImpl(job.getConfiguration(), job.getJobID());
-            FileOutputCommitter outputCommitter = new FileOutputCommitter(new Path(path), context);
-            outputCommitter.commitJob(context);
+                // job successful
+                JobContext context = new JobContextImpl(job.getConfiguration(), job.getJobID());
+                FileOutputCommitter outputCommitter = new FileOutputCommitter(new Path(path), context);
+                outputCommitter.commitJob(context);
 
-            // get actual output shards
-            Set<String> actual = Sets.newHashSet();
-            FileStatus[] statuses = FileSystemUtil.listSubFiles(fs, path);
+                // get actual output shards
+                Set<String> actual = Sets.newHashSet();
+                FileStatus[] statuses = FileSystemUtil.listSubFiles(fs, path);
 
-            checkState(expected.size() == Lists.newArrayList(writerResults).size(),
-                    "Data loss due to writer results hash collision");
-            for (FileStatus s : statuses) {
-                String name = s.getPath().getName();
-                int pos = name.indexOf('.');
-                actual.add(pos > 0 ? name.substring(0, pos) : name);
-            }
+                checkState(expected.size() == Lists.newArrayList(writerResults).size(),
+                        "Data loss due to writer results hash collision");
+                for (FileStatus s : statuses) {
+                    String name = s.getPath().getName();
+                    int pos = name.indexOf('.');
+                    actual.add(pos > 0 ? name.substring(0, pos) : name);
+                }
 
-            checkState(actual.equals(expected), "Writer results and output files do not match");
+                checkState(actual.equals(expected), "Writer results and output files do not match");
 
-            // rename output shards to Hadoop style, i.e. part-r-00000.txt
-            int i = 0;
-            for (FileStatus s : statuses) {
-                String name = s.getPath().getName();
-                int pos = name.indexOf('.');
-                String ext = pos > 0 ? name.substring(pos) : "";
-                rename(fs, s.getPath(), String.format("part-r-%05d%s", i, ext));
-                i++;
+                // rename output shards to Hadoop style, i.e. part-r-00000.txt
+                int i = 0;
+                for (FileStatus s : statuses) {
+                    String name = s.getPath().getName();
+                    int pos = name.indexOf('.');
+                    String ext = pos > 0 ? name.substring(pos) : "";
+                    rename(fs, s.getPath(), String.format("part-r-%05d%s", i, ext));
+                    i++;
+                }
             }
 
             FileStatus[] sourceStatuses = FileSystemUtil.listSubFiles(fs, path); // after rename, before generate merged file
             if (sourceStatuses.length > 0 && mergeOutput) {
                 String sourceFileName = sourceStatuses[0].getPath().getName();
-                String finalPath = path + String.format("/part-r-merged%s",
-                        sourceFileName.indexOf('.') > 0 ? sourceFileName.substring(sourceFileName.indexOf('.')) : "");
+                String extension =
+                        sourceFileName.indexOf('.') > 0 ? sourceFileName.substring(sourceFileName.indexOf('.')) : "";
+                String finalPath = path + String.format("/part-r-merged%s", extension);
                 fs.delete(new Path(finalPath), true); // finalize method may be called multiple times, be sure idempotent
                 LOG.info("Start to merge files in {} to {}", path, finalPath);
-                boolean success = mergeOutput(fs, path, finalPath);
-                if (success) {
-                    LOG.info("Merge files in {} to {} successful, start to delete the source files.", path, finalPath);
-                    for (FileStatus sourceStatus : sourceStatuses) {
-                        fs.delete(sourceStatus.getPath(), true);
-                    }
-                } else {
-                    throw new IOException("Failed to merge output files in " + path + " to " + finalPath);
+                mergeOutput(fs, path, finalPath);
+                LOG.info("Merge files in {} to {} successful, start to delete the source files.", path, finalPath);
+                for (FileStatus sourceStatus : sourceStatuses) {
+                    fs.delete(sourceStatus.getPath(), true);
                 }
             }
 
@@ -228,9 +229,9 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
             fs.rename(sourcePath, new Path(sourcePath.getParent(), newFileName));
         }
 
-        protected boolean mergeOutput(FileSystem fs, String sourceFolder, String targetFile) {
+        protected void mergeOutput(FileSystem fs, String sourceFolder, String targetFile) throws IOException {
             // need to be implement
-            return false;
+            throw new IOException("Merge must be implemented in a subclass.");
         }
 
         @Override

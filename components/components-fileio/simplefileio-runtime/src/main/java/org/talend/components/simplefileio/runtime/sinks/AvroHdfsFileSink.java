@@ -14,6 +14,7 @@ package org.talend.components.simplefileio.runtime.sinks;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.avro.Schema;
@@ -61,7 +62,7 @@ public class AvroHdfsFileSink extends UgiFileSinkBase<AvroKey<IndexedRecord>, Nu
     }
 
     @Override
-    protected boolean mergeOutput(FileSystem fs, String sourceFolder, String targetFile) {
+    protected void mergeOutput(FileSystem fs, String sourceFolder, String targetFile) throws IOException {
         try (DataFileWriter<GenericRecord> writer = new DataFileWriter<GenericRecord>(new GenericDatumWriter<GenericRecord>())) {
             FileStatus[] sourceStatuses = FileSystemUtil.listSubFiles(fs, sourceFolder);
             Schema schema = null;
@@ -88,10 +89,6 @@ public class AvroHdfsFileSink extends UgiFileSinkBase<AvroKey<IndexedRecord>, Nu
                     writer.appendAllFrom(reader, false);
                 }
             }
-        } catch (Exception e) {
-            LOG.error("Error when merging files in {}.\n{}", sourceFolder, e.getMessage());
-            return false;
         }
-        return true;
     }
 }
