@@ -16,9 +16,11 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.table.AzureStorageTableDefinition;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TAzureStorageOutputTableDefinition extends AzureStorageTableDefinition {
 
@@ -26,6 +28,14 @@ public class TAzureStorageOutputTableDefinition extends AzureStorageTableDefinit
 
     public TAzureStorageOutputTableDefinition() {
         super(COMPONENT_NAME);
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
+            ConnectorTopology connectorTopology) {
+        assertEngineCompatibility(engine);
+        assertConnectorTopologyCompatibility(connectorTopology);
+        return super.getRuntimeInfo(engine, properties, connectorTopology);
     }
 
     @SuppressWarnings("rawtypes")
