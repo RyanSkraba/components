@@ -137,7 +137,7 @@ public class AzureStorageQueueWriter implements WriterWithFeedback<Result, Index
         return result;
     }
 
-    private synchronized void sendParallelMessages() {
+    private void sendParallelMessages() {
         messagesBuffer.parallelStream().forEach(new Consumer<QueueMessage>() {
 
             @Override
@@ -145,10 +145,12 @@ public class AzureStorageQueueWriter implements WriterWithFeedback<Result, Index
                 try {
                     queue.addMessage(queueMessage.getMsg(), queueMessage.getTimeToLiveInSeconds(),
                             queueMessage.getInitialVisibilityDelayInSeconds(), null, null);
-                    result.successCount++;
-                    IndexedRecord record = new Record(writeSchema);
-                    record.put(0, queueMessage.getMsg().getMessageContentAsString());
-                    successfulWrites.add(record);
+                    synchronized (this) {
+                        result.successCount++;
+                        IndexedRecord record = new Record(writeSchema);
+                        record.put(0, queueMessage.getMsg().getMessageContentAsString());
+                        successfulWrites.add(record);
+                    }
                 } catch (StorageException e) {
                     result.rejectCount++;
                     LOGGER.error(e.getLocalizedMessage());
