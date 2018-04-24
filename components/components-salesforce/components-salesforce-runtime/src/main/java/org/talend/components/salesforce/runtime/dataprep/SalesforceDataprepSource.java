@@ -94,6 +94,10 @@ public class SalesforceDataprepSource
 
             String endpoint = props.getProperty("endpoint");
             if (endpoint != null && !endpoint.isEmpty()) {
+                if (endpoint.contains(SalesforceConnectionProperties.RETIRED_ENDPOINT)) {
+                    endpoint = endpoint.replaceFirst(SalesforceConnectionProperties.RETIRED_ENDPOINT,
+                            SalesforceConnectionProperties.ACTIVE_ENDPOINT);
+                }
                 this.endpoint = endpoint;
             }
 

@@ -167,6 +167,10 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
         } else {
             SalesforceConnectionProperties connProps = getConnectionProperties();
             String endpoint = connProps.endpoint.getStringValue();
+            if (endpoint != null && endpoint.contains(SalesforceConnectionProperties.RETIRED_ENDPOINT)) {
+                endpoint = endpoint.replaceFirst(SalesforceConnectionProperties.RETIRED_ENDPOINT,
+                        SalesforceConnectionProperties.ACTIVE_ENDPOINT);
+            }
             endpoint = StringUtils.strip(endpoint, "\"");
             if (SalesforceConnectionProperties.LoginType.OAuth.equals(connProps.loginType.getValue())) {
                 SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps, endpoint,
