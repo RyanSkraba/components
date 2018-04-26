@@ -70,6 +70,10 @@ public class AggregateCombineFn
 
     @Override
     public IndexedRecord extractOutput(AggregateAccumulator accumulator) {
+        // this method can be invoked even addInput not, return null, and filter null value in next PTransform
+        if (accumulator.outputRecordSchemaStr == null) {
+            return null;
+        }
         Schema.Parser parser = new Schema.Parser();
         Schema outputRecordSchema = parser.parse(accumulator.outputRecordSchemaStr);
         IndexedRecord outputRecord = new GenericData.Record(outputRecordSchema);

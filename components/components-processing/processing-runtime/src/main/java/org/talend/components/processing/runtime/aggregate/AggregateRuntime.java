@@ -7,8 +7,10 @@ import java.util.Set;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.coders.AvroCoder;
 import org.apache.beam.sdk.coders.KvCoder;
+import org.apache.beam.sdk.coders.NullableCoder;
 import org.apache.beam.sdk.transforms.Combine;
 import org.apache.beam.sdk.transforms.Create;
+import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
@@ -47,10 +49,24 @@ public class AggregateRuntime extends PTransform<PCollection<IndexedRecord>, PCo
 
         PCollection<KV<IndexedRecord, IndexedRecord>> aggregateResult = kv
                 .apply(Combine.<IndexedRecord, IndexedRecord, IndexedRecord> perKey(new AggregateCombineFn(properties)))
-                .setCoder(KvCoder.of(LazyAvroCoder.of(), LazyAvroCoder.of()));
+                .setCoder(KvCoder.of(LazyAvroCoder.of(), NullableCoder.of(LazyAvroCoder.of())));
 
-        PCollection<IndexedRecord> result =
-                aggregateResult.apply(ParDo.of(new MergeKVFn())).setCoder(LazyAvroCoder.of());
+        PCollection<IndexedRecord> result = aggregateResult
+                .apply(ParDo.of(new DoFn<KV<IndexedRecord, IndexedRecord>, KV<IndexedRecord, IndexedRecord>>() {
+
+                    @ProcessElement
+                    public void processElement(ProcessContext c) {
+                        /**
+                         * Filter null value when AggregateCombineFn for nothing, see {@link
+                         * org.talend.components.processing.runtime.aggregate.AggregateCombineFn#extractOutput(AggregateCombineFn.AggregateAccumulator)}
+                         */
+                        if (c.element().getValue() != null) {
+                            c.output(c.element());
+                        }
+                    }
+                }))
+                .apply(ParDo.of(new MergeKVFn()))
+                .setCoder(LazyAvroCoder.of());
 
         return result;
     }
