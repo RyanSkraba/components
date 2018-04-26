@@ -328,6 +328,10 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
          * normal operations, but is necessary for TFD-3404 for now.
          */
         public void commitManually(String committed, String rewriteFile) throws IOException {
+            // If the writer was never opened for writing records, then there's nothing to commit.
+            if (outputCommitter == null)
+                return;
+
             Path srcDir = outputCommitter.getCommittedTaskPath(context);
             Path src = new Path(srcDir, committed);
             Path dst = new Path(path, rewriteFile);
