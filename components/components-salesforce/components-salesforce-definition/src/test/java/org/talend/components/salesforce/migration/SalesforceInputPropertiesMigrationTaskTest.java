@@ -1,5 +1,6 @@
 package org.talend.components.salesforce.migration;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -21,5 +22,16 @@ public class SalesforceInputPropertiesMigrationTaskTest {
 
         TSalesforceInputProperties properties = deser.object;
         assertTrue(properties.safetySwitch.getValue());
+    }
+
+    @Test
+    public void testEndpointChange() throws IOException {
+        Deserialized<TSalesforceInputProperties> deser = Properties.Helper.fromSerializedPersistent(
+                TestUtils.getResourceAsString(getClass(), "tSalesforceInputProperties_701.json"),
+                TSalesforceInputProperties.class);
+
+        TSalesforceInputProperties properties = deser.object;
+        assertEquals("\"https://login.salesforce.com/services/Soap/u/42.0\"",
+                properties.connection.endpoint.getValue());
     }
 }

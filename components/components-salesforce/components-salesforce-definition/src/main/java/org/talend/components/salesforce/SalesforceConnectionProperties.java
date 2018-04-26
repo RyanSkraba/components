@@ -317,7 +317,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
 
     @Override
     public int getVersionNumber() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -334,6 +334,17 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
             if (oauth2FlowType.getValue() == null) {
                 oauth2FlowType.setValue(OAuth2FlowType.Implicit_Flow);
                 migrated = true;
+            }
+        }
+
+        if (version < 3) {
+            if (endpoint.getStoredValue() != null) {
+                String storedEndpoint = String.valueOf(endpoint.getStoredValue());
+                if (storedEndpoint.contains(RETIRED_ENDPOINT)) {
+                    storedEndpoint = storedEndpoint.replaceFirst(RETIRED_ENDPOINT, ACTIVE_ENDPOINT);
+                    endpoint.setStoredValue(storedEndpoint);
+                    migrated = true;
+                }
             }
         }
 
