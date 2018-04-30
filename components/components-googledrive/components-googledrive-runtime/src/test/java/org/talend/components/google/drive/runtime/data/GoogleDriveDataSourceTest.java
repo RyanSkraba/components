@@ -36,6 +36,7 @@ public class GoogleDriveDataSourceTest extends GoogleDriveDataBaseTest {
 
     @Test
     public void testValidate() throws Exception {
+        inputProperties.getDatasetProperties().getDatastoreProperties().serviceAccountJSONFile.setValue("");
         dataSource.initialize(container, inputProperties);
         assertEquals(Result.ERROR, dataSource.validate(container).getStatus());
 
