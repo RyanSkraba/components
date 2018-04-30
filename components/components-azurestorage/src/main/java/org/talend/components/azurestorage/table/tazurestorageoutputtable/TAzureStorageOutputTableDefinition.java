@@ -60,4 +60,8 @@ public class TAzureStorageOutputTableDefinition extends AzureStorageTableDefinit
         return true;
     }
 
+    @Override
+    public boolean isStartable() {
+        return false;
+    }
 }

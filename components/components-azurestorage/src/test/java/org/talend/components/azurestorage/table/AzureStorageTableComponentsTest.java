@@ -175,4 +175,12 @@ public class AzureStorageTableComponentsTest {
         defOutput.getRuntimeInfo(null, null, ConnectorTopology.NONE);
         fail("Should not be here: WRONG_CONNECTOR Exception should have been raised.");
     }
+
+    @Test
+    public void testStartable() throws Exception {
+        TAzureStorageOutputTableDefinition defOutput = new TAzureStorageOutputTableDefinition();
+        TAzureStorageInputTableDefinition defInput = new TAzureStorageInputTableDefinition();
+        assertTrue(defInput.isStartable());
+        assertFalse(defOutput.isStartable());
+    }
 }
