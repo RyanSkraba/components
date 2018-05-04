@@ -224,8 +224,8 @@ public class MarketoBulkExecClient extends MarketoCustomObjectClient {
             mkto.setSuccess(rs.isSuccess());
             if (!mkto.isSuccess()) {
                 mkto.setRecordCount(0);
-                mkto.setErrors(Arrays.asList(new MarketoError(REST, rs.getErrors().get(0).getCode(),
-                        messages.getMessage("bulkimport.error.import", rs.getErrors().get(0).getMessage()))));
+                mkto.setErrors(Arrays
+                        .asList(new MarketoError(REST, messages.getMessage("bulkimport.error.import", rs.getErrorsString()))));
                 return mkto;
             }
             BulkImport bulkResult = rs.getResult().get(0);

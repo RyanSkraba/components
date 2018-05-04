@@ -516,4 +516,9 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         assertTrue(mktoSR.getErrorsString().isEmpty());
     }
 
+    @Test
+    public void testIsAvailable() throws Exception {
+        assertFalse(client.isAvailable());
+    }
+
 }

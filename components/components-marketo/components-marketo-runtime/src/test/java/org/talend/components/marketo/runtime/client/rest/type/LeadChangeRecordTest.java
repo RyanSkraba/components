@@ -46,4 +46,10 @@ public class LeadChangeRecordTest {
         assertNotNull(r.getAttributes());
     }
 
+    @Test
+    public void testToString() throws Exception {
+        String t = "LeadChangeRecord [id=null, leadId=null, activityDate=null, activityTypeId=null, activityTypeValue=null, fields=null, attributes=[]]";
+        assertEquals(t, new LeadChangeRecord().toString());
+    }
+
 }

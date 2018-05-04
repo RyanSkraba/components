@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
+import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.marketo.MarketoProvideConnectionProperties;
 import org.talend.components.marketo.runtime.MarketoSourceOrSinkRuntime;
 import org.talend.daikon.properties.PresentationItem;
@@ -38,7 +39,8 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
-public class TMarketoConnectionProperties extends ComponentPropertiesImpl implements MarketoProvideConnectionProperties {
+public class TMarketoConnectionProperties extends ComponentPropertiesImpl
+        implements MarketoProvideConnectionProperties, DatastoreProperties {
 
     public static final String FORM_WIZARD = "Wizard";
 

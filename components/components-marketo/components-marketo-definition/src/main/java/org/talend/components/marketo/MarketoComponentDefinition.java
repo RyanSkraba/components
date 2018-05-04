@@ -46,6 +46,12 @@ public abstract class MarketoComponentDefinition extends AbstractComponentDefini
 
     public static final String RUNTIME_SOURCE_CLASS = "org.talend.components.marketo.runtime.MarketoSource";
 
+    public static final String RUNTIME_DATASTORE = "org.talend.components.marketo.runtime.data.MarketoDatastoreRuntime";
+
+    public static final String RUNTIME_DATASET = "org.talend.components.marketo.runtime.data.MarketoDatasetRuntime";
+
+    public static final String RUNTIME_DATASET_SOURCE = "org.talend.components.marketo.runtime.data.MarketoDatasetSource";
+
     public static final String RETURN_NB_CALL = "nbCall";
 
     public static final Property<Integer> RETURN_NB_CALL_PROP = PropertyFactory.newInteger(RETURN_NB_CALL);

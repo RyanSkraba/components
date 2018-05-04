@@ -32,10 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 import java.util.regex.Pattern;
-
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.avro.Schema;
@@ -249,14 +246,6 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
         }
     }
 
-    private String convertStreamToString(InputStream inputStream) {
-        try {
-            return new Scanner(inputStream).useDelimiter("\\A").next();
-        } catch (NoSuchElementException e) {
-            return "";
-        }
-    }
-
     public InputStreamReader httpFakeGet(String content, boolean isForLead) throws MarketoException {
         try {
             current_uri.append(fmtParams(QUERY_METHOD, QUERY_METHOD_GET));
@@ -344,7 +333,6 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
                 InputStream inStream = urlConn.getInputStream();
                 InputStreamReader reader = new InputStreamReader(inStream);
                 Gson gson = new Gson();
-                // LOG.error("{}", convertStreamToString(inStream));
                 return (RequestResult) gson.fromJson(reader, resultClass);
             } else {
                 LOG.error("POST request failed: {}", responseCode);

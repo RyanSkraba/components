@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -49,6 +50,8 @@ public class MarketoOutputWriterTest extends MarketoRuntimeTestBase {
         props.outputOperation.setValue(OutputOperation.deleteLeads);
         props.batchSize.setValue(1);
         props.updateSchemaRelated();
+        props.connection.maxReconnAttemps.setValue(2);
+        props.connection.attemptsIntervalTime.setValue(500);
         when(sink.getProperties()).thenReturn(props);
         writer = new MarketoOutputWriter(new MarketoWriteOperation(sink), null);
     }
@@ -233,6 +236,7 @@ public class MarketoOutputWriterTest extends MarketoRuntimeTestBase {
     public void testRetryOperationFailRecoverableErrror() throws Exception {
         IndexedRecord record = new Record(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads());
         record.put(0, 12345);
+        doNothing().when(client).getToken();
         doReturn(getFailedSyncResult("REST", "602", "expired header")).when(client)
                 .syncMultipleLeads(any(TMarketoOutputProperties.class), any(List.class));
         doReturn(true).when(client).isErrorRecoverable(any(List.class));

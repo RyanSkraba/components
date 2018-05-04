@@ -12,10 +12,9 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.spy;
 import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_REST;
 
 import java.text.SimpleDateFormat;
@@ -50,7 +49,7 @@ public class MarketoBaseRESTClientTest {
         conn.endpoint.setValue("https://fake.io");
         conn.clientAccessId.setValue("client");
         conn.secretKey.setValue("sekret");
-        client = new MarketoRESTClient(conn);
+        client = spy(new MarketoRESTClient(conn));
     }
 
     @Test
@@ -63,6 +62,7 @@ public class MarketoBaseRESTClientTest {
     @Test
     public void testIsErrorRecoverable() throws Exception {
         MarketoError error = new MarketoException("REST", "602", "Access token expired").toMarketoError();
+        doNothing().when(client).getToken();
         assertTrue(client.isErrorRecoverable(Arrays.asList(error)));
         for (String code : new String[] { "502", "604", "606", "608", "611", "614", "615" }) {
             error = new MarketoException("REST", code, "API Temporarily Unavailable").toMarketoError();

@@ -51,6 +51,8 @@ public class MarketoBulkExecReaderTest {
         TMarketoBulkExecProperties props = new TMarketoBulkExecProperties("test");
         props.connection.setupProperties();
         props.setupProperties();
+        props.connection.maxReconnAttemps.setValue(2);
+        props.connection.attemptsIntervalTime.setValue(500);
         client = mock(MarketoRESTClient.class);
         when(client.bulkImport(any(TMarketoBulkExecProperties.class))).thenReturn(new MarketoRecordResult());
         MarketoSource source = mock(MarketoSource.class);

@@ -50,6 +50,8 @@ public class MarketoInputWriterTest extends MarketoRuntimeTestBase {
         props.connection.setupProperties();
         props.setupProperties();
         props.leadKeyValues.setValue("email");
+        props.connection.maxReconnAttemps.setValue(2);
+        props.connection.attemptsIntervalTime.setValue(500);
         props.updateSchemaRelated();
         when(sink.getProperties()).thenReturn(props);
         wop = new MarketoWriteOperation(sink);

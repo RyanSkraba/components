@@ -122,7 +122,7 @@ public class MarketoTestBase extends AbstractComponentTest2 {
             when(((MarketoSourceOrSinkSchemaProvider) runtimeSourceOrSink).getCompoundKeyFields(eq("car_null"))).thenReturn(null);
             when(((MarketoSourceOrSinkSchemaProvider) runtimeSourceOrSink).getCompoundKeyFields(eq("car_except")))
                     .thenThrow(new IOException("ERROR"));
-
+            when(((MarketoSourceOrSinkSchemaProvider) runtimeSourceOrSink).getSchemaNames(null)).thenReturn(CO_SCHEMA_NAMES);
         }
 
         public void changeValidateConnectionResult(Result result) {

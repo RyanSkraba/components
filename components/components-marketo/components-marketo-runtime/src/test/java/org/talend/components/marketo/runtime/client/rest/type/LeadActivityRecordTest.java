@@ -38,7 +38,6 @@ public class LeadActivityRecordTest {
 
     @Test
     public void testGetters() throws Exception {
-
         assertEquals("1", r.getId().toString());
         assertEquals("2", r.getLeadId().toString());
         assertEquals("3", r.getActivityTypeId().toString());
@@ -49,4 +48,9 @@ public class LeadActivityRecordTest {
         assertNotNull(r.getAttributes());
     }
 
+    @Test
+    public void testToString() throws Exception {
+        String t = "LeadActivityRecord [id=null, leadId=null, activityDate=null, activityTypeId=null, activityTypeValue=null, primaryAttributeValueId=null, primaryAttributeValue=null, attributes=[]]";
+        assertEquals(t, new LeadActivityRecord().toString());
+    }
 }

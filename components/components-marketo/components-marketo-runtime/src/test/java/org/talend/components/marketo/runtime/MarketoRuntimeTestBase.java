@@ -20,7 +20,9 @@ import static org.talend.components.marketo.runtime.MarketoSourceOrSink.TALEND6_
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -28,7 +30,6 @@ import org.apache.avro.Schema.Field.Order;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
-import org.junit.After;
 import org.junit.Before;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
@@ -54,6 +55,32 @@ public class MarketoRuntimeTestBase {
 
     public MarketoRESTClient client;
 
+    public RuntimeContainer container = new RuntimeContainer() {
+
+        private Map<String, Object> map = new HashMap<>();
+
+        @Override
+        public Object getComponentData(String componentId, String key) {
+            return map.get(componentId + "_" + key);
+        }
+
+        @Override
+        public void setComponentData(String componentId, String key, Object data) {
+            map.put(componentId + "_" + key, data);
+        }
+
+        @Override
+        public String getCurrentComponentId() {
+            return "MarketoRuntimeTest";
+        }
+
+        @Override
+        public Object getGlobalData(String key) {
+            return null;
+        }
+
+    };
+
     @Before
     public void setUp() throws Exception {
 
@@ -74,10 +101,6 @@ public class MarketoRuntimeTestBase {
         when(sink.validate(any(RuntimeContainer.class))).thenReturn(ValidationResult.OK);
         when(sink.validateConnection(any(MarketoProvideConnectionProperties.class))).thenReturn(new ValidationResult(Result.OK));
         when(sink.getClientService(any(RuntimeContainer.class))).thenReturn(client);
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     public static MarketoRecordResult getLeadRecordResult(boolean withRemainCount) {

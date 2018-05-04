@@ -46,6 +46,8 @@ public class MarketoListOperationWriterTest extends MarketoRuntimeTestBase {
         props = new TMarketoListOperationProperties("test");
         props.connection.setupProperties();
         props.setupProperties();
+        props.connection.maxReconnAttemps.setValue(2);
+        props.connection.attemptsIntervalTime.setValue(500);
 
         when(sink.getProperties()).thenReturn(props);
         writer = new MarketoListOperationWriter(new MarketoWriteOperation(sink), null);
