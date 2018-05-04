@@ -33,7 +33,6 @@ import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureS
 import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableProperties.ActionOnData;
 import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableProperties.ActionOnTable;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
-import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
@@ -165,15 +164,6 @@ public class AzureStorageTableComponentsTest {
         assertEquals(ActionOnTable.Default, ActionOnTable.valueOf("Default"));
         assertEquals(ActionOnTable.Drop_and_create_table, ActionOnTable.valueOf("Drop_and_create_table"));
         assertEquals(ActionOnTable.Drop_table_if_exist_and_create, ActionOnTable.valueOf("Drop_table_if_exist_and_create"));
-    }
-
-    @Test(expected = TalendRuntimeException.class)
-    public void testOutputTableConnectorWarning() throws Exception {
-        TAzureStorageOutputTableDefinition defOutput = new TAzureStorageOutputTableDefinition();
-        assertNotNull(defOutput.getRuntimeInfo(null, null, ConnectorTopology.INCOMING));
-        assertNotNull(defOutput.getRuntimeInfo(null, null, ConnectorTopology.INCOMING_AND_OUTGOING));
-        defOutput.getRuntimeInfo(null, null, ConnectorTopology.NONE);
-        fail("Should not be here: WRONG_CONNECTOR Exception should have been raised.");
     }
 
     @Test
