@@ -20,13 +20,13 @@ import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
+import org.joda.time.Duration;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jms.JmsMessageType;
 import org.talend.components.jms.input.JmsInputProperties;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
-import org.joda.time.Duration;
 
 public class JmsInputPTransformRuntime extends PTransform<PBegin, PCollection> implements RuntimableRuntime {
 
@@ -71,7 +71,7 @@ public class JmsInputPTransformRuntime extends PTransform<PBegin, PCollection> i
         } else if (properties.timeout.getValue() != -1) {
             read = read.withMaxReadTime(Duration.millis(properties.timeout.getValue()));
         }
-        PCollection<JmsRecord> jmsCollection = pBegin.apply(read);
+        PCollection<JmsRecord> jmsCollection = (PCollection<JmsRecord>) pBegin.apply(read);
 
         if (jmsCollection != null) {
             PCollection<String> outputCollection = jmsCollection.apply("JmsRecordToIndexedRecord", ParDo.of(new DoFn<JmsRecord, String>() {

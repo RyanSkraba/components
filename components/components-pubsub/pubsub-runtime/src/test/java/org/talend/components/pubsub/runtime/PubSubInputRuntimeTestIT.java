@@ -13,27 +13,23 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import com.google.api.services.pubsub.model.PubsubMessage;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.beam.runners.spark.SparkContextOptions;
-import org.apache.beam.runners.spark.SparkRunner;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.adapter.beam.BeamJobRuntimeContainer;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
+import org.talend.components.adapter.beam.utils.SparkRunnerTestUtils;
 import org.talend.components.pubsub.PubSubDatasetProperties;
 import org.talend.components.pubsub.PubSubDatastoreProperties;
+
+import com.google.api.services.pubsub.model.PubsubMessage;
 
 public class PubSubInputRuntimeTestIT {
 
@@ -44,18 +40,6 @@ public class PubSubInputRuntimeTestIT {
     final static String subscriptionName = "tcomp-pubsub-inputtest-sub1" + uuid;
 
     static PubSubClient client = PubSubConnection.createClient(createDatastore());
-
-    // TODO extract this to utils
-    private Pipeline createSparkRunnerPipeline() {
-        PipelineOptions o = PipelineOptionsFactory.create();
-        SparkContextOptions options = o.as(SparkContextOptions.class);
-        JavaSparkContext jsc = new JavaSparkContext("local[2]", "PubSubInput");
-        options.setProvidedSparkContext(jsc);
-        options.setUsesProvidedSparkContext(true);
-        options.setRunner(SparkRunner.class);
-        runtimeContainer = new BeamJobRuntimeContainer(options);
-        return Pipeline.create(options);
-    }
 
     @Rule
     public final TestPipeline pipeline = TestPipeline.create();
@@ -116,10 +100,8 @@ public class PubSubInputRuntimeTestIT {
     }
 
     @Test
-    @Ignore("Can not run together with inputAvro_Spark, JavaSparkContext can't modify in same jvm"
-            + " error, or PAssert check with wrong data issue")
     public void inputCsv_Spark() throws IOException {
-        inputCsv(createSparkRunnerPipeline());
+        inputCsv(new SparkRunnerTestUtils(this.getClass().getName()).createPipeline());
     }
 
     @Test
@@ -129,7 +111,7 @@ public class PubSubInputRuntimeTestIT {
 
     @Test
     public void inputAvro_Spark() throws IOException {
-        inputAvro(createSparkRunnerPipeline());
+        inputAvro(new SparkRunnerTestUtils(this.getClass().getName()).createPipeline());
     }
 
     private void inputAvro(Pipeline pipeline) throws IOException {

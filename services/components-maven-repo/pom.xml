@@ -22,8 +22,8 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.boot.version>1.5.1.RELEASE</spring.boot.version>
-		<hadoop.version>2.7.0</hadoop.version>
-		<beam.version>2.0.0</beam.version>
+        <hadoop.version>2.7.3</hadoop.version>
+        <beam.version>2.3.0</beam.version>
 		<!-- JDBC drivers versions -->
 		<mariadb.driver.version>2.0.2</mariadb.driver.version>
 		<postgresql.driver.version>42.1.1</postgresql.driver.version>
@@ -140,7 +140,14 @@
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 				<version>20.0</version>
-			</dependency>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>2.9.4</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 

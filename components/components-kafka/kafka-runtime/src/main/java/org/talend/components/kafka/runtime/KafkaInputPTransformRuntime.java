@@ -31,6 +31,7 @@ import org.apache.beam.sdk.transforms.Values;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.joda.time.Duration;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
@@ -46,10 +47,13 @@ public class KafkaInputPTransformRuntime extends PTransform<PBegin, PCollection<
     @Override
     public PCollection<IndexedRecord> expand(PBegin pBegin) {
 
-        KafkaIO.Read<byte[], byte[]> kafkaRead = KafkaIO.readBytes()
+        KafkaIO.Read<byte[], byte[]> kafkaRead = KafkaIO
+                .<byte[], byte[]> read()
                 .withBootstrapServers(properties.getDatasetProperties().getDatastoreProperties().brokers.getValue())
                 .withTopics(Arrays.asList(new String[] { properties.getDatasetProperties().topic.getValue() }))
-                .updateConsumerProperties(KafkaConnection.createInputMaps(properties));
+                .updateConsumerProperties(KafkaConnection.createInputMaps(properties))
+                .withKeyDeserializer(ByteArrayDeserializer.class)
+                .withValueDeserializer(ByteArrayDeserializer.class);
 
         if (properties.useMaxReadTime.getValue()) {
             kafkaRead = kafkaRead.withMaxReadTime(new Duration(properties.maxReadTime.getValue()));
@@ -58,7 +62,8 @@ public class KafkaInputPTransformRuntime extends PTransform<PBegin, PCollection<
             kafkaRead = kafkaRead.withMaxNumRecords(properties.maxNumRecords.getValue());
         }
         // only consider value of kafkaRecord no matter which format selected
-        PCollection<byte[]> kafkaRecords = pBegin.apply(kafkaRead) //
+        PCollection<byte[]> kafkaRecords = pBegin
+                .apply(kafkaRead) //
                 .apply(ParDo.of(new ExtractRecord())) //
                 .apply(Values.<byte[]> create());
         switch (properties.getDatasetProperties().valueFormat.getValue()) {
@@ -81,7 +86,8 @@ public class KafkaInputPTransformRuntime extends PTransform<PBegin, PCollection<
                     .apply(ConvertToIndexedRecord.<String[]>of());
         }
         default:
-            throw new RuntimeException("To be implemented: " + properties.getDatasetProperties().valueFormat.getValue());
+            throw new RuntimeException(
+                    "To be implemented: " + properties.getDatasetProperties().valueFormat.getValue());
         }
 
     }
