@@ -329,12 +329,10 @@ public class DBTestUtils {
         }
     }
 
-    public static void createTableWithSpecialName(AllSetting allSetting, String tablename)
+    public static void createTableWithSpecialName(Connection conn, String tablename)
             throws SQLException, ClassNotFoundException {
-        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("CREATE TABLE " + tablename + " (P1_Vente_Qté INT)");
-            }
+        try (Statement statement = conn.createStatement()) {
+            statement.execute("CREATE TABLE " + tablename + " (P1_Vente_Qté INT, \"Customer Id\" INT)");
         }
     }
 
@@ -1027,4 +1025,15 @@ public class DBTestUtils {
         mappings_url = new URL(mappings_url.getProtocol(),mappings_url.getHost(),mappings_url.getPort(),file_path);
         return mappings_url;
     }
+    
+    public static void testMetadata4SpecialName(List<Field> columns) {
+      Schema.Field field = columns.get(0);
+
+      assertEquals("P1_VENTE_QT_", field.name());
+      assertEquals("P1_VENTE_QTÉ", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+      
+      field = columns.get(1);
+      assertEquals("Customer_Id", field.name());
+      assertEquals("Customer Id", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+  }
 }

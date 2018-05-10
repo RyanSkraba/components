@@ -44,6 +44,7 @@ public class JDBCDatasetTestIT {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
             DBTestUtils.createTestTable(conn, tablename);
             DBTestUtils.createAllTypesTable(conn, tablename_all_type);
+            DBTestUtils.createTableWithSpecialName(conn,special_table_name);
             DBTestUtils.loadTestData(conn, tablename);
             DBTestUtils.loadAllTypesData(conn, tablename_all_type);
         }
@@ -52,12 +53,15 @@ public class JDBCDatasetTestIT {
     private static final String tablename = "JDBCDATASET";
 
     private static final String tablename_all_type = "JDBCDATASETALLTYPE";
+    
+    private static final String special_table_name = "JDBCDATASETSPECIAL";
 
     @AfterClass
     public static void afterClass() throws Exception {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
             DBTestUtils.dropTestTable(conn, tablename);
             DBTestUtils.dropAllTypesTable(conn, tablename_all_type);
+            DBTestUtils.dropTestTable(conn, special_table_name);
         } finally {
             DBTestUtils.shutdownDBIfNecessary();
         }
@@ -65,7 +69,7 @@ public class JDBCDatasetTestIT {
 
     @Test
     public void testUpdateSchema() {
-        JDBCDatasetProperties dataset = createDatasetProperties(true);
+        JDBCDatasetProperties dataset = createDatasetProperties(true, tablename);
 
         Schema schema = dataset.main.schema.getValue();
 
@@ -75,7 +79,7 @@ public class JDBCDatasetTestIT {
 
     @Test
     public void testGetSchema() {
-        JDBCDatasetProperties dataset = createDatasetProperties(false);
+        JDBCDatasetProperties dataset = createDatasetProperties(false, tablename);
 
         JDBCDatasetRuntime runtime = new JDBCDatasetRuntime();
         runtime.initialize(null, dataset);
@@ -84,10 +88,22 @@ public class JDBCDatasetTestIT {
         Assert.assertNotNull(schema);
         DBTestUtils.testMetadata(schema.getFields(), true);
     }
+    
+    @Test
+    public void testGetSchema4SpecialName() {
+        JDBCDatasetProperties dataset = createDatasetProperties(false, special_table_name);
+
+        JDBCDatasetRuntime runtime = new JDBCDatasetRuntime();
+        runtime.initialize(null, dataset);
+        Schema schema = runtime.getSchema();
+
+        Assert.assertNotNull(schema);
+        DBTestUtils.testMetadata4SpecialName(schema.getFields());
+    }
 
     @Test
     public void testGetSchemaFromTable() throws IOException {
-        JDBCDatasetProperties dataset = createDatasetProperties(false);
+        JDBCDatasetProperties dataset = createDatasetProperties(false, tablename);
 
         JDBCDatasetRuntime runtime = new JDBCDatasetRuntime();
         runtime.initialize(null, dataset);
@@ -105,19 +121,19 @@ public class JDBCDatasetTestIT {
 
     @Test
     public void testGetSampleWithValidDesignSchema() {
-        JDBCDatasetProperties dataset = createDatasetProperties(true);
+        JDBCDatasetProperties dataset = createDatasetProperties(true, tablename);
         getSampleAction(dataset);
     }
 
     @Test
     public void testGetSampleWithoutDesignSchema() {
-        JDBCDatasetProperties dataset = createDatasetProperties(false);
+        JDBCDatasetProperties dataset = createDatasetProperties(false, tablename);
         getSampleAction(dataset);
     }
 
     @Test
     public void testDoHealthChecks() {
-        JDBCDatasetProperties dataset = createDatasetProperties(true);
+        JDBCDatasetProperties dataset = createDatasetProperties(true, tablename);
         JDBCDatastoreRuntime runtime = new JDBCDatastoreRuntime();
         runtime.initialize(null, dataset.getDatastoreProperties());
         Iterable<ValidationResult> result = runtime.doHealthChecks(null);
@@ -145,7 +161,7 @@ public class JDBCDatasetTestIT {
         Assert.assertEquals("wangwei", record[0].get(1));
     }
 
-    private JDBCDatasetProperties createDatasetProperties(boolean updateSchema) {
+    private JDBCDatasetProperties createDatasetProperties(boolean updateSchema, String tablename) {
         JDBCDatastoreDefinition def = new JDBCDatastoreDefinition();
         JDBCDatastoreProperties datastore = new JDBCDatastoreProperties("datastore");
 

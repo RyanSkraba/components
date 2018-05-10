@@ -45,7 +45,9 @@ public class JDBCSchemaTestIT {
     public static void beforeClass() throws Exception {
         allSetting = DBTestUtils.createAllSetting();
 
-        DBTestUtils.createTableWithSpecialName(allSetting,tablename);
+        try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
+          DBTestUtils.createTableWithSpecialName(conn,tablename);
+        }
     }
 
     @AfterClass
@@ -81,21 +83,7 @@ public class JDBCSchemaTestIT {
         Schema schema = source.getEndpointSchema(container, tablename);
         assertEquals(tablename, schema.getName().toUpperCase());
         List<Field> columns = schema.getFields();
-        testMetadata(columns);
+        DBTestUtils.testMetadata4SpecialName(columns);
     }
-
-    private void testMetadata(List<Field> columns) {
-        Schema.Field field = columns.get(0);
-
-        assertEquals("P1_VENTE_QT_", field.name());
-        assertEquals("P1_VENTE_QTÉ", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        assertEquals(AvroUtils._int(), AvroUtils.unwrapIfNullable(field.schema()));
-        assertEquals("INTEGER", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
-        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
-        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
-        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
-        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
-    }
-
 
 }

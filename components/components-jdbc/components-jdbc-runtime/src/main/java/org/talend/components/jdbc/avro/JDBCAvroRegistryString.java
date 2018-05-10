@@ -28,6 +28,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.avro.JDBCTableMetadata;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.NameUtil;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.java8.SerializableFunction;
 
@@ -77,6 +78,9 @@ public class JDBCAvroRegistryString extends AvroRegistry {
     protected Schema inferSchemaResultSetMetaData(ResultSetMetaData metadata) throws SQLException {
         List<Field> fields = new ArrayList<>();
 
+        Set<String> existNames = new HashSet<String>();
+        int index = 0;
+        
         int count = metadata.getColumnCount();
         for (int i = 1; i <= count; i++) {
             int size = metadata.getPrecision(i);
@@ -90,7 +94,10 @@ public class JDBCAvroRegistryString extends AvroRegistry {
             // not necessary for the result schema from the query statement
             boolean isKey = false;
 
-            Field field = sqlType2Avro(size, scale, dbtype, nullable, fieldName, dbColumnName, null, isKey);
+            String validName = NameUtil.correct(fieldName, index++, existNames);
+            existNames.add(validName);
+            
+            Field field = sqlType2Avro(size, scale, dbtype, nullable, validName, dbColumnName, null, isKey);
 
             fields.add(field);
         }
@@ -103,6 +110,9 @@ public class JDBCAvroRegistryString extends AvroRegistry {
         Set<String> keys = getPrimaryKeys(databaseMetdata, tableMetadata.getCatalog(), tableMetadata.getDbSchema(),
                 tableMetadata.getTablename());
 
+        Set<String> existNames = new HashSet<String>();
+        int index = 0;
+        
         try (ResultSet metadata = databaseMetdata.getColumns(tableMetadata.getCatalog(), tableMetadata.getDbSchema(),
                 tableMetadata.getTablename(), null)) {
             if (!metadata.next()) {
@@ -123,12 +133,15 @@ public class JDBCAvroRegistryString extends AvroRegistry {
 
                 String defaultValue = metadata.getString("COLUMN_DEF");
 
-                Field field = sqlType2Avro(size, scale, dbtype, nullable, columnName, columnName, defaultValue, isKey);
+                String validName = NameUtil.correct(columnName, index++, existNames);
+                existNames.add(validName);
+                
+                Field field = sqlType2Avro(size, scale, dbtype, nullable, validName, columnName, defaultValue, isKey);
 
                 fields.add(field);
             } while (metadata.next());
 
-            return Schema.createRecord(tablename, null, null, false, fields);
+            return Schema.createRecord(NameUtil.correct(tablename, 0, new HashSet<String>()), null, null, false, fields);
         }
     }
 
