@@ -70,6 +70,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
 
     protected IndexedRecordConverter<?, IndexedRecord> getFactory() throws IOException {
         if (null == factory) {
+            Schema schema = getSchema();
             boolean useBulkFactory = false;
             if (properties instanceof TSalesforceBulkExecProperties) {
                 useBulkFactory = true;
@@ -77,6 +78,10 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
                 if (TSalesforceInputProperties.QueryMode.Bulk
                         .equals(((TSalesforceInputProperties) properties).queryMode.getValue())) {
                     useBulkFactory = true;
+                    if (((TSalesforceInputProperties) properties).returnNullValue.getValue()) {
+                        schema.addProp(SalesforceSchemaConstants.RETURN_NULL_FOR_EMPTY, true);
+                    }
+
                 }
             }
             if (useBulkFactory) {
@@ -84,7 +89,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
             } else {
                 factory = new SObjectAdapterFactory();
             }
-            factory.setSchema(getSchema());
+            factory.setSchema(schema);
         }
         return factory;
     }

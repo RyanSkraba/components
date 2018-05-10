@@ -86,6 +86,8 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     public Property<Boolean> safetySwitch = newBoolean("safetySwitch", true);
 
+    public Property<Boolean> returnNullValue = newBoolean("returnNullValue", false);
+
     public Property<Integer> jobTimeOut = newInteger("jobTimeOut");
 
     public Property<Boolean> pkChunking = newBoolean("pkChunking", false);
@@ -144,6 +146,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(safetySwitch);
+        advancedForm.addRow(returnNullValue);
         advancedForm.addRow(jobTimeOut);
         advancedForm.addRow(pkChunking);
         advancedForm.addRow(chunkSize);
@@ -249,6 +252,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         if (Form.ADVANCED.equals(form.getName())) {
             boolean isBulkQuery = queryMode.getValue().equals(QueryMode.Bulk);
             form.getWidget(safetySwitch.getName()).setVisible(isBulkQuery);
+            form.getWidget(returnNullValue.getName()).setVisible(isBulkQuery);
             form.getWidget(jobTimeOut.getName()).setVisible(isBulkQuery);
             form.getWidget(pkChunking.getName()).setVisible(isBulkQuery);
             form.getWidget(chunkSize.getName()).setVisible(isBulkQuery && pkChunking.getValue());

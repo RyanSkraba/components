@@ -24,4 +24,6 @@ public abstract class SalesforceSchemaConstants {
     public final static String COLUMNNAME_DELIMTER = "salesforce.column.delimiter";
 
     public final static String VALUE_DELIMITER = "salesforce.value.delimiter";
+
+    public final static String RETURN_NULL_FOR_EMPTY = "RETURN_NULL_FOR_EMPTY";
 }
