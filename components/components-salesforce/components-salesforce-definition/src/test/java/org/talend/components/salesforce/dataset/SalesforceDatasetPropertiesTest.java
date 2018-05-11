@@ -83,9 +83,9 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
         assertNotNull(mainForm.getWidget(properties.sourceType.getName()));
         assertEquals(SalesforceDatasetProperties.SourceType.MODULE_SELECTION, properties.sourceType.getValue());
         assertNotNull(mainForm.getWidget(properties.query.getName()));
-        assertTrue(mainForm.getWidget(properties.query.getName()).isVisible());
+        assertFalse(mainForm.getWidget(properties.query.getName()).isVisible());
         assertNotNull(mainForm.getWidget(properties.moduleName.getName()));
-        assertFalse(mainForm.getWidget(properties.moduleName.getName()).isVisible());
+        assertTrue(mainForm.getWidget(properties.moduleName.getName()).isVisible());
         assertNotNull(mainForm.getWidget(properties.selectColumnIds.getName()));
         assertFalse(mainForm.getWidget(properties.selectColumnIds.getName()).isVisible());
         assertNotNull(mainForm.getWidget(properties.condition.getName()));
