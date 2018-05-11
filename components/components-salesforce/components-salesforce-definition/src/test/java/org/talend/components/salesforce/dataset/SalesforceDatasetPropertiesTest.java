@@ -71,7 +71,7 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
     public void testSetupProperties() {
         properties.setupProperties();
 
-        assertEquals(SalesforceDatasetProperties.SourceType.SOQL_QUERY, properties.sourceType.getValue());
+        assertEquals(SalesforceDatasetProperties.SourceType.MODULE_SELECTION, properties.sourceType.getValue());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
         Form mainForm = properties.getForm(Form.MAIN);
         assertNotNull(mainForm);
         assertNotNull(mainForm.getWidget(properties.sourceType.getName()));
-        assertEquals(SalesforceDatasetProperties.SourceType.SOQL_QUERY, properties.sourceType.getValue());
+        assertEquals(SalesforceDatasetProperties.SourceType.MODULE_SELECTION, properties.sourceType.getValue());
         assertNotNull(mainForm.getWidget(properties.query.getName()));
         assertTrue(mainForm.getWidget(properties.query.getName()).isVisible());
         assertNotNull(mainForm.getWidget(properties.moduleName.getName()));

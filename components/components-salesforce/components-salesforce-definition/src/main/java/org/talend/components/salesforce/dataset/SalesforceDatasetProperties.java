@@ -182,7 +182,7 @@ public class SalesforceDatasetProperties extends PropertiesImpl
 
     @Override
     public void setupProperties() {
-        sourceType.setValue(SourceType.SOQL_QUERY);
+        sourceType.setValue(SourceType.MODULE_SELECTION);
     }
 
     @Override
@@ -195,14 +195,6 @@ public class SalesforceDatasetProperties extends PropertiesImpl
         mainForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
         mainForm.addRow(Widget.widget(selectColumnIds).setWidgetType(Widget.MULTIPLE_VALUE_SELECTOR_WIDGET_TYPE));
         mainForm.addRow(condition);
-
-        Form citizenForm = Form.create(this, Form.CITIZEN_USER);
-
-        citizenForm.addRow(Widget.widget(sourceType).setWidgetType(Widget.RADIO_WIDGET_TYPE));
-        citizenForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
-        citizenForm.addRow(Widget.widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
-        citizenForm.addRow(Widget.widget(selectColumnIds).setWidgetType(Widget.MULTIPLE_VALUE_SELECTOR_WIDGET_TYPE));
-        citizenForm.addRow(condition);
     }
 
     /**
