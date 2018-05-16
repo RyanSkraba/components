@@ -70,6 +70,10 @@ public class AggregateCombineFn
 
     @Override
     public IndexedRecord extractOutput(AggregateAccumulator accumulator) {
+        // this method can be invoked even addInput not, return null, and filter null value in next PTransform
+        if (accumulator.outputRecordSchemaStr == null) {
+            return null;
+        }
         Schema.Parser parser = new Schema.Parser();
         Schema outputRecordSchema = parser.parse(accumulator.outputRecordSchemaStr);
         IndexedRecord outputRecord = new GenericData.Record(outputRecordSchema);
@@ -151,7 +155,9 @@ public class AggregateCombineFn
                         this.accumulatorFn = next.accumulatorFn;
                         continue;
                     }
-                    accs.add(next.accumulatorFn.getAccumulators());
+                    if (next.accumulatorFn != null) { // the next.addInput never be invoked
+                        accs.add(next.accumulatorFn.getAccumulators());
+                    }
                 }
                 this.accumulatorFn.mergeAccumulators(accs);
             }
@@ -357,9 +363,6 @@ public class AggregateCombineFn
         @Override
         public void mergeAccumulators(Iterable<Long> accsList) {
             Iterator<Long> iterator = accsList.iterator();
-            if (!iterator.hasNext()) {
-                createAccumulator();
-            }
             while (iterator.hasNext()) {
                 accs += iterator.next();
             }

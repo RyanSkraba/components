@@ -71,7 +71,7 @@ public class KinesisInputDefinition extends AbstractComponentDefinition {
 
     @Override
     public String getIconKey() {
-        return "AWS-kinesis";
+        return "aws-kinesis";
     }
 
     @Override

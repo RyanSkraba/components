@@ -101,6 +101,7 @@ public class SalesforceDatasetRuntimeTestIT {
         CommonTestUtils.setValueForDatastoreProperties(datastore);
 
         SalesforceDatasetProperties dataset = (SalesforceDatasetProperties) def.createDatasetProperties(datastore);
+        dataset.sourceType.setValue(SalesforceDatasetProperties.SourceType.MODULE_SELECTION);
         dataset.moduleName.setValue("Account");
 
         return dataset;

@@ -30,6 +30,7 @@ import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.simplefileio.runtime.beamcopy.Write;
 import org.talend.components.simplefileio.runtime.coders.LazyAvroKeyWrapper;
 import org.talend.components.simplefileio.runtime.sinks.AvroHdfsFileSink;
+import org.talend.components.simplefileio.runtime.sinks.UnboundedWrite;
 import org.talend.components.simplefileio.runtime.sources.AvroHdfsFileSource;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
@@ -74,7 +75,12 @@ public class SimpleRecordFormatAvroIO extends SimpleRecordFormatBase {
 
         PCollection<KV<AvroKey<IndexedRecord>, NullWritable>> pc1 = in.apply(ParDo.of(new FormatAvro()));
         pc1 = pc1.setCoder(KvCoder.of(lakw, WritableCoder.of(NullWritable.class)));
-        return pc1.apply(Write.to(sink));
+
+        if (in.isBounded() == PCollection.IsBounded.BOUNDED) {
+            return pc1.apply(Write.to(sink));
+        } else {
+            return pc1.apply(UnboundedWrite.of(sink));
+        }
     }
 
     public static class ExtractRecordFromAvroKey extends DoFn<AvroKey, Object> {

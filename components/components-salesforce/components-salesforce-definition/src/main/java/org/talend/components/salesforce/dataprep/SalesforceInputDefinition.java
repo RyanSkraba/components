@@ -25,6 +25,7 @@ import org.talend.components.api.component.SupportedProduct;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
+import org.talend.components.salesforce.SalesforceFamilyDefinition;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -34,10 +35,11 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class SalesforceInputDefinition extends AbstractComponentDefinition {
 
-    public static String NAME = "DataPrepSalesforceInput";
+    public static String NAME = "DataPrep" + SalesforceFamilyDefinition.NAME + "Input";
 
+    // TODO: quick fix to let this component available on datastreams, https://jira.talendforge.org/browse/TFD-3839
     public SalesforceInputDefinition() {
-        super(NAME, ExecutionEngine.DI);
+        super(NAME, ExecutionEngine.DI, ExecutionEngine.BEAM);
     }
 
     @Override
@@ -54,6 +56,7 @@ public class SalesforceInputDefinition extends AbstractComponentDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
+        assertConnectorTopologyCompatibility(connectorTopology);
         return SalesforceDefinition.getCommonRuntimeInfo(DATAPREP_SOURCE_CLASS);
     }
 
@@ -66,5 +69,15 @@ public class SalesforceInputDefinition extends AbstractComponentDefinition {
     @Override
     public List<String> getSupportedProducts() {
         return Arrays.asList(SupportedProduct.DATAPREP);
+    }
+
+    @Override
+    public String getIconKey() {
+        return "file-salesforce";
+    }
+
+    @Override
+    public String[] getFamilies() {
+        return new String[] { SalesforceFamilyDefinition.NAME };
     }
 }

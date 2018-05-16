@@ -18,6 +18,9 @@ import java.util.NoSuchElementException;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
@@ -36,6 +39,8 @@ import com.sforce.async.AsyncApiException;
 import com.sforce.ws.ConnectionException;
 
 public final class SalesforceBulkQueryReader extends AbstractBoundedReader<IndexedRecord> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SalesforceBulkQueryReader.class);
 
     private SalesforceBulkRuntime bulkRuntime;
 
@@ -122,6 +127,7 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
 
     protected void executeSalesforceBulkQuery() throws IOException, ConnectionException {
         String queryText = getQueryString();
+        LOG.debug("Execute SOQL:" + queryText);
         try {
             bulkRuntime.doBulkQuery(getModuleName(), queryText);
         } catch (AsyncApiException | InterruptedException | ConnectionException e) {
@@ -172,6 +178,10 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
             }
             sb.append(" from ");
             sb.append(dataset.moduleName.getValue());
+            if (!StringUtils.isEmpty(dataset.condition.getValue())) {
+                sb.append(" where ");
+                sb.append(dataset.condition.getValue());
+            }
             if (limit > 0) {
                 sb.append(" limit " + limit);
             }

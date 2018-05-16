@@ -72,7 +72,7 @@ public class SalesforceDataprepSource
 
     private String endpoint = SalesforceConnectionProperties.URL;
 
-    private ConnectionHolder connectionHolder;
+    private transient ConnectionHolder connectionHolder;
 
     private int timeout = DEFAULT_TIMEOUT;
 
@@ -115,7 +115,7 @@ public class SalesforceDataprepSource
     @Override
     public ValidationResult validate(RuntimeContainer container) {
         try {
-            connectionHolder = connect(container);
+            getConnectionHolder();
         } catch (IOException ex) {
             return SalesforceRuntimeCommon.exceptionToValidationResult(ex);
         }
@@ -147,25 +147,21 @@ public class SalesforceDataprepSource
 
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
-        if (connectionHolder == null) {
-            LOG.error("Cannot retrieve the schema due to null connection holder");
-            throw new IllegalStateException("The Salesforce connection holder is null whereas it must not be");
-        }
-        return SalesforceRuntimeCommon.getSchemaNames(connectionHolder.connection);
+        return SalesforceRuntimeCommon.getSchemaNames(getConnectionHolder().connection);
     }
 
     @Override
     public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
         try {
             DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
-            describeSObjectResults = connectionHolder.connection.describeSObjects(new String[] { schemaName });
+            describeSObjectResults = getConnectionHolder().connection.describeSObjects(new String[] { schemaName });
             return SalesforceAvroRegistryString.get().inferSchema(describeSObjectResults[0]);
         } catch (ConnectionException e) {
             throw new IOException(e);
         }
     }
 
-    ConnectionHolder connect(RuntimeContainer container) throws IOException {
+    ConnectionHolder connect() throws IOException {
         SalesforceRuntimeCommon.enableTLSv11AndTLSv12ForJava7();
 
         final ConnectionHolder ch = new ConnectionHolder();
@@ -258,7 +254,7 @@ public class SalesforceDataprepSource
         DescribeSObjectResult describeSObjectResult = null;
 
         try {
-            describeSObjectResult = connectionHolder.connection.describeSObject(drivingEntityName);
+            describeSObjectResult = getConnectionHolder().connection.describeSObject(drivingEntityName);
         } catch (ConnectionException e) {
             throw new RuntimeException(e);
         }
@@ -305,7 +301,11 @@ public class SalesforceDataprepSource
         return null;
     }
 
-    public ConnectionHolder getConnectionHolder() {
+    public ConnectionHolder getConnectionHolder() throws IOException {
+        if (connectionHolder == null) {
+            connectionHolder = connect();
+            return connectionHolder;
+        }
         return connectionHolder;
     }
 }

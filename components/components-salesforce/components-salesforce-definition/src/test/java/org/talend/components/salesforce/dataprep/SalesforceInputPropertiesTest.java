@@ -39,22 +39,19 @@ public class SalesforceInputPropertiesTest extends SalesforceTestBase {
     @Before
     public void setUp() {
         datasetProperties = new SalesforceDatasetProperties("dataset");
-
+        datasetProperties.init();
         properties = new SalesforceInputProperties("root");
+        properties.setDatasetProperties(datasetProperties);
+        properties.init();
     }
 
     @Test
     public void testSetupProperties() {
-        properties.setupProperties();
-
-        properties.setDatasetProperties(datasetProperties);
         assertEquals(datasetProperties, properties.getDatasetProperties());
     }
 
     @Test
     public void testSetupLayout() {
-        properties.init();
-
         Form mainForm = properties.getForm(Form.MAIN);
         assertNotNull(mainForm);
     }

@@ -69,6 +69,6 @@ public class KinesisDatasetDefinition extends I18nDefinition implements DatasetD
 
     @Override
     public String getIconKey() {
-        return "AWS-kinesis";
+        return "aws-kinesis";
     }
 }

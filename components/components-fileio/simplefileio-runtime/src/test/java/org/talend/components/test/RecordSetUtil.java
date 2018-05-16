@@ -39,6 +39,10 @@ public class RecordSetUtil {
         return new RecordSet("simple", getRandomRecords(seed, 0, 10, 10, 6));
     }
 
+    public static RecordSet getEmptyTestData() {
+        return new RecordSet("empty");
+    }
+
     /**
      *
      * @param seed

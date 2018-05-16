@@ -28,22 +28,16 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.beam.runners.spark.SparkContextOptions;
-import org.apache.beam.runners.spark.SparkRunner;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.spark.SparkConf;
-import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.talend.components.adapter.beam.utils.SparkRunnerTestUtils;
 import org.talend.components.kinesis.KinesisDatasetProperties;
 
 import com.amazonaws.services.kinesis.AmazonKinesis;
@@ -90,22 +84,6 @@ public class KinesisInputRuntimeTestIT {
     @Rule
     public final TestPipeline pipeline = TestPipeline.create();
 
-    private Pipeline createSparkRunnerPipeline() {
-        PipelineOptions o = PipelineOptionsFactory.create();
-        SparkContextOptions options = o.as(SparkContextOptions.class);
-
-        SparkConf conf = new SparkConf();
-        conf.setAppName("KinesisInput");
-        conf.setMaster("local[2]");
-        conf.set("spark.driver.allowMultipleContexts", "true");
-        JavaSparkContext jsc = new JavaSparkContext(new SparkContext(conf));
-        options.setProvidedSparkContext(jsc);
-        options.setUsesProvidedSparkContext(true);
-        options.setRunner(SparkRunner.class);
-
-        return Pipeline.create(options);
-    }
-
     @Test
     public void inputCsv_Local() throws IOException {
         inputCsv(pipeline, csvStream1);
@@ -113,7 +91,7 @@ public class KinesisInputRuntimeTestIT {
 
     @Test
     public void inputCsv_Spark() throws IOException {
-        inputCsv(createSparkRunnerPipeline(), csvStream2);
+        inputCsv(new SparkRunnerTestUtils(this.getClass().getName()).createPipeline(), csvStream2);
     }
 
     public void inputCsv(Pipeline pipeline, String streamName) throws IOException {
@@ -147,7 +125,7 @@ public class KinesisInputRuntimeTestIT {
 
     @Test
     public void inputAvro_Spark() throws IOException {
-        inputCsv(createSparkRunnerPipeline(), avroStream2);
+        inputCsv(new SparkRunnerTestUtils(this.getClass().getName()).createPipeline(), avroStream2);
     }
 
     public void inputAvro(Pipeline pipeline, String streamName) throws IOException {

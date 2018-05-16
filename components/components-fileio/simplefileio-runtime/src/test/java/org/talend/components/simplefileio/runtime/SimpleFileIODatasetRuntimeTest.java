@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.talend.components.test.RecordSetUtil.getEmptyTestData;
 import static org.talend.components.test.RecordSetUtil.getSimpleTestData;
 import static org.talend.components.test.RecordSetUtil.writeRandomAvroFile;
 import static org.talend.components.test.RecordSetUtil.writeRandomCsvFile;
@@ -73,6 +74,27 @@ public class SimpleFileIODatasetRuntimeTest {
         // Configure the component.
         SimpleFileIODatasetProperties props = createDatasetProperties();
         props.format.setValue(SimpleFileIOFormat.AVRO);
+        props.path.setValue(fileSpec);
+
+        // Create the runtime.
+        SimpleFileIODatasetRuntime runtime = new SimpleFileIODatasetRuntime();
+        runtime.initialize(null, props);
+
+        // Attempt to get a sample using the runtime methods.
+        Schema actual = runtime.getSchema();
+
+        assertThat(actual, notNullValue());
+        // TODO(rskraba): check the schema with the input file.
+    }
+
+    @Test
+    public void testGetSchemaEmptyCsvFile() throws Exception {
+        writeRandomCsvFile(mini.getFs(), "/user/test/empty.csv", getEmptyTestData());
+        String fileSpec = mini.getFs().getUri().resolve("/user/test/empty.csv").toString();
+
+        // Configure the component.
+        SimpleFileIODatasetProperties props = createDatasetProperties();
+        props.format.setValue(SimpleFileIOFormat.CSV);
         props.path.setValue(fileSpec);
 
         // Create the runtime.

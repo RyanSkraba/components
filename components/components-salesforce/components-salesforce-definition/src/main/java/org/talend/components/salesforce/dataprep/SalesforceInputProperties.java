@@ -32,9 +32,11 @@ public class SalesforceInputProperties extends FixedConnectorsComponentPropertie
      */
     private static final long serialVersionUID = 8370922451458863132L;
 
-    public ReferenceProperties<SalesforceDatasetProperties> dataset = new ReferenceProperties<>("dataset", SalesforceDatasetDefinition.NAME);
+    public ReferenceProperties<SalesforceDatasetProperties> dataset =
+            new ReferenceProperties<>("dataset", SalesforceDatasetDefinition.NAME);
 
-    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "dataset.main");
+    protected transient PropertyPathConnector MAIN_CONNECTOR =
+            new PropertyPathConnector(Connector.MAIN_NAME, "dataset.main");
 
     public SalesforceInputProperties(String name) {
         super(name);

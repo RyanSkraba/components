@@ -47,7 +47,8 @@ import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.properties.property.StringProperty;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
-public class SalesforceDatasetProperties extends PropertiesImpl implements DatasetProperties<SalesforceDatastoreProperties> {
+public class SalesforceDatasetProperties extends PropertiesImpl
+        implements DatasetProperties<SalesforceDatastoreProperties> {
 
     /**
      * 
@@ -56,14 +57,17 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceDatasetProperties.class);
 
-    public ReferenceProperties<SalesforceDatastoreProperties> datastore = new ReferenceProperties<>("datastore",
-            SalesforceDatastoreDefinition.NAME);
+    public ReferenceProperties<SalesforceDatastoreProperties> datastore =
+            new ReferenceProperties<>("datastore", SalesforceDatastoreDefinition.NAME);
 
     public Property<SourceType> sourceType = PropertyFactory.newEnum("sourceType", SourceType.class).setRequired();
 
     public StringProperty moduleName = PropertyFactory.newString("moduleName");
 
     public Property<List<String>> selectColumnIds = newStringList("selectColumnIds");
+
+    // condition using after SOQL Where statement
+    public Property<String> condition = PropertyFactory.newString("condition");
 
     public Property<String> query = PropertyFactory.newString("query");
 
@@ -109,32 +113,14 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
             runtimeTask(consumer);
         }
     }
-    
-    static Set<String> MODULE_LIST_WHICH_NOT_SUPPORT_BULK_API = new HashSet<String>(Arrays.asList(
-        "AcceptedEventRelation",
-        "ActivityHistory",
-        "AggregateResult",
-        "AttachedContentDocument",
-        "CaseStatus",
-        "CombinedAttachment",
-        "ContractStatus",
-        "DeclinedEventRelation",
-        "EmailStatus",
-        "LookedUpFromActivity",
-        "Name",
-        "NoteAndAttachment",
-        "OpenActivity",
-        "OwnedContentDocument",
-        "PartnerRole",
-        "ProcessInstanceHistory",
-        "RecentlyViewed",
-        "SolutionStatus",
-        "TaskPriority",
-        "TaskStatus",
-        "UndecidedEventRelation",
-        "UserRecordAccess"
-     )); 
-    
+
+    static Set<String> MODULE_LIST_WHICH_NOT_SUPPORT_BULK_API =
+            new HashSet<String>(Arrays.asList("AcceptedEventRelation", "ActivityHistory", "AggregateResult",
+                    "AttachedContentDocument", "CaseStatus", "CombinedAttachment", "ContractStatus",
+                    "DeclinedEventRelation", "EmailStatus", "LookedUpFromActivity", "Name", "NoteAndAttachment",
+                    "OpenActivity", "OwnedContentDocument", "PartnerRole", "ProcessInstanceHistory", "RecentlyViewed",
+                    "SolutionStatus", "TaskPriority", "TaskStatus", "UndecidedEventRelation", "UserRecordAccess"));
+
     private List<NamedThing> filter(List<NamedThing> moduleNames) {
         List<NamedThing> result = new ArrayList<NamedThing>();
         if (moduleNames != null) {
@@ -204,11 +190,11 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
         Form mainForm = Form.create(this, Form.MAIN);
 
         mainForm.addRow(Widget.widget(sourceType).setWidgetType(Widget.RADIO_WIDGET_TYPE));
+        mainForm.addRow(Widget.widget(query).setWidgetType(Widget.CODE_WIDGET_TYPE).setConfigurationValue(
+                Widget.CODE_SYNTAX_WIDGET_CONF, "sql"));
         mainForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
-        mainForm.addRow(Widget.widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
         mainForm.addRow(Widget.widget(selectColumnIds).setWidgetType(Widget.MULTIPLE_VALUE_SELECTOR_WIDGET_TYPE));
-        mainForm.getWidget(selectColumnIds).setVisible(false);
-        selectColumnIds.setRequired(false);
+        mainForm.addRow(condition);
     }
 
     /**
@@ -217,30 +203,18 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
      */
     @Override
     public void refreshLayout(Form form) {
-        if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
-            form.getWidget(moduleName).setVisible(true);
-            moduleName.setRequired(true);
-            // We can not have a hidden field which is required
-            form.getWidget(query).setVisible(false);
-            query.setRequired(false);
-            if (StringUtils.isNotEmpty(moduleName.getValue())) {
-                form.getWidget(selectColumnIds).setVisible();
-                selectColumnIds.setRequired(true);
-            } else {
-                form.getWidget(selectColumnIds).setVisible(false);
-                selectColumnIds.setRequired(false);
-            }
-
-        } else if (sourceType.getValue() == SourceType.SOQL_QUERY) {
-            form.getWidget(query).setVisible(true);
-            query.setRequired();
-            // We can not have a hidden field which is required
-            form.getWidget(moduleName).setVisible(false);
-            moduleName.setRequired(false);
-            form.getWidget(selectColumnIds).setVisible(false);
-            selectColumnIds.setRequired(false);
-        }
         super.refreshLayout(form);
+        boolean useModule = sourceType.getValue() == SourceType.MODULE_SELECTION;
+        form.getWidget(moduleName).setVisible(useModule);
+        moduleName.setRequired(useModule);
+        boolean moduleNameSelect = StringUtils.isNotEmpty(moduleName.getValue());
+        form.getWidget(selectColumnIds).setVisible(useModule && moduleNameSelect);
+        selectColumnIds.setRequired(useModule && moduleNameSelect);
+        form.getWidget(condition).setVisible(useModule && moduleNameSelect);
+
+        // We can not have a hidden field which is required
+        form.getWidget(query).setVisible(!useModule);
+        query.setRequired(!useModule);
     }
 
     @Override

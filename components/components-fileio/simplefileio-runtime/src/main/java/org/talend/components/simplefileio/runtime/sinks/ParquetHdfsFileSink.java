@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.simplefileio.runtime.sinks;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,26 +53,19 @@ public class ParquetHdfsFileSink extends UgiFileSinkBase<Void, IndexedRecord> {
     }
 
     @Override
-    protected boolean mergeOutput(FileSystem fs, String sourceFolder, String targetFile) {
-        try {
-            FileStatus[] sourceStatuses = FileSystemUtil.listSubFiles(fs, sourceFolder);
-            List<Path> sourceFiles = new ArrayList<>();
-            for (FileStatus sourceStatus : sourceStatuses) {
-                sourceFiles.add(sourceStatus.getPath());
-            }
-            FileMetaData mergedMeta = ParquetFileWriter.mergeMetadataFiles(sourceFiles, fs.getConf()).getFileMetaData();
-            ParquetFileWriter writer = new ParquetFileWriter(fs.getConf(), mergedMeta.getSchema(), new Path(targetFile),
-                    ParquetFileWriter.Mode.CREATE);
-            writer.start();
-            for (Path input : sourceFiles) {
-                writer.appendFile(fs.getConf(), input);
-            }
-            writer.end(mergedMeta.getKeyValueMetaData());
-        } catch (Exception e) {
-            LOG.error("Error when merging files in {}.\n{}", sourceFolder, e.getMessage());
-            return false;
+    protected void mergeOutput(FileSystem fs, String sourceFolder, String targetFile) throws IOException {
+        FileStatus[] sourceStatuses = FileSystemUtil.listSubFiles(fs, sourceFolder);
+        List<Path> sourceFiles = new ArrayList<>();
+        for (FileStatus sourceStatus : sourceStatuses) {
+            sourceFiles.add(sourceStatus.getPath());
         }
-        return true;
+        FileMetaData mergedMeta = ParquetFileWriter.mergeMetadataFiles(sourceFiles, fs.getConf()).getFileMetaData();
+        ParquetFileWriter writer = new ParquetFileWriter(fs.getConf(), mergedMeta.getSchema(), new Path(targetFile),
+                ParquetFileWriter.Mode.CREATE);
+        writer.start();
+        for (Path input : sourceFiles) {
+            writer.appendFile(fs.getConf(), input);
+        }
+        writer.end(mergedMeta.getKeyValueMetaData());
     }
-
 }

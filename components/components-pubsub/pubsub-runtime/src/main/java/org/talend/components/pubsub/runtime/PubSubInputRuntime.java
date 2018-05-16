@@ -47,7 +47,6 @@ import org.talend.components.pubsub.input.PubSubInputProperties;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.google.api.services.pubsub.model.AcknowledgeRequest;
 import com.google.api.services.pubsub.model.ReceivedMessage;
 import com.google.common.collect.ImmutableMap;
 
@@ -69,7 +68,7 @@ public class PubSubInputRuntime extends PTransform<PBegin, PCollection<IndexedRe
         this.dataset = properties.getDatasetProperties();
         this.datastore = dataset.getDatastoreProperties();
 
-        if(container != null) {
+        if (container != null) {
             Object pipelineOptionsObj = container.getGlobalData(BeamJobRuntimeContainer.PIPELINE_OPTIONS);
             if (pipelineOptionsObj != null) {
                 PipelineOptions pipelineOptions = (PipelineOptions) pipelineOptionsObj;
@@ -89,11 +88,12 @@ public class PubSubInputRuntime extends PTransform<PBegin, PCollection<IndexedRe
     public PCollection<IndexedRecord> expand(PBegin in) {
         PCollection<PubsubMessage> pubsubMessages = null;
         if (properties.useMaxNumRecords.getValue() || properties.useMaxReadTime.getValue()) {
-            pubsubMessages = in.apply(Create.of(dataset.subscription.getValue()))
-                    .apply(ParDo.of(new BoundedReaderFn(properties)));
+            pubsubMessages = in.apply(Create.of(dataset.subscription.getValue())).apply(
+                    ParDo.of(new BoundedReaderFn(properties)));
         } else {// normal
-            PubsubIO.Read<PubsubMessage> pubsubRead = PubsubIO.readMessages().fromSubscription(String
-                    .format("projects/%s/subscriptions/%s", datastore.projectName.getValue(), dataset.subscription.getValue()));
+            PubsubIO.Read<PubsubMessage> pubsubRead =
+                    PubsubIO.readMessages().fromSubscription(String.format("projects/%s/subscriptions/%s",
+                            datastore.projectName.getValue(), dataset.subscription.getValue()));
             if (properties.idLabel.getValue() != null && !"".equals(properties.idLabel.getValue())) {
                 pubsubRead.withIdAttribute(properties.idLabel.getValue());
             }
@@ -107,7 +107,8 @@ public class PubSubInputRuntime extends PTransform<PBegin, PCollection<IndexedRe
         switch (dataset.valueFormat.getValue()) {
         case AVRO: {
             Schema schema = new Schema.Parser().parse(dataset.avroSchema.getValue());
-            return pubsubMessages.apply(ParDo.of(new ConvertToAvro(schema.toString()))).setCoder(getDefaultOutputCoder());
+            return pubsubMessages.apply(ParDo.of(new ConvertToAvro(schema.toString()))).setCoder(
+                    getDefaultOutputCoder());
         }
         case CSV: {
             return (PCollection<IndexedRecord>) pubsubMessages
@@ -186,10 +187,14 @@ public class PubSubInputRuntime extends PTransform<PBegin, PCollection<IndexedRe
             while (num < maxNum && Instant.now().isBefore(endTime)) {
                 try {
                     List<String> ackIds = new ArrayList<>();
-                    for (ReceivedMessage receivedMessage : client.pull(spec.getDatasetProperties().subscription.getValue(),
-                            maxNum - num)) {
-                        context.output(
-                                new PubsubMessage(receivedMessage.getMessage().decodeData(), ImmutableMap.<String, String> of()));
+                    List<ReceivedMessage> receivedMessages =
+                            client.pull(spec.getDatasetProperties().subscription.getValue(), maxNum - num);
+                    if (receivedMessages == null) {
+                        continue;
+                    }
+                    for (ReceivedMessage receivedMessage : receivedMessages) {
+                        context.output(new PubsubMessage(receivedMessage.getMessage().decodeData(),
+                                ImmutableMap.<String, String> of()));
                         ackIds.add(receivedMessage.getAckId());
                         num++;
                     }
