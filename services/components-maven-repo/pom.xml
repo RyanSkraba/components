@@ -1,129 +1,133 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.talend.components</groupId>
-		<artifactId>components-parent</artifactId>
-		<version>0.24.0-SNAPSHOT</version>
-		<relativePath>../../components-parent/pom.xml</relativePath>
-	</parent>
+    <parent>
+        <groupId>org.talend.components</groupId>
+        <artifactId>components-parent</artifactId>
+        <version>0.24.0-SNAPSHOT</version>
+        <relativePath>../../components-parent/pom.xml</relativePath>
+    </parent>
 
+    <artifactId>components-maven-repo</artifactId>
+    <packaging>pom</packaging>
+    <name>Maven repository with components for REST service</name>
 
-	<artifactId>components-maven-repo</artifactId>
-	<packaging>pom</packaging>
-	<name>Maven repository with components for REST service</name>
-
-	<properties>
-		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
-		<java.version>1.8</java.version>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.boot.version>1.5.1.RELEASE</spring.boot.version>
+    <properties>
+        <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.boot.version>1.5.1.RELEASE</spring.boot.version>
         <hadoop.version>2.7.3</hadoop.version>
         <beam.version>2.3.0</beam.version>
-		<!-- JDBC drivers versions -->
-		<mariadb.driver.version>2.0.2</mariadb.driver.version>
-		<postgresql.driver.version>42.1.1</postgresql.driver.version>
-		<jtds.driver.version>1.3.1</jtds.driver.version>
-		<derby.driver.version>10.12.1.1</derby.driver.version>
-		<snowflake.driver.version>3.3.1</snowflake.driver.version>
-		<redshift.driver.version>1.2.10.1009</redshift.driver.version>
-		<redshift.aws.driver.exts.version>1.11.118</redshift.aws.driver.exts.version>
-		<!-- Dependencies version -->
-		<winutils.version>2.7.1</winutils.version>
-		<!-- Used for Docker images name -->
-		<git_branch>local</git_branch>
-		<talend_docker_registry>registry.datapwn.com</talend_docker_registry>
-	</properties>
+        <!-- JDBC drivers versions -->
+        <mariadb.driver.version>2.0.2</mariadb.driver.version>
+        <postgresql.driver.version>42.1.1</postgresql.driver.version>
+        <jtds.driver.version>1.3.1</jtds.driver.version>
+        <derby.driver.version>10.12.1.1</derby.driver.version>
+        <snowflake.driver.version>3.3.1</snowflake.driver.version>
+        <redshift.driver.version>1.2.10.1009</redshift.driver.version>
+        <redshift.aws.driver.exts.version>1.11.118</redshift.aws.driver.exts.version>
+        <!-- Dependencies version -->
+        <winutils.version>2.7.1</winutils.version>
+        <!-- Used for Docker images name -->
+        <git_branch>local</git_branch>
+        <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
+    </properties>
 
-	<dependencies>
-		<!-- the runtime artifact are added as test so that the global maven build 
-			builds them before -->
-		<!-- they are used to create the maven repo for runtime hence not real 
-			dependencies for the REST service -->
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-jira</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>localio-runtime</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>s3-runtime-di</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>jms-runtime_1_1</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-jdbc-runtime</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-jdbc-runtime-beam</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-salesforce-runtime</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.eclipse.jetty</groupId>
-					<artifactId>jetty-server</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>kafka-runtime</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>elasticsearch-runtime_2_4</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>simplefileio-runtime</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>processing-runtime</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>bigquery-runtime</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>pubsub-runtime</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
+    <dependencies>
+        <!-- the runtime artifact are added as test so that the global maven build
+            builds them before -->
+        <!-- they are used to create the maven repo for runtime hence not real
+            dependencies for the REST service -->
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-jira</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>localio-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>s3-runtime-di</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>jms-runtime_1_1</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-jdbc-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-jdbc-runtime-beam</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-salesforce-runtime</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-server</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>kafka-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>elasticsearch-runtime_2_4</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>simplefileio-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>processing-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>bigquery-runtime</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>pubsub-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>kinesis-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-marketo-runtime</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -131,15 +135,15 @@
             <artifactId>derby</artifactId>
             <version>10.12.1.1</version>
         </dependency>
-	</dependencies>
+    </dependencies>
 
-	<dependencyManagement>
-		<dependencies>
-			<!-- Lock guava to the Beam dependency -->
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>20.0</version>
+    <dependencyManagement>
+        <dependencies>
+            <!-- Lock guava to the Beam dependency -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>20.0</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
@@ -148,261 +152,264 @@
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
-		</dependencies>
-	</dependencyManagement>
+        </dependencies>
+    </dependencyManagement>
 
-	<repositories>
-		<repository>
-			<id>talend-update</id>
-			<url>https://talend-update.talend.com/nexus/content/repositories/libraries/</url>
-		</repository>
-		<repository>
-			<id>apache.snapshots</id>
-			<name>Apache Development Snapshot Repository</name>
-			<url>https://repository.apache.org/content/repositories/snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>mapr-releases-repository</id>
-			<url>http://repository.mapr.com/nexus/content/groups/mapr-public/releases/</url>
-		</repository>
-		<repository>
-			<id>redshift</id>
-			<url>http://redshift-maven-repository.s3-website-us-east-1.amazonaws.com/release</url>
-		</repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <id>talend-update</id>
+            <url>https://talend-update.talend.com/nexus/content/repositories/libraries/</url>
+        </repository>
+        <repository>
+            <id>apache.snapshots</id>
+            <name>Apache Development Snapshot Repository</name>
+            <url>https://repository.apache.org/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>mapr-releases-repository</id>
+            <url>http://repository.mapr.com/nexus/content/groups/mapr-public/releases/</url>
+        </repository>
+        <repository>
+            <id>redshift</id>
+            <url>http://redshift-maven-repository.s3-website-us-east-1.amazonaws.com/release</url>
+        </repository>
+    </repositories>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>package</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<!-- import winutils binaries for hadoop -->
-								<artifactItem>
-									<groupId>org.apache.hadoop</groupId>
-									<artifactId>hadoop-winutils</artifactId>
-									<version>${winutils.version}</version>
-									<type>zip</type>
-									<outputDirectory>${project.build.directory}/binaries/hadoop/bin</outputDirectory>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<!-- this will create the maven repository for the application runtime 
-					resolution -->
-				<!-- you must specify the runtime artifacts if they are not part of dependencies 
-					of this pom. -->
-				<artifactId>maven-invoker-plugin</artifactId>
-				<version>2.0.1-TALEND</version>
-				<configuration>
-					<localRepositoryPath>target/mvn-repo</localRepositoryPath>
-					<skipTestScopeForExtraArtifacts>true</skipTestScopeForExtraArtifacts>
-					<projectsDirectory>src/it</projectsDirectory>
-					<cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-		            <onlyResolveDependencies>true</onlyResolveDependencies>
-				</configuration>
-				<executions>
-					<execution>
-						<id>generate-components-maven-repo</id>
-						<phase>package</phase>
-						<goals>
-							<goal>install</goal>
-						</goals>
-						<configuration>
-							<extraArtifacts>
-								<!-- Components runtime -->
-								<extraArtifact>org.talend.components:components-salesforce-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jira:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:jms-runtime_1_1:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:localio-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:kafka-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:elasticsearch-runtime_2_4:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:simplefileio-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:s3-runtime-di:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jdbc-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jdbc-runtime-beam:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:processing-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:bigquery-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:pubsub-runtime:${project.version}:jar</extraArtifact>
-                                <extraArtifact>org.talend.components:kinesis-runtime:${project.version}:jar
-                                </extraArtifact>
-								<!-- JDBC drivers -->
-								<extraArtifact>org.apache.derby:derbyclient:${derby.driver.version}:jar</extraArtifact>
-								<extraArtifact>org.mariadb.jdbc:mariadb-java-client:${mariadb.driver.version}:jar</extraArtifact>
-								<extraArtifact>org.postgresql:postgresql:${postgresql.driver.version}:jar</extraArtifact>
-								<extraArtifact>net.sourceforge.jtds:jtds:${jtds.driver.version}:jar</extraArtifact>
-								<extraArtifact>net.snowflake:snowflake-jdbc:${snowflake.driver.version}:jar</extraArtifact>
-								<extraArtifact>com.amazon.redshift:redshift-jdbc42-no-awssdk:${redshift.driver.version}:jar</extraArtifact>
-								<extraArtifact>com.amazonaws:aws-java-sdk-core:${redshift.aws.driver.exts.version}:jar</extraArtifact>
-								<extraArtifact>com.amazonaws:aws-java-sdk-redshift:${redshift.aws.driver.exts.version}:jar</extraArtifact>
-								<extraArtifact>com.amazonaws:aws-java-sdk-sts:${redshift.aws.driver.exts.version}:jar</extraArtifact>
-							</extraArtifacts>
-							<pomIncludes>
-								<pomInclude>*/pom.xml</pomInclude>
-							</pomIncludes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>no-arch-package</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>assembly/no-arch.xml</descriptor>
-							</descriptors>
-							<appendAssemblyId>false</appendAssemblyId>
-						</configuration>
-					</execution>
-					<execution>
-						<id>config-package</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>assembly/config.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<!-- create a class path with all the compile scope dependencies of this 
-					pom using the local maven repository -->
-				<groupId>com.github.veithen.alta</groupId>
-				<artifactId>alta-maven-plugin</artifactId>
-				<version>0.5.3-TALEND</version>
-				<executions>
-					<execution>
-						<id>generate-components-list</id>
-						<goals>
-							<goal>generate-properties</goal>
-						</goals>
-						<configuration>
-							<name>components.list</name>
-							<value>mvn:%groupId%/%artifactId%/%baseVersion%/%type%%classifier?/@:%</value>
-							<separator>,</separator>
-							<artifacts>
-								<artifact>
-									<groupId>org.talend.components</groupId>
-									<artifactId>components-jdbc-definition</artifactId>
-									<version>${project.version}</version>
-								</artifact>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <!-- import winutils binaries for hadoop -->
+                                <artifactItem>
+                                    <groupId>org.apache.hadoop</groupId>
+                                    <artifactId>hadoop-winutils</artifactId>
+                                    <version>${winutils.version}</version>
+                                    <type>zip</type>
+                                    <outputDirectory>${project.build.directory}/binaries/hadoop/bin</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- this will create the maven repository for the application runtime
+                    resolution -->
+                <!-- you must specify the runtime artifacts if they are not part of dependencies
+                    of this pom. -->
+                <artifactId>maven-invoker-plugin</artifactId>
+                <version>2.0.1-TALEND</version>
+                <configuration>
+                    <localRepositoryPath>target/mvn-repo</localRepositoryPath>
+                    <skipTestScopeForExtraArtifacts>true</skipTestScopeForExtraArtifacts>
+                    <projectsDirectory>src/it</projectsDirectory>
+                    <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+                    <onlyResolveDependencies>true</onlyResolveDependencies>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-components-maven-repo</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install</goal>
+                        </goals>
+                        <configuration>
+                            <extraArtifacts>
+                                <!-- Components runtime -->
+                                <extraArtifact>org.talend.components:components-salesforce-runtime:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:components-jira:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:jms-runtime_1_1:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:localio-runtime:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:kafka-runtime:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:elasticsearch-runtime_2_4:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:simplefileio-runtime:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:s3-runtime-di:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:components-jdbc-runtime:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:components-jdbc-runtime-beam:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:processing-runtime:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:bigquery-runtime:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:pubsub-runtime:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:kinesis-runtime:${project.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:components-marketo-runtime:${project.version}:jar</extraArtifact>
+                                <!-- JDBC drivers -->
+                                <extraArtifact>org.apache.derby:derbyclient:${derby.driver.version}:jar</extraArtifact>
+                                <extraArtifact>org.mariadb.jdbc:mariadb-java-client:${mariadb.driver.version}:jar</extraArtifact>
+                                <extraArtifact>org.postgresql:postgresql:${postgresql.driver.version}:jar</extraArtifact>
+                                <extraArtifact>net.sourceforge.jtds:jtds:${jtds.driver.version}:jar</extraArtifact>
+                                <extraArtifact>net.snowflake:snowflake-jdbc:${snowflake.driver.version}:jar</extraArtifact>
+                                <extraArtifact>com.amazon.redshift:redshift-jdbc42-no-awssdk:${redshift.driver.version}:jar</extraArtifact>
+                                <extraArtifact>com.amazonaws:aws-java-sdk-core:${redshift.aws.driver.exts.version}:jar</extraArtifact>
+                                <extraArtifact>com.amazonaws:aws-java-sdk-redshift:${redshift.aws.driver.exts.version}:jar</extraArtifact>
+                                <extraArtifact>com.amazonaws:aws-java-sdk-sts:${redshift.aws.driver.exts.version}:jar</extraArtifact>
+                            </extraArtifacts>
+                            <pomIncludes>
+                                <pomInclude>*/pom.xml</pomInclude>
+                            </pomIncludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>no-arch-package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly/no-arch.xml</descriptor>
+                            </descriptors>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>config-package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly/config.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- create a class path with all the compile scope dependencies of this
+                    pom using the local maven repository -->
+                <groupId>com.github.veithen.alta</groupId>
+                <artifactId>alta-maven-plugin</artifactId>
+                <version>0.5.3-TALEND</version>
+                <executions>
+                    <execution>
+                        <id>generate-components-list</id>
+                        <goals>
+                            <goal>generate-properties</goal>
+                        </goals>
+                        <configuration>
+                            <name>components.list</name>
+                            <value>mvn:%groupId%/%artifactId%/%baseVersion%/%type%%classifier?/@:%</value>
+                            <separator>,</separator>
+                            <artifacts>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>components-jdbc-definition</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
 
-								<artifact>
-									<groupId>org.talend.components</groupId>
-									<artifactId>simplefileio-definition</artifactId>
-									<version>${project.version}</version>
-								</artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>simplefileio-definition</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
 
-								<artifact>
-									<groupId>org.talend.components</groupId>
-									<artifactId>components-salesforce-definition</artifactId>
-									<version>${project.version}</version>
-								</artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>components-salesforce-definition</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
 
-								<artifact>
-									<groupId>org.talend.components</groupId>
-									<artifactId>localio-definition</artifactId>
-									<version>${project.version}</version>
-								</artifact>
-								<artifact>
-									<groupId>org.talend.components</groupId>
-									<artifactId>jms-definition</artifactId>
-									<version>${project.version}</version>
-								</artifact>
-								<artifact>
-									<groupId>org.talend.components</groupId>
-									<artifactId>kafka-definition</artifactId>
-									<version>${project.version}</version>
-								</artifact>
-								<artifact>
-									<groupId>org.talend.components</groupId>
-									<artifactId>elasticsearch-definition</artifactId>
-									<version>${project.version}</version>
-								</artifact>
-								<artifact>
-									<groupId>org.talend.components</groupId>
-									<artifactId>components-jira</artifactId>
-									<version>${project.version}</version>
-								</artifact>
-								<artifact>
-									<groupId>org.talend.components</groupId>
-									<artifactId>processing-definition</artifactId>
-									<version>${project.version}</version>
-								</artifact>
-								<artifact>
-									<groupId>org.talend.components</groupId>
-									<artifactId>bigquery-definition</artifactId>
-									<version>${project.version}</version>
-								</artifact>
-								<artifact>
-									<groupId>org.talend.components</groupId>
-									<artifactId>pubsub-definition</artifactId>
-									<version>${project.version}</version>
-								</artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>localio-definition</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>jms-definition</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>kafka-definition</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>elasticsearch-definition</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>components-jira</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>processing-definition</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>bigquery-definition</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>pubsub-definition</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
                                 <artifact>
                                     <groupId>org.talend.components</groupId>
                                     <artifactId>kinesis-definition</artifactId>
                                     <version>${project.version}</version>
                                 </artifact>
-							</artifacts>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<!-- this computes the tcom service classpath using maven artifacts -->
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.8</version>
-				<executions>
-					<!-- create a file with the components mvn url to be used by the service -->
-					<execution>
-						<id>generate-components.list</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<exportAntProperties>true</exportAntProperties>
-							<tasks>
-								<echo message="tcomp.components.list=${components.list}" />
-								<echo
-									file="${project.build.directory}${file.separator}config${file.separator}components.list"
-									message="tcomp.components.list=${components.list}" />
-							</tasks>
-						</configuration>
-					</execution>
-
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>components-marketo-definition</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- this computes the tcom service classpath using maven artifacts -->
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <!-- create a file with the components mvn url to be used by the service -->
+                    <execution>
+                        <id>generate-components.list</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <exportAntProperties>true</exportAntProperties>
+                            <tasks>
+                                <echo message="tcomp.components.list=${components.list}"/>
+                                <echo
+                                        file="${project.build.directory}${file.separator}config${file.separator}components.list"
+                                        message="tcomp.components.list=${components.list}"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
