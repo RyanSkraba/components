@@ -32,16 +32,17 @@ import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class S3DatasetProperties extends PropertiesImpl implements DatasetProperties<S3DatastoreProperties> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(S3DatasetProperties.class);
+  
     public final transient ReferenceProperties<S3DatastoreProperties> datastoreRef = new ReferenceProperties<>("datastoreRef",
             S3DatastoreDefinition.NAME);
 
     // S3 Connectivity
-    public Property<S3Region> region = PropertyFactory.newEnum("region", S3Region.class).setValue(S3Region.DEFAULT).setRequired();
-
-    public Property<String> unknownRegion = PropertyFactory.newString("unknownRegion", "us-east-1").setRequired();
-
     public Property<String> bucket = PropertyFactory.newString("bucket").setRequired();
 
     public Property<String> object = PropertyFactory.newString("object").setRequired();
@@ -82,6 +83,8 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
     @Override
     public void setDatastoreProperties(S3DatastoreProperties datastoreProperties) {
         datastoreRef.setReference(datastoreProperties);
+        //TODO should not call here, any reason? now it's necessary, if not, the trigger method don't work.
+        afterDatastoreRef();
     }
 
     @Override
@@ -95,8 +98,6 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
         // S3
-        mainForm.addRow(region);
-        mainForm.addRow(unknownRegion);
         mainForm.addRow(Widget.widget(bucket).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
         mainForm.addRow(object);
         if (ACTIVATE_DATA_IN_MOTION) {
@@ -120,9 +121,6 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
         // Main properties
         if (form.getName().equals(Form.MAIN)) {
             // S3
-            form.getWidget(region.getName()).setVisible();
-            form.getWidget(unknownRegion.getName()).setVisible(S3Region.OTHER.equals(region.getValue()));
-
             form.getWidget(bucket.getName()).setVisible();
             form.getWidget(object.getName()).setVisible();
             if (ACTIVATE_DATA_IN_MOTION) {
@@ -148,8 +146,11 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
         }
     }
 
-    public void afterRegion() {
-        refreshLayout(getForm(Form.MAIN));
+    public void afterDatastoreRef() {
+        //the current method is called at some strange place, need to skip it if bucket list have been set
+        if(!this.bucket.getPossibleValues().isEmpty()) {
+            return;
+        }
         S3DatasetDefinition definition = new S3DatasetDefinition();
         RuntimeInfo runtimeInfo = definition.getRuntimeInfo(this);
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, getClass().getClassLoader())) {
@@ -157,14 +158,13 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
             runtime.initialize(null, this);
             this.bucket.setPossibleValues(new ArrayList<String>(runtime.listBuckets()));
         } catch (Exception e) {
-            TalendRuntimeException.build(ComponentsErrorCode.IO_EXCEPTION, e).throwIt();
+            //TalendRuntimeException.build(ComponentsErrorCode.IO_EXCEPTION, e).throwIt();
+            //ignore the exception here, as the trigger method should not block to save the data set properties action. 
+            //And as the current after data store trigger method is called at some strange place, the exception should not break something.
+            LOGGER.warn(e.getClass() + " : " + e.getMessage());
         }
     }
-
-    public void afterUnknownRegion() {
-        afterRegion();
-    }
-
+    
     public void afterEncryptDataInMotion() {
         refreshLayout(getForm(Form.MAIN));
     }

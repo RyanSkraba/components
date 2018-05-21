@@ -5,7 +5,6 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.talend.components.simplefileio.s3.S3DatasetProperties;
 import org.talend.components.simplefileio.s3.S3DatastoreProperties;
-import org.talend.components.simplefileio.s3.S3Region;
 import org.talend.components.simplefileio.s3.output.S3OutputProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -15,8 +14,6 @@ public class PropertiesPreparer {
     public static String accessKey = System.getProperty("s3.accesskey");
 
     public static String secretkey = System.getProperty("s3.secretkey");
-
-    public static String region = System.getProperty("s3.region");
 
     public static String bucket = System.getProperty("s3.bucket");
 
@@ -36,7 +33,6 @@ public class PropertiesPreparer {
 
         datastore.accessKey.setValue(accessKey);
         datastore.secretKey.setValue(secretkey);
-        dataset.region.setValue(S3Region.valueOf(region));
         dataset.bucket.setValue(bucket);
         dataset.kmsForDataInMotion.setValue(ssekmskey);
         dataset.kmsForDataAtRest.setValue(csekmskey);

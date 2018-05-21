@@ -27,7 +27,6 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.talend.components.simplefileio.s3.S3DatasetProperties;
 import org.talend.components.simplefileio.s3.S3DatastoreProperties;
-import org.talend.components.simplefileio.s3.S3Region;
 
 import com.talend.shaded.com.amazonaws.services.s3.model.ObjectMetadata;
 import com.talend.shaded.org.apache.hadoop.fs.s3a.S3AFileSystem;
@@ -41,7 +40,6 @@ import com.talend.shaded.org.apache.hadoop.fs.s3a.S3AFileSystem;
  *   <properties>
  *     <s3.accesskey>ACCESS_KEY</s3.accesskey>
  *     <s3.secretkey>SECRETY_KEY</s3.secretkey>
- *     <s3.region>EU_WEST_1</s3.region>
  *     <s3.bucket>testbucket</s3.bucket>
  *     <s3.ssekmskey>KEY1</s3.ssekmskey>
  *     <s3.csekmskey>KEY2</s3.csekmskey>
@@ -94,7 +92,7 @@ public class S3TestResource extends ExternalResource {
     }
 
     /**
-     * @return An S3DatasetProperties with credentials in the datastore, not configured for encryption. The region are
+     * @return An S3DatasetProperties with credentials in the datastore, not configured for encryption. The 
      * bucket are taken from the environment, and a unique "object" property is created for this unit test.
      */
     public S3DatasetProperties createS3DatasetProperties() {
@@ -107,12 +105,11 @@ public class S3TestResource extends ExternalResource {
      * @param sseKms Whether server-side encryption is used. The KMS key is taken from the system environment.
      * @param sseKms Whether client-side encryption is used. The KMS key is taken from the system environment.
      * @return An S3DatasetProperties with credentials in the datastore, configured for the specified encryption. The
-     * region are bucket are taken from the environment, and a unique "object" property is created for this unit test.
+     * bucket are taken from the environment, and a unique "object" property is created for this unit test.
      */
     public S3DatasetProperties createS3DatasetProperties(boolean sseKms, boolean cseKms) {
         S3DatasetProperties properties = new S3DatasetProperties(null);
         properties.init();
-        properties.region.setValue(S3Region.valueOf(System.getProperty("s3.region")));
         properties.bucket.setValue(bucketName);
         properties.object.setValue(getPath());
         properties.setDatastoreProperties(createS3DatastoreProperties());

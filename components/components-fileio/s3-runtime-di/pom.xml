@@ -102,7 +102,6 @@
                     <systemPropertyVariables>
                         <s3.accesskey>${s3.accesskey}</s3.accesskey>
                         <s3.secretkey>${s3.secretkey}</s3.secretkey>
-                        <s3.region>${s3.region}</s3.region>
                         <s3.bucket>${s3.bucket}</s3.bucket>
                         <s3.ssekmskey>${s3.ssekmskey}</s3.ssekmskey>
                         <s3.csekmskey>${s3.csekmskey}</s3.csekmskey>
