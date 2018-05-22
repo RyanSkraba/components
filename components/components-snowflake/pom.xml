@@ -1,237 +1,72 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.talend.components</groupId>
-        <artifactId>components-parent</artifactId>
-        <version>0.24.0-SNAPSHOT</version>
-        <relativePath>../../components-parent/pom.xml</relativePath>
-    </parent>
+    <groupId>org.talend.components</groupId>
+    <artifactId>components-snowflake-aggregator</artifactId>
+    <version>0.24.0-SNAPSHOT</version>
 
-    <name>Components - Snowflake</name>
-    <artifactId>components-snowflake</artifactId>
-    <packaging>bundle</packaging>
-    <dependencies>
-        <dependency>
-            <groupId>net.snowflake</groupId>
-            <artifactId>snowflake-jdbc</artifactId>
-            <version>3.5.3</version>
-        </dependency>
+    <name>Components - Snowflake Aggregator</name>
+    <packaging>pom</packaging>
 
-        <!-- APIs for all Components -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
-        </dependency>
+    <properties>
+        <!-- skip the deployment for this aggregator as it's not necessary -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
-        <!-- Annotation processing -->
-        <dependency>
-            <groupId>biz.aQute.bnd</groupId>
-            <artifactId>annotation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
-        </dependency>
-
-        <!-- Shared component properties such as Use/Password or Schema -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common</artifactId>
-        </dependency>
-
-        <!-- Jar containing Test utils methods -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
-        <!-- spring jar for integration tests -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-rest</artifactId>
-            <classifier>lib</classifier>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-rest</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-osgitest</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common</artifactId>
-            <classifier>bundle</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common</artifactId>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-            <version>1.6.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>1.6.5</version>
-            <scope>test</scope>
-        </dependency>
-
-    </dependencies>
+    <modules>
+        <module>components-snowflake-definition</module>
+        <module>components-snowflake-runtime</module>
+        <module>components-snowflake-integration</module>
+    </modules>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <snowflake.account>${snowflake.account}</snowflake.account>
-                        <snowflake.user>${snowflake.user}</snowflake.user>
-                        <snowflake.password>${snowflake.password}</snowflake.password>
-                        <snowflake.warehouse>${snowflake.warehouse}</snowflake.warehouse>
-                        <snowflake.db>${snowflake.db}</snowflake.db>
-                        <snowflake.schema>${snowflake.schema}</snowflake.schema>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>com.github.veithen.alta</groupId>
-                <artifactId>alta-maven-plugin</artifactId>
-                <version>0.4.2-Talend</version>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.8</version>
                 <executions>
                     <execution>
-                        <phase>pre-integration-test</phase>
+                        <id>merge-ut</id>
+                        <phase>prepare-package</phase>
                         <goals>
-                            <goal>generate-test-resources</goal>
+                            <goal>merge</goal>
                         </goals>
                         <configuration>
-                            <name>%groupId%-%artifactId%%dashClassifier%.link</name>
-                            <value>%url%</value>
-                            <separator>${line.separator}</separator>
-                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
-                            <dependencySet>
-                                <scope>test</scope>
-                            </dependencySet>
-                            <artifacts>
-                                <artifact>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <classifier>bundle</classifier>
-                                    <version>${project.version}</version>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.20-PAXEXAM-PATCH</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
-                    <systemPropertyVariables>
-                        <pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
-                        <snowflake.account>${snowflake.account}</snowflake.account>
-                        <snowflake.user>${snowflake.user}</snowflake.user>
-                        <snowflake.password>${snowflake.password}</snowflake.password>
-                        <snowflake.warehouse>${snowflake.warehouse}</snowflake.warehouse>
-                        <snowflake.db>${snowflake.db}</snowflake.db>
-                        <snowflake.schema>${snowflake.schema}</snowflake.schema>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>lib-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <instructions>
-                                <Bundle-SymbolicName>org.talend.components.snowflake.lib</Bundle-SymbolicName>
-                                <Bundle-Name>${project.name} lib</Bundle-Name>
-                                <Service-Component>*</Service-Component>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Include-Resource>
-                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
-                                </Include-Resource>
-                            </instructions>
+                            <destFile>${project.build.directory}/jacoco.exec</destFile>
+                            <fileSets>
+                                <fileSet>
+                                    <directory>${project.basedir}</directory>
+                                    <includes>
+                                        <include>components-snowflake-definition/target/jacoco.exec</include>
+                                        <include>components-snowflake-runtime/target/jacoco.exec</include>
+                                        <include>components-snowflake-integration/target/jacoco.exec</include>
+                                    </includes>
+                                </fileSet>
+                            </fileSets>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>osgi-bundle</id>
-                        <phase>package</phase>
+                        <id>merge-it</id>
+                        <phase>prepare-package</phase>
                         <goals>
-                            <goal>bundle</goal>
+                            <goal>merge</goal>
                         </goals>
                         <configuration>
-                            <classifier>bundle</classifier>
-                            <instructions>
-                                <Bundle-SymbolicName>org.talend.components.snowflake</Bundle-SymbolicName>
-                                <Service-Component>*</Service-Component>
-                                <Import-Package>
-                                    !*internal,org.talend*,org.slf4j*,javax*,org.apache.commons*,org.xml.sax*,org.apache.avro.*,org.codehaus.jackson*
-                                </Import-Package>
-                                <Export-Package>org.talend.components.snowflake*,com.snowflake*,net.snowflake*</Export-Package>
-                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|auto-service</Embed-Dependency>
-                                <Include-Resource>
-                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
-                                </Include-Resource>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                            </instructions>
+                            <destFile>${project.build.directory}/jacoco-it.exec</destFile>
+                            <fileSets>
+                                <fileSet>
+                                    <directory>${project.basedir}</directory>
+                                    <includes>
+                                        <include>components-snowflake-definition/target/jacoco-it.exec</include>
+                                        <include>components-snowflake-runtime/target/jacoco-it.exec</include>
+                                        <include>components-snowflake-integration/target/jacoco-it.exec</include>
+                                    </includes>
+                                </fileSet>
+                            </fileSets>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <!-- The following plugins are there to make sure they are launched after
-                the bundle are packaged when used in the package phase.-->
-            <!-- They may be used with the -PgenerateP2 maven profile to build a p2
-                update site for distribution to the Studio -->
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.eclipse.tycho.extras</groupId>
-                <artifactId>tycho-p2-extras-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

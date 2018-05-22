@@ -1,0 +1,174 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.talend.components</groupId>
+        <artifactId>components-parent</artifactId>
+        <version>0.24.0-SNAPSHOT</version>
+        <relativePath>../../../components-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>components-snowflake-integration</artifactId>
+
+    <name>Components - Snowflake Integration Tests</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <!-- skip the deployment for integration tests, not necessary -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-snowflake-definition</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-snowflake-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Tests -->
+
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api</artifactId>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-common</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-common</artifactId>
+            <classifier>bundle</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-common</artifactId>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api-service-rest</artifactId>
+            <classifier>lib</classifier>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api-service-rest</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-osgitest</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- only generate the bundle link for test -->
+            <plugin>
+                <groupId>com.github.veithen.alta</groupId>
+                <artifactId>alta-maven-plugin</artifactId>
+                <version>0.4.2-Talend</version>
+                <executions>
+                    <execution>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>generate-test-resources</goal>
+                        </goals>
+                        <configuration>
+                            <name>%groupId%-%artifactId%%dashClassifier%.link</name>
+                            <value>%url%</value>
+                            <separator>${line.separator}</separator>
+                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                            <dependencySet>
+                                <scope>test</scope>
+                            </dependencySet>
+                            <artifacts>
+                                <artifact>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>components-snowflake-definition</artifactId>
+                                    <classifier>bundle</classifier>
+                                    <version>${project.version}</version>
+                                </artifact>
+                                <!-- no need at final, but need to refactor the test before removing
+                                    it -->
+                                <artifact>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>components-snowflake-runtime</artifactId>
+                                    <classifier>bundle</classifier>
+                                    <version>${project.version}</version>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.20-PAXEXAM-PATCH</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
+                    <systemPropertyVariables>
+                        <pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
+                        <snowflake.account>${snowflake.account}</snowflake.account>
+                        <snowflake.user>${snowflake.user}</snowflake.user>
+                        <snowflake.password>${snowflake.password}</snowflake.password>
+                        <snowflake.warehouse>${snowflake.warehouse}</snowflake.warehouse>
+                        <snowflake.db>${snowflake.db}</snowflake.db>
+                        <snowflake.schema>${snowflake.schema}</snowflake.schema>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <!-- The following plugins are there to make sure they are launched after
+                the bundle are packaged when used in the package phase.-->
+            <!-- They may be used with the -PgenerateP2 maven profile to build a p2
+                update site for distribution to the Studio -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho.extras</groupId>
+                <artifactId>tycho-p2-extras-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
