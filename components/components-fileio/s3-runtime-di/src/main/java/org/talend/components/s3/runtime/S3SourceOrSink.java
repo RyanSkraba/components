@@ -12,9 +12,7 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResultMutable;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.internal.Constants;
 
 public class S3SourceOrSink implements SourceOrSink {
 
@@ -51,13 +49,9 @@ public class S3SourceOrSink implements SourceOrSink {
     public ValidationResult validate(RuntimeContainer container) {
         try {
             AmazonS3 conn = S3Connection.createClient(properties);
-            try {
-                conn.listObjects(properties.getDatasetProperties().bucket.getValue(), "any");
-            } catch (AmazonServiceException ase) {
-                if (ase.getStatusCode() != Constants.NO_SUCH_BUCKET_STATUS_CODE) {
-                    throw ase;
-                }
-            }
+            //For test S3 connection only
+            conn.getS3AccountOwner();
+            
             return ValidationResult.OK;
         } catch (Exception e) {
             ValidationResultMutable vr = new ValidationResultMutable();

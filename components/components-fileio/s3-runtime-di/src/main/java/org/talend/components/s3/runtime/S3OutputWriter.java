@@ -63,13 +63,8 @@ public class S3OutputWriter implements Writer<Result> {
     public void open(String uId) throws IOException {
         // connect to s3
         s3_client = S3Connection.createClient(properties);
-        try {
-            s3_client.listObjects(properties.getDatasetProperties().bucket.getValue(), "any");
-        } catch (AmazonServiceException ase) {
-            if (ase.getStatusCode() != Constants.NO_SUCH_BUCKET_STATUS_CODE) {
-                throw ase;
-            }
-        }
+        //Test whether the bucket exist and authorized to current user.
+        s3_client.getBucketAcl(properties.getDatasetProperties().bucket.getValue());
 
         // prepare the local target, will upload it to s3 and clear it in the close method
         data_file = File.createTempFile("s3-", ".csv");
