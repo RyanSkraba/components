@@ -1,5 +1,8 @@
 package org.talend.components.processing.runtime.pythonrow;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.security.AccessControlException;
 
@@ -10,12 +13,13 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.python.core.PyBaseExceptionDerived;
 import org.python.core.PyException;
+import org.python.core.PyType;
 import org.talend.components.processing.definition.pythonrow.MapType;
 import org.talend.components.processing.definition.pythonrow.PythonRowProperties;
 import org.talend.daikon.avro.GenericDataRecordHelper;
 
-@Ignore("Use absolutely path in policy file, no way to make unit test works")
 public class PythonRowDoFnSecurityTest {
 
     // Just let the python component run, the content is not important.
@@ -46,6 +50,7 @@ public class PythonRowDoFnSecurityTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
+    @Ignore("Use absolutely path in policy file, no way to make unit test works")
     public void test_fileAccess() throws Throwable {
         expectedException.expect(AccessControlException.class);
         expectedException.expectMessage("access denied (\"java.io.FilePermission\" \"/etc/passwd\" \"read\")");
@@ -58,14 +63,54 @@ public class PythonRowDoFnSecurityTest {
     public void test_limitImports() throws Throwable {
         String command = "import os\n" //
                 + "output['content'] = 'no error?'\n";
+        try {
+            execute(command);
+        } catch (PyException pyEx) {
+            assertEquals("ImportError", ((PyType) pyEx.type).getName());
+            assertEquals("No module named os", ((PyBaseExceptionDerived) pyEx.value).getMessage().toString());
+            return;
+        }
+        assertTrue(false);
+    }
+
+    @Test
+    @Ignore("workaround")
+    public void test_limitImplictImports() throws Throwable {
+        String command = "import genericpath\n" //
+                + "output['content'] = genericpath.os.getpid()\nprint output['content']";
         execute(command);
     }
 
     @Test
-    public void test_limitImplictImports() throws Throwable {
-        String command = "import genericpath\n" //
-                + "import signal\n" //
-                + "genericpath.os.kill(123123,signal.SIGTERM)\n";
+    public void test_sysExit() throws Throwable {
+        String command = "sys.exit(1)\n" //
+                + "output['content']='no error?'";
+        execute(command);
+        assertTrue(true);
+    }
+
+    @Test
+    public void test_threadExit() throws Throwable {
+        String command = "import thread\n" //
+                + "thread.exit()\n" //
+                + "output['content'] = 'no error?'\n";
+        execute(command);
+        assertTrue(true);
+    }
+
+    @Test
+    @Ignore("Show all loaded modules")
+    public void test_limitAdvancedImports() throws Throwable {
+        String command = "import importlib\n" + "\n" //
+                + "for module_name in sys.builtin_module_names:\n" //
+                + "    try:\n" //
+                + "        print module_name\n" //
+                + "        loaded_module = importlib.import_module(module_name)\n" //
+                + "        functions = dir(loaded_module)\n" //
+                + "        output[module_name] = functions\n" //
+                + "        print module_name, output[module_name]\n" //
+                + "    except ImportError, e:\n" //
+                + "        output['error'] = e";
         execute(command);
     }
 

@@ -12,11 +12,10 @@
 // ============================================================================
 package org.talend.components.processing.runtime.pythonrow;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -28,6 +27,7 @@ import org.python.core.PyString;
 import org.python.util.PythonInterpreter;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.processing.definition.pythonrow.MapType;
 import org.talend.components.processing.definition.pythonrow.PythonRowProperties;
 import org.talend.daikon.avro.converter.JsonGenericRecordConverter;
@@ -35,8 +35,6 @@ import org.talend.daikon.avro.inferrer.JsonSchemaInferrer;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import net.sourceforge.prograde.sm.ProGradeJSM;
 
 public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
         implements RuntimableRuntime<PythonRowProperties> {
@@ -64,13 +62,6 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
             interpreter.exec(setUpFlatMap());
         }
         pyFn = interpreter.get("userFunction");
-
-        // export deny.security.policy file and public key talend-jython.ks
-        String policyFilePath = ExportResource("deny.security.abs.policy");
-        // ExportResource("/talend-jython.ks");
-        // set the policy file, "=" is needed for override the default policy
-        System.setProperty("java.security.policy", "=" + policyFilePath);
-        System.setSecurityManager(new ProGradeJSM()); // use pro grade security manager
     }
 
     @ProcessElement
@@ -85,36 +76,46 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
     }
 
     private String securityPyFunc() {
-        return "import sys\n" //
-                + "deimported_modules = ['os', 'signal']\n" //
-                + "deimported_java_packages = ['java.security','java.security.SecureClassLoader','java.security.Permission']\n" //
-                + "for deimported_module in deimported_modules:\n" //
-                + " sys.modules[deimported_module] = None\n" //
-                + "for deimported_java_package in deimported_java_packages:\n" //
-                + " sys.modules[deimported_java_package] = None\n" //
-                + "delattr(sys, 'exit')\n" //
-                + "\n";
+        String pySript;
+        try {
+            InputStream resourceAsStream = getClass().getResourceAsStream("import_restriction.py");
+            ByteArrayOutputStream result = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = resourceAsStream.read(buffer)) != -1) {
+                result.write(buffer, 0, length);
+            }
+            pySript = result.toString(StandardCharsets.UTF_8.name());
+        } catch (IOException e) {
+            throw new ComponentException(e);
+        }
+        return pySript;
     }
 
     private String setUpMap() {
         return securityPyFunc() + "import json\n" //
                 + "import collections\n" //
                 + "def userFunction(inputJSON):\n" //
-                + "    input = json.loads(inputJSON, object_pairs_hook=collections.OrderedDict)\n" //
-                + "    output = json.loads(\"{}\", object_pairs_hook=collections.OrderedDict)\n" //
-                + "    " + properties.pythonCode.getValue().replaceAll("\n", "\n    ").trim() //
-                + "\n    return json.dumps(output)";
+                + "  input = json.loads(inputJSON, object_pairs_hook=collections.OrderedDict)\n" //
+                + "  output = json.loads(\"{}\", object_pairs_hook=collections.OrderedDict)\n" //
+                + "  try:\n" //
+                + "    " + properties.pythonCode.getValue().replaceAll("\n", "\n    ").trim() + "\n"//
+                + "  except SystemExit:\n" //
+                + "    pass\n" //
+                + "  return json.dumps(output)";
     }
 
     private String setUpFlatMap() {
         return securityPyFunc() + "import json\n" //
                 + "import collections\n" //
                 + "def userFunction(inputJSON):\n" //
-                + "    input = json.loads(inputJSON, object_pairs_hook=collections.OrderedDict)\n" //
-                + "    outputList = []\n" //
-                + "    " + properties.pythonCode.getValue().replaceAll("\n", "\n    ").trim() //
-                + "\n    return [ json.dumps(outputElement) for outputElement in outputList ]";
-
+                + "  input = json.loads(inputJSON, object_pairs_hook=collections.OrderedDict)\n" //
+                + "  outputList = []\n" //
+                + "  try:\n" //
+                + "    " + properties.pythonCode.getValue().replaceAll("\n", "\n    ").trim() + "\n"//
+                + "  except SystemExit:\n" //
+                + "    pass\n" //
+                + "  return [ json.dumps(outputElement) for outputElement in outputList ]";
     }
 
     private void map(IndexedRecord input, ProcessContext context) throws IOException {
@@ -153,32 +154,4 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
         interpreter.close();
     }
 
-    // Copy the policy file and public key from the jython jar to the current runtime folder
-    public String ExportResource(String resourceName) throws Exception {
-        InputStream stream = null;
-        OutputStream resStreamOut = null;
-        String jarFolder;
-        try {
-            stream = getClass().getResourceAsStream(resourceName);// note that each / is a directory down in the "jar
-            if (stream == null) {
-                throw new Exception("Cannot get resource \"" + resourceName + "\" from Jar file.");
-            }
-            int readBytes;
-            byte[] buffer = new byte[4096];
-            jarFolder = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
-                    .getParentFile()
-                    .getPath()
-                    .replace('\\', '/');
-            resStreamOut = new FileOutputStream(jarFolder + resourceName);
-            while ((readBytes = stream.read(buffer)) > 0) {
-                resStreamOut.write(buffer, 0, readBytes);
-            }
-        } catch (Exception ex) {
-            throw ex;
-        } finally {
-            stream.close();
-            resStreamOut.close();
-        }
-        return jarFolder + resourceName;
-    }
 }
