@@ -12,8 +12,10 @@
 // ============================================================================
 package org.talend.components.marketo.data;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.talend.components.marketo.MarketoComponentDefinition.getCommonRuntimeInfo;
 
+import org.slf4j.Logger;
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.marketo.MarketoComponentDefinition;
 import org.talend.daikon.definition.DefinitionImageType;
@@ -23,6 +25,8 @@ import org.talend.daikon.runtime.RuntimeInfo;
 public class MarketoDatasetDefinition extends I18nDefinition implements DatasetDefinition<MarketoDatasetProperties> {
 
     public static final String COMPONENT_NAME = "MarketoDataset";
+
+    private transient static final Logger LOG = getLogger(MarketoDatasetDefinition.class);
 
     public MarketoDatasetDefinition() {
         super(COMPONENT_NAME);

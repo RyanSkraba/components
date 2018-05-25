@@ -33,10 +33,10 @@ import org.junit.Test;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.data.MarketoDatasetProperties;
 import org.talend.components.marketo.data.MarketoDatasetProperties.Operation;
+import org.talend.components.marketo.data.MarketoDatastoreProperties;
 import org.talend.components.marketo.data.MarketoInputProperties;
 import org.talend.components.marketo.runtime.MarketoInputReader;
 import org.talend.components.marketo.runtime.MarketoRuntimeTestBase;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
@@ -48,7 +48,7 @@ public class MarketoDatasetRuntimeTest extends MarketoRuntimeTestBase {
 
     private MarketoDatasetRuntime runtime;
 
-    private TMarketoConnectionProperties datastore;
+    private MarketoDatastoreProperties datastore;
 
     private MarketoDatasetSource ds;
 
@@ -58,7 +58,7 @@ public class MarketoDatasetRuntimeTest extends MarketoRuntimeTestBase {
     public void setUp() throws Exception {
         super.setUp();
 
-        datastore = new TMarketoConnectionProperties("test");
+        datastore = new MarketoDatastoreProperties("test");
         datastore.init();
         datastore.setupProperties();
         datastore.endpoint.setValue("https://abc.mktorest.com/rest");

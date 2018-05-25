@@ -27,12 +27,12 @@ public class MarketoDatastoreDefinitionTest {
 
     private MarketoDatastoreDefinition definition;
 
-    private TMarketoConnectionProperties connection;
+    private MarketoDatastoreProperties connection;
 
     @Before
     public void setUp() throws Exception {
         definition = new MarketoDatastoreDefinition();
-        connection = new TMarketoConnectionProperties("test");
+        connection = new MarketoDatastoreProperties("test");
     }
 
     @After
@@ -59,7 +59,7 @@ public class MarketoDatastoreDefinitionTest {
 
     @Test
     public void testGetPropertiesClass() throws Exception {
-        assertEquals(TMarketoConnectionProperties.class, definition.getPropertiesClass());
+        assertEquals(MarketoDatastoreProperties.class, definition.getPropertiesClass());
     }
 
     @Test

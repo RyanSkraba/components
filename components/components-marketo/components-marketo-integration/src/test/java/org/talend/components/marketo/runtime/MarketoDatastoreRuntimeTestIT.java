@@ -16,20 +16,20 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.marketo.data.MarketoDatastoreProperties;
 import org.talend.components.marketo.runtime.data.MarketoDatastoreRuntime;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
 public class MarketoDatastoreRuntimeTestIT extends MarketoBaseTestIT {
 
-    private TMarketoConnectionProperties datastore;
+    private MarketoDatastoreProperties datastore;
 
     private MarketoDatastoreRuntime runtime;
 
     @Before
     public void setUp() throws Exception {
-        datastore = new TMarketoConnectionProperties("test");
+        datastore = new MarketoDatastoreProperties("test");
         datastore.init();
         datastore.setupProperties();
         datastore.endpoint.setValue(ENDPOINT_REST);

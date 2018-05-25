@@ -26,7 +26,7 @@ public class MarketoDatasetDefinitionTest {
 
     private MarketoDatasetProperties properties;
 
-    private TMarketoConnectionProperties connection;
+    private MarketoDatastoreProperties connection;
 
     // private MarketoDatastore
 
@@ -34,7 +34,7 @@ public class MarketoDatasetDefinitionTest {
     public void setUp() throws Exception {
         definition = new MarketoDatasetDefinition();
         properties = new MarketoDatasetProperties("test");
-        connection = new TMarketoConnectionProperties("test");
+        connection = new MarketoDatastoreProperties("test");
         connection.init();
         properties.setDatastoreProperties(connection);
     }

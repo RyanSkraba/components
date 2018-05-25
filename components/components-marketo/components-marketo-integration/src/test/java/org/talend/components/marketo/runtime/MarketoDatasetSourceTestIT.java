@@ -22,6 +22,7 @@ import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.data.MarketoDatasetProperties;
 import org.talend.components.marketo.data.MarketoDatasetProperties.Operation;
+import org.talend.components.marketo.data.MarketoDatastoreProperties;
 import org.talend.components.marketo.data.MarketoInputProperties;
 import org.talend.components.marketo.runtime.data.MarketoDatasetSource;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
@@ -36,7 +37,7 @@ public class MarketoDatasetSourceTestIT extends MarketoBaseTestIT {
 
     @Before
     public void setUp() throws Exception {
-        TMarketoConnectionProperties datastore = new TMarketoConnectionProperties("test");
+        MarketoDatastoreProperties datastore = new MarketoDatastoreProperties("test");
         datastore.init();
         datastore.setupProperties();
         datastore.endpoint.setValue(ENDPOINT_REST);

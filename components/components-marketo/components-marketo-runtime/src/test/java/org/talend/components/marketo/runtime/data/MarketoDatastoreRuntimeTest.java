@@ -20,8 +20,8 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.marketo.data.MarketoDatastoreProperties;
 import org.talend.components.marketo.runtime.MarketoRuntimeTestBase;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
@@ -29,12 +29,12 @@ public class MarketoDatastoreRuntimeTest extends MarketoRuntimeTestBase {
 
     private MarketoDatastoreRuntime runtime;
 
-    private TMarketoConnectionProperties properties;
+    private MarketoDatastoreProperties properties;
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        properties = new TMarketoConnectionProperties("test");
+        properties = new MarketoDatastoreProperties("test");
         properties.init();
         properties.setupProperties();
         properties.setupLayout();

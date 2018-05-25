@@ -17,17 +17,17 @@ import java.util.Collections;
 
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.datastore.runtime.DatastoreRuntime;
+import org.talend.components.marketo.data.MarketoDatastoreProperties;
 import org.talend.components.marketo.runtime.MarketoSourceOrSink;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
-public class MarketoDatastoreRuntime implements DatastoreRuntime<TMarketoConnectionProperties> {
+public class MarketoDatastoreRuntime implements DatastoreRuntime<MarketoDatastoreProperties> {
 
-    private TMarketoConnectionProperties properties;
+    private MarketoDatastoreProperties properties;
 
     @Override
-    public ValidationResult initialize(RuntimeContainer container, TMarketoConnectionProperties properties) {
+    public ValidationResult initialize(RuntimeContainer container, MarketoDatastoreProperties properties) {
         this.properties = properties;
         return ValidationResult.OK;
     }

@@ -30,14 +30,14 @@ public class MarketoDatasetPropertiesTest extends MarketoTestBase {
 
     private MarketoDatasetProperties properties;
 
-    private TMarketoConnectionProperties datastoreProperties;
+    private MarketoDatastoreProperties datastoreProperties;
 
     @Before
     public void setUp() throws Exception {
         properties = new MarketoDatasetProperties("test");
         properties.setupProperties();
         properties.setupLayout();
-        datastoreProperties = new TMarketoConnectionProperties("test");
+        datastoreProperties = new MarketoDatastoreProperties("test");
         datastoreProperties.init();
     }
 

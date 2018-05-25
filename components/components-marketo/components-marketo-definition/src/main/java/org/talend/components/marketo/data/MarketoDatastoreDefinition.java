@@ -14,17 +14,20 @@ package org.talend.components.marketo.data;
 
 import static org.talend.components.marketo.MarketoComponentDefinition.getCommonRuntimeInfo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.marketo.MarketoComponentDefinition;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
-public class MarketoDatastoreDefinition extends I18nDefinition implements DatastoreDefinition<TMarketoConnectionProperties> {
+public class MarketoDatastoreDefinition extends I18nDefinition implements DatastoreDefinition<MarketoDatastoreProperties> {
 
     public static final String COMPONENT_NAME = "MarketoDatastore";
+
+    private transient static final Logger LOG = LoggerFactory.getLogger(MarketoDatastoreDefinition.class);
 
     public MarketoDatastoreDefinition() {
         super(COMPONENT_NAME);
@@ -51,20 +54,20 @@ public class MarketoDatastoreDefinition extends I18nDefinition implements Datast
     }
 
     @Override
-    public Class<TMarketoConnectionProperties> getPropertiesClass() {
-        return TMarketoConnectionProperties.class;
+    public Class<MarketoDatastoreProperties> getPropertiesClass() {
+        return MarketoDatastoreProperties.class;
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(TMarketoConnectionProperties properties) {
+    public RuntimeInfo getRuntimeInfo(MarketoDatastoreProperties properties) {
         return getCommonRuntimeInfo(MarketoComponentDefinition.RUNTIME_DATASTORE);
     }
 
     @Override
-    public DatasetProperties createDatasetProperties(TMarketoConnectionProperties storeProp) {
+    public DatasetProperties createDatasetProperties(MarketoDatastoreProperties storeProp) {
         MarketoDatasetProperties dataset = new MarketoDatasetProperties("datasetProperties");
+        dataset.init();
         dataset.setDatastoreProperties(storeProp);
-
         return dataset;
     }
 
