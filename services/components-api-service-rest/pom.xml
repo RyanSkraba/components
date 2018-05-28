@@ -7,13 +7,11 @@
         <groupId>org.talend.daikon</groupId>
         <artifactId>service-parent</artifactId>
         <version>0.24.0-SNAPSHOT</version>
-        <relativePath></relativePath>
     </parent>
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-api-service-rest</artifactId>
     <version>0.24.0-SNAPSHOT</version>
-
     <name>Component REST API</name>
     <properties>
         <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
@@ -25,8 +23,22 @@
         <git_branch>local</git_branch>
         <docker_tag_suffix>${maven.build.timestamp}</docker_tag_suffix>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
-        <jackson.version>2.9.4</jackson.version>
+
+        <biz.aQute.bnd.annotation.version>2.4.0</biz.aQute.bnd.annotation.version>
+        <commons-io.version>2.5</commons-io.version>
+        <derby.version>10.12.1.1</derby.version>
+        <guava.version>20.0</guava.version>
+        <hamcrest.version>1.3</hamcrest.version>
+        <httpasyncclient.version>4.1.2</httpasyncclient.version>
+        <httpcomponents.version>4.5.4</httpcomponents.version>
+        <httpcore-nio.version>4.4.5</httpcore-nio.version>
+        <httpcore.version>4.4.9</httpcore.version>
         <jackson.version.annotations>2.9.0</jackson.version.annotations>
+        <jackson.version>2.9.4</jackson.version>
+        <org.talend.libraries.mysql.version>6.0.0</org.talend.libraries.mysql.version>
+        <pax-url-aethe.version>2.4.7</pax-url-aethe.version>
+        <rest-assured.version>2.6.0</rest-assured.version>
+        <slf4.version>1.7.25</slf4.version>
     </properties>
     <url>https://github.com/Talend/components/tree/master/services/components-api-service-rest</url>
     <organization>
@@ -35,7 +47,6 @@
     </organization>
 
     <dependencies>
-
         <!-- spring dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -79,23 +90,24 @@
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
             <artifactId>annotation</artifactId>
-            <version>2.4.0</version>
+            <version>${biz.aQute.bnd.annotation.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>20.0</version>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
-            <version>2.4.7</version>
+            <version>${pax-url-aethe.version}</version>
         </dependency>
-        <!-- provides layouts for logging. It is not really compile dependency, 
+        <!-- provides layouts for logging. It is not really compile dependency,
             but rather runtime -->
         <dependency>
             <groupId>org.talend.daikon</groupId>
@@ -119,13 +131,35 @@
         <dependency>
             <groupId>com.jayway.restassured</groupId>
             <artifactId>rest-assured</artifactId>
-            <version>2.6.0</version>
+            <version>${rest-assured.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpcore</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpmime</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpasyncclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpcore-nio</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
-            <version>1.3</version>
+            <version>${hamcrest.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -134,11 +168,10 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.talend.libraries</groupId>
             <artifactId>mysql-connector-java-5.1.30-bin</artifactId>
-            <version>6.0.0</version>
+            <version>${org.talend.libraries.mysql.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -163,13 +196,13 @@
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
-            <version>10.12.1.1</version>
+            <version>${derby.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derbyclient</artifactId>
-            <version>10.12.1.1</version>
+            <version>${derby.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -192,9 +225,60 @@
             <artifactId>jackson-module-scala_2.11</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${slf4.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpcomponents.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${httpcore.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>${httpcomponents.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpasyncclient</artifactId>
+            <version>${httpasyncclient.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore-nio</artifactId>
+            <version>${httpcore-nio.version}</version>
+        </dependency>
     </dependencies>
-    <!-- dependencyManagement block may be added here and components bom 
-        may be included to manage versions -->
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.talend.components</groupId>
+                <artifactId>components-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <plugins>
             <!-- To get the GIT information for version endpoint. -->
@@ -243,7 +327,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
-                    <!-- create an executable jar only with rest service 
+                    <!-- create an executable jar only with rest service
                         classes, excluding configuration but using the maven repo classpath files -->
                     <execution>
                         <id>default-jar</id>
@@ -263,7 +347,7 @@
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>.m2/</classpathPrefix>
                                     <classpathLayoutType>repository</classpathLayoutType>
-                                    <useUniqueVersions>false</useUniqueVersions><!-- 
+                                    <useUniqueVersions>false</useUniqueVersions><!--
                                         to avoid time stamped snapshots -->
                                     <mainClass>org.talend.components.service.rest.Application</mainClass>
                                 </manifest>
@@ -271,7 +355,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <!-- this lib is exactly the same as the default 
+                        <!-- this lib is exactly the same as the default
                             jar but it keept here because all component tests depends on it. -->
                         <id>lib-jar</id>
                         <phase>package</phase>
@@ -323,7 +407,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <!-- creates config zip package to be used by any 
+                        <!-- creates config zip package to be used by any
                             other packaging modules such as as all components -->
                         <id>config-package</id>
                         <phase>package</phase>
@@ -339,7 +423,7 @@
                 </executions>
             </plugin>
             <plugin>
-                <!-- removes jdbc runtime jar from the integration tests 
+                <!-- removes jdbc runtime jar from the integration tests
                     classpath -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -351,7 +435,8 @@
                         </goals>
                         <configuration>
                             <classpathDependencyExcludes>
-                                <classpathDependencyExclude>org.talend.components:components-jdbc-runtime</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.talend.components:components-jdbc-runtime
+                                </classpathDependencyExclude>
                             </classpathDependencyExcludes>
                         </configuration>
                     </execution>
@@ -412,9 +497,12 @@
                                     <autoPull>once</autoPull>
                                     <images>
                                         <image>
-                                            <name>${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}</name>
+                                            <name>
+                                                ${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}
+                                            </name>
                                             <build>
-                                                <from>${talend_docker_registry}/talend/microservices-base:1.latest</from>
+                                                <from>${talend_docker_registry}/talend/microservices-base:1.latest
+                                                </from>
                                                 <tags>
                                                     <tag>${project.version}-${docker_tag_suffix}</tag>
                                                 </tags>
@@ -430,7 +518,7 @@
                                                     <run>apk add --no-cache libc6-compat</run>
                                                     <run>chmod +x /maven/start.sh</run>
                                                 </runCmds>
-                                                <assembly><!-- includes the 
+                                                <assembly><!-- includes the
                                                         artifact generated by the current pom -->
                                                     <descriptor>${project.basedir}/assembly/no-arch.xml</descriptor>
                                                 </assembly>

@@ -3,7 +3,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -30,6 +29,10 @@
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
         <jackson.version>2.9.4</jackson.version>
         <jackson.version.annotations>2.9.0</jackson.version.annotations>
+        <guava.version>20.0</guava.version>
+        <logback.version>1.1.9</logback.version>
+        <slf4.version>1.7.25</slf4.version>
+        <bnd-annotation.version>2.4.0</bnd-annotation.version>
     </properties>
     <dependencies>
         <!-- rest service -->
@@ -43,8 +46,23 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${slf4.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4.version}</version>
+        </dependency>
         <dependency>
             <!-- only there for running test app in the IDE for now -->
             <groupId>org.talend.components</groupId>
@@ -103,34 +121,37 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>biz.aQute.bnd</groupId>
+            <artifactId>annotation</artifactId>
+            <version>${bnd-annotation.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version.annotations}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-scala_2.11</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
     </dependencies>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Lock guava to the Beam dependency -->
             <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>20.0</version>
+                <groupId>org.talend.components</groupId>
+                <artifactId>components-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -205,17 +226,18 @@
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
                                 </artifactItem>
-                                <!-- import the components list and binary 
+                                <!-- import the components list and binary
                                     dependencies -->
                                 <artifactItem>
                                     <groupId>org.talend.components</groupId>
                                     <artifactId>components-maven-repo</artifactId>
                                     <classifier>config</classifier>
                                     <type>zip</type>
-                                    <outputDirectory>${project.build.directory}/external-resources/config</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/external-resources/config
+                                    </outputDirectory>
                                     <excludes>META-INF/**</excludes>
                                 </artifactItem>
-                                <!-- import the service scripts and configuration 
+                                <!-- import the service scripts and configuration
                                     files -->
                                 <artifactItem>
                                     <groupId>org.talend.components</groupId>
@@ -232,7 +254,7 @@
             </plugin>
 
             <plugin>
-                <!-- this will add the Rest service artifacts to the local 
+                <!-- this will add the Rest service artifacts to the local
                     maven repo -->
                 <artifactId>maven-invoker-plugin</artifactId>
                 <version>2.0.1-TALEND</version>
@@ -286,7 +308,8 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <argLine>-Dorg.ops4j.pax.url.mvn.localRepository=${project.basedir}/target/mvn-repo/.m2</argLine>
+                            <argLine>-Dorg.ops4j.pax.url.mvn.localRepository=${project.basedir}/target/mvn-repo/.m2
+                            </argLine>
                         </configuration>
                     </execution>
                 </executions>
@@ -317,9 +340,12 @@
                                     <autoPull>once</autoPull>
                                     <images>
                                         <image>
-                                            <name>${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}</name>
+                                            <name>
+                                                ${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}
+                                            </name>
                                             <build>
-                                                <from>${talend_docker_registry}/talend/microservices-base:1.latest</from>
+                                                <from>${talend_docker_registry}/talend/microservices-base:1.latest
+                                                </from>
                                                 <tags>
                                                     <tag>${project.version}-${docker_tag_suffix}</tag>
                                                 </tags>
@@ -338,7 +364,7 @@
                                                     <run>apk add --no-cache libc6-compat</run>
                                                     <run>chmod +x /maven/start.sh</run>
                                                 </runCmds>
-                                                <assembly><!-- includes the 
+                                                <assembly><!-- includes the
                                                         artifact generated by the current pom -->
                                                     <descriptor>${project.basedir}/assembly/no-arch.xml</descriptor>
                                                 </assembly>
@@ -357,6 +383,5 @@
             </build>
         </profile>
     </profiles>
-
 
 </project>

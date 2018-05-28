@@ -19,12 +19,14 @@
         <module>components-snowflake-integration</module>
     </modules>
 
+
     <build>
         <plugins>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.7.8</version>
+
                 <executions>
                     <execution>
                         <id>merge-ut</id>
@@ -70,5 +72,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

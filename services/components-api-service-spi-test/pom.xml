@@ -1,71 +1,70 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.talend.components</groupId>
-		<artifactId>components-parent</artifactId>
-		<version>0.24.0-SNAPSHOT</version>
-		<relativePath>../../components-parent/pom.xml</relativePath>
-	</parent>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.talend.components</groupId>
+        <artifactId>components-parent</artifactId>
+        <version>0.24.0-SNAPSHOT</version>
+        <relativePath>../../components-parent/pom.xml</relativePath>
+    </parent>
 
-	<name>Component API Service implementation for Java SPI</name>
-	<artifactId>components-api-service-spi-test</artifactId>
+    <name>Component API Service implementation for Java SPI</name>
+    <artifactId>components-api-service-spi-test</artifactId>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api-service-spi</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api-service-spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Component families to test. -->
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>localio-definition</artifactId>
-			<version>0.18.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>simplefileio-definition</artifactId>
-			<version>0.18.0</version>
-			<scope>test</scope>
-		</dependency>
+        <!-- Component families to test. -->
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>localio-definition</artifactId>
+            <version>0.18.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>simplefileio-definition</artifactId>
+            <version>0.18.0</version>
+            <scope>test</scope>
+        </dependency>
         <!-- added to make sure it is built before but dynamically used see the plugin element below. -->
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>multiple-runtime-comp</artifactId>
-			<version>0.18.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-jdbc-definition</artifactId>
-			<version>0.18.0</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>multiple-runtime-comp</artifactId>
+            <version>0.18.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-jdbc-definition</artifactId>
+            <version>0.18.0</version>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>org.ops4j.pax.url</groupId>
-			<artifactId>pax-url-aether</artifactId>
-			<version>2.4.7</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-			<!-- this removes the multi-runtime deps cause it is dynamically loaded -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<classpathDependencyExcludes>
-						<classpathDependencyExclude>org.talend.components:multiple-runtime-comp</classpathDependencyExclude>
-						<classpathDependencyExclude>org.talend.components:components-jdbc-definition</classpathDependencyExclude>
-					</classpathDependencyExcludes>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <!-- this removes the multi-runtime deps cause it is dynamically loaded -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>org.talend.components:multiple-runtime-comp</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.talend.components:components-jdbc-definition</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

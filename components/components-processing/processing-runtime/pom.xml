@@ -16,7 +16,6 @@
 
     <properties>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
-        <spark.version>2.2.1</spark.version>
     </properties>
 
     <dependencies>

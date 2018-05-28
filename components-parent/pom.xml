@@ -6,35 +6,41 @@
     <artifactId>components-parent</artifactId>
     <packaging>pom</packaging>
     <version>0.24.0-SNAPSHOT</version>
-
     <name>Component Parent POM</name>
+
     <properties>
         <java.version>1.7</java.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <!-- version properties will go to some bom pom -->
-        <spring.boot.version>1.5.1.RELEASE</spring.boot.version>
-        <avro.version>1.8.1</avro.version>
-        <components.version>0.24.0-SNAPSHOT</components.version>
-        <daikon.version>0.24.0-SNAPSHOT</daikon.version>
-        <guava.version>19.0</guava.version>
-        <hamcrest.version>1.3</hamcrest.version>
-        <org.json.version>20131018</org.json.version>
-        <commons-beanutils.version>1.8.0</commons-beanutils.version>
-        <jackson.1x.version>1.9.14-TALEND</jackson.1x.version>
-        <jackson.version>2.9.4</jackson.version>
-        <jackson.version.annotations>2.9.0</jackson.version.annotations>
         <log4j.rootLogger>INFO, stdout</log4j.rootLogger>
         <log4j.appender.stdout>org.apache.log4j.ConsoleAppender</log4j.appender.stdout>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <docker.removeVolumes>true</docker.removeVolumes>
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
-
         <coverage.sonar.reportRoot>${project.basedir}</coverage.sonar.reportRoot>
         <sonar.jacoco.reportPath>${coverage.sonar.reportRoot}/target/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.jacoco.itReportPath>${coverage.sonar.reportRoot}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
 
+        <components.version>0.24.0-SNAPSHOT</components.version>
+        <daikon.version>0.24.0-SNAPSHOT</daikon.version>
+
+        <tycho-p2-extras-plugin.version>0.26.0</tycho-p2-extras-plugin.version>
+        <docker-maven-plugin.version>0.20.1</docker-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.7.8</jacoco-maven-plugin.version>
+        <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
+        <maven-assembly-plugin.version>3.0.0</maven-assembly-plugin.version>
+        <maven-bundle-plugin.version>3.0.1</maven-bundle-plugin.version>
+        <maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
+        <maven-failsafe-plugin-paxexam.version>2.20-PAXEXAM-PATCH</maven-failsafe-plugin-paxexam.version>
+        <maven-failsafe-plugin.version>2.18</maven-failsafe-plugin.version>
+        <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
+        <maven-resources-plugin.version>3.0.2</maven-resources-plugin.version>
+        <maven-scm-plugin.version>1.9.4</maven-scm-plugin.version>
+        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+        <maven-surefire-plugin.version>2.18</maven-surefire-plugin.version>
+
+        <cxf.version>3.2.4</cxf.version>
     </properties>
 
     <scm>
@@ -44,6 +50,7 @@
 
     <modules>
         <module>components-p2update-assembly</module>
+        <module>components-bom</module>
     </modules>
 
     <distributionManagement>
@@ -94,220 +101,14 @@
         </dependency>
     </dependencies>
 
-    <!-- This will be moved to bom pom -->
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <version>${spring.boot.version}</version>
-                <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>1.1.9</version>
-            </dependency>
-            <dependency>
-                <groupId>biz.aQute.bnd</groupId>
-                <artifactId>annotation</artifactId>
-                <version>2.4.0</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.google.auto.service</groupId>
-                <artifactId>auto-service</artifactId>
-                <version>1.0-rc2</version>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson</groupId>
-                <artifactId>jackson-bom</artifactId>
-                <version>${jackson.version}</version>
+                <groupId>org.talend.components</groupId>
+                <artifactId>components-bom</artifactId>
+                <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-core-asl</artifactId>
-                <version>${jackson.1x.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-mapper-asl</artifactId>
-                <version>${jackson.1x.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.daikon</groupId>
-                <artifactId>daikon-spring-utils</artifactId>
-                <version>${daikon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.daikon</groupId>
-                <artifactId>daikon</artifactId>
-                <version>${daikon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.daikon</groupId>
-                <artifactId>daikon</artifactId>
-                <version>${daikon.version}</version>
-                <classifier>tests</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.daikon</groupId>
-                <artifactId>daikon</artifactId>
-                <version>${daikon.version}</version>
-                <classifier>bundle</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.avro</groupId>
-                <artifactId>avro</artifactId>
-                <version>${avro.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.json</groupId>
-                <artifactId>json</artifactId>
-                <version>${org.json.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-beanutils</groupId>
-                <artifactId>commons-beanutils</artifactId>
-                <version>${commons-beanutils.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-            <!-- Components modules -->
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-adapter-beam</artifactId>
-                <version>${components.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-api</artifactId>
-                <version>${components.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-api</artifactId>
-                <version>${components.version}</version>
-                <type>test-jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-api</artifactId>
-                <version>${components.version}</version>
-                <classifier>tests</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-api</artifactId>
-                <version>${components.version}</version>
-                <classifier>bundle</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-api-service-common</artifactId>
-                <version>${components.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-api-service-common</artifactId>
-                <version>${components.version}</version>
-                <type>test-jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-api-service-common</artifactId>
-                <version>${components.version}</version>
-                <classifier>tests</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-api-service-osgi</artifactId>
-                <version>${components.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-api-service-osgi</artifactId>
-                <version>${components.version}</version>
-                <classifier>tests</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-api-service-rest</artifactId>
-                <version>${components.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-api-service-rest</artifactId>
-                <version>${components.version}</version>
-                <classifier>lib</classifier>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-api-service-rest</artifactId>
-                <version>${components.version}</version>
-                <type>test-jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-common</artifactId>
-                <version>${components.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-common</artifactId>
-                <version>${components.version}</version>
-                <classifier>bundle</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-common</artifactId>
-                <version>${components.version}</version>
-                <classifier>tests</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-common-oauth</artifactId>
-                <version>${components.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-common-oauth</artifactId>
-                <version>${components.version}</version>
-                <classifier>bundle</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-osgitest</artifactId>
-                <version>${components.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -346,12 +147,8 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        <!--<repository> -->
-        <!--<id>talend_beam</id> -->
-        <!--<name>Talend Patched Beam Repository</name> -->
-        <!--<url>http://maven.nanthrax.net/</url> -->
-        <!--</repository> -->
     </repositories>
+
     <pluginRepositories>
         <pluginRepository>
             <id>spring-releases</id>
@@ -362,6 +159,7 @@
             <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
         </pluginRepository>
     </pluginRepositories>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -434,14 +232,16 @@
                             <goal>list</goal>
                         </goals>
                         <configuration>
-                            <outputFile>target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</outputFile>
+                            <outputFile>
+                                target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+                            </outputFile>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
+                <version>${maven-antrun-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>append-self-artifact-to-deps</id>
@@ -449,7 +249,8 @@
                         <configuration>
                             <tasks>
                                 <echo file="target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt"
-                                      message="${project.groupId}:${project.artifactId}:jar:${project.version}:runtime" append="true" encoding="UTF-8"/>
+                                      message="${project.groupId}:${project.artifactId}:jar:${project.version}:runtime"
+                                      append="true" encoding="UTF-8"/>
                             </tasks>
                         </configuration>
                         <goals>
@@ -489,7 +290,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.8</version>
+                <version>${jacoco-maven-plugin.version}</version>
                 <configuration>
                     <includes>
                         <includes>org/talend/**/*</includes>
@@ -532,19 +333,9 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- this was supposed to deploy only when all the modules are succesfully
-                build -->
-            <!-- but it seems not to be working on jenkins -->
-            <!-- <plugin> -->
-            <!-- <groupId>org.apache.maven.plugins</groupId> -->
-            <!-- <artifactId>maven-deploy-plugin</artifactId> -->
-            <!-- <version>2.8.2</version> -->
-            <!-- <configuration> -->
-            <!-- <deployAtEnd>true</deployAtEnd> -->
-            <!-- </configuration> -->
-            <!-- </plugin> -->
         </plugins>
     </build>
+
     <profiles>
         <profile>
             <id>skipTestRun</id>
@@ -578,7 +369,7 @@
                     <!-- Copy the bundle to a new directory to prepare the update-site -->
                     <plugin>
                         <artifactId>maven-resources-plugin</artifactId>
-                        <version>3.0.1</version>
+                        <version>3.0.2</version>
                         <executions>
                             <execution>
                                 <id>copy-bundles-for-publishing</id>
@@ -614,8 +405,10 @@
                                     <goal>publish-features-and-bundles</goal>
                                 </goals>
                                 <configuration>
-                                    <metadataRepositoryLocation>${project.build.directory}/repository</metadataRepositoryLocation>
-                                    <artifactRepositoryLocation>${project.build.directory}/repository</artifactRepositoryLocation>
+                                    <metadataRepositoryLocation>${project.build.directory}/repository
+                                    </metadataRepositoryLocation>
+                                    <artifactRepositoryLocation>${project.build.directory}/repository
+                                    </artifactRepositoryLocation>
                                     <sourceLocation>${project.build.directory}/source</sourceLocation>
                                     <compress>true</compress>
                                     <publishArtifacts>true</publishArtifacts>
