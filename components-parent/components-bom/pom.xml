@@ -12,6 +12,8 @@
         <components.version>0.24.0-SNAPSHOT</components.version>
         <daikon.version>0.24.0-SNAPSHOT</daikon.version>
         <!-- -->
+        <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
+        <!-- -->
         <activemq.version>5.14.3</activemq.version>
         <antlr4-runtime.version>4.6</antlr4-runtime.version>
         <avro.version>1.8.1</avro.version>
@@ -162,6 +164,17 @@
         <xercesImpl.version>2.9.1</xercesImpl.version>
         <xz.version>1.5</xz.version>
     </properties>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>talend_nexus_deployment</id>
+            <url>${talend_snapshots_deployment}</url>
+        </snapshotRepository>
+        <repository>
+            <id>talend_nexus_deployment</id>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+        </repository>
+    </distributionManagement>
 
     <dependencyManagement>
         <dependencies>
