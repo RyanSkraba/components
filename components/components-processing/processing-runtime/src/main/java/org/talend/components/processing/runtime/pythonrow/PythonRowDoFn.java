@@ -99,10 +99,13 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
                 + "  input = json.loads(inputJSON, object_pairs_hook=collections.OrderedDict)\n" //
                 + "  output = json.loads(\"{}\", object_pairs_hook=collections.OrderedDict)\n" //
                 + "  try:\n" //
+                + "    emptyFunction()\n" //
                 + "    " + properties.pythonCode.getValue().replaceAll("\n", "\n    ").trim() + "\n"//
                 + "  except SystemExit:\n" //
                 + "    pass\n" //
-                + "  return json.dumps(output)";
+                + "  return json.dumps(output)\n" //
+                + "def emptyFunction():\n" // to avoid compile error when empty user code block
+                + "  pass";
     }
 
     private String setUpFlatMap() {
@@ -112,10 +115,13 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
                 + "  input = json.loads(inputJSON, object_pairs_hook=collections.OrderedDict)\n" //
                 + "  outputList = []\n" //
                 + "  try:\n" //
+                + "    emptyFunction()\n" //
                 + "    " + properties.pythonCode.getValue().replaceAll("\n", "\n    ").trim() + "\n"//
                 + "  except SystemExit:\n" //
                 + "    pass\n" //
-                + "  return [ json.dumps(outputElement) for outputElement in outputList ]";
+                + "  return [ json.dumps(outputElement) for outputElement in outputList ]\n" //
+                + "def emptyFunction():\n" // to avoid compile error when empty user code block
+                + "  pass";
     }
 
     private void map(IndexedRecord input, ProcessContext context) throws IOException {

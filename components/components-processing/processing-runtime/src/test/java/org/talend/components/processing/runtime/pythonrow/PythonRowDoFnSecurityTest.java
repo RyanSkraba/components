@@ -32,10 +32,14 @@ public class PythonRowDoFnSecurityTest {
     }
 
     public void execute(String command) throws Throwable {
+        execute(command, MapType.MAP);
+    }
+
+    public void execute(String command, MapType type) throws Throwable {
         try {
             PythonRowProperties properties = new PythonRowProperties("test");
             properties.init();
-            properties.mapType.setValue(MapType.MAP);
+            properties.mapType.setValue(type);
             properties.pythonCode.setValue(command);
             PythonRowDoFn function = new PythonRowDoFn();
             function.initialize(null, properties);
@@ -96,6 +100,18 @@ public class PythonRowDoFnSecurityTest {
                 + "output['content'] = 'no error?'\n";
         execute(command);
         assertTrue(true);
+    }
+
+    @Test
+    public void test_emptyCodeMap() throws Throwable {
+        String command = "";
+        execute(command);
+    }
+
+    @Test
+    public void test_emptyCodeFlatMap() throws Throwable {
+        String command = "";
+        execute(command, MapType.FLATMAP);
     }
 
     @Test
