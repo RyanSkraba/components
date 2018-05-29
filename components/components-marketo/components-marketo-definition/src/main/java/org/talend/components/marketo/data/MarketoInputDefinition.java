@@ -52,7 +52,7 @@ public class MarketoInputDefinition extends MarketoComponentDefinition {
 
     @Override
     public List<String> getSupportedProducts() {
-        return Arrays.asList(SupportedProduct.DATAPREP, SupportedProduct.DATASTREAMS);
+        return Arrays.asList(SupportedProduct.DATAPREP);
     }
 
 }

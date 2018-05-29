@@ -13,7 +13,10 @@
 package org.talend.components.marketo.data;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
+
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +55,7 @@ public class MarketoInputDefinitionTest {
 
     @Test
     public void testGetSupportedProducts() throws Exception {
-        assertThat(definition.getSupportedProducts(), contains(SupportedProduct.DATAPREP, SupportedProduct.DATASTREAMS));
+        assertThat(definition.getSupportedProducts(), is(Arrays.asList(SupportedProduct.DATAPREP)));
+
     }
 }

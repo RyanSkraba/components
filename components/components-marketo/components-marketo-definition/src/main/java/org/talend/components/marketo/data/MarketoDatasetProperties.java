@@ -84,7 +84,7 @@ public class MarketoDatasetProperties extends ComponentPropertiesImpl implements
         customObjectName.setValue("");
         filterType.setValue("");
         filterValue.setValue("");
-        batchSize.setValue(300);
+        batchSize.setValue(200);
     }
 
     public Schema getSchema() {
@@ -115,7 +115,6 @@ public class MarketoDatasetProperties extends ComponentPropertiesImpl implements
         main.addRow(Widget.widget(customObjectName).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
         main.addRow(filterType);
         main.addColumn(filterValue);
-        main.addRow(batchSize);
     }
 
     @Override
