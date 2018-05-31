@@ -24,18 +24,22 @@ import java.util.Set;
 
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.ComponentConstants;
-import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
+import org.talend.components.snowflake.SnowflakeGuessSchemaProperties;
+import org.talend.daikon.properties.PresentationItem;
+import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TSnowflakeInputProperties extends SnowflakeConnectionTableProperties {
+public class TSnowflakeInputProperties extends SnowflakeGuessSchemaProperties {
 
     public Property<String> condition = newProperty("condition"); //$NON-NLS-1$
 
     public Property<Boolean> manualQuery = newBoolean("manualQuery"); //$NON-NLS-1$
+
+    public transient PresentationItem guessSchema = new PresentationItem("guessSchema");
 
     public Property<String> query = newProperty("query"); //$NON-NLS-1$
 
@@ -66,6 +70,7 @@ public class TSnowflakeInputProperties extends SnowflakeConnectionTablePropertie
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(manualQuery);
+        mainForm.addColumn(Widget.widget(guessSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE).setLongRunning(true));
         mainForm.addRow(condition);
         mainForm.addRow(widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
 
@@ -77,6 +82,7 @@ public class TSnowflakeInputProperties extends SnowflakeConnectionTablePropertie
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
+            form.getWidget(guessSchema.getName()).setHidden(!manualQuery.getValue());
             form.getWidget(query.getName()).setHidden(!manualQuery.getValue());
             form.getWidget(condition.getName()).setHidden(manualQuery.getValue());
         } else if (form.getName().equals(Form.ADVANCED)) {
@@ -84,8 +90,22 @@ public class TSnowflakeInputProperties extends SnowflakeConnectionTablePropertie
         }
     }
 
+    @Override
+    public ValidationResult validateGuessSchema() {
+        return super.validateGuessSchema();
+    }
+
     public void afterManualQuery() {
         refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterGuessSchema() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    @Override
+    public String getQuery() {
+        return query.getValue();
     }
 
 }

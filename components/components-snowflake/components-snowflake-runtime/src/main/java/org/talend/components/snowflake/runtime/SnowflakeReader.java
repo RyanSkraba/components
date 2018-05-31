@@ -28,10 +28,8 @@ import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
-import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
-import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
+import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
-import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -42,7 +40,7 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
 
     private transient Connection connection;
 
-    private transient JDBCResultSetIndexedRecordConverter factory;
+    private transient SnowflakeResultSetIndexedRecordConverter factory;
 
     protected TSnowflakeInputProperties properties;
 
@@ -74,14 +72,7 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
 
     protected Schema getSchema() throws IOException {
         if (querySchema == null) {
-            querySchema = properties.table.main.schema.getValue();
-            if (AvroUtils.isIncludeAllFields(querySchema)) {
-                String tableName = null;
-                if (properties instanceof SnowflakeConnectionTableProperties) {
-                    tableName = properties.table.tableName.getStringValue();
-                }
-                querySchema = getCurrentSource().getEndpointSchema(container, tableName);
-            }
+            querySchema = getRuntimeSchema();
         }
         return querySchema;
     }
@@ -89,7 +80,7 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
     protected String getQueryString() throws IOException {
         String condition = null;
         if (properties.manualQuery.getValue()) {
-            return properties.query.getStringValue();
+            return properties.getQuery();
         } else {
             condition = properties.condition.getStringValue();
         }
@@ -116,9 +107,6 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
 
     @Override
     public boolean start() throws IOException {
-        if (null == factory.getSchema()) {
-            factory.setSchema(getSchema());
-        }
         result = new Result();
         try {
             statement = getConnection().createStatement();
@@ -152,6 +140,9 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
         try {
+            if (null == factory.getSchema()) {
+                factory.setSchema(getSchema());
+            }
             return factory.convertToAvro(resultSet);
         } catch (Exception e) {
             throw new ComponentException(e);
@@ -182,6 +173,23 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
     @Override
     public Map<String, Object> getReturnValues() {
         return result.toMap();
+    }
+
+    private Schema getRuntimeSchema() throws IOException {
+        final SnowflakeSourceOrSink source = (SnowflakeSourceOrSink) getCurrentSource();
+        return source.getRuntimeSchema(new SchemaResolver() {
+
+            @Override
+            public Schema getSchema() throws IOException {
+                try {
+                    return properties.manualQuery.getValue()
+                            ? factory.getRegistry().inferSchema(resultSet.getMetaData())
+                                    : source.getSchema(container, connection, properties.getTableName());
+                } catch (SQLException e) {
+                    throw new IOException(e);
+                }
+            }
+        });
     }
 
 }

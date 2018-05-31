@@ -30,4 +30,6 @@ public interface SnowflakeRuntimeSourceOrSink extends SourceOrSink {
 
     ValidationResult validateConnection(SnowflakeProvideConnectionProperties properties);
 
+    Schema getSchemaFromQuery(RuntimeContainer container) throws IOException;
+
 }

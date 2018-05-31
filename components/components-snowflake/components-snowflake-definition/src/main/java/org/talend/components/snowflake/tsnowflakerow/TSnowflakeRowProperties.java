@@ -25,7 +25,7 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.ComponentConstants;
 import org.talend.components.common.SchemaProperties;
-import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
+import org.talend.components.snowflake.SnowflakeGuessSchemaProperties;
 import org.talend.components.snowflake.SnowflakePreparedStatementTableProperties;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.PresentationItem;
@@ -41,7 +41,7 @@ import org.talend.daikon.properties.property.PropertyFactory;
  * This properties class is responsible for design tSnowlfakeRow component. For more detailed information see {@link Properties}.
  *
  */
-public class TSnowflakeRowProperties extends SnowflakeConnectionTableProperties {
+public class TSnowflakeRowProperties extends SnowflakeGuessSchemaProperties {
 
     private static final long serialVersionUID = -1694372250903352577L;
 
@@ -54,6 +54,8 @@ public class TSnowflakeRowProperties extends SnowflakeConnectionTableProperties 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject");
 
     public transient PresentationItem guessQuery = new PresentationItem("guessQuery");
+
+    public transient PresentationItem guessSchema = new PresentationItem("guessSchema");
 
     public Property<String> query = PropertyFactory.newString("query", "\"select id, name from employee\"");
 
@@ -77,7 +79,8 @@ public class TSnowflakeRowProperties extends SnowflakeConnectionTableProperties 
         super.setupLayout();
 
         Form main = getForm(Form.MAIN);
-        main.addRow(Widget.widget(guessQuery).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
+        main.addColumn(Widget.widget(guessQuery).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
+        main.addColumn(Widget.widget(guessSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE).setLongRunning(true));
         main.addRow(Widget.widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
         main.addRow(dieOnError);
 
@@ -121,6 +124,16 @@ public class TSnowflakeRowProperties extends SnowflakeConnectionTableProperties 
     }
 
     public void afterGuessQuery() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    @Override
+    public ValidationResult validateGuessSchema() {
+        return super.validateGuessSchema();
+    }
+
+    public void afterGuessSchema() {
+        afterMainSchema();
         refreshLayout(getForm(Form.MAIN));
     }
 
@@ -209,7 +222,7 @@ public class TSnowflakeRowProperties extends SnowflakeConnectionTableProperties 
         return sql.toString();
     }
 
-
+    @Override
     public String getQuery() {
         return query.getValue();
     }

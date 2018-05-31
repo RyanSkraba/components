@@ -19,7 +19,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,8 +35,10 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCTableMetadata;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
+import org.talend.components.snowflake.SnowflakeGuessSchemaProperties;
 import org.talend.components.snowflake.SnowflakeProvideConnectionProperties;
 import org.talend.components.snowflake.SnowflakeRuntimeSourceOrSink;
+import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.avro.AvroUtils;
@@ -86,6 +90,7 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         return vr;
     }
 
+    @Override
     public ValidationResult validateConnection(SnowflakeProvideConnectionProperties properties) {
         // check if every required properties was specified
         ValidationResultMutable vr = validateConnectionProperties(properties);
@@ -160,6 +165,7 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         return connProps.schemaName.getStringValue();
     }
 
+    @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container, Connection connection) throws IOException {
         // Returns the list with a table names (for the wh, db and schema)
         List<NamedThing> returnList = new ArrayList<>();
@@ -187,20 +193,38 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         return getSchema(container, createConnection(container), schemaName);
     }
 
-    protected Schema getRuntimeSchema(RuntimeContainer container) throws IOException {
+    protected Schema getRuntimeSchema(SchemaResolver resolver) throws IOException {
         SnowflakeConnectionTableProperties connectionTableProperties = ((SnowflakeConnectionTableProperties) properties);
         Schema schema = connectionTableProperties.getSchema();
         if (AvroUtils.isIncludeAllFields(schema)) {
-            schema = getEndpointSchema(container, connectionTableProperties.getTableName());
+            schema = resolver.getSchema();
         }
         return schema;
     }
 
+    public static Schema getSchemaFromQuery(RuntimeContainer container, SnowflakeProvideConnectionProperties properties) throws IOException {
+        SnowflakeSourceOrSink ss = new SnowflakeSourceOrSink();
+        ss.initialize(container, (ComponentProperties) properties);
+        return ss.getSchemaFromQuery(container);
+    }
+
+    public Schema getSchemaFromQuery(RuntimeContainer container) throws IOException {
+        ResultSetMetaData metadata = null;
+        try (Connection connection = createConnection(container);
+                Statement statement = connection.createStatement();
+                ResultSet rs = statement.executeQuery(((SnowflakeGuessSchemaProperties)properties).getQuery())) {
+            metadata = rs.getMetaData();
+            return getSnowflakeAvroRegistry().inferSchema(metadata);
+        } catch (SQLException e) {
+            throw new IOException(e);
+        }
+    }
 
     protected SnowflakeAvroRegistry getSnowflakeAvroRegistry() {
         return SnowflakeAvroRegistry.get();
     }
 
+    @Override
     public Schema getSchema(RuntimeContainer container, Connection connection, String tableName) throws IOException {
         Schema tableSchema = null;
 
@@ -210,8 +234,9 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
             tableMetadata.setDatabaseMetaData(connection.getMetaData()).setCatalog(getCatalog(connProps))
                     .setDbSchema(getDbSchema(connProps)).setTablename(tableName);
             tableSchema = getSnowflakeAvroRegistry().inferSchema(tableMetadata);
-            if (tableSchema == null)
+            if (tableSchema == null) {
                 throw new IOException(i18nMessages.getMessage("error.tableNotFound", tableName));
+            }
         } catch (SQLException se) {
             throw new IOException(se);
         }

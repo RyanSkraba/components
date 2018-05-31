@@ -37,6 +37,7 @@ import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
+import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.runtime.utils.SnowflakePreparedStatementUtils;
 import org.talend.components.snowflake.tsnowflakerow.TSnowflakeRowProperties;
 import org.talend.daikon.avro.AvroUtils;
@@ -110,8 +111,8 @@ public class SnowflakeRowWriter implements WriterWithFeedback<Result, IndexedRec
         rejectedWrites = new ArrayList<>();
 
         connection = sink.createConnection(container);
-        mainSchema = sink.getRuntimeSchema(container);
-        schemaReject = rowProperties.schemaReject.schema.getValue();
+        mainSchema = getSchema();
+
         try {
             if(commitStep > 1) {
                 connection.setAutoCommit(false);
@@ -238,8 +239,20 @@ public class SnowflakeRowWriter implements WriterWithFeedback<Result, IndexedRec
         return true;
     }
 
-    private void handleReject(IndexedRecord input, SQLException e) throws IOException {
+    private Schema getSchema() throws IOException {
+        return sink.getRuntimeSchema(new SchemaResolver() {
 
+            @Override
+            public Schema getSchema() throws IOException {
+                return sink.getSchema(container, connection, rowProperties.getTableName());
+            }
+        });
+    }
+
+    private void handleReject(IndexedRecord input, SQLException e) throws IOException {
+        if (schemaReject == null) {
+            schemaReject = rowProperties.schemaReject.schema.getValue();
+        }
         IndexedRecord rejectRecord = new GenericData.Record(schemaReject);
 
         for (Schema.Field rejectedField : schemaReject.getFields()) {

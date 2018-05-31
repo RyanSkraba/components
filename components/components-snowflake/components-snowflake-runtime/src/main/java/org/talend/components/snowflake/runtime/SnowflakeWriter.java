@@ -33,6 +33,7 @@ import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.runtime.DynamicSchemaUtils;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
+import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -109,7 +110,7 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         processingConnection = sink.createConnection(container);
         uploadConnection = sink.createConnection(container);
         if (null == mainSchema) {
-            mainSchema = sink.getRuntimeSchema(container);
+            mainSchema = getSchema();
         }
 
         SnowflakeConnectionProperties connectionProperties = sprops.getConnectionProperties();
@@ -236,6 +237,16 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
     @Override
     public WriteOperation<Result> getWriteOperation() {
         return snowflakeWriteOperation;
+    }
+
+    private Schema getSchema() throws IOException {
+        return sink.getRuntimeSchema(new SchemaResolver() {
+
+            @Override
+            public Schema getSchema() throws IOException {
+                return sink.getSchema(container, processingConnection, sprops.getTableName());
+            }
+        });
     }
 
 }

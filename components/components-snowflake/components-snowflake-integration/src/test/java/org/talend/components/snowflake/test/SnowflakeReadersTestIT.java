@@ -23,7 +23,9 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
@@ -41,6 +43,7 @@ import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputDefinition
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputDefinition;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
@@ -95,6 +98,24 @@ public class SnowflakeReadersTestIT extends SnowflakeRuntimeIOTestIT {
         LOGGER.debug(schema.toString());
         assertEquals(BigDecimal.valueOf(81), rows.get(0).get(0));
         assertThat((String) rows.get(0).get(1), containsString("\"bar\": 81"));
+    }
+
+    @Test
+    public void testInputManualQueryWithDynamicSchema() throws Exception {
+        TSnowflakeInputProperties inputProperties = new TSnowflakeInputProperties("input");
+        setupProps(inputProperties.getConnectionProperties());
+        inputProperties.init();
+        inputProperties.manualQuery.setValue(true);
+        inputProperties.query.setValue("select ID, C3, C7 from " + testTable + " where ID=80;");
+        Schema schema = SchemaBuilder.builder().record("Dynamic").fields().requiredString("DYNA").endRecord();
+        schema.addProp(SchemaConstants.INCLUDE_ALL_FIELDS, "true");
+        inputProperties.table.main.schema.setValue(schema);
+        List<IndexedRecord> rows = readRows(inputProperties);
+        Assert.assertEquals(1, rows.size());
+        IndexedRecord record = rows.get(0);
+        Assert.assertTrue(new BigDecimal(80).equals(record.get(0)));
+        Assert.assertTrue(Double.valueOf(80).equals(record.get(1)));
+        assertThat((String) record.get(2), containsString("\"bar\": 80"));
     }
 
     @Test(expected = IOException.class)

@@ -22,7 +22,7 @@ import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
 public class SnowflakeResultSetIndexedRecordConverter extends JDBCResultSetIndexedRecordConverter {
 
     @Override
-    protected JDBCAvroRegistry getRegistry() {
+    public JDBCAvroRegistry getRegistry() {
         return SnowflakeAvroRegistry.get();
     }
 

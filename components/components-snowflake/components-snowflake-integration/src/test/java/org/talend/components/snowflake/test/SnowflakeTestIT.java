@@ -190,7 +190,7 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
         }
     }
 
-    class TestRuntimeContainer extends DefaultComponentRuntimeContainerImpl {
+    static class TestRuntimeContainer extends DefaultComponentRuntimeContainerImpl {
     }
 
 }

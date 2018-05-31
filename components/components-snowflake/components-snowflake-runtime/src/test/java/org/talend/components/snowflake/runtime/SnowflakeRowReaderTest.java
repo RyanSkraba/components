@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakerow.TSnowflakeRowProperties;
 import org.talend.daikon.avro.SchemaConstants;
 
@@ -52,6 +53,8 @@ public class SnowflakeRowReaderTest {
 
     private static final String FIELD_VALUE = "name_value";
 
+    private Schema schema;
+
     @Before
     public void setup() throws IOException, SQLException {
         source = Mockito.mock(SnowflakeRowSource.class);
@@ -60,7 +63,7 @@ public class SnowflakeRowReaderTest {
         Mockito.when(source.createConnection(Mockito.any(RuntimeContainer.class))).thenReturn(connection);
         Mockito.doNothing().when(source).closeConnection(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class));
         properties = new TSnowflakeRowProperties("rowProperties");
-        Schema schema = SchemaBuilder.builder().record("test").fields().requiredString("name").endRecord();
+        schema = SchemaBuilder.builder().record("test").fields().requiredString("name").endRecord();
         query = "SELECT id, name from " + TABLE_NAME;
         properties.query.setValue(query);
         properties.schemaFlow.schema.setValue(schema);
@@ -84,14 +87,13 @@ public class SnowflakeRowReaderTest {
         Mockito.when(rs.getString(1)).thenReturn(FIELD_VALUE);
         Mockito.when(statement.executeQuery(Mockito.eq(query))).thenReturn(rs);
         Mockito.when(rs.next()).thenReturn(true, false);
-
+        Mockito.when(source.getRuntimeSchema(Mockito.any(SchemaResolver.class))).thenReturn(schema);
         try {
             if (reader.start()) {
-                do {
+                while (reader.advance()) {
                     IndexedRecord indexedRecord = reader.getCurrent();
                     Assert.assertEquals(FIELD_VALUE, indexedRecord.get(indexedRecord.getSchema().getField("name").pos()));
-
-                } while (reader.advance());
+                }
             } else {
                 Assert.fail("Shouldn't get here");
             }
@@ -119,7 +121,7 @@ public class SnowflakeRowReaderTest {
 
         Schema remoteSchema = SchemaBuilder.builder().record("remoteSchema").fields().requiredInt("id").requiredString("name")
                 .requiredInt("age").endRecord();
-        Mockito.when(source.getRuntimeSchema(Mockito.any(RuntimeContainer.class))).thenReturn(remoteSchema);
+        Mockito.when(source.getRuntimeSchema(Mockito.any(SchemaResolver.class))).thenReturn(remoteSchema);
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
         Mockito.when(connection.prepareStatement(Mockito.eq(sql))).thenReturn(preparedStatement);
         Mockito.when(preparedStatement.execute()).thenReturn(true);

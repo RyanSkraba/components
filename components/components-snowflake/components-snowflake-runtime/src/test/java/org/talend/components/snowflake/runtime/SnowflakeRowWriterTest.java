@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 import org.talend.components.api.component.runtime.Result;
+import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakerow.TSnowflakeRowProperties;
 
 public class SnowflakeRowWriterTest {
@@ -79,7 +80,7 @@ public class SnowflakeRowWriterTest {
                 .requiredInt("age").endRecord();
         rowProperties.table.main.schema.setValue(schema);
         rowProperties.usePreparedStatement.setValue(false);
-        Mockito.when(sink.getRuntimeSchema(null)).thenReturn(schema);
+        Mockito.when(sink.getRuntimeSchema(Mockito.any(SchemaResolver.class))).thenReturn(schema);
         IndexedRecord record = new GenericData.Record(schema);
         record.put(0, 1);
         record.put(1, "name");
@@ -113,7 +114,7 @@ public class SnowflakeRowWriterTest {
                 .requiredInt("age").endRecord();
         rowProperties.table.main.schema.setValue(schema);
         rowProperties.afterMainSchema();
-        Mockito.when(sink.getRuntimeSchema(null)).thenReturn(schema);
+        Mockito.when(sink.getRuntimeSchema(Mockito.any(SchemaResolver.class))).thenReturn(schema);
         rowProperties.preparedStatementTable.indexes.setValue(new ArrayList<Integer>());
         IndexedRecord record = Mockito.mock(IndexedRecord.class);
         Mockito.when(record.getSchema()).thenReturn(schema);

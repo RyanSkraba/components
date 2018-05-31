@@ -36,7 +36,7 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.DataRejectException;
-import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
+import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.runtime.utils.SnowflakePreparedStatementUtils;
 import org.talend.components.snowflake.tsnowflakerow.TSnowflakeRowProperties;
 import org.talend.daikon.i18n.GlobalI18N;
@@ -65,7 +65,7 @@ public class SnowflakeRowReader implements Reader<IndexedRecord> {
 
     private Result result;
 
-    private transient JDBCResultSetIndexedRecordConverter converter = new SnowflakeResultSetIndexedRecordConverter();
+    private transient SnowflakeResultSetIndexedRecordConverter converter = new SnowflakeResultSetIndexedRecordConverter();
 
     private Statement statement;
 
@@ -93,9 +93,6 @@ public class SnowflakeRowReader implements Reader<IndexedRecord> {
     public boolean start() throws IOException {
         connection = source.createConnection(container);
         result = new Result();
-        Schema schema = source.getRuntimeSchema(container);
-        schemaReject = properties.schemaReject.schema.getValue();
-        converter.setSchema(schema);
         this.dieOnError = properties.dieOnError.getValue();
         try {
             if (source.usePreparedStatement()) {
@@ -139,6 +136,9 @@ public class SnowflakeRowReader implements Reader<IndexedRecord> {
             }
             LOGGER.warn(I18N_MESSAGES.getMessage("error.resultSetIssue"), e);
         }
+        if (converter.getSchema() == null) {
+            converter.setSchema(getSchema());
+        }
         if (hasNext) {
             current = converter.convertToAvro(rs);
             result.totalCount++;
@@ -159,6 +159,20 @@ public class SnowflakeRowReader implements Reader<IndexedRecord> {
     @Override
     public Instant getCurrentTimestamp() {
         return Instant.now();
+    }
+
+    private Schema getSchema() throws IOException {
+        return source.getRuntimeSchema(new SchemaResolver() {
+
+            @Override
+            public Schema getSchema() throws IOException {
+                try {
+                    return converter.getRegistry().inferSchema(rs.getMetaData());
+                } catch (SQLException e) {
+                    throw new IOException(e);
+                }
+            }
+        });
     }
 
     private boolean validateResultSet(ResultSet rs) throws IOException {
@@ -184,6 +198,9 @@ public class SnowflakeRowReader implements Reader<IndexedRecord> {
     }
 
     private void handleReject(SQLException e) {
+        if (schemaReject == null) {
+            schemaReject = properties.schemaReject.schema.getValue();
+        }
         IndexedRecord reject = new GenericData.Record(schemaReject);
 
         reject.put(schemaReject.getField("errorCode").pos(), e.getSQLState());

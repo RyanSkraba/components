@@ -28,8 +28,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
-import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -68,8 +68,10 @@ public class SnowflakeReaderTest {
         tSnowflakeInputProperties.setupProperties();
 
         tSnowflakeInputProperties.table.main.schema.setValue(schema);
+        Mockito.when(snowflakeSourceMock.getRuntimeSchema(Mockito.any(SchemaResolver.class))).thenReturn(schema);
         tSnowflakeInputProperties.table.tableName.setValue("Table");
-
+        Mockito.doCallRealMethod().when(snowflakeSourceMock).initialize(Mockito.any(RuntimeContainer.class), Mockito.eq(tSnowflakeInputProperties));
+        snowflakeSourceMock.initialize(null, tSnowflakeInputProperties);
         snowflakeReader = new SnowflakeReader(runtimeContainerMock, snowflakeSourceMock, tSnowflakeInputProperties);
     }
 
@@ -220,11 +222,11 @@ public class SnowflakeReaderTest {
 
     @Test
     public void testGetSchemaFromSource() throws Exception {
-        AvroUtils.setIncludeAllFields(schema, true);
-        snowflakeReader.properties.table.main.schema.setValue(schema);
-        Schema mockSchema = Mockito.mock(Schema.class);
-        Mockito.when(snowflakeSourceMock.getEndpointSchema(runtimeContainerMock, "Table")).thenReturn(mockSchema);
-        Assert.assertEquals(mockSchema, snowflakeReader.getSchema());
+        snowflakeReader.properties.manualQuery.setValue(false);
+        Mockito.doCallRealMethod().when(snowflakeSourceMock).getRuntimeSchema(Mockito.any(SchemaResolver.class));
+        Mockito.when(snowflakeSourceMock.getSchema(Mockito.eq(runtimeContainerMock), Mockito.any(Connection.class),
+                Mockito.eq("Table"))).thenReturn(schema);
+        Assert.assertEquals(schema, snowflakeReader.getSchema());
     }
 
     @Test
