@@ -18,6 +18,7 @@
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
         <marklogic-client-api.version>4.0.3</marklogic-client-api.version>
         <marklogic.mlcp.version>9.0.3</marklogic.mlcp.version>
+        <okio.version>1.13.0</okio.version>
     </properties>
 
     <repositories>
@@ -208,6 +209,7 @@
         <dependency>
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio</artifactId>
+            <version>${okio.version}</version>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>

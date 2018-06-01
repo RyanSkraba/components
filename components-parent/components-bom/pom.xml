@@ -140,7 +140,7 @@
         <netty-transport-native-epoll.version>4.0.27.Final</netty-transport-native-epoll.version>
         <netty-transport.version>4.1.8.Final</netty-transport.version>
         <netty.version>3.10.6.Final</netty.version>
-        <okio.version>1.6.0</okio.version>
+        <okio.version>1.13.0</okio.version>
         <org.json.version>20140107</org.json.version>
         <org.osgi.version>5.0.0</org.osgi.version>
         <oro.version>2.0.8</oro.version>
