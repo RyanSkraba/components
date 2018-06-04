@@ -63,8 +63,8 @@ public class SimpleFileIODatasetProperties extends PropertiesImpl implements Dat
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
-        mainForm.addRow(format);
         mainForm.addRow(path);
+        mainForm.addRow(format);
         mainForm.addRow(recordDelimiter);
         mainForm.addRow(specificRecordDelimiter);
         mainForm.addRow(fieldDelimiter);
