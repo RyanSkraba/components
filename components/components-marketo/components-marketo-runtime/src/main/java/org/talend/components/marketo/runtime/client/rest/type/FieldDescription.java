@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
+import org.apache.avro.SchemaBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.marketo.MarketoConstants;
@@ -183,7 +184,7 @@ public class FieldDescription {
         Schema fs = null;
         String fname = getName().replaceAll("-", "_");
         //
-        fs = AvroUtils._string();
+        fs = SchemaBuilder.builder().unionOf().nullType().and().stringType().endUnion();
         switch (getDataType()) {
         case ("string"):
         case ("text"):
@@ -192,21 +193,21 @@ public class FieldDescription {
         case ("url"):
         case ("lead_function"):
         case ("reference"):
-            fs = AvroUtils._string();
+            fs = SchemaBuilder.builder().unionOf().nullType().and().stringType().endUnion();
             break;
         case ("integer"):
-            fs = AvroUtils._int();
+            fs = SchemaBuilder.builder().unionOf().nullType().and().intType().endUnion();
             break;
         case ("boolean"):
-            fs = AvroUtils._boolean();
+            fs = SchemaBuilder.builder().unionOf().nullType().and().booleanType().endUnion();
             break;
         case ("float"):
         case ("currency"):
-            fs = AvroUtils._float();
+            fs = SchemaBuilder.builder().unionOf().nullType().and().floatType().endUnion();
             break;
         case ("date"):
         case ("datetime"):
-            fs = AvroUtils._date();
+            fs = SchemaBuilder.builder().unionOf().nullType().and().longType().endUnion();
             break;
         default:
             LOG.warn("Non managed type : {}. for {}. Defaulting to String.", getDataType(), this);
@@ -216,7 +217,7 @@ public class FieldDescription {
         if (getLength() != null) {
             f.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, getLength().toString());
         }
-        if (fs.equals(AvroUtils._date())) {
+        if (AvroUtils._long().equals(fs.getTypes().get(1))) {
             f.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, MarketoConstants.DATETIME_PATTERN_REST);
             f.addProp(SchemaConstants.JAVA_CLASS_FLAG, "java.util.Date");
         }

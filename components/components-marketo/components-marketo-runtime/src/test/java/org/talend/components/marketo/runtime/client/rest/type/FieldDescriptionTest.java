@@ -12,12 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client.rest.type;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_REST;
 
 import org.apache.avro.Schema;
@@ -82,7 +77,8 @@ public class FieldDescriptionTest {
 
     @Test
     public void testToString() throws Exception {
-        assertEquals("FieldDescription{id=null, displayName='null', dataType='null', length=null, rest=null, soap=null}",
+        assertEquals(
+                "FieldDescription{id=null, displayName='null', dataType='null', length=null, rest=null, soap=null}",
                 fd.toString());
     }
 
@@ -98,38 +94,38 @@ public class FieldDescriptionTest {
         assertNotNull(af);
         assertEquals("avrof", af.name());
         assertEquals("123456", af.getProp("mktoId"));
-        assertEquals("STRING", af.schema().getType().toString());
+        assertEquals("STRING", af.schema().getTypes().get(1).getType().toString());
         assertEquals("25", af.getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
         for (String s : new String[] { "string", "text", "phone", "email", "url", "lead_function", "reference" }) {
             fd.setDataType(s);
             af = fd.toAvroField();
-            assertEquals("STRING", af.schema().getType().toString());
+            assertEquals("STRING", af.schema().getTypes().get(1).getType().toString());
         }
         fd.setUpdateable(false);
         fd.setDataType("integer");
         af = fd.toAvroField();
-        assertEquals("INT", af.schema().getType().toString());
+        assertEquals("INT", af.schema().getTypes().get(1).getType().toString());
         assertEquals("true", af.getProp(SchemaConstants.TALEND_IS_LOCKED));
         fd.setUpdateable(null);
         af = fd.toAvroField();
         assertNull(af.getProp(SchemaConstants.TALEND_IS_LOCKED));
         fd.setDataType("boolean");
         af = fd.toAvroField();
-        assertEquals("BOOLEAN", af.schema().getType().toString());
+        assertEquals("BOOLEAN", af.schema().getTypes().get(1).getType().toString());
         fd.setDataType("float");
         af = fd.toAvroField();
-        assertEquals("FLOAT", af.schema().getType().toString());
+        assertEquals("FLOAT", af.schema().getTypes().get(1).getType().toString());
         fd.setDataType("currency");
         af = fd.toAvroField();
-        assertEquals("FLOAT", af.schema().getType().toString());
+        assertEquals("FLOAT", af.schema().getTypes().get(1).getType().toString());
         fd.setDataType("date");
         af = fd.toAvroField();
-        assertEquals("LONG", af.schema().getType().toString());
+        assertEquals("LONG", af.schema().getTypes().get(1).getType().toString());
         assertEquals(DATETIME_PATTERN_REST, af.getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("java.util.Date", af.getProp(SchemaConstants.JAVA_CLASS_FLAG));
         fd.setDataType("datetime");
         af = fd.toAvroField();
-        assertEquals("LONG", af.schema().getType().toString());
+        assertEquals("LONG", af.schema().getTypes().get(1).getType().toString());
         assertEquals(DATETIME_PATTERN_REST, af.getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("java.util.Date", af.getProp(SchemaConstants.JAVA_CLASS_FLAG));
         fd.setId(null);
@@ -140,7 +136,7 @@ public class FieldDescriptionTest {
         assertNull(af.getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
         fd.setDataType("unknown");
         af = fd.toAvroField();
-        assertEquals("STRING", af.schema().getType().toString());
+        assertEquals("STRING", af.schema().getTypes().get(1).getType().toString());
     }
 
     @Test
@@ -158,12 +154,12 @@ public class FieldDescriptionTest {
         assertNotNull(r);
         assertEquals("createdAt", r.getFields().get(0).name());
         assertEquals("true", r.getField("model").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
-        assertEquals("STRING", r.getField("marketoGUID").schema().getType().toString());
-        assertEquals("STRING", r.getField("brand").schema().getType().toString());
-        assertEquals("LONG", r.getField("createdAt").schema().getType().toString());
+        assertEquals("STRING", r.getField("marketoGUID").schema().getTypes().get(1).getType().toString());
+        assertEquals("STRING", r.getField("brand").schema().getTypes().get(1).getType().toString());
+        assertEquals("LONG", r.getField("createdAt").schema().getTypes().get(1).getType().toString());
         assertEquals("java.util.Date", r.getField("createdAt").getProp(SchemaConstants.JAVA_CLASS_FLAG));
         assertEquals(DATETIME_PATTERN_REST, r.getField("createdAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
-        assertEquals("LONG", r.getField("updatedAt").schema().getType().toString());
+        assertEquals("LONG", r.getField("updatedAt").schema().getTypes().get(1).getType().toString());
         assertEquals("java.util.Date", r.getField("updatedAt").getProp(SchemaConstants.JAVA_CLASS_FLAG));
         assertEquals(DATETIME_PATTERN_REST, r.getField("updatedAt").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
     }
