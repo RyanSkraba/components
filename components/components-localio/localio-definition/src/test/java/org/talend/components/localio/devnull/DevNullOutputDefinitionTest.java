@@ -46,7 +46,7 @@ public class DevNullOutputDefinitionTest {
         Assert.assertThat(def.getFamilies(), arrayContaining("LocalIO"));
         Assert.assertThat(def.getPropertiesClass(), is(equalTo((Object) DevNullOutputProperties.class)));
         Assert.assertThat(def.getImagePath(DefinitionImageType.PALETTE_ICON_32X32), is("DevNullOutput_icon32.png"));
-        assertThat(def.getIconKey(), is("trash"));
+        assertThat(def.getIconKey(), is("flow-target-o"));
         Assert.assertThat(def.getSupportedConnectorTopologies(), contains(ConnectorTopology.INCOMING));
     }
 

@@ -55,7 +55,7 @@ public class DevNullOutputDefinition extends AbstractComponentDefinition {
 
     @Override
     public String getIconKey() {
-        return "trash";
+        return "flow-target-o";
     }
 
     @Override
