@@ -16,9 +16,9 @@
 
     <properties>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
-        <marklogic-client-api.version>4.0.3</marklogic-client-api.version>
-        <marklogic.mlcp.version>9.0.3</marklogic.mlcp.version>
-        <okio.version>1.13.0</okio.version>
+        <marklogic-client-api.version>4.0.4</marklogic-client-api.version>
+        <marklogic.mlcp.version>9.0.5</marklogic.mlcp.version>
+        <okio.version>1.14.0</okio.version>
     </properties>
 
     <repositories>
