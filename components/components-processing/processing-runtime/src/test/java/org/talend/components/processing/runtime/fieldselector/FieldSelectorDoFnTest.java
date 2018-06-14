@@ -244,6 +244,18 @@ public class FieldSelectorDoFnTest {
         assertEquals("BBB", outputs.get(0).get(3));
     }
 
+
+    @Test(expected = TalendRuntimeException.class)
+    public void selectInvalidElements() throws Exception {
+        FieldSelectorProperties properties = addSelector(null, "a b", "a");
+
+        FieldSelectorDoFn function = new FieldSelectorDoFn().withProperties(properties);
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
+        fnTester.processBundle(inputSimpleRecord);
+        // throw exception
+    }
+
+
     @Test
     public void testBasicHierarchical() throws Exception {
         FieldSelectorProperties properties = addSelector(null, "id", ".id");

@@ -29,6 +29,8 @@ public enum ProcessingErrorCode implements ErrorCode {
     /** The user attempted to access a field that was not found in the record. */
     FIELD_NOT_FOUND("FIELD_NOT_FOUND", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "field"),
 
+    INVALID_FIELD_NAME_EXCEPTION("INVALID_FIELD_NAME_EXCEPTION", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "field"),
+
     AVPATH_SYNTAX_ERROR("AVPATH_SYNTAX_ERROR", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "query", "position");
 
     private final String code;
@@ -78,6 +80,19 @@ public enum ProcessingErrorCode implements ErrorCode {
     public static TalendRuntimeException createFieldNotFoundException(Throwable cause, String field) {
         return new TalendMsgRuntimeException(cause, FIELD_NOT_FOUND,
                 ExceptionContext.withBuilder().put("field", field).build(), "The field '" + field + "' was not found.");
+    }
+
+    /**
+     * Create an exception with the error code and context for {@link #INVALID_FIELD_NAME_EXCEPTION}.
+     *
+     * @param cause The technical exception that was caught when the error occurred.
+     * @param field The field that the user was attempting to write to.
+     * @return An exception corresponding to the error code.
+     */
+    public static TalendRuntimeException createInvalidFieldNameErrorException(Throwable cause, String field) {
+        return new TalendMsgRuntimeException(cause, INVALID_FIELD_NAME_EXCEPTION,
+                ExceptionContext.withBuilder().put("field", field).build(),
+                "The field '" + field + "' cannot be used as a new field name.");
     }
 
     /**

@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.SchemaParseException;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.transforms.DoFn;
@@ -88,9 +89,20 @@ public class FieldSelectorDoFn extends DoFn<IndexedRecord, IndexedRecord> {
         Evaluator.Ctx firstAvPathcontext = avPathContexts.get(0);
         if (avPathContexts.size() > 1 || FieldSelectorUtil.canRetrieveMultipleElements(aVPath)) {
             // create an list for this field
-            return new Field(field, SchemaBuilder.array().items(firstAvPathcontext.schema()), "", "");
+            try {
+                return new Field(field, SchemaBuilder.array().items(firstAvPathcontext.schema()), "", "");
+            } catch (SchemaParseException e) {
+                throw ProcessingErrorCode.createInvalidFieldNameErrorException(e, field);
+
+            }
         } else {
-            return new Field(field, firstAvPathcontext.schema(), "", "");
+            try {
+                return new Field(field, firstAvPathcontext.schema(), "", "");
+            } catch (SchemaParseException e) {
+                throw ProcessingErrorCode.createInvalidFieldNameErrorException(e, field);
+
+            }
+
         }
     }
 
