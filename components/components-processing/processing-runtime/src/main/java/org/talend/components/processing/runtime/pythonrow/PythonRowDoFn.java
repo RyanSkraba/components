@@ -12,22 +12,28 @@
 // ============================================================================
 package org.talend.components.processing.runtime.pythonrow;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.transforms.DoFn;
+import org.python.antlr.AnalyzingParser;
+import org.python.antlr.PythonTree;
+import org.python.antlr.Visitor;
+import org.python.antlr.ast.Import;
+import org.python.antlr.ast.ImportFrom;
+import org.python.antlr.ast.alias;
+import org.python.antlr.base.mod;
+import org.python.antlr.runtime.ANTLRStringStream;
 import org.python.core.PyList;
 import org.python.core.PyObject;
-import org.python.core.PyString;
+import org.python.core.PyUnicode;
 import org.python.util.PythonInterpreter;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
+import org.talend.components.processing.definition.ProcessingErrorCode;
 import org.talend.components.processing.definition.pythonrow.MapType;
 import org.talend.components.processing.definition.pythonrow.PythonRowProperties;
 import org.talend.daikon.avro.converter.JsonGenericRecordConverter;
@@ -35,9 +41,9 @@ import org.talend.daikon.avro.inferrer.JsonSchemaInferrer;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 
-public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
-        implements RuntimableRuntime<PythonRowProperties> {
+public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord> implements RuntimableRuntime<PythonRowProperties> {
 
     private PythonRowProperties properties = null;
 
@@ -46,6 +52,10 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
     private PyObject pyFn = null;
 
     private JsonGenericRecordConverter jsonGenericRecordConverter = null;
+
+    private Set<String> moduleBlacklist = Sets.newHashSet("os", "signal", "java.security",
+            // This is absolutely crucial for these two to be in the blacklist
+            "java.security.SecureClassLoader", "java.security.Permission");
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, PythonRowProperties componentProperties) {
@@ -57,9 +67,13 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
     public void setup() throws Exception {
         interpreter = new PythonInterpreter();
         if (MapType.MAP.equals(properties.mapType.getValue())) {
-            interpreter.exec(setUpMap());
+            String userData = setUpMap();
+            checkImportBlacklist(userData);
+            interpreter.exec(userData);
         } else { // flatmap
-            interpreter.exec(setUpFlatMap());
+            String userData = setUpFlatMap();
+            checkImportBlacklist(userData);
+            interpreter.exec(userData);
         }
         pyFn = interpreter.get("userFunction");
     }
@@ -75,25 +89,50 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
         }
     }
 
-    private String securityPyFunc() {
-        String pySript;
-        try {
-            InputStream resourceAsStream = getClass().getResourceAsStream("import_restriction.py");
-            ByteArrayOutputStream result = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = resourceAsStream.read(buffer)) != -1) {
-                result.write(buffer, 0, length);
+    private void checkImportBlacklist(String userData) throws Exception {
+        mod tree = new AnalyzingParser(new ANTLRStringStream(userData), "", "ascii").parseModule();
+        Visitor vis = new Visitor() {
+
+            @Override
+            public Object visitImport(Import node) throws Exception {
+                for (alias importName : node.getInternalNames()) {
+                    if (moduleBlacklist.contains(importName.getInternalName())) {
+                        throw ProcessingErrorCode.createInvalidPythonImportErrorException(importName.getInternalName());
+                    }
+                }
+                return node;
             }
-            pySript = result.toString(StandardCharsets.UTF_8.name());
-        } catch (IOException e) {
-            throw new ComponentException(e);
+
+            @Override
+            public Object visitImportFrom(ImportFrom node) throws Exception {
+                if (moduleBlacklist.contains(node.getInternalModule())) {
+                    throw ProcessingErrorCode.createInvalidPythonImportErrorException(node.getInternalModule());
+                }
+
+                for (alias importName : node.getInternalNames()) {
+                    if (moduleBlacklist.contains(node.getInternalModule() + "." + importName.getInternalName())) {
+                        throw ProcessingErrorCode.createInvalidPythonImportErrorException(
+                                node.getInternalModule() + "." + importName.getInternalName());
+                    }
+                }
+                return node;
+            }
+        };
+        for (PythonTree c : tree.getChildren()) {
+            try {
+                vis.visit(c);
+            } catch (Exception e) {
+                // error case, we kill the interpreter to avoid caching mechanism.
+                interpreter.close();
+                interpreter = null;
+                throw e;
+            }
         }
-        return pySript;
+
     }
 
     private String setUpMap() {
-        return securityPyFunc() + "import json\n" //
+        return "import json\n" //
                 + "import collections\n" //
                 + "def userFunction(inputJSON):\n" //
                 + "  input = json.loads(inputJSON, object_pairs_hook=collections.OrderedDict)\n" //
@@ -109,7 +148,7 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
     }
 
     private String setUpFlatMap() {
-        return securityPyFunc() + "import json\n" //
+        return "import json\n" //
                 + "import collections\n" //
                 + "def userFunction(inputJSON):\n" //
                 + "  input = json.loads(inputJSON, object_pairs_hook=collections.OrderedDict)\n" //
@@ -125,7 +164,7 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
     }
 
     private void map(IndexedRecord input, ProcessContext context) throws IOException {
-        PyObject output = pyFn.__call__(new PyString(input.toString()));
+        PyObject output = pyFn.__call__(new PyUnicode(input.toString()));
 
         if (jsonGenericRecordConverter == null) {
             JsonSchemaInferrer jsonSchemaInferrer = new JsonSchemaInferrer(new ObjectMapper());
@@ -139,7 +178,7 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
 
     private void flatMap(IndexedRecord input, ProcessContext context) throws IOException {
         // Prepare Python environment
-        PyObject outputList = pyFn.__call__(new PyString(input.toString()));
+        PyObject outputList = pyFn.__call__(new PyUnicode(input.toString()));
 
         if (outputList instanceof PyList) {
             PyList list = (PyList) outputList;

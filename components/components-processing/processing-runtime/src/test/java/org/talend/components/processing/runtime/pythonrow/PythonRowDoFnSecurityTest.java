@@ -8,6 +8,7 @@ import java.security.AccessControlException;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.transforms.DoFnTester;
+import org.apache.beam.sdk.util.UserCodeException;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -63,10 +64,27 @@ public class PythonRowDoFnSecurityTest {
         execute(command);
     }
 
-    @Test
+    @Test(expected = UserCodeException.class)
     public void test_limitImports() throws Throwable {
         String command = "import os\n" //
                 + "output['content'] = 'no error?'\n";
+        execute(command);
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_limitCode() throws Throwable {
+        String command =
+                "from java.security import AccessControlException, Permissions, AllPermission, SecureClassLoader, CodeSource\n"
+                        + "from java.net import URL\n" + "import java.security\n" + "\n"
+                        + "class MagicClassLoader(SecureClassLoader):\n" + "  def _init_(self):\n"
+                        + "    SecureClassLoader._init_(self)\n" + "    self.datamap = {}\n"
+                        + "    self.codeSource = CodeSource(URL('file:/pwn'), None)\n" + "\n"
+                        + "  def addClass(self, name, data):\n" + "    self.datamap[name] = data\n" + "\n"
+                        + "  def findClass(self, name):\n" + "    data = self.datamap[name]\n"
+                        + "    return self.super_defineClass(name, data, 0, len(data), self.codeSource)\n" + "    \n"
+                        + "  def getPermissions(self, codesource):\n" + "    permissions = Permissions()\n"
+                        + "    permissions.add(AllPermission())\n" + "    return permissions    \n" + "\n"
+                        + "output = input";
         try {
             execute(command);
         } catch (PyException pyEx) {
@@ -87,7 +105,9 @@ public class PythonRowDoFnSecurityTest {
 
     @Test
     public void test_sysExit() throws Throwable {
-        String command = "sys.exit(1)\n" //
+        String command =
+                "import sys\n" //
+                + "sys.exit(1)\n" //
                 + "output['content']='no error?'";
         execute(command);
         assertTrue(true);

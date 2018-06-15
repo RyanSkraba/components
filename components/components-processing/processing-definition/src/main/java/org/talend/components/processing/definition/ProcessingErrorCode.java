@@ -31,6 +31,8 @@ public enum ProcessingErrorCode implements ErrorCode {
 
     INVALID_FIELD_NAME_EXCEPTION("INVALID_FIELD_NAME_EXCEPTION", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "field"),
 
+    INVALID_PYTHON_IMPORT_EXCEPTION("INVALID_PYTHON_IMPORT_EXCEPTION", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "importName"),
+    
     AVPATH_SYNTAX_ERROR("AVPATH_SYNTAX_ERROR", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "query", "position");
 
     private final String code;
@@ -93,6 +95,18 @@ public enum ProcessingErrorCode implements ErrorCode {
         return new TalendMsgRuntimeException(cause, INVALID_FIELD_NAME_EXCEPTION,
                 ExceptionContext.withBuilder().put("field", field).build(),
                 "The field '" + field + "' cannot be used as a new field name.");
+    }
+
+    /**
+     * Create an exception when the PythonRow is trying to import something that can make a security issue.
+     *
+     * @param importName The name of the invalid import
+     * @return An exception corresponding to the error code.
+     */
+    public static TalendRuntimeException createInvalidPythonImportErrorException(String importName) {
+        return new TalendMsgRuntimeException(INVALID_PYTHON_IMPORT_EXCEPTION,
+                ExceptionContext.withBuilder().put("importName", importName).build(),
+                "The import '" + importName + "' cannot be used.");
     }
 
     /**

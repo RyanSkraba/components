@@ -15,7 +15,6 @@ package org.talend.components.processing.runtime.pythonrow;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -34,6 +33,9 @@ public class PythonRowDoFnTest {
     private static IndexedRecord inputIndexedRecord = null;
 
     private static IndexedRecord outputIndexedRecord = null;
+
+    private static String utf8Sample = "Les naïfs ægithales hâtifs pondant à Noël où il gèle sont sûrs d'être "
+            + "déçus en voyant leurs drôles d'œufs abîmés.";
 
     @BeforeClass
     public static void setUp() throws IOException {
@@ -228,6 +230,19 @@ public class PythonRowDoFnTest {
         compareRecords(inputIndexedRecord, outputRecord1);
         compareRecords(outputIndexedRecord, outputRecord2);
         compareRecords(outputIndexedRecord, outputRecord3);
+    }
+
+    @Test
+    public void test_utf8() throws Exception {
+        PythonRowProperties properties = new PythonRowProperties("test");
+        properties.init();
+        properties.mapType.setValue(MapType.MAP);
+        properties.pythonCode.setValue("output['a1'] = input['a1']");
+        PythonRowDoFn function = new PythonRowDoFn();
+        assertEquals(ValidationResult.OK, function.initialize(null, properties));
+        DoFnTester<IndexedRecord, IndexedRecord> fnTester = DoFnTester.of(function);
+        List<IndexedRecord> outputs = fnTester.processBundle(GenericDataRecordHelper.createRecord(new Object[] { utf8Sample }));
+        assertEquals(utf8Sample, outputs.get(0).get(0));
     }
 
     /**
