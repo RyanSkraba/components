@@ -13,7 +13,8 @@
 package org.talend.components.processing.runtime.pythonrow;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -41,9 +42,9 @@ import org.talend.daikon.avro.inferrer.JsonSchemaInferrer;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Sets;
 
-public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord> implements RuntimableRuntime<PythonRowProperties> {
+public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord>
+        implements RuntimableRuntime<PythonRowProperties> {
 
     private PythonRowProperties properties = null;
 
@@ -53,7 +54,7 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord> implements
 
     private JsonGenericRecordConverter jsonGenericRecordConverter = null;
 
-    private Set<String> moduleBlacklist = Sets.newHashSet("os", "signal", "java.security",
+    private List<String> moduleBlacklist = Arrays.asList("os", "signal", "java.security",
             // This is absolutely crucial for these two to be in the blacklist
             "java.security.SecureClassLoader", "java.security.Permission");
 
@@ -90,14 +91,19 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord> implements
     }
 
     private void checkImportBlacklist(String userData) throws Exception {
-        mod tree = new AnalyzingParser(new ANTLRStringStream(userData), "", "ascii").parseModule();
+        mod tree = new AnalyzingParser(new ANTLRStringStream(userData), "", "UTF-8").parseModule();
         Visitor vis = new Visitor() {
 
             @Override
             public Object visitImport(Import node) throws Exception {
                 for (alias importName : node.getInternalNames()) {
-                    if (moduleBlacklist.contains(importName.getInternalName())) {
-                        throw ProcessingErrorCode.createInvalidPythonImportErrorException(importName.getInternalName());
+                    for (String blackListElement : moduleBlacklist) {
+                        if (importName.getInternalName().equals(blackListElement)
+                                || importName.getInternalName().startsWith(blackListElement + ".")) {
+                            throw ProcessingErrorCode
+                                    .createInvalidPythonImportErrorException(importName.getInternalName());
+                        }
+
                     }
                 }
                 return node;
@@ -105,14 +111,20 @@ public class PythonRowDoFn extends DoFn<IndexedRecord, IndexedRecord> implements
 
             @Override
             public Object visitImportFrom(ImportFrom node) throws Exception {
-                if (moduleBlacklist.contains(node.getInternalModule())) {
-                    throw ProcessingErrorCode.createInvalidPythonImportErrorException(node.getInternalModule());
+                for (String blackListElement : moduleBlacklist) {
+                    if (node.getInternalModule().equals(blackListElement)
+                            || node.getInternalModule().startsWith(blackListElement + ".")) {
+                        throw ProcessingErrorCode.createInvalidPythonImportErrorException(node.getInternalModule());
+                    }
                 }
 
                 for (alias importName : node.getInternalNames()) {
-                    if (moduleBlacklist.contains(node.getInternalModule() + "." + importName.getInternalName())) {
-                        throw ProcessingErrorCode.createInvalidPythonImportErrorException(
-                                node.getInternalModule() + "." + importName.getInternalName());
+                    for (String blackListElement : moduleBlacklist) {
+                        String fullImport = node.getInternalModule() + "." + importName.getInternalName();
+                        if (fullImport.equals(blackListElement)
+                                || fullImport.startsWith(blackListElement + ".")) {
+                            throw ProcessingErrorCode.createInvalidPythonImportErrorException(fullImport);
+                        }
                     }
                 }
                 return node;

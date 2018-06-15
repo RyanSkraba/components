@@ -84,12 +84,105 @@ public class PythonRowDoFnSecurityTest {
                         + "    return self.super_defineClass(name, data, 0, len(data), self.codeSource)\n" + "    \n"
                         + "  def getPermissions(self, codesource):\n" + "    permissions = Permissions()\n"
                         + "    permissions.add(AllPermission())\n" + "    return permissions    \n" + "\n"
-                        + "output = input";
+                        + "output = input\n";
         try {
             execute(command);
         } catch (PyException pyEx) {
             assertEquals("ImportError", ((PyType) pyEx.type).getName());
             assertEquals("No module named os", ((PyBaseExceptionDerived) pyEx.value).getMessage().toString());
+            return;
+        }
+        assertTrue(false);
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_Javasevurity() throws Throwable {
+        String command = "import java.security";
+        execute(command);
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_JavasevurityReverse() throws Throwable {
+        String command = "from java.security import *";
+        execute(command);
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_JavasevurityAlgorithmConstraints() throws Throwable {
+        String command = "import java.security.AlgorithmConstraints";
+
+        execute(command);
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_JavasevurityAlgorithmConstraintsReverse() throws Throwable {
+        String command = "from java.security import AlgorithmConstraints";
+
+        execute(command);
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_JavasevurityKeyStore() throws Throwable {
+        String command = "import java.security.KeyStore";
+
+        execute(command);
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_JavasevurityKeyStoreReverse() throws Throwable {
+        String command = "import java.security.KeyStore import *";
+
+        execute(command);
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_JavasevurityKeyStoreLoadStoreParameter() throws Throwable {
+        String command = "import java.security.KeyStore.LoadStoreParameter";
+
+        execute(command);
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_JavasevurityKeyStoreLoadStoreParameterReverse() throws Throwable {
+        String command = "from java.security.KeyStore import LoadStoreParameter";
+
+        execute(command);
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_JavasevurityKeyStoreLoadStoreParametertricky() throws Throwable {
+        String command = "from java import security.KeyStore.LoadStoreParameter";
+
+        execute(command);
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_os() throws Throwable {
+        String command = "import os";
+        execute(command);
+
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_osotsomething() throws Throwable {
+        String command = "import os.environ";
+        execute(command);
+    }
+
+    @Test(expected = UserCodeException.class)
+    public void test_osotsomethingReverse() throws Throwable {
+        String command = "from os import environ";
+        execute(command);
+    }
+
+    @Test
+    public void test_oss() throws Throwable {
+        String command = "import oss";
+        try {
+            execute(command);
+        } catch (PyException pyEx) {
+            assertEquals("ImportError", ((PyType) pyEx.type).getName());
+            assertEquals("No module named oss", ((PyBaseExceptionDerived) pyEx.value).getMessage().toString());
             return;
         }
         assertTrue(false);
@@ -105,8 +198,7 @@ public class PythonRowDoFnSecurityTest {
 
     @Test
     public void test_sysExit() throws Throwable {
-        String command =
-                "import sys\n" //
+        String command = "import sys\n" //
                 + "sys.exit(1)\n" //
                 + "output['content']='no error?'";
         execute(command);
