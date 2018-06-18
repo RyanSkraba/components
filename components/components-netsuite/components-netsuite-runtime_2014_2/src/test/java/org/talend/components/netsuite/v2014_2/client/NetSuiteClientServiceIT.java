@@ -73,7 +73,7 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
 
             retrievedCount++;
         }
-        assertTrue(retrievedCount > 1);
+        assertTrue(retrievedCount > 0);
     }
 
     @Test

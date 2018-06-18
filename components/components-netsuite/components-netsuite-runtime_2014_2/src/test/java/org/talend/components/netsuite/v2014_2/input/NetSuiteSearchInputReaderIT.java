@@ -70,6 +70,7 @@ public class NetSuiteSearchInputReaderIT extends AbstractNetSuiteTestBase {
         properties.connection.account.setValue(webServiceTestFixture.getCredentials().getAccount());
         properties.connection.role.setValue(Integer.valueOf(webServiceTestFixture.getCredentials().getRoleId()));
         properties.connection.applicationId.setValue(webServiceTestFixture.getCredentials().getApplicationId());
+        properties.connection.apiVersion.setValue("2014.2");
         properties.module.moduleName.setValue("Account");
 
         NetSuiteRuntimeImpl runtime = new NetSuiteRuntimeImpl();

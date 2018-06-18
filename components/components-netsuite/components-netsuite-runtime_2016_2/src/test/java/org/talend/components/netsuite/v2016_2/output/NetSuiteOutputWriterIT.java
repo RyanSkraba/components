@@ -49,6 +49,7 @@ import org.talend.components.netsuite.client.model.CustomFieldDesc;
 import org.talend.components.netsuite.client.model.FieldDesc;
 import org.talend.components.netsuite.client.model.RefType;
 import org.talend.components.netsuite.client.model.TypeDesc;
+import org.talend.components.netsuite.input.NsObjectInputTransducer;
 import org.talend.components.netsuite.output.NetSuiteOutputProperties;
 import org.talend.components.netsuite.output.NetSuiteOutputWriter;
 import org.talend.components.netsuite.output.NetSuiteWriteOperation;
@@ -162,7 +163,6 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
 
         // Read added records
 
-        List<Account> recordList = new ArrayList<>(refList.size());
 
         List<NsReadResponse<Account>> readResponseList = clientService.execute(
         new NetSuiteClientService.PortOperation<List<NsReadResponse<Account>>, NetSuitePortType>() {
@@ -172,25 +172,20 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
                 return NetSuiteClientServiceImpl.toNsReadResponseList(port.getList(request).getReadResponseList());
             }
         });
+        TypeDesc typeDesc = clientService.getMetaDataSource().getTypeInfo("Account");
+        NsObjectInputTransducer transducer = new NsObjectInputTransducer(clientService, schema, typeDesc.getTypeName());
+        List<IndexedRecord> recordList = new ArrayList<>(refList.size());
         for (NsReadResponse<Account> readResponse : readResponseList) {
             assertTrue(readResponse.getStatus().isSuccess());
 
-            recordList.add(readResponse.getRecord());
+            recordList.add(transducer.read(readResponse.getRecord()));
         }
 
-        List<IndexedRecord> indexedRecordList = new ArrayList<>(refList.size());
-        for (Account record : recordList) {
-            GenericRecord indexedRecord = new GenericData.Record(schema);
-
-            indexedRecord.put("InternalId", record.getInternalId());
-            indexedRecord.put("AcctNumber", record.getAcctNumber());
-            indexedRecord.put("AcctType", record.getAcctType().value());
-
+        for (IndexedRecord record : recordList) {
             // Updated fields
-            indexedRecord.put("AcctName", record.getAcctName() + " (edited)");
-            indexedRecord.put("Description", "qwerty");
-
-            indexedRecordList.add(indexedRecord);
+            int pos = schema.getField("AcctName").pos();
+            record.put(pos, record.get(pos) + " (edited)");
+            record.put(schema.getField("Description").pos(), "qwerty");
         }
 
         // Update records
@@ -203,14 +198,14 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
         NetSuiteOutputWriter writer = (NetSuiteOutputWriter) writeOperation.createWriter(container);
         writer.open(UUID.randomUUID().toString());
 
-        for (IndexedRecord indexedRecord : indexedRecordList) {
+        for (IndexedRecord indexedRecord : recordList) {
             writer.write(indexedRecord);
         }
 
         Result writerResult = writer.close();
         assertNotNull(writerResult);
-        assertEquals(indexedRecordList.size(), writerResult.totalCount);
-        assertEquals(indexedRecordList.size(), writerResult.successCount);
+        assertEquals(recordList.size(), writerResult.totalCount);
+        assertEquals(recordList.size(), writerResult.successCount);
 
         // Re-read updated records
 
@@ -290,9 +285,6 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
         }
 
         // Read added records
-
-        List<Contact> recordList = new ArrayList<>(refList.size());
-
         List<NsReadResponse<Contact>> readResponseList = clientService.execute(
                 new NetSuiteClientService.PortOperation<List<NsReadResponse<Contact>>, NetSuitePortType>() {
                     @Override public List<NsReadResponse<Contact>> execute(NetSuitePortType port) throws Exception {
@@ -301,23 +293,18 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
                         return NetSuiteClientServiceImpl.toNsReadResponseList(port.getList(request).getReadResponseList());
                     }
                 });
+        List<IndexedRecord> recordList = new ArrayList<>(refList.size());
+
+        NsObjectInputTransducer transducer = new NsObjectInputTransducer(clientService, schema, typeDesc.getTypeName());
+
         for (NsReadResponse<Contact> readResponse : readResponseList) {
             assertTrue(readResponse.getStatus().isSuccess());
 
-            recordList.add(readResponse.getRecord());
+            recordList.add(transducer.read(readResponse.getRecord()));
         }
 
-        List<IndexedRecord> indexedRecordList = new ArrayList<>(refList.size());
-        for (Contact record : recordList) {
-            GenericRecord indexedRecord = new GenericData.Record(schema);
-
-            indexedRecord.put("InternalId", record.getInternalId());
-
-            // Updated fields
-
-            indexedRecord.put("custentity_interest_bpm", Boolean.FALSE);
-
-            indexedRecordList.add(indexedRecord);
+        for (IndexedRecord record : recordList) {
+            record.put(schema.getField("Custentity_interest_bpm").pos(), Boolean.FALSE);
         }
 
         // Update records
@@ -330,14 +317,14 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
         NetSuiteOutputWriter writer = (NetSuiteOutputWriter) writeOperation.createWriter(container);
         writer.open(UUID.randomUUID().toString());
 
-        for (IndexedRecord indexedRecord : indexedRecordList) {
+        for (IndexedRecord indexedRecord : recordList) {
             writer.write(indexedRecord);
         }
 
         Result writerResult = writer.close();
         assertNotNull(writerResult);
-        assertEquals(indexedRecordList.size(), writerResult.totalCount);
-        assertEquals(indexedRecordList.size(), writerResult.successCount);
+        assertEquals(recordList.size(), writerResult.totalCount);
+        assertEquals(recordList.size(), writerResult.successCount);
 
         // Re-read updated records
 
@@ -585,7 +572,6 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
         for (int i = 1; i <= count; i++) {
             Account record = new Account();
             String id = Long.toString(System.currentTimeMillis());
-            record.setAcctNumber(id);
             record.setAcctName("Test account " + id);
             record.setAcctType(AccountType.OTHER_ASSET);
             record.setDescription("Test description " + i);
