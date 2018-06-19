@@ -447,7 +447,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                                 handleSuccess(upsertItems.get(i), upsertResults[i].getId(), "updated");
                             }
                         } else {
-                            handleReject(upsertItems.get(0), upsertResults[i].getErrors(), changedItemKeys, batch_idx);
+                            handleReject(upsertItems.get(i), upsertResults[i].getErrors(), changedItemKeys, batch_idx);
                         }
                     }
                 }

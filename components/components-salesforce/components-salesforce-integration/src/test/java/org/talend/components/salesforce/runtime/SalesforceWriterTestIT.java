@@ -1425,6 +1425,73 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
     }
 
+    /**
+     * Test salesforce output upsert reject records when active extend insert
+     */
+    @Test
+    public void testUpsertExtendInsertReject() throws Exception {
+        // Component framework objects.
+        ComponentDefinition sfDef = new TSalesforceOutputDefinition();
+
+        TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
+        SalesforceTestBase.setupProps(sfProps.connection, false);
+        sfProps.outputAction.setValue(OutputAction.UPSERT);
+        sfProps.upsertKeyColumn.setValue("Id");
+        sfProps.module.setValue("moduleName", "Account");
+        sfProps.module.main.schema.setValue(SCHEMA_INSERT_ACCOUNT);
+        sfProps.ceaseForError.setValue(false);
+        sfProps.extendInsert.setValue(true);
+        // Automatically generate the out schemas.
+        sfProps.module.schemaListener.afterSchema();
+
+        DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
+
+        // Initialize the Sink, WriteOperation and Writer
+        SalesforceSink sfSink = new SalesforceSink();
+        sfSink.initialize(container, sfProps);
+        sfSink.validate(container);
+
+        SalesforceWriteOperation sfWriteOp = sfSink.createWriteOperation();
+        sfWriteOp.initialize(container);
+
+        SalesforceWriter sfWriter = sfSink.createWriteOperation().createWriter(container);
+        sfWriter.open("uid1");
+
+        // Write one record.
+        IndexedRecord r1 = new GenericData.Record(SCHEMA_INSERT_ACCOUNT);
+        r1.put(1, "deleteme1");
+        r1.put(2, "deleteme1");
+        r1.put(3, "deleteme1");
+        sfWriter.write(r1);
+        IndexedRecord r2 = new GenericData.Record(SCHEMA_INSERT_ACCOUNT);
+        r2.put(1, "deleteme2");
+        r2.put(2, "deleteme2");
+        r2.put(3, "deleteme2");
+        sfWriter.write(r2);
+
+        sfWriter.close();
+
+        List<IndexedRecord> rejectRecords = sfWriter.getRejectedWrites();
+
+        assertThat(rejectRecords, hasSize(2));
+        assertThat(sfWriter.getSuccessfulWrites(), empty());
+
+        IndexedRecord reject2 = rejectRecords.get(1);
+
+        assertNull(reject2.get(0));
+        assertThat(reject2.get(1), is((Object) "deleteme2"));
+        assertThat(reject2.get(2), is((Object) "deleteme2"));
+        assertThat(reject2.get(3), is((Object) "deleteme2"));
+        assertNotNull(reject2.get(4));
+        assertThat(reject2.get(5), is((Object) "Name"));
+        assertNotNull(reject2.get(6));
+
+        sfWriter.cleanWrites();
+        // Finish the Writer, WriteOperation and Sink.
+        Result wr1 = sfWriter.close();
+        sfWriteOp.finalize(Arrays.asList(wr1), container);
+    }
+
     public String getFirstCreatedAccountRecordId() throws Exception {
         TSalesforceInputProperties sfInputProps = getSalesforceInputProperties();
         SalesforceTestBase.setupProps(sfInputProps.connection, false);
