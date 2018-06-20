@@ -26,7 +26,9 @@ import org.apache.avro.Schema;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.salesforce.SalesforceBulkProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
+import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
@@ -49,7 +51,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         mainForm.addRow(widget(bulkFilePath).setWidgetType(Widget.FILE_WIDGET_TYPE));
 
         Form advancedForm = getForm(Form.ADVANCED);
-        advancedForm.addRow(widget(bulkProperties.getForm(Form.MAIN).setName("bulkProperties")));
+        advancedForm.addRow(widget(bulkProperties.getForm(Form.MAIN)));
         advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.TABLE_WIDGET_TYPE));
     }
 
@@ -61,6 +63,22 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
             form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
             form.getChildForm(connection.getName()).getWidget(connection.httpChunked.getName()).setHidden(true);
             form.getWidget(upsertRelationTable.getName()).setHidden(true);
+
+            Form bulkForm = form.getChildForm(bulkProperties.getName());
+            if (bulkForm != null) {
+                boolean oauthLogin = SalesforceConnectionProperties.LoginType.OAuth
+                            .equals(getEffectiveConnProperties().loginType.getValue());
+                bulkForm.getWidget(bulkProperties.bulkApiV2.getName()).setVisible(oauthLogin);
+                boolean useBulkApiV2 = oauthLogin && bulkProperties.bulkApiV2.getValue();
+                bulkForm.getWidget(bulkProperties.rowsToCommit.getName()).setVisible(!useBulkApiV2);
+                bulkForm.getWidget(bulkProperties.bytesToCommit.getName()).setVisible(!useBulkApiV2);
+                bulkForm.getWidget(bulkProperties.concurrencyMode.getName()).setVisible(!useBulkApiV2);
+                bulkForm.getWidget(bulkProperties.columnDelimiter.getName()).setVisible(useBulkApiV2);
+                bulkForm.getWidget(bulkProperties.lineEnding.getName()).setVisible(useBulkApiV2);
+
+                form.getChildForm(connection.getName()).getWidget(connection.httpChunked.getName()).setHidden(
+                        useBulkApiV2);
+            }
         }
     }
 
@@ -131,7 +149,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         for (Schema.Field se : metadataSchema.getFields()) {
             Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
             field.getObjectProps().putAll(se.getObjectProps());
-            for (Map.Entry<String,Object> entry : se.getObjectProps().entrySet()) {
+            for (Map.Entry<String, Object> entry : se.getObjectProps().entrySet()) {
                 field.addProp(entry.getKey(), entry.getValue());
             }
             copyFieldList.add(field);
@@ -140,7 +158,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         copyFieldList.addAll(moreFields);
 
         newSchema.setFields(copyFieldList);
-        for (Map.Entry<String,Object> entry : metadataSchema.getObjectProps().entrySet()) {
+        for (Map.Entry<String, Object> entry : metadataSchema.getObjectProps().entrySet()) {
             newSchema.addProp(entry.getKey(), entry.getValue());
         }
 
@@ -158,7 +176,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
             return Collections.emptySet();
         }
     }
-    
+
     @Override
     public Set<PropertyPathConnector> getPossibleConnectors(boolean isOutputConnection) {
         if (isOutputConnection) {
@@ -169,6 +187,25 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         } else {
             return Collections.singleton(MAIN_CONNECTOR);
         }
+    }
+
+    /**
+     * If use connection from connection component, need return the referenced connection properties
+     */
+    public SalesforceConnectionProperties getEffectiveConnProperties(){
+        if (isUseExistConnection()) {
+            return connection.getReferencedConnectionProperties();
+        }
+        return connection;
+    }
+
+    /**
+     * Whether use other connection information
+     */
+    public boolean isUseExistConnection() {
+        String refComponentIdValue = connection.getReferencedComponentId();
+        return refComponentIdValue != null
+                && refComponentIdValue.startsWith(TSalesforceConnectionDefinition.COMPONENT_NAME);
     }
 
 }

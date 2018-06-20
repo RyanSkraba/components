@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDeletedProperties;
 import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
@@ -63,14 +64,24 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
                 return new SalesforceInputReader(adaptor, this, sfInProperties);
             }
         } else if (properties instanceof TSalesforceGetServerTimestampProperties) {
-            return new SalesforceServerTimeStampReader(adaptor, this, (TSalesforceGetServerTimestampProperties) properties);
+            return new SalesforceServerTimeStampReader(adaptor, this,
+                    (TSalesforceGetServerTimestampProperties) properties);
         } else if (properties instanceof TSalesforceGetDeletedProperties) {
             return new SalesforceGetDeletedReader(adaptor, this, (TSalesforceGetDeletedProperties) properties);
         } else if (properties instanceof TSalesforceGetUpdatedProperties) {
             return new SalesforceGetUpdatedReader(adaptor, this, (TSalesforceGetUpdatedProperties) properties);
         } else if (properties instanceof TSalesforceBulkExecProperties) {
-            ((TSalesforceBulkExecProperties) properties).connection.bulkConnection.setValue(true);
-            return new SalesforceBulkExecReader(adaptor, this, (TSalesforceBulkExecProperties) properties);
+            TSalesforceBulkExecProperties bulkConnProp = (TSalesforceBulkExecProperties) properties;
+            bulkConnProp.connection.bulkConnection.setValue(true);
+            boolean useBulkApiV2 = SalesforceConnectionProperties.LoginType.OAuth
+                    .equals(bulkConnProp.getEffectiveConnProperties().loginType.getValue())
+                    && bulkConnProp.bulkProperties.bulkApiV2.getValue();
+            if (useBulkApiV2) {
+                return new SalesforceBulkV2ExecReader(adaptor, this, bulkConnProp);
+            } else {
+                return new SalesforceBulkExecReader(adaptor, this, bulkConnProp);
+            }
+
         }
         return null;
     }

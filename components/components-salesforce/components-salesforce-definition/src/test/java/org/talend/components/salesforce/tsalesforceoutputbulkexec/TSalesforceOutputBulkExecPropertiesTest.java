@@ -24,11 +24,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentReferenceProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.service.PropertiesService;
+import org.talend.daikon.properties.service.PropertiesServiceImpl;
 
 /**
  *
@@ -37,9 +42,12 @@ public class TSalesforceOutputBulkExecPropertiesTest extends SalesforceTestBase 
 
     private TSalesforceOutputBulkExecProperties properties;
 
+    private PropertiesService propertiesService;
+
     @Before
     public void setUp() {
         properties = new TSalesforceOutputBulkExecProperties("root");
+        propertiesService = new PropertiesServiceImpl();
     }
 
     @Test
@@ -55,10 +63,12 @@ public class TSalesforceOutputBulkExecPropertiesTest extends SalesforceTestBase 
     public void testGetInputComponentProperties() {
         properties.init();
 
-        TSalesforceOutputBulkProperties inputProperties = (TSalesforceOutputBulkProperties) properties.getInputComponentProperties();
+        TSalesforceOutputBulkProperties inputProperties =
+                (TSalesforceOutputBulkProperties) properties.getInputComponentProperties();
 
         assertEquals(properties.module.main.schema, inputProperties.schema.schema);
-        assertEquals(properties.module.main.schema.getValueEvaluator(), inputProperties.schema.schema.getValueEvaluator());
+        assertEquals(properties.module.main.schema.getValueEvaluator(),
+                inputProperties.schema.schema.getValueEvaluator());
 
         assertEquals(properties.bulkFilePath, inputProperties.bulkFilePath);
         assertEquals(properties.bulkFilePath.getValueEvaluator(), inputProperties.bulkFilePath.getValueEvaluator());
@@ -75,7 +85,8 @@ public class TSalesforceOutputBulkExecPropertiesTest extends SalesforceTestBase 
     public void testGetOutputComponentProperties() {
         properties.init();
 
-        TSalesforceBulkExecProperties outputProperties = (TSalesforceBulkExecProperties) properties.getOutputComponentProperties();
+        TSalesforceBulkExecProperties outputProperties =
+                (TSalesforceBulkExecProperties) properties.getOutputComponentProperties();
 
         assertEquals(properties.schemaFlow, outputProperties.schemaFlow);
         assertEquals(properties.schemaReject, outputProperties.schemaReject);
@@ -93,8 +104,8 @@ public class TSalesforceOutputBulkExecPropertiesTest extends SalesforceTestBase 
 
         Form mainForm = properties.getForm(Form.MAIN);
         assertNotNull(mainForm.getWidget(properties.getConnectionProperties().getName()));
-        assertNotNull(mainForm.getChildForm(properties.getConnectionProperties().getName())
-                .getChildForm(properties.getConnectionProperties().getName()));
+        assertNotNull(mainForm.getChildForm(properties.getConnectionProperties().getName()).getChildForm(
+                properties.getConnectionProperties().getName()));
 
         Form advForm = properties.getForm(Form.ADVANCED);
         assertNotNull(advForm.getWidget(properties.getConnectionProperties().getName()));
@@ -112,18 +123,24 @@ public class TSalesforceOutputBulkExecPropertiesTest extends SalesforceTestBase 
 
         properties.refreshLayout(mainForm);
 
-        assertTrue(mainForm.getChildForm(properties.getConnectionProperties().getName())
+        assertTrue(mainForm
                 .getChildForm(properties.getConnectionProperties().getName())
-                .getWidget(properties.getConnectionProperties().loginType.getName()).isVisible());
+                .getChildForm(properties.getConnectionProperties().getName())
+                .getWidget(properties.getConnectionProperties().loginType.getName())
+                .isVisible());
 
         Form advForm = properties.getForm(Form.ADVANCED);
 
         properties.refreshLayout(advForm);
 
-        assertFalse(advForm.getChildForm(properties.getConnectionProperties().getName()).getWidget(
-                properties.getConnectionProperties().bulkConnection.getName()).isVisible());
-        assertTrue(advForm.getChildForm(properties.getConnectionProperties().getName()).getWidget(
-                properties.getConnectionProperties().httpTraceMessage.getName()).isVisible());
+        assertFalse(advForm
+                .getChildForm(properties.getConnectionProperties().getName())
+                .getWidget(properties.getConnectionProperties().bulkConnection.getName())
+                .isVisible());
+        assertTrue(advForm
+                .getChildForm(properties.getConnectionProperties().getName())
+                .getWidget(properties.getConnectionProperties().httpTraceMessage.getName())
+                .isVisible());
         assertFalse(advForm.getWidget(properties.upsertRelationTable.getName()).isVisible());
     }
 
@@ -136,23 +153,58 @@ public class TSalesforceOutputBulkExecPropertiesTest extends SalesforceTestBase 
         properties.outputAction.setValue(SalesforceOutputProperties.OutputAction.INSERT);
         properties.afterOutputAction();
         assertFalse(advForm.getWidget(properties.upsertRelationTable.getName()).isVisible());
-        assertEquals(SalesforceOutputProperties.OutputAction.INSERT, properties.outputBulkProperties.outputAction.getValue());
+        assertEquals(SalesforceOutputProperties.OutputAction.INSERT,
+                properties.outputBulkProperties.outputAction.getValue());
 
         properties.outputAction.setValue(SalesforceOutputProperties.OutputAction.UPSERT);
         properties.afterOutputAction();
         assertTrue(advForm.getWidget(properties.upsertRelationTable.getName()).isVisible());
-        assertEquals(SalesforceOutputProperties.OutputAction.UPSERT, properties.outputBulkProperties.outputAction.getValue());
+        assertEquals(SalesforceOutputProperties.OutputAction.UPSERT,
+                properties.outputBulkProperties.outputAction.getValue());
     }
 
     @Test
     public void testPropertiesConnectors() {
 
-        assertThat(properties.getAllSchemaPropertiesConnectors(false), containsInAnyOrder(
-                (Connector) new PropertyPathConnector(Connector.MAIN_NAME, "schema")));
+        assertThat(properties.getAllSchemaPropertiesConnectors(false),
+                containsInAnyOrder((Connector) new PropertyPathConnector(Connector.MAIN_NAME, "schema")));
 
-        assertThat(properties.getAllSchemaPropertiesConnectors(true), containsInAnyOrder(
-                (Connector) new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow"),
-                new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject")));
+        assertThat(properties.getAllSchemaPropertiesConnectors(true),
+                containsInAnyOrder((Connector) new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow"),
+                        new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject")));
+    }
+
+    @Test
+    public void testReferenceProperties() throws Throwable {
+
+        properties.init();
+
+        // Build a reference properties
+        SalesforceConnectionProperties cProps = new SalesforceConnectionProperties("refer");
+        cProps.init();
+        cProps.loginType.setValue(SalesforceConnectionProperties.LoginType.OAuth);
+        cProps.apiVersion.setValue("41.0");
+
+        properties.connection.referencedComponent.setValue("referenceType",
+                ComponentReferenceProperties.ReferenceType.COMPONENT_INSTANCE);
+        properties.connection.referencedComponent.setValue("componentInstanceId", "tSalesforceConnection_1");
+        properties.connection.referencedComponent.setValue("referenceDefinitionName", "tSalesforceConnection");
+        properties.connection.referencedComponent.setReference(cProps);
+
+        assertTrue(properties.isUseExistConnection());
+
+        ComponentProperties outputComponentProperties = properties.getOutputComponentProperties();
+        assertNotNull(outputComponentProperties);
+        assertEquals(TSalesforceBulkExecProperties.class, outputComponentProperties.getClass());
+        TSalesforceBulkExecProperties bulkExecProperties = (TSalesforceBulkExecProperties) outputComponentProperties;
+        assertEquals(SalesforceConnectionProperties.DEFAULT_API_VERSION,
+                bulkExecProperties.connection.apiVersion.getValue());
+        SalesforceConnectionProperties referConnProps =
+                bulkExecProperties.connection.referencedComponent.getReference();
+        // Check properties value from reference properties.
+        assertNotNull(referConnProps);
+        assertEquals("41.0", referConnProps.apiVersion.getValue());
+        assertEquals(SalesforceConnectionProperties.LoginType.OAuth, referConnProps.loginType.getValue());
     }
 
 }

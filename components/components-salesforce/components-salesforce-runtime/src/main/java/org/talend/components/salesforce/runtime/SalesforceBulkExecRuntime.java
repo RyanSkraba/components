@@ -22,22 +22,33 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.runtime.bulk.v2.BulkV2Connection;
+import org.talend.components.salesforce.runtime.bulk.v2.SalesforceBulkV2Runtime;
+import org.talend.components.salesforce.runtime.bulk.v2.error.BulkV2ClientException;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.sforce.async.AsyncApiException;
+import com.sforce.async.BulkConnection;
 import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
 
 public class SalesforceBulkExecRuntime extends SalesforceSourceOrSink
         implements ComponentDriverInitialization<ComponentProperties> {
+
+    private transient static final Logger LOG = getLogger(SalesforceBulkExecRuntime.class);
+
+    private static final I18nMessages MESSAGES =
+            GlobalI18N.getI18nMessageProvider().getI18nMessages(SalesforceBulkExecRuntime.class);
 
     protected int dataCount;
 
     private int successCount;
 
     private int rejectCount;
-
-    private transient static final Logger LOG = getLogger(SalesforceBulkExecRuntime.class);
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
@@ -47,7 +58,14 @@ public class SalesforceBulkExecRuntime extends SalesforceSourceOrSink
 
     @Override
     public void runAtDriver(RuntimeContainer container) {
-        bulkExecute(container);
+        TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
+        boolean useBulkApiV2 = SalesforceConnectionProperties.LoginType.OAuth.equals(
+                sprops.getEffectiveConnProperties().loginType.getValue()) && sprops.bulkProperties.bulkApiV2.getValue();
+        if (useBulkApiV2) {
+            bulkV2Execute(container);
+        } else {
+            bulkExecute(container);
+        }
         setReturnValues(container);
     }
 
@@ -74,6 +92,26 @@ public class SalesforceBulkExecRuntime extends SalesforceSourceOrSink
             }
             bulkRuntime.close();
         } catch (IOException | AsyncApiException | ConnectionException e) {
+            throw new ComponentException(e);
+        }
+    }
+
+    public void bulkV2Execute(RuntimeContainer container) {
+        TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
+        try {
+            BulkConnection bulkConnection = connect(container).bulkConnection;
+            if (bulkConnection == null) {
+                throw new BulkV2ClientException(MESSAGES.getMessage("error.bulk.config"));
+            }
+            ConnectorConfig bulkConfig = bulkConnection.getConfig();
+            String apiVersion = sprops.getEffectiveConnProperties().apiVersion.getValue();
+            BulkV2Connection bulkV2Conn = new BulkV2Connection(bulkConfig, apiVersion);
+            SalesforceBulkV2Runtime bulkRuntime = new SalesforceBulkV2Runtime(bulkV2Conn, sprops);
+            bulkRuntime.executeBulk();
+            dataCount = bulkRuntime.getNumberRecordsProcessed();
+            rejectCount = bulkRuntime.getNumberRecordsFailed();
+            successCount = dataCount - rejectCount;
+        } catch (InterruptedException | IOException e) {
             throw new ComponentException(e);
         }
     }

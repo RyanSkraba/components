@@ -19,15 +19,21 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.api.properties.ComponentReferenceProperties;
+import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.daikon.avro.SchemaConstants;
@@ -44,6 +50,9 @@ public class TSalesforceBulkExecPropertiesTest extends SalesforceTestBase {
             .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().stringType().noDefault() //
             .name("Name").type().stringType().noDefault() //
             .endRecord();
+
+    @Rule
+    public ErrorCollector errorCollector = new ErrorCollector();
 
     private PropertiesService propertiesService;
 
@@ -177,6 +186,85 @@ public class TSalesforceBulkExecPropertiesTest extends SalesforceTestBase {
 
         assertThat(properties.getPossibleConnectors(false), containsInAnyOrder(
                 new PropertyPathConnector(Connector.MAIN_NAME, "module.main")));
+    }
+
+    @Test
+    public void testRefreshProperties() throws Throwable {
+
+        properties.init();
+        Form mainForm = properties.getForm(Form.MAIN);
+        properties.connection.loginType.setValue(SalesforceConnectionProperties.LoginType.Basic);
+        ComponentTestUtils.checkSerialize(properties, errorCollector);
+        assertEquals(Form.MAIN, mainForm.getName());
+
+        assertNull(properties.bulkFilePath.getValue());
+        assertTrue(mainForm.getWidget(properties.bulkFilePath.getName()).isVisible());
+        assertEquals(SalesforceOutputProperties.OutputAction.INSERT, properties.outputAction.getValue());
+        assertEquals(SalesforceConnectionProperties.LoginType.Basic, properties.connection.loginType.getValue());
+
+        Form advancedForm = properties.getForm(Form.ADVANCED);
+
+        Form bulkForm = advancedForm.getChildForm(properties.bulkProperties.getName());
+
+        assertFalse(bulkForm.getWidget(properties.bulkProperties.bulkApiV2.getName()).isVisible());
+        assertTrue(bulkForm.getWidget(properties.bulkProperties.rowsToCommit.getName()).isVisible());
+        assertTrue(bulkForm.getWidget(properties.bulkProperties.bytesToCommit.getName()).isVisible());
+        assertTrue(bulkForm.getWidget(properties.bulkProperties.concurrencyMode.getName()).isVisible());
+        assertTrue(bulkForm.getWidget(properties.bulkProperties.waitTimeCheckBatchState.getName()).isVisible());
+        assertFalse(bulkForm.getWidget(properties.bulkProperties.columnDelimiter.getName()).isVisible());
+        assertFalse(bulkForm.getWidget(properties.bulkProperties.lineEnding.getName()).isVisible());
+
+        properties.connection.loginType.setValue(SalesforceConnectionProperties.LoginType.OAuth);
+        propertiesService.afterProperty(properties.connection.loginType.getName(), properties.connection);
+
+        properties.refreshLayout(advancedForm);
+        assertTrue(bulkForm.getWidget(properties.bulkProperties.bulkApiV2.getName()).isVisible());
+
+        properties.bulkProperties.bulkApiV2.setValue(true);
+        propertiesService.afterProperty(properties.bulkProperties.bulkApiV2.getName(), properties.bulkProperties);
+
+        assertFalse(bulkForm.getWidget(properties.bulkProperties.rowsToCommit.getName()).isVisible());
+        assertFalse(bulkForm.getWidget(properties.bulkProperties.bytesToCommit.getName()).isVisible());
+        assertFalse(bulkForm.getWidget(properties.bulkProperties.concurrencyMode.getName()).isVisible());
+        assertTrue(bulkForm.getWidget(properties.bulkProperties.waitTimeCheckBatchState.getName()).isVisible());
+        assertTrue(bulkForm.getWidget(properties.bulkProperties.columnDelimiter.getName()).isVisible());
+        assertTrue(bulkForm.getWidget(properties.bulkProperties.lineEnding.getName()).isVisible());
+
+    }
+
+    @Test
+    public void testUseConnRefresh() throws Throwable {
+        properties.init();
+        // Referenced properties simulating salesforce connect component
+        SalesforceConnectionProperties cProps = new SalesforceConnectionProperties("refer");
+        cProps.init();
+
+        Form advancedForm = properties.getForm(Form.ADVANCED);
+        Form bulkForm = advancedForm.getChildForm(properties.bulkProperties.getName());
+        assertFalse(bulkForm.getWidget(properties.bulkProperties.bulkApiV2.getName()).isVisible());
+        properties.connection.loginType.setValue(SalesforceConnectionProperties.LoginType.OAuth);
+        propertiesService.afterProperty(properties.connection.loginType.getName(), properties.connection);
+        properties.refreshLayout(advancedForm);
+        assertTrue(bulkForm.getWidget(properties.bulkProperties.bulkApiV2.getName()).isVisible());
+
+        String compId = "tSalesforceConnection_1";
+        // Use the connection props of the salesforce connect component
+        properties.connection.referencedComponent.referenceType
+                .setValue(ComponentReferenceProperties.ReferenceType.COMPONENT_INSTANCE);
+        properties.connection.referencedComponent.componentInstanceId.setValue(compId);
+        properties.connection.referencedComponent.setReference(cProps);
+
+        Form referForm = properties.connection.getForm(Form.REFERENCE);
+        assertTrue(referForm.getWidget(properties.connection.referencedComponent.getName()).isCallAfter());
+        propertiesService.afterProperty(properties.connection.referencedComponent.getName(), properties.connection);
+        properties.refreshLayout(advancedForm);
+        assertFalse(bulkForm.getWidget(properties.bulkProperties.bulkApiV2.getName()).isVisible());
+
+        cProps.loginType.setValue(SalesforceConnectionProperties.LoginType.OAuth);
+        propertiesService.afterProperty(cProps.loginType.getName(), cProps);
+        properties.refreshLayout(advancedForm);
+        assertTrue(bulkForm.getWidget(properties.bulkProperties.bulkApiV2.getName()).isVisible());
+
     }
 
 }

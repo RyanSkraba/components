@@ -23,13 +23,15 @@ import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecP
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
 import org.talend.daikon.properties.presentation.Form;
 
-public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProperties implements VirtualComponentProperties {
+public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProperties
+        implements VirtualComponentProperties {
+
+    public TSalesforceOutputBulkProperties outputBulkProperties =
+            new TSalesforceOutputBulkProperties("outputBulkProperties");
 
     public TSalesforceOutputBulkExecProperties(String name) {
         super(name);
     }
-
-    public TSalesforceOutputBulkProperties outputBulkProperties = new TSalesforceOutputBulkProperties("outputBulkProperties");
 
     @Override
     public void setupProperties() {
@@ -66,9 +68,12 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
 
         // we need to pass also the possible values, only way from the studio to know it comes from a combo box (need to
         // add quotes for generation)
-        outputBulkProperties.upsertRelationTable.columnName.setPossibleValues(upsertRelationTable.columnName.getPossibleValues());
-        outputBulkProperties.upsertRelationTable.columnName.setStoredValue(upsertRelationTable.columnName.getStoredValue());
-        outputBulkProperties.upsertRelationTable.columnName.setValueEvaluator(upsertRelationTable.columnName.getValueEvaluator());
+        outputBulkProperties.upsertRelationTable.columnName
+                .setPossibleValues(upsertRelationTable.columnName.getPossibleValues());
+        outputBulkProperties.upsertRelationTable.columnName
+                .setStoredValue(upsertRelationTable.columnName.getStoredValue());
+        outputBulkProperties.upsertRelationTable.columnName
+                .setValueEvaluator(upsertRelationTable.columnName.getValueEvaluator());
         outputBulkProperties.upsertRelationTable.lookupFieldExternalIdName
                 .setStoredValue(upsertRelationTable.lookupFieldExternalIdName.getStoredValue());
         outputBulkProperties.upsertRelationTable.lookupFieldExternalIdName
@@ -81,7 +86,8 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
                 .setStoredValue(upsertRelationTable.lookupFieldModuleName.getStoredValue());
         outputBulkProperties.upsertRelationTable.lookupFieldModuleName
                 .setValueEvaluator(upsertRelationTable.lookupFieldModuleName.getValueEvaluator());
-        outputBulkProperties.upsertRelationTable.polymorphic.setStoredValue(upsertRelationTable.polymorphic.getStoredValue());
+        outputBulkProperties.upsertRelationTable.polymorphic
+                .setStoredValue(upsertRelationTable.polymorphic.getStoredValue());
         outputBulkProperties.upsertRelationTable.polymorphic
                 .setValueEvaluator(upsertRelationTable.polymorphic.getValueEvaluator());
         for (Form form : outputBulkProperties.getForms()) {
@@ -99,12 +105,19 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
 
         // we need to pass also the possible values, only way from the studio to know it comes from a combo box (need to
         // add quotes for generation)
-        bulkExecProperties.upsertRelationTable.columnName.setPossibleValues(upsertRelationTable.columnName.getPossibleValues());
+        bulkExecProperties.upsertRelationTable.columnName
+                .setPossibleValues(upsertRelationTable.columnName.getPossibleValues());
 
-        bulkExecProperties.connection.referencedComponent.componentInstanceId.setTaggedValue(UpsertRelationTable.ADD_QUOTES,
-                true);
+        bulkExecProperties.connection.referencedComponent.componentInstanceId
+                .setTaggedValue(UpsertRelationTable.ADD_QUOTES, true);
         bulkExecProperties.module.connection.referencedComponent.componentInstanceId
                 .setTaggedValue(UpsertRelationTable.ADD_QUOTES, true);
+
+        // Seems that properties copy can't copy the reference properties
+        if (isUseExistConnection()) {
+            bulkExecProperties.connection.referencedComponent
+                    .setReference(connection.getReferencedConnectionProperties());
+        }
 
         for (Form form : bulkExecProperties.getForms()) {
             bulkExecProperties.refreshLayout(form);
