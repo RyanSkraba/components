@@ -141,6 +141,7 @@ public class SimpleFileIORoundTripRuntimeTest {
         outputProps.getDatasetProperties().path.setValue(fileSpec);
         SimpleFileIOInputProperties inputProps = createInputComponentProperties();
         inputProps.setDatasetProperties(outputProps.getDatasetProperties());
+        inputProps.getDatasetProperties().headerLine.setValue(0);
 
         List<IndexedRecord> actual = runRoundTripPipelines(beam, rs.getAllData(), outputProps, inputProps);
 
@@ -176,6 +177,7 @@ public class SimpleFileIORoundTripRuntimeTest {
         outputProps.getDatasetProperties().specificFieldDelimiter.setValue("|");
         SimpleFileIOInputProperties inputProps = createInputComponentProperties();
         inputProps.setDatasetProperties(outputProps.getDatasetProperties());
+        inputProps.getDatasetProperties().headerLine.setValue(0);
 
         List<IndexedRecord> actual = runRoundTripPipelines(beam, rs.getAllData(), outputProps, inputProps);
 

@@ -14,6 +14,7 @@ package org.talend.components.test;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -119,9 +120,9 @@ public class RecordSetUtil {
      * @param td The test data to write.
      * @throws IOException If there was an exception writing to the filesystem.
      */
-    public static void writeRandomCsvFile(FileSystem fs, String path, RecordSet td) throws IOException {
+    public static void writeRandomCsvFile(FileSystem fs, String path, RecordSet td, String encoding) throws IOException {
         int size = td.getSchema().getFields().size();
-        try (PrintWriter w = new PrintWriter(fs.create(new Path(path)))) {
+        try (PrintWriter w = (encoding != null ? new PrintWriter(new OutputStreamWriter(fs.create(new Path(path)), encoding)) : new PrintWriter(fs.create(new Path(path))))) {
             for (List<IndexedRecord> partition : td.getPartitions()) {
                 for (IndexedRecord record : partition) {
                     if (size > 0)
@@ -135,5 +136,11 @@ public class RecordSetUtil {
             }
         }
     }
+    
+    public static void writeCsvFile(FileSystem fs, String path, String content, String encoding) throws IOException {
+      try (PrintWriter w = (encoding != null ? new PrintWriter(new OutputStreamWriter(fs.create(new Path(path)), encoding)) : new PrintWriter(fs.create(new Path(path))))) {
+          w.print(content);
+      }
+  }
 
 }

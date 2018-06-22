@@ -93,6 +93,7 @@ public class GSRoundTripRuntimeTestIT {
 
         SimpleFileIOInputProperties inputProps = createInputProps();
         inputProps.getDatasetProperties().path.setValue(gsPath + "*");
+        inputProps.getDatasetProperties().headerLine.setValue(0);
 
         SimpleFileIOInputRuntime inputRuntime = new SimpleFileIOInputRuntime();
         inputRuntime.initialize(null, inputProps);

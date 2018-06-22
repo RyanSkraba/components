@@ -28,11 +28,9 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.values.PCollection;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.transform.DirectCollector;
 import org.talend.components.simplefileio.SimpleFileIODatasetProperties;
 import org.talend.components.simplefileio.SimpleFileIOFormat;
@@ -164,6 +162,7 @@ public class S3RoundTripRuntimeTestIT {
         datasetProps.format.setValue(SimpleFileIOFormat.CSV);
         datasetProps.recordDelimiter.setValue(SimpleFileIODatasetProperties.RecordDelimiterType.LF);
         datasetProps.fieldDelimiter.setValue(SimpleFileIODatasetProperties.FieldDelimiterType.SEMICOLON);
+        datasetProps.headerLine.setValue(0);
         test_noEncryption(datasetProps);
     }
 

@@ -18,9 +18,11 @@ import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.simplefileio.SimpleFileIODatasetProperties;
 import org.talend.components.simplefileio.input.SimpleFileIOInputProperties;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 import org.talend.components.simplefileio.runtime.ugi.UgiExceptionHandler;
+import org.talend.components.simplefileio.s3.S3DatasetProperties;
 import org.talend.daikon.properties.ValidationResult;
 
 public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>>
@@ -60,12 +62,19 @@ public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<Ind
             break;
 
         case CSV:
-            rf = new SimpleRecordFormatCsvIO(doAs, path, overwrite, limit, properties.getDatasetProperties().getRecordDelimiter(),
-                    properties.getDatasetProperties().getFieldDelimiter(), mergeOutput);
+            SimpleFileIODatasetProperties dataset = properties.getDatasetProperties();
+            rf = new SimpleRecordFormatCsvIO(doAs, path, limit, dataset.getRecordDelimiter(),
+                dataset.getFieldDelimiter(), dataset.getEncoding(), 
+                dataset.getHeaderLine(), dataset.getTextEnclosureCharacter(), dataset.getEscapeCharacter());
             break;
 
         case PARQUET:
             rf = new SimpleRecordFormatParquetIO(doAs, path, overwrite, limit, mergeOutput);
+            break;
+            
+        case EXCEL:
+            SimpleFileIODatasetProperties ds = properties.getDatasetProperties();
+            rf = new SimpleRecordFormatExcelIO(doAs, path, overwrite, limit, mergeOutput, ds.getEncoding(), ds.getSheetName(), ds.getHeaderLine(), ds.getFooterLine(), ds.getExcelFormat());
             break;
         }
 
@@ -75,4 +84,5 @@ public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<Ind
 
         return rf.read(in);
     }
+    
 }

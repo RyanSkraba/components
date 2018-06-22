@@ -51,6 +51,10 @@ public class S3OutputPropertiesTest {
         datastoreProperties.init();
         S3DatasetProperties datasetProperties = new S3DatasetProperties("test");
         datasetProperties.init();
+        
+        //set a fake one to avoid to trigger the runtime which should not run here
+        datasetProperties.bucket.setPossibleValues("bucket1");
+        
         datasetProperties.setDatastoreProperties(datastoreProperties);
         properties.setDatasetProperties(datasetProperties);
         properties.init();

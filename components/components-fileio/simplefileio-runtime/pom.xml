@@ -19,6 +19,10 @@
         <hadoop.aws.artifactId>hadoop-aws-tlnd</hadoop.aws.artifactId>
         <hadoop.aws.version>2.7.3.1</hadoop.aws.version>
         <parquet.version>1.9.0</parquet.version>
+        <!--
+        <poi.version>3.16</poi.version>
+        -->
+        <tika.version>1.15</tika.version>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
 
@@ -213,6 +217,130 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        
+        <!-- Excel format support -->
+        <!-- tika introduce poi, so not necessary
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${poi.version}</version>
+        </dependency>
+        -->
+        <dependency>
+	    	<groupId>com.monitorjbl</groupId>
+		    <artifactId>xlsx-streamer</artifactId>
+		    <version>1.0.0</version>
+		    <exclusions>
+                <exclusion>
+		      		<groupId>org.apache.poi</groupId>
+		      		<artifactId>poi-ooxml</artifactId>
+			    </exclusion>
+			    <exclusion>
+			      	<groupId>xerces</groupId>
+			      	<artifactId>xercesImpl</artifactId>
+			    </exclusion>
+			    <exclusion>
+			      	<groupId>org.slf4j</groupId>
+			      	<artifactId>slf4j-api</artifactId>
+			    </exclusion>
+            </exclusions>
+	  	</dependency>
+        <dependency>
+    		<groupId>org.apache.tika</groupId>
+		    <artifactId>tika-parsers</artifactId>
+	    	<version>${tika.version}</version>
+			<exclusions>
+                <exclusion>
+                    <groupId>org.osgi</groupId>
+                    <artifactId>org.osgi.core</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>edu.usc.ir</groupId>
+                    <artifactId>sentiment-analysis-parser</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.opengis</groupId>
+					<artifactId>geoapi</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.apache.commons</groupId>
+					<artifactId>commons-csv</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.apache.sis.core</groupId>
+					<artifactId>sis-utility</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.apache.sis.storage</groupId>
+					<artifactId>sis-netcdf</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.apache.sis.core</groupId>
+					<artifactId>sis-metadata</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>edu.ucar</groupId>
+					<artifactId>httpservices</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>edu.ucar</groupId>
+					<artifactId>cdm</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>edu.ucar</groupId>
+					<artifactId>grib</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>edu.ucar</groupId>
+					<artifactId>netcdf4</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>com.github.jai-imageio</groupId>
+					<artifactId>jai-imageio-jpeg2000</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>com.github.jai-imageio</groupId>
+					<artifactId>jai-imageio-core</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+				<exclusion>
+					<groupId>org.mockito</groupId>
+					<artifactId>mockito-core</artifactId>
+                </exclusion>
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+                </exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jul-to-slf4j</artifactId>
+                </exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+  		</dependency>
     </dependencies>
     <build>
         <plugins>

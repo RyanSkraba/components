@@ -72,6 +72,7 @@ public class SimpleFileIODatasetRuntimeTest {
 
         SimpleFileIODatasetProperties props = createDatasetProperties();
         props.path.setValue(input.toURI().toString());
+        props.headerLine.setValue(0);
 
         final List<IndexedRecord> consumed = new ArrayList<>();
 

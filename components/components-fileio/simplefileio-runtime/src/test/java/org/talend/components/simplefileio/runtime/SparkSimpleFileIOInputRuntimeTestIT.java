@@ -90,6 +90,7 @@ public class SparkSimpleFileIOInputRuntimeTestIT {
         // Configure the component.
         SimpleFileIOInputProperties inputProps = SimpleFileIOInputRuntimeTest.createInputComponentProperties();
         inputProps.getDatasetProperties().path.setValue(fileSpec);
+        inputProps.getDatasetProperties().headerLine.setValue(0);
 
         // Create the runtime.
         SimpleFileIOInputRuntime runtime = new SimpleFileIOInputRuntime();

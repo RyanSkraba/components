@@ -58,6 +58,7 @@ public class CsvExample {
                             "\"a\";b;c", "a;\"b\";c", "a;b;\"c\"", "\"a\";\"b\";c", "a;\"b\";\"c\"", "\"a\";b;\"c\"",
                             "\"a\";\"b\";\"c\""));
 
+            /*
             // Escaped values
             new CsvExample(new String[] { "" }, "\"\"");
             new CsvExample(new String[] { ";" }, "\";\"");
@@ -73,6 +74,7 @@ public class CsvExample {
             // No escape character
             new CsvExample(new String[] { "\\", "" }, "\\;");
             new CsvExample(new String[] { "\\", "\\", "\\" }, "\\;\\;\\");
+            */
         }
 
         return EXAMPLES;

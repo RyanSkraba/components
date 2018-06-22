@@ -38,6 +38,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
@@ -65,7 +66,33 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
     private final String recordDelimiter;
 
     private final String fieldDelimiter;
+    
+    private String encoding = "UTF-8";
+    
+    private long header;
+    
+    private String textEnclosure;
+    
+    private String escapeChar;
 
+    /**
+     * work for the reading
+     * @param doAs
+     * @param path
+     * @param limit
+     * @param recordDelimiter
+     * @param fieldDelimiter
+     */
+    
+    public SimpleRecordFormatCsvIO(UgiDoAs doAs, String path, int limit, String recordDelimiter,
+            String fieldDelimiter, String encoding, long header, String textEnclosure, String escapeChar) {
+        this(doAs, path, false, limit, recordDelimiter, fieldDelimiter, false);
+        this.encoding = encoding;
+        this.header = header;
+        this.textEnclosure = textEnclosure;
+        this.escapeChar = escapeChar;
+    }
+    
     public SimpleRecordFormatCsvIO(UgiDoAs doAs, String path, boolean overwrite, int limit, String recordDelimiter,
             String fieldDelimiter, boolean mergeOutput) {
         super(doAs, path, overwrite, limit, mergeOutput);
@@ -83,22 +110,34 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
 
     @Override
     public PCollection<IndexedRecord> read(PBegin in) {
-
+        boolean isGSFileSystem = false;
+        
         PCollection<?> pc2;
         if (path.startsWith("gs://")) {
+            isGSFileSystem = true;
             pc2 = in.apply(TextIO.read().from(path));
         } else {
-            CsvHdfsFileSource source = CsvHdfsFileSource.of(doAs, path, recordDelimiter);
+            CsvHdfsFileSource source = CsvHdfsFileSource.of(doAs, path, recordDelimiter, encoding, header, textEnclosure, escapeChar);
             source.getExtraHadoopConfiguration().addFrom(getExtraHadoopConfiguration());
 
             source.setLimit(limit);
 
-            PCollection<KV<org.apache.hadoop.io.LongWritable, Text>> pc1 = in.apply(Read.from(source));
+            PCollection<KV<org.apache.hadoop.io.LongWritable, BytesWritable>> pc1 = in.apply(Read.from(source));
 
-            pc2 = pc1.apply(Values.<Text> create());
+            pc2 = pc1.apply(Values.<BytesWritable> create());
         }
 
-        PCollection<IndexedRecord> pc3 = pc2.apply(ParDo.of(new ExtractCsvRecord<>(fieldDelimiter.charAt(0))));
+        Character te = null;
+        if(this.textEnclosure!=null && !this.textEnclosure.isEmpty()) {
+            te = this.textEnclosure.charAt(0);
+        }
+        
+        Character ec = null;
+        if(this.escapeChar!=null && !this.escapeChar.isEmpty()) {
+            ec = this.escapeChar.charAt(0);
+        }
+        
+        PCollection<IndexedRecord> pc3 = pc2.apply(ParDo.of(new ExtractCsvRecord<>(fieldDelimiter.charAt(0), isGSFileSystem, encoding, te, ec)));
         return pc3;
     }
 
@@ -168,12 +207,24 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
         }
 
         public final char fieldDelimiter;
+        
+        public final boolean isGSFileSystem; 
+        
+        public final String encoding; 
+        
+        public final Character textEnclosure; 
+        
+        public final Character escapeChar; 
 
         /** The converter is cached for performance. */
         private transient IndexedRecordConverter<CSVRecord, ? extends IndexedRecord> converter;
 
-        public ExtractCsvRecord(char fieldDelimiter) {
+        public ExtractCsvRecord(char fieldDelimiter, boolean isGSFileSystem, String encoding, Character textEnclosure, Character escapeChar) {
             this.fieldDelimiter = fieldDelimiter;
+            this.isGSFileSystem = isGSFileSystem;
+            this.encoding = encoding;
+            this.textEnclosure = textEnclosure;
+            this.escapeChar = escapeChar;
         }
 
         @ProcessElement
@@ -181,9 +232,37 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
             if (converter == null) {
                 converter = new SimpleFileIOAvroRegistry.CsvRecordToIndexedRecordConverter();
             }
-            String in = c.element().toString();
-            for (CSVRecord r : CSVFormat.RFC4180.withDelimiter(fieldDelimiter).parse(new StringReader(in)))
+            
+            if(isGSFileSystem) {
+                String in = c.element().toString();
+                for (CSVRecord r : CSVFormat.RFC4180.withDelimiter(fieldDelimiter).parse(new StringReader(in))) {
+                    c.output(converter.convertToAvro(r));
+                }
+                
+                return;
+            }
+            
+            BytesWritable bytes = (BytesWritable)c.element();
+            String rowValue = new String(bytes.copyBytes(), encoding);
+            
+            //CSVFormat.RFC4180 use " as quote and no escape char and "," as field delimiter
+            
+            //TODO create it every time? performance?
+            CSVFormat cf = CSVFormat.RFC4180.withDelimiter(fieldDelimiter);
+            //the with method return a new object, so have to assign back
+            if(textEnclosure!=null) {
+                cf = cf.withQuote(textEnclosure);
+            } else {
+                cf = cf.withQuote(null);
+            }
+            
+            if(escapeChar!=null) {
+                cf = cf.withEscape(escapeChar);
+            }
+            
+            for (CSVRecord r : cf.parse(new StringReader(rowValue))) {
                 c.output(converter.convertToAvro(r));
+            }
         }
     }
 

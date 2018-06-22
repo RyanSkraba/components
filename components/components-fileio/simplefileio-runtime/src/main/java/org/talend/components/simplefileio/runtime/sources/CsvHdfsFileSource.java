@@ -14,38 +14,42 @@ package org.talend.components.simplefileio.runtime.sources;
 
 import java.io.IOException;
 
+import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.talend.components.simplefileio.runtime.ExtraHadoopConfiguration;
 import org.talend.components.simplefileio.runtime.SimpleFileIOAvroRegistry;
+import org.talend.components.simplefileio.runtime.hadoop.csv.CSVFileInputFormat;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
 /**
  * CSV implementation of HDFSFileSource.
  *
- * This implementation allows the recordDelimiter to be injected into the TextInputFormat.
  */
-public class CsvHdfsFileSource extends FileSourceBase<LongWritable, Text, CsvHdfsFileSource> {
+public class CsvHdfsFileSource extends FileSourceBase<LongWritable, BytesWritable, CsvHdfsFileSource> {
 
     static {
         // Ensure that the singleton for the SimpleFileIOAvroRegistry is created.
         SimpleFileIOAvroRegistry.get();
     }
 
-    private CsvHdfsFileSource(UgiDoAs doAs, String filepattern, String recordDelimiter, ExtraHadoopConfiguration extraConfig,
+    private CsvHdfsFileSource(UgiDoAs doAs, String filepattern, String recordDelimiter, String encoding, long header, String textEnclosure, String escapeChar, ExtraHadoopConfiguration extraConfig,
             SerializableSplit serializableSplit) {
-        super(doAs, filepattern, TextInputFormat.class, LongWritable.class, Text.class, extraConfig, serializableSplit);
-        getExtraHadoopConfiguration().set("textinputformat.record.delimiter", recordDelimiter);
+        super(doAs, filepattern, CSVFileInputFormat.class, LongWritable.class, BytesWritable.class, extraConfig, serializableSplit);
+        ExtraHadoopConfiguration hadoop_config = getExtraHadoopConfiguration();
+        hadoop_config.set(CSVFileInputFormat.TALEND_ENCODING, encoding);
+        hadoop_config.set(CSVFileInputFormat.TALEND_HEADER, String.valueOf(header));
+        hadoop_config.set(CSVFileInputFormat.TALEND_ROW_DELIMITED, recordDelimiter);
+        hadoop_config.set(CSVFileInputFormat.TALEND_TEXT_ENCLOSURE, textEnclosure);
+        hadoop_config.set(CSVFileInputFormat.TALEND_ESCAPE, escapeChar);
     }
 
     private CsvHdfsFileSource(UgiDoAs doAs, String filepattern, ExtraHadoopConfiguration extraConfig,
             SerializableSplit serializableSplit) {
-        super(doAs, filepattern, TextInputFormat.class, LongWritable.class, Text.class, extraConfig, serializableSplit);
+        super(doAs, filepattern, CSVFileInputFormat.class, LongWritable.class, BytesWritable.class, extraConfig, serializableSplit);
     }
 
-    public static CsvHdfsFileSource of(UgiDoAs doAs, String filepattern, String recordDelimiter) {
-        return new CsvHdfsFileSource(doAs, filepattern, recordDelimiter, new ExtraHadoopConfiguration(), null);
+    public static CsvHdfsFileSource of(UgiDoAs doAs, String filepattern, String recordDelimiter, String encoding, long header, String textEnclosure, String escapeChar) {
+        return new CsvHdfsFileSource(doAs, filepattern, recordDelimiter, encoding, header, textEnclosure, escapeChar, new ExtraHadoopConfiguration(), null);
     }
 
     @Override
