@@ -57,7 +57,7 @@
         <commons-net.version>2.2</commons-net.version>
         <commons-pool.version>1.6</commons-pool.version>
         <commons-pool2.version>2.4.2</commons-pool2.version>
-        <commons-validator.version>1.6.0</commons-validator.version>
+        <commons-validator.version>1.6</commons-validator.version>
         <cxf.version>3.2.4</cxf.version>
         <derby.version>10.12.1.1</derby.version>
         <dom4j.version>1.6.1</dom4j.version>
