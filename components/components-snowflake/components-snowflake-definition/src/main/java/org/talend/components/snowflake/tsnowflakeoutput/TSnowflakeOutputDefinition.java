@@ -35,6 +35,10 @@ public class TSnowflakeOutputDefinition extends SnowflakeDefinition {
         super(COMPONENT_NAME);
     }
 
+    public TSnowflakeOutputDefinition(String componentName) {
+        super(componentName);
+    }
+
     @Override
     public boolean isSchemaAutoPropagate() {
         return false;

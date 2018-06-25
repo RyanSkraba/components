@@ -49,7 +49,7 @@ public abstract class SnowflakeRuntime {
      * @throws IOException may be thrown if referenced connection is closed or if failed to create connection using
      * {@link DriverManager}
      */
-    protected Connection createConnection(RuntimeContainer container)
+    public Connection createConnection(RuntimeContainer container)
             throws IOException {
 
         Connection conn = null;
@@ -87,7 +87,7 @@ public abstract class SnowflakeRuntime {
         return conn;
     }
 
-    protected void closeConnection(RuntimeContainer container, Connection conn)
+    public void closeConnection(RuntimeContainer container, Connection conn)
             throws SQLException {
         String refComponentId = getConnectionProperties().getReferencedComponentId();
         if ((refComponentId == null || container == null) && (conn != null && !conn.isClosed())) {

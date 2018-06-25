@@ -18,7 +18,7 @@ import org.talend.components.api.container.RuntimeContainer;
 
 import java.util.Map;
 
-public final class SnowflakeWriteOperation implements WriteOperation<Result> {
+public class SnowflakeWriteOperation implements WriteOperation<Result> {
 
     /**
      * Default serial version UID.

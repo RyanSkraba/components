@@ -39,20 +39,20 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
+import net.snowflake.client.loader.Loader;
 import net.snowflake.client.loader.LoaderFactory;
 import net.snowflake.client.loader.LoaderProperty;
 import net.snowflake.client.loader.Operation;
-import net.snowflake.client.loader.StreamLoader;
 
-public final class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
+public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
-    private StreamLoader loader;
+    protected Loader loader;
 
     private final SnowflakeWriteOperation snowflakeWriteOperation;
 
     private Connection uploadConnection;
 
-    private Connection processingConnection;
+    protected Connection processingConnection;
 
     private Object[] row;
 
@@ -64,11 +64,11 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
 
     private String uId;
 
-    private final SnowflakeSink sink;
+    protected final SnowflakeSink sink;
 
-    private final RuntimeContainer container;
+    protected final RuntimeContainer container;
 
-    private final TSnowflakeOutputProperties sprops;
+    protected final TSnowflakeOutputProperties sprops;
 
     private transient IndexedRecordConverter<Object, ? extends IndexedRecord> factory;
 
@@ -101,69 +101,21 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         this.container = container;
         sink = snowflakeWriteOperation.getSink();
         sprops = sink.getSnowflakeOutputProperties();
-        listener = new SnowflakeResultListener(sprops);
+        listener = getResultListener();
     }
 
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
-        processingConnection = sink.createConnection(container);
-        uploadConnection = sink.createConnection(container);
+        createConnections();
         if (null == mainSchema) {
             mainSchema = getSchema();
         }
 
-        SnowflakeConnectionProperties connectionProperties = sprops.getConnectionProperties();
+        row = new Object[mainSchema.getFields().size()];
 
-        Map<LoaderProperty, Object> prop = new HashMap<>();
-        boolean isUpperCase = sprops.convertColumnsAndTableToUppercase.getValue();
-        String tableName = isUpperCase ? sprops.getTableName().toUpperCase() : sprops.getTableName();
-        prop.put(LoaderProperty.tableName, tableName);
-        prop.put(LoaderProperty.schemaName, connectionProperties.schemaName.getStringValue());
-        prop.put(LoaderProperty.databaseName, connectionProperties.db.getStringValue());
-        switch (sprops.outputAction.getValue()) {
-        case INSERT:
-            prop.put(LoaderProperty.operation, Operation.INSERT);
-            break;
-        case UPDATE:
-            prop.put(LoaderProperty.operation, Operation.MODIFY);
-            break;
-        case UPSERT:
-            prop.put(LoaderProperty.operation, Operation.UPSERT);
-            break;
-        case DELETE:
-            prop.put(LoaderProperty.operation, Operation.DELETE);
-            break;
-        }
-
-        List<Field> columns = mainSchema.getFields();
-        List<String> keyStr = new ArrayList<>();
-        List<String> columnsStr = new ArrayList<>();
-        for (Field f : columns) {
-            String dbColumnName = f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
-            String fName = isUpperCase ? dbColumnName.toUpperCase() : dbColumnName;
-            columnsStr.add(fName);
-            if (null != f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY)) {
-                keyStr.add(fName);
-            }
-        }
-
-        row = new Object[columnsStr.size()];
-
-        prop.put(LoaderProperty.columns, columnsStr);
-        if (sprops.outputAction.getValue() == UPSERT) {
-            keyStr.clear();
-            keyStr.add(sprops.upsertKeyColumn.getValue());
-        }
-        if (keyStr.size() > 0) {
-            prop.put(LoaderProperty.keys, keyStr);
-        }
-
-        prop.put(LoaderProperty.remoteStage, "~");
-
-        loader = (StreamLoader) LoaderFactory.createLoader(prop, uploadConnection, processingConnection);
+        loader = getLoader();
         loader.setListener(listener);
-
         loader.start();
     }
 
@@ -226,8 +178,7 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         }
 
         try {
-            sink.closeConnection(container, processingConnection);
-            sink.closeConnection(container, uploadConnection);
+            closeConnections();
         } catch (SQLException e) {
             throw new IOException(e);
         }
@@ -249,4 +200,75 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         });
     }
 
+    protected TSnowflakeOutputProperties getProps() {
+        return sprops;
+    }
+
+    protected Map<LoaderProperty, Object> getLoaderProps() {
+        SnowflakeConnectionProperties connectionProperties = sprops.getConnectionProperties();
+
+        Map<LoaderProperty, Object> prop = new HashMap<>();
+        boolean isUpperCase = sprops.convertColumnsAndTableToUppercase.getValue();
+        String tableName = isUpperCase ? sprops.getTableName().toUpperCase() : sprops.getTableName();
+        prop.put(LoaderProperty.tableName, tableName);
+        prop.put(LoaderProperty.schemaName, connectionProperties.schemaName.getStringValue());
+        prop.put(LoaderProperty.databaseName, connectionProperties.db.getStringValue());
+        switch (sprops.outputAction.getValue()) {
+        case INSERT:
+            prop.put(LoaderProperty.operation, Operation.INSERT);
+            break;
+        case UPDATE:
+            prop.put(LoaderProperty.operation, Operation.MODIFY);
+            break;
+        case UPSERT:
+            prop.put(LoaderProperty.operation, Operation.UPSERT);
+            break;
+        case DELETE:
+            prop.put(LoaderProperty.operation, Operation.DELETE);
+            break;
+        }
+
+        List<Field> columns = mainSchema.getFields();
+        List<String> keyStr = new ArrayList<>();
+        List<String> columnsStr = new ArrayList<>();
+        for (Field f : columns) {
+            String dbColumnName = f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+            String fName = isUpperCase ? dbColumnName.toUpperCase() : dbColumnName;
+            columnsStr.add(fName);
+            if (null != f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY)) {
+                keyStr.add(fName);
+            }
+        }
+
+        prop.put(LoaderProperty.columns, columnsStr);
+        if (sprops.outputAction.getValue() == UPSERT) {
+            keyStr.clear();
+            keyStr.add(sprops.upsertKeyColumn.getValue());
+        }
+        if (keyStr.size() > 0) {
+            prop.put(LoaderProperty.keys, keyStr);
+        }
+
+        prop.put(LoaderProperty.remoteStage, "~");
+
+        return prop;
+    }
+
+    protected Loader getLoader() {
+        return LoaderFactory.createLoader(getLoaderProps(), uploadConnection, processingConnection);
+    }
+
+    protected SnowflakeResultListener getResultListener() {
+        return new SnowflakeResultListener(sprops);
+    }
+
+    protected void createConnections() throws IOException {
+        processingConnection = sink.createConnection(container);
+        uploadConnection = sink.createConnection(container);
+    }
+
+    protected void closeConnections() throws SQLException {
+        sink.closeConnection(container, processingConnection);
+        sink.closeConnection(container, uploadConnection);
+    }
 }

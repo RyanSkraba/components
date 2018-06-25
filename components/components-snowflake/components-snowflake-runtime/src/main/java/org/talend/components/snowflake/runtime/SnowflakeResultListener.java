@@ -30,7 +30,7 @@ import net.snowflake.client.loader.Operation;
  */
 public class SnowflakeResultListener implements LoadResultListener {
 
-    final private List<IndexedRecord> errors = new ArrayList<>();
+    final protected List<IndexedRecord> errors = new ArrayList<>();
 
     final private AtomicInteger errorCount = new AtomicInteger(0);
 
@@ -50,7 +50,7 @@ public class SnowflakeResultListener implements LoadResultListener {
 
     public boolean throwOnError = false; // should not trigger rollback
 
-    private TSnowflakeOutputProperties properties;
+    protected TSnowflakeOutputProperties properties;
 
 
     public SnowflakeResultListener(TSnowflakeOutputProperties properties) {
