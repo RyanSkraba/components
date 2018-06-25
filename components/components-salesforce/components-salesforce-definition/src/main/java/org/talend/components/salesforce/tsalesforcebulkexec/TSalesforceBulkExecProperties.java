@@ -66,8 +66,10 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
             Form bulkForm = form.getChildForm(bulkProperties.getName());
             if (bulkForm != null) {
-                boolean oauthLogin = SalesforceConnectionProperties.LoginType.OAuth
-                            .equals(getEffectiveConnProperties().loginType.getValue());
+                SalesforceConnectionProperties sfConn = getEffectiveConnProperties();
+                // Note: Avoid issue when job which migrate from old framework, the reference properties is missing
+                boolean oauthLogin = (sfConn != null)
+                        && SalesforceConnectionProperties.LoginType.OAuth.equals(sfConn.loginType.getStoredValue());
                 bulkForm.getWidget(bulkProperties.bulkApiV2.getName()).setVisible(oauthLogin);
                 boolean useBulkApiV2 = oauthLogin && bulkProperties.bulkApiV2.getValue();
                 bulkForm.getWidget(bulkProperties.rowsToCommit.getName()).setVisible(!useBulkApiV2);
@@ -192,7 +194,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
     /**
      * If use connection from connection component, need return the referenced connection properties
      */
-    public SalesforceConnectionProperties getEffectiveConnProperties(){
+    public SalesforceConnectionProperties getEffectiveConnProperties() {
         if (isUseExistConnection()) {
             return connection.getReferencedConnectionProperties();
         }

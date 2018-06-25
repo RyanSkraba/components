@@ -265,6 +265,11 @@ public class TSalesforceBulkExecPropertiesTest extends SalesforceTestBase {
         properties.refreshLayout(advancedForm);
         assertTrue(bulkForm.getWidget(properties.bulkProperties.bulkApiV2.getName()).isVisible());
 
+        // Test reference is null
+        properties.connection.referencedComponent.setReference(null);
+        properties.refreshLayout(advancedForm);
+        assertFalse(bulkForm.getWidget(properties.bulkProperties.bulkApiV2.getName()).isVisible());
+
     }
 
 }
