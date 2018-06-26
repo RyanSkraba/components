@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
@@ -31,9 +32,10 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.talend.components.simplefileio.runtime.hadoop.excel.streaming.StreamingReader;
 import org.talend.daikon.avro.NameUtil;
+
+import com.monitorjbl.xlsx.impl.StreamingRow;
 
 public class Excel2007FileRecordReader extends RecordReader<Void, IndexedRecord> {
   private static final Log LOG = LogFactory.getLog(Excel2007FileRecordReader.class);
@@ -180,11 +182,11 @@ public class Excel2007FileRecordReader extends RecordReader<Void, IndexedRecord>
       Set<String> existNames = new HashSet<String>();
       int index = 0;
       
-      int i = 0;
-      //this way will skip empty cell, but for header fetch, we have to depend on it, suppose header must be valid, no empty cell
-      //but for row retrieve, we will not use it, use getCell(index) to fetch cell even it's empty, not skip
-      for (Cell cell : headerRow) {
-          String fieldName = validName ? (cell == null ? StringUtils.EMPTY : cell.getStringCellValue()) : (FIELD_PREFIX + (i++));
+      int cellNumber = getCellNumber(headerRow);
+      
+      for (int i = 0; i < cellNumber; i++) {
+          Cell cell = headerRow.getCell(i);
+          String fieldName = validName ? (cell == null ? StringUtils.EMPTY : cell.getStringCellValue()) : (FIELD_PREFIX + (i));
           
           String finalName = NameUtil.correct(fieldName, index++, existNames);
           existNames.add(finalName);
@@ -194,6 +196,27 @@ public class Excel2007FileRecordReader extends RecordReader<Void, IndexedRecord>
     }
     
     return fa.endRecord();
+  }
+
+  //stream interface adjust
+  private int getCellNumber(Row headerRow) {
+    Map<Integer, Cell> cellMap = ((StreamingRow)headerRow).getCellMap();
+    
+    int max = 0;
+    boolean emptyRow = true;
+    for(Map.Entry<Integer, Cell> entry : cellMap.entrySet()) {
+      Integer key = entry.getKey();
+      if(key != null) {
+        emptyRow = false;
+        max = Math.max(max, key);
+      }
+    }
+    
+    if(emptyRow) {
+      return 0;
+    }
+    
+    return max + 1;
   }
 
   private Schema schema;

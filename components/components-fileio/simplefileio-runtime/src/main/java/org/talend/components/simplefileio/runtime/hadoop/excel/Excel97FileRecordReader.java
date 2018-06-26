@@ -178,11 +178,9 @@ public class Excel97FileRecordReader extends RecordReader<Void, IndexedRecord> {
       Set<String> existNames = new HashSet<String>();
       int index = 0;
       
-      int i = 0;
-      //this way will skip empty cell, but for header fetch, we have to depend on it, suppose header must be valid, no empty cell
-      //but for row retrieve, we will not use it, use getCell(index) to fetch cell even it's empty, not skip
-      for (Cell cell : headerRow) {
-          String fieldName = validName ? ExcelUtils.getCellValueAsString(cell, formulaEvaluator) : (FIELD_PREFIX + (i++));
+      for (int i = 0; i < headerRow.getLastCellNum(); i++) {
+          Cell cell = headerRow.getCell(i);
+          String fieldName = validName ? ExcelUtils.getCellValueAsString(cell, formulaEvaluator) : (FIELD_PREFIX + (i));
           
           String finalName = NameUtil.correct(fieldName, index++, existNames);
           existNames.add(finalName);
