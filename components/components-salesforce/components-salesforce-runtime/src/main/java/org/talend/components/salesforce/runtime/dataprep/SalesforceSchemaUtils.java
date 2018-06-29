@@ -6,8 +6,15 @@ import java.util.List;
 import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties;
+import org.talend.components.salesforce.runtime.SalesforceBulkExecRuntime;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 public abstract class SalesforceSchemaUtils {
+
+    private static final I18nMessages MESSAGES =
+            GlobalI18N.getI18nMessageProvider().getI18nMessages(SalesforceSchemaUtils.class);
+
 
     public static Schema getSchema(SalesforceDatasetProperties dataset, SalesforceDataprepSource sds, RuntimeContainer container)
             throws IOException {
@@ -17,10 +24,10 @@ public abstract class SalesforceSchemaUtils {
                 try {
                     return sds.guessSchema(query(sds, dataset, fields));
                 } catch (Exception exception) {
-                    throw new RuntimeException("Cannot retrieve schema from specified the SOQL query.", exception);
+                    throw new RuntimeException(MESSAGES.getMessage("error.retrieveSchema"), exception);
                 }
             }
-            throw new RuntimeException("Cannot retrieve schema when no field or column is specified.");
+            throw new RuntimeException(MESSAGES.getMessage("error.retrieveSchemaNoField"));
         } else {
             return sds.guessSchema(dataset.query.getValue());
         }
@@ -29,7 +36,7 @@ public abstract class SalesforceSchemaUtils {
     private static String query(SalesforceDataprepSource sds, SalesforceDatasetProperties dataset, List<String> fields)
             throws IOException {
         if (dataset.sourceType.getValue() != SalesforceDatasetProperties.SourceType.MODULE_SELECTION || fields.isEmpty()) {
-            throw new IllegalArgumentException("The module selection should be chosen and the specified fields not empty.");
+            throw new IllegalArgumentException(MESSAGES.getMessage("error.moduleAndFieldEmpty"));
         }
         StringBuilder sb = new StringBuilder();
         sb.append("select ");
