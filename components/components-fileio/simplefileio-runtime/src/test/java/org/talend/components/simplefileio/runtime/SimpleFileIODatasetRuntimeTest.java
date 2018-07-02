@@ -128,7 +128,7 @@ public class SimpleFileIODatasetRuntimeTest {
         props.format.setValue(SimpleFileIOFormat.CSV);
         props.path.setValue(fileSpec);
 
-        final List<IndexedRecord> actual = getSample(props,100);
+        final List<IndexedRecord> actual = getSample(props,Integer.MAX_VALUE);
 
         // Check the expected values match.
         assertThat(actual, hasSize(9));

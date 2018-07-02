@@ -73,6 +73,9 @@ public class S3DatasetRuntime implements IS3DatasetRuntime {
         return s[0];
     }
 
+    //getSample is not a good name for the data set interface, as sometimes, it is used to fetch all data in data set definition, not sample
+    //Or if it's a good name and only for get sample, for the rest api to get all data in data set should not call this method, should call another interface for
+    //fetch all data.
     @Override
     public void getSample(int limit, Consumer<IndexedRecord> consumer) {
         // Create an input runtime based on the properties.
@@ -90,7 +93,6 @@ public class S3DatasetRuntime implements IS3DatasetRuntime {
         try (DirectConsumerCollector<IndexedRecord> collector = DirectConsumerCollector.of(consumer)) {
             // Collect a sample of the input records.
             p.apply(inputRuntime) //
-                    .apply(Sample.<IndexedRecord> any(limit)) //
                     .apply(collector);
             p.run().waitUntilFinish();
         }
