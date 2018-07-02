@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -27,8 +27,12 @@ import static org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutp
 import static org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.FIELD_SALESFORCE_ID;
 import static org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.FIELD_STATUS;
 
+import java.util.Collections;
+
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,8 +40,8 @@ import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.salesforce.SalesforceOutputProperties;
+import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.exception.TalendRuntimeException;
@@ -46,8 +50,6 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesService;
 import org.talend.daikon.properties.service.PropertiesServiceImpl;
-import org.talend.daikon.serialize.SerializerDeserializer;
-import org.talend.daikon.serialize.jsonio.PersistenceTestObject;
 
 public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
 
@@ -78,11 +80,11 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
         propertiesService = new PropertiesServiceImpl();
 
         properties = new TSalesforceOutputProperties("root");
+        properties.init();
     }
 
     @Test
     public void testValuesAndLayout() throws Throwable {
-        properties.init();
 
         // check default
         Form mainForm = properties.getForm(Form.MAIN);
@@ -150,7 +152,6 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
 
     @Test
     public void testBeforeModuleName() throws Throwable {
-        properties.init();
 
         try (MockRuntimeSourceOrSinkTestFixture testFixture =
                 new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
@@ -167,7 +168,6 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
     public void testBeforeModuleNameErrorWhenExceptionOccurs() throws Throwable {
         ValidationResult expectedValidationResult =
                 new ValidationResult(ValidationResult.Result.ERROR, "UNEXPECTED_EXCEPTION:{message=ERROR}");
-        properties.init();
 
         try (MockRuntimeSourceOrSinkTestFixture testFixture =
                 new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
@@ -186,7 +186,6 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
 
     @Test
     public void testAfterModuleName() throws Throwable {
-        properties.init();
 
         try (MockRuntimeSourceOrSinkTestFixture testFixture =
                 new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
@@ -206,8 +205,6 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
 
     @Test
     public void testAfterModuleNameForUpsert() throws Throwable {
-        properties.init();
-
         try (MockRuntimeSourceOrSinkTestFixture testFixture =
                 new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
             testFixture.setUp();
@@ -248,6 +245,41 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
         assertThat(properties.getPossibleConnectors(true),
                 containsInAnyOrder((Connector) new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow"),
                         new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject")));
+    }
+
+    @Test
+    public void testDeleteActionSchema() {
+        properties.outputAction.setValue(OutputAction.DELETE);
+        properties.afterOutputAction();
+        Schema deleteSchema = properties.module.main.schema.getValue();
+        Assert.assertEquals(1, deleteSchema.getFields().size());
+        Assert.assertTrue(TSalesforceOutputProperties.SALESFORCE_ID.equals(deleteSchema.getFields().get(0).name()));
+    }
+
+    @Test
+    public void testUpdateActionContainsId() {
+        properties.outputAction.setValue(OutputAction.UPDATE);
+        properties.module.main.schema.setValue(
+                Schema.createRecord("update", null, null, false,
+                        Collections.singletonList(
+                                new Field("Name", Schema.create(Schema.Type.STRING), null, (Object) null))));
+        properties.afterOutputAction();
+        Schema updateSchema = properties.module.main.schema.getValue();
+        Assert.assertEquals(2, updateSchema.getFields().size());
+        Assert.assertTrue(TSalesforceOutputProperties.SALESFORCE_ID.equals(updateSchema.getFields().get(0).name()));
+    }
+
+    @Test
+    public void testDynamicUpdateSkipIdInsetion() {
+        properties.outputAction.setValue(OutputAction.UPDATE);
+        Field dynamicField = new Field("DYNA", Schema.create(Schema.Type.STRING), null, (Object) null);
+        Schema schema = Schema.createRecord("update", null, null, false, Collections.singletonList(dynamicField));
+        schema.addProp(SchemaConstants.INCLUDE_ALL_FIELDS, "true");
+        properties.module.main.schema.setValue(schema);
+        properties.afterOutputAction();
+        Schema updateSchema = properties.module.main.schema.getValue();
+        Assert.assertEquals(1, updateSchema.getFields().size());
+        Assert.assertFalse(TSalesforceOutputProperties.SALESFORCE_ID.equals(updateSchema.getFields().get(0).name()));
     }
 
 }
