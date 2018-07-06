@@ -11,8 +11,6 @@
     <name>Components - Google Drive Runtime</name>
     <packaging>jar</packaging>
     <properties>
-        <httpcomponents.version>4.5.4</httpcomponents.version>
-        <httpcore.version>4.4.9</httpcore.version>
         <swt.version>[3.103.1.v20140903-1938,)</swt.version>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
@@ -45,12 +43,10 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>${httpcore.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>${httpcomponents.version}</version>
         </dependency>
         <!-- -->
         <dependency>
