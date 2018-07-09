@@ -45,6 +45,11 @@ public class PubSubOutputRuntimeTestIT implements Serializable {
 
     final static String subscriptionName = "tcomp-pubsub-outputtest-sub1" + uuid;
 
+    // two unit tests will create topic with this name but with Create_If_Not_Exists function
+    final static String newTopicName = "tcomp-pubsub-createTopicSub" + uuid;
+
+    final static String newSubName = "tcomp-pubsub-createTopicSub-sub" + uuid;
+
     static PubSubClient client = PubSubConnection.createClient(createDatastore());
 
     static {
@@ -72,8 +77,10 @@ public class PubSubOutputRuntimeTestIT implements Serializable {
 
     @AfterClass
     public static void cleanTopic() throws Exception {
-        client.deleteTopic(topicName);
         client.deleteSubscription(subscriptionName);
+        client.deleteTopic(topicName);
+        client.deleteSubscription(newSubName);
+        client.deleteTopic(newTopicName);
     }
 
     @Before
@@ -197,10 +204,6 @@ public class PubSubOutputRuntimeTestIT implements Serializable {
     private void createTopicSub(Pipeline pipeline) throws IOException {
         String testID = "createTopicSubTest" + new Random().nextInt();
 
-        final String newTopicName = "tcomp-pubsub-createTopicSub" + uuid;
-
-        final String newSubName = "tcomp-pubsub-createTopicSub-sub" + uuid;
-
         final String fieldDelimited = ";";
 
         List<Person> expectedPersons = Person.genRandomList(testID, maxRecords);
@@ -241,8 +244,6 @@ public class PubSubOutputRuntimeTestIT implements Serializable {
             }
         }
 
-        client.deleteSubscription(newSubName);
-        client.deleteTopic(newTopicName);
         assertThat(actual, containsInAnyOrder(expectedMessages.toArray()));
     }
 }

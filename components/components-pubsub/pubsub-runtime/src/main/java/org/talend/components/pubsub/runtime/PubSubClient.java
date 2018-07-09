@@ -28,7 +28,17 @@ import org.talend.daikon.exception.TalendRuntimeException;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.services.pubsub.Pubsub;
 import com.google.api.services.pubsub.PubsubScopes;
-import com.google.api.services.pubsub.model.*;
+import com.google.api.services.pubsub.model.AcknowledgeRequest;
+import com.google.api.services.pubsub.model.ListTopicSubscriptionsResponse;
+import com.google.api.services.pubsub.model.ListTopicsResponse;
+import com.google.api.services.pubsub.model.PublishRequest;
+import com.google.api.services.pubsub.model.PublishResponse;
+import com.google.api.services.pubsub.model.PubsubMessage;
+import com.google.api.services.pubsub.model.PullRequest;
+import com.google.api.services.pubsub.model.PullResponse;
+import com.google.api.services.pubsub.model.ReceivedMessage;
+import com.google.api.services.pubsub.model.Subscription;
+import com.google.api.services.pubsub.model.Topic;
 import com.google.auth.Credentials;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -47,10 +57,10 @@ public class PubSubClient {
 
     private Pubsub client;
 
-    public PubSubClient(PubSubDatastoreProperties datastore) {
+    public PubSubClient(PubSubDatastoreProperties datastore, boolean runOnDataflow) {
 
         Credentials credentials = null;
-        if (datastore.serviceAccountFile.getValue() == null) {
+        if (runOnDataflow || datastore.serviceAccountFile.getValue() == null) {
             try {
                 credentials = GoogleCredentials.getApplicationDefault().createScoped(PubsubScopes.all());
             } catch (IOException e) {

@@ -35,6 +35,7 @@ import org.talend.components.adapter.beam.gcp.GcpServiceAccountOptions;
 import org.talend.components.adapter.beam.gcp.ServiceAccountCredentialFactory;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.pubsub.PubSubDatasetProperties;
 import org.talend.components.pubsub.PubSubDatastoreProperties;
 import org.talend.components.pubsub.output.PubSubOutputProperties;
@@ -42,6 +43,7 @@ import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.ValidationResult;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.common.collect.ImmutableMap;
 
 public class PubSubOutputRuntime extends PTransform<PCollection<IndexedRecord>, PDone>
@@ -56,6 +58,8 @@ public class PubSubOutputRuntime extends PTransform<PCollection<IndexedRecord>, 
 
     private PubSubDatastoreProperties datastore = null;
 
+    private boolean runOnDataflow = false;
+
     @Override
     public ValidationResult initialize(RuntimeContainer container, PubSubOutputProperties properties) {
         this.properties = properties;
@@ -66,11 +70,14 @@ public class PubSubOutputRuntime extends PTransform<PCollection<IndexedRecord>, 
         if (pipelineOptionsObj != null) {
             PipelineOptions pipelineOptions = (PipelineOptions) pipelineOptionsObj;
             GcpServiceAccountOptions gcpOptions = pipelineOptions.as(GcpServiceAccountOptions.class);
-            gcpOptions.setProject(datastore.projectName.getValue());
-            if (datastore.serviceAccountFile.getValue() != null) {
-                gcpOptions.setCredentialFactoryClass(ServiceAccountCredentialFactory.class);
-                gcpOptions.setServiceAccountFile(datastore.serviceAccountFile.getValue());
-                gcpOptions.setGcpCredential(PubSubConnection.createCredentials(datastore));
+            runOnDataflow = "DataflowRunner".equals(gcpOptions.getRunner().getSimpleName());
+            if (!runOnDataflow) {
+                gcpOptions.setProject(datastore.projectName.getValue());
+                if (datastore.serviceAccountFile.getValue() != null) {
+                    gcpOptions.setCredentialFactoryClass(ServiceAccountCredentialFactory.class);
+                    gcpOptions.setServiceAccountFile(datastore.serviceAccountFile.getValue());
+                    gcpOptions.setGcpCredential(PubSubConnection.createCredentials(datastore));
+                }
             }
         }
 
@@ -82,14 +89,10 @@ public class PubSubOutputRuntime extends PTransform<PCollection<IndexedRecord>, 
         PubSubDatasetProperties dataset = properties.getDatasetProperties();
         PubSubDatastoreProperties datastore = dataset.getDatastoreProperties();
 
-        try {
-            createTopicSubscriptionIfNeeded(properties);
-        } catch (IOException e) {
-            throw TalendRuntimeException.createUnexpectedException(e);
-        }
+        prepareTopicSubscription(properties);
 
-        PubsubIO.Write<PubsubMessage> pubsubWrite = PubsubIO.writeMessages()
-                .to(String.format("projects/%s/topics/%s", datastore.projectName.getValue(), dataset.topic.getValue()));
+        PubsubIO.Write<PubsubMessage> pubsubWrite = PubsubIO.writeMessages().to(
+                String.format("projects/%s/topics/%s", datastore.projectName.getValue(), dataset.topic.getValue()));
 
         if (properties.idLabel.getValue() != null && !"".equals(properties.idLabel.getValue())) {
             pubsubWrite.withIdAttribute(properties.idLabel.getValue());
@@ -111,14 +114,15 @@ public class PubSubOutputRuntime extends PTransform<PCollection<IndexedRecord>, 
 
     }
 
-    private void createTopicSubscriptionIfNeeded(PubSubOutputProperties properties) throws IOException {
+    private void prepareTopicSubscription(PubSubOutputProperties properties) {
         PubSubOutputProperties.TopicOperation topicOperation = properties.topicOperation.getValue();
         if (topicOperation == PubSubOutputProperties.TopicOperation.NONE) {
+            // no check exist method provided, if the topic do not exist, the exception will thrown by pipeline
             return;
         }
         validateForCreateTopic();
 
-        PubSubClient client = PubSubConnection.createClient(datastore);
+        PubSubClient client = PubSubConnection.createClient(datastore, runOnDataflow);
 
         if (topicOperation == PubSubOutputProperties.TopicOperation.DROP_IF_EXISTS_AND_CREATE) {
             dropTopic(client);
@@ -127,23 +131,56 @@ public class PubSubOutputRuntime extends PTransform<PCollection<IndexedRecord>, 
         createTopic(client);
     }
 
-    private void createTopic(PubSubClient client) throws IOException {
-        client.createTopic(dataset.topic.getValue());
-        client.createSubscription(dataset.topic.getValue(), dataset.subscription.getValue());
+    private void createTopic(PubSubClient client) {
+        try {
+            client.createTopic(dataset.topic.getValue());
+        } catch (Exception e) {
+            if (((GoogleJsonResponseException) e).getStatusCode() == 409) {
+                // Ignore ALREADY_EXISTS, but throw others
+            } else {
+                TalendRuntimeException.build(ComponentsErrorCode.IO_EXCEPTION, e).throwIt();
+            }
+        }
+        try {
+            client.createSubscription(dataset.topic.getValue(), dataset.subscription.getValue());
+        } catch (Exception e) {
+            if (((GoogleJsonResponseException) e).getStatusCode() == 409) {
+                // Ignore ALREADY_EXISTS, but throw others
+            } else {
+                TalendRuntimeException.build(ComponentsErrorCode.IO_EXCEPTION, e).throwIt();
+            }
+        }
     }
 
-    private void dropTopic(PubSubClient client) throws IOException {
-        client.deleteSubscription(dataset.subscription.getValue());
-        client.deleteTopic(dataset.topic.getValue());
+    private void dropTopic(PubSubClient client) {
+        try {
+            client.deleteSubscription(dataset.subscription.getValue());
+        } catch (Exception e) {
+            if (((GoogleJsonResponseException) e).getStatusCode() == 404) {
+                // Ignore Not Found, but throw others
+            } else {
+                TalendRuntimeException.build(ComponentsErrorCode.IO_EXCEPTION, e).throwIt();
+            }
+        }
+        try {
+            client.deleteTopic(dataset.topic.getValue());
+        } catch (Exception e) {
+            if (((GoogleJsonResponseException) e).getStatusCode() == 404) {
+                // Ignore Not Found, but throw others
+            } else {
+                TalendRuntimeException.build(ComponentsErrorCode.IO_EXCEPTION, e).throwIt();
+            }
+        }
     }
 
     private void validateForCreateTopic() {
         if (dataset.subscription.getValue() == null || "".equals(dataset.subscription.getValue())) {
-            TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_EXCEPTION)
-                    .setAndThrow("Subscription required when create topic");
+            TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_EXCEPTION).setAndThrow(
+                    "Subscription required when create topic");
         }
         if (dataset.topic.getValue() == null || "".equals(dataset.topic.getValue())) {
-            TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_EXCEPTION).setAndThrow("Topic required when create topic");
+            TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_EXCEPTION).setAndThrow(
+                    "Topic required when create topic");
         }
     }
 

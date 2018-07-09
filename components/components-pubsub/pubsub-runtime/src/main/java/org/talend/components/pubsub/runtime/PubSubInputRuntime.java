@@ -62,6 +62,8 @@ public class PubSubInputRuntime extends PTransform<PBegin, PCollection<IndexedRe
 
     private PubSubDatastoreProperties datastore = null;
 
+    protected boolean runOnDataflow = false;
+
     @Override
     public ValidationResult initialize(RuntimeContainer container, PubSubInputProperties properties) {
         this.properties = properties;
@@ -73,11 +75,14 @@ public class PubSubInputRuntime extends PTransform<PBegin, PCollection<IndexedRe
             if (pipelineOptionsObj != null) {
                 PipelineOptions pipelineOptions = (PipelineOptions) pipelineOptionsObj;
                 GcpServiceAccountOptions gcpOptions = pipelineOptions.as(GcpServiceAccountOptions.class);
-                gcpOptions.setProject(datastore.projectName.getValue());
-                if (datastore.serviceAccountFile.getValue() != null) {
-                    gcpOptions.setCredentialFactoryClass(ServiceAccountCredentialFactory.class);
-                    gcpOptions.setServiceAccountFile(datastore.serviceAccountFile.getValue());
-                    gcpOptions.setGcpCredential(PubSubConnection.createCredentials(datastore));
+                runOnDataflow = "DataflowRunner".equals(gcpOptions.getRunner().getSimpleName());
+                if (!runOnDataflow) {
+                    gcpOptions.setProject(datastore.projectName.getValue());
+                    if (datastore.serviceAccountFile.getValue() != null) {
+                        gcpOptions.setCredentialFactoryClass(ServiceAccountCredentialFactory.class);
+                        gcpOptions.setServiceAccountFile(datastore.serviceAccountFile.getValue());
+                        gcpOptions.setGcpCredential(PubSubConnection.createCredentials(datastore));
+                    }
                 }
             }
         }
@@ -89,7 +94,7 @@ public class PubSubInputRuntime extends PTransform<PBegin, PCollection<IndexedRe
         PCollection<PubsubMessage> pubsubMessages = null;
         if (properties.useMaxNumRecords.getValue() || properties.useMaxReadTime.getValue()) {
             pubsubMessages = in.apply(Create.of(dataset.subscription.getValue())).apply(
-                    ParDo.of(new BoundedReaderFn(properties)));
+                    ParDo.of(new BoundedReaderFn(properties, runOnDataflow)));
         } else {// normal
             PubsubIO.Read<PubsubMessage> pubsubRead =
                     PubsubIO.readMessages().fromSubscription(String.format("projects/%s/subscriptions/%s",
@@ -164,13 +169,16 @@ public class PubSubInputRuntime extends PTransform<PBegin, PCollection<IndexedRe
 
         private boolean ack = true;
 
-        private BoundedReaderFn(PubSubInputProperties spec) {
+        private boolean runOnDataflow = false;
+
+        private BoundedReaderFn(PubSubInputProperties spec, boolean runOnDataflow) {
             this.spec = spec;
+            this.runOnDataflow = runOnDataflow;
         }
 
         @Setup
         public void setup() {
-            client = PubSubConnection.createClient(spec.getDatasetProperties().getDatastoreProperties());
+            client = PubSubConnection.createClient(spec.getDatasetProperties().getDatastoreProperties(), runOnDataflow);
             if (spec.useMaxNumRecords.getValue()) {
                 maxNum = spec.maxNumRecords.getValue();
             }

@@ -25,7 +25,11 @@ import com.google.auth.oauth2.GoogleCredentials;
 public class PubSubConnection {
 
     public static PubSubClient createClient(PubSubDatastoreProperties datastore) {
-        return new PubSubClient(datastore);
+        return new PubSubClient(datastore, false);
+    }
+
+    public static PubSubClient createClient(PubSubDatastoreProperties datastore, boolean runOnDataflow) {
+        return new PubSubClient(datastore, runOnDataflow);
     }
 
     public static Credentials createCredentials(PubSubDatastoreProperties datastore) {
