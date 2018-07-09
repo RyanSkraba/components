@@ -13,6 +13,7 @@
 
 package org.talend.components.netsuite;
 
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.daikon.properties.ValidationResult;
 
 /**
@@ -41,6 +42,15 @@ public interface NetSuiteRuntime {
      * @return {@code NetSuiteDatasetRuntime} object
      */
     NetSuiteDatasetRuntime getDatasetRuntime(NetSuiteProvideConnectionProperties properties);
+
+    /**
+     * Get {@link NetSuiteDatasetRuntime} for given connection properties.
+     *
+     * @param properties connection properties
+     * @param container runtime container for sharing information
+     * @return {@code NetSuiteDatasetRuntime} object
+     */
+    NetSuiteDatasetRuntime getDatasetRuntime(RuntimeContainer container, NetSuiteProvideConnectionProperties properties);
 
     /**
      * Validate connection for given connection properties.

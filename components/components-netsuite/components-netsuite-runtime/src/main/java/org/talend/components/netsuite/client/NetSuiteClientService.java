@@ -163,6 +163,17 @@ public abstract class NetSuiteClientService<PortT> {
 
     public void setBodyFieldsOnly(boolean bodyFieldsOnly) {
         this.bodyFieldsOnly = bodyFieldsOnly;
+        searchPreferences.setBodyFieldsOnly(bodyFieldsOnly);
+        Object searchPreferencesObject = createNativeSearchPreferences(searchPreferences);
+        try {
+            Header searchPreferencesHeader = new Header(
+                    new QName(getPlatformMessageNamespaceUri(), "searchPreferences"),
+                    searchPreferencesObject, new JAXBDataBinding(searchPreferencesObject.getClass()));
+            setHeader(port, searchPreferencesHeader);
+        } catch (JAXBException e) {
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.INTERNAL_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.binding"), e);
+        }
     }
 
     public boolean isReturnSearchColumns() {
@@ -795,7 +806,6 @@ public abstract class NetSuiteClientService<PortT> {
 
         NsSearchPreferences searchPreferences = new NsSearchPreferences();
         searchPreferences.setPageSize(searchPageSize);
-        searchPreferences.setBodyFieldsOnly(Boolean.valueOf(bodyFieldsOnly));
         searchPreferences.setReturnSearchColumns(Boolean.valueOf(returnSearchColumns));
 
         this.searchPreferences = searchPreferences;
@@ -930,7 +940,7 @@ public abstract class NetSuiteClientService<PortT> {
 
         } catch (JAXBException e) {
             throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.INTERNAL_ERROR),
-                    "XML binding error", e);
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.binding"), e);
         }
     }
 
@@ -952,7 +962,7 @@ public abstract class NetSuiteClientService<PortT> {
                 }
             } catch (JAXBException e) {
                 throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.INTERNAL_ERROR),
-                        "XML binding error", e);
+                        NetSuiteRuntimeI18n.MESSAGES.getMessage("error.binding"), e);
             }
         }
     }

@@ -53,7 +53,7 @@ public class NetSuiteWriteOperation implements WriteOperation<Result> {
 
     @Override
     public Writer<Result> createWriter(RuntimeContainer adaptor) {
-        NetSuiteClientService clientService = sink.getClientService();
+        NetSuiteClientService<?> clientService = sink.getClientService(adaptor);
 
         OutputAction action = properties.module.action.getValue();
 

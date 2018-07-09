@@ -18,18 +18,20 @@ import java.net.URL;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientFactory;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteCredentials;
 import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
-import org.talend.components.netsuite.input.NetSuiteInputProperties;
 
 /**
  * Represents NetSuite Web Service endpoint.
  */
 public class NetSuiteEndpoint {
+
+    public static final String CONNECTION = "NetSuite_Connection";
 
     /** Creates instance of NetSuite client. */
     private NetSuiteClientFactory<?> clientFactory;
@@ -136,9 +138,7 @@ public class NetSuiteEndpoint {
         try {
             ConnectionConfig connectionConfig = new ConnectionConfig(
                     new URL(endpointUrl), apiVersion.getMajor(), credentials);
-            if (properties instanceof NetSuiteInputProperties) {
-                connectionConfig.setBodyFieldsOnly(((NetSuiteInputProperties) properties).bodyFieldsOnly.getValue());
-            }
+            connectionConfig.setReferenceComponentId(properties.getReferencedComponentId());
             connectionConfig.setCustomizationEnabled(customizationEnabled);
             return connectionConfig;
         } catch (MalformedURLException e) {
@@ -172,9 +172,17 @@ public class NetSuiteEndpoint {
      * @return client
      * @throws NetSuiteException if an error occurs during connecting
      */
-    public NetSuiteClientService<?> getClientService() throws NetSuiteException {
+    public NetSuiteClientService<?> getClientService(RuntimeContainer container) throws NetSuiteException {
         if (clientService == null) {
-            clientService = connect();
+            if (connectionConfig.getReferenceComponentId() != null && container != null) {
+                clientService = (NetSuiteClientService<?>) container.getComponentData(connectionConfig.getReferenceComponentId(),
+                        CONNECTION);
+            } else {
+                clientService = connect();
+                if (container != null) {
+                    container.setComponentData(container.getCurrentComponentId(), CONNECTION, clientService);
+                }
+            }
         }
         return clientService;
     }
@@ -192,7 +200,6 @@ public class NetSuiteEndpoint {
         NetSuiteClientService<?> clientService = clientFactory.createClient();
         clientService.setEndpointUrl(connectionConfig.getEndpointUrl().toString());
         clientService.setCredentials(connectionConfig.getCredentials());
-        clientService.setBodyFieldsOnly(connectionConfig.isBodyFieldsOnly());
         MetaDataSource metaDataSource = clientService.getMetaDataSource();
         metaDataSource.setCustomizationEnabled(connectionConfig.isCustomizationEnabled());
 
@@ -208,8 +215,9 @@ public class NetSuiteEndpoint {
         private URL endpointUrl;
         private NetSuiteVersion apiVersion;
         private NetSuiteCredentials credentials;
-        private boolean bodyFieldsOnly = true;
         private boolean customizationEnabled;
+
+        private String referenceComponentId;
 
         public ConnectionConfig() {
         }
@@ -244,20 +252,20 @@ public class NetSuiteEndpoint {
             this.credentials = credentials;
         }
 
-        public boolean isBodyFieldsOnly() {
-            return bodyFieldsOnly;
-        }
-
-        public void setBodyFieldsOnly(boolean bodyFieldsOnly) {
-            this.bodyFieldsOnly = bodyFieldsOnly;
-        }
-
         public boolean isCustomizationEnabled() {
             return customizationEnabled;
         }
 
         public void setCustomizationEnabled(boolean customizationEnabled) {
             this.customizationEnabled = customizationEnabled;
+        }
+
+        public void setReferenceComponentId(String referenceComponentId) {
+            this.referenceComponentId = referenceComponentId;
+        }
+
+        public String getReferenceComponentId() {
+            return this.referenceComponentId;
         }
 
         @Override
@@ -269,9 +277,10 @@ public class NetSuiteEndpoint {
                 return false;
             }
             ConnectionConfig that = (ConnectionConfig) o;
-            return bodyFieldsOnly == that.bodyFieldsOnly && customizationEnabled == that.customizationEnabled
+            return customizationEnabled == that.customizationEnabled
                     && Objects.equals(endpointUrl, that.endpointUrl) && Objects.equals(apiVersion, that.apiVersion)
-                    && Objects.equals(credentials, that.credentials);
+                    && Objects.equals(credentials, that.credentials)
+                    && Objects.equals(referenceComponentId,that.referenceComponentId);
         }
 
         @Override
@@ -285,8 +294,8 @@ public class NetSuiteEndpoint {
             sb.append("endpointUrl=").append(endpointUrl);
             sb.append("apiVersion=").append(apiVersion);
             sb.append(", credentials=").append(credentials);
-            sb.append(", bodyFieldsOnly=").append(bodyFieldsOnly);
             sb.append(", customizationEnabled=").append(customizationEnabled);
+            sb.append(", referenceComponentId=").append(referenceComponentId);
             sb.append('}');
             return sb.toString();
         }

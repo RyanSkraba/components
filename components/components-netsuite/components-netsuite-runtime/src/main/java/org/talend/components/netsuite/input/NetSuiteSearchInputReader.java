@@ -80,8 +80,8 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
         try {
             schema = properties.module.main.schema.getValue();
 
-            clientService = ((NetSuiteSource) getCurrentSource()).getClientService();
-
+            clientService = ((NetSuiteSource) getCurrentSource()).getClientService(container);
+            clientService.setBodyFieldsOnly(properties.bodyFieldsOnly.getValue());
             // Set up MetaDataSource which retrieves customization meta data from schema.
             // We use MetaDataSource from NetSuite client as base source.
             MetaDataSource originalMetaDataSource = clientService.getMetaDataSource();
@@ -122,6 +122,9 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
 
     @Override
     public void close() throws IOException {
+        if (!properties.bodyFieldsOnly.getValue()) {
+            clientService.setBodyFieldsOnly(true);
+        }
         // Nothing to close
     }
 

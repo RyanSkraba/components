@@ -39,12 +39,16 @@ import com.netsuite.webservices.v2014_2.platform.core.Record;
 public class NsObjectInputTransducerIT extends AbstractNetSuiteTestBase {
     private static NetSuiteWebServiceTestFixture webServiceTestFixture;
 
+    private static NetSuiteClientService<?> connection;
+
     @BeforeClass
     public static void classSetUp() throws Exception {
         webServiceTestFixture = new NetSuiteWebServiceTestFixture(
                 NetSuiteClientFactoryImpl.INSTANCE, "2014_2");
         classScopedTestFixtures.add(webServiceTestFixture);
         setUpClassScopedTestFixtures();
+        connection = webServiceTestFixture.getClientService();
+        connection.login();
     }
 
     @AfterClass
@@ -54,9 +58,6 @@ public class NsObjectInputTransducerIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testBasic() throws Exception {
-        NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
-        connection.login();
-
         TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo("Opportunity");
         Schema schema = NetSuiteDatasetRuntimeImpl.inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
 
@@ -78,10 +79,6 @@ public class NsObjectInputTransducerIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testIncludeAllFields() throws Exception {
-        NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
-
-        connection.login();
-
         TypeDesc basicTypeDesc = connection.getBasicMetaData().getTypeInfo("Opportunity");
         Schema schema = getDynamicSchema();
 

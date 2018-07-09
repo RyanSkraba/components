@@ -26,4 +26,11 @@ public interface NetSuiteProvideConnectionProperties {
      * @return connection properties
      */
     NetSuiteConnectionProperties getConnectionProperties();
+
+    /**
+     * Return identifier of referenced connection component.
+     *
+     * @return referenced connection component's ID or {@code null}
+     */
+    String getReferencedComponentId();
 }

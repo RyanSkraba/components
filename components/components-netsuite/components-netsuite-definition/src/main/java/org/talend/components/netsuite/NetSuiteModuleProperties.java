@@ -70,6 +70,11 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
         return connection.getEffectiveConnectionProperties();
     }
 
+    @Override
+    public String getReferencedComponentId() {
+        return connection.getReferencedComponentId();
+    }
+
     /**
      * Get names of NetSuite record types which are available for a component.
      *

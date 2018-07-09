@@ -147,7 +147,7 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
         NetSuiteSink sink = new NetSuiteSinkImpl();
         sink.initialize(mockTestFixture.getRuntimeContainer(), properties);
 
-        NetSuiteClientService<?> clientService = sink.getClientService();
+        NetSuiteClientService<?> clientService = sink.getClientService(null);
 
         NetSuiteWriteOperation writeOperation = (NetSuiteWriteOperation) sink.createWriteOperation();
         NetSuiteOutputWriter writer = (NetSuiteOutputWriter) writeOperation.createWriter(
@@ -216,7 +216,7 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
         NetSuiteSink sink = new NetSuiteSinkImpl();
         sink.initialize(mockTestFixture.getRuntimeContainer(), properties);
 
-        NetSuiteClientService<?> clientService = sink.getClientService();
+        NetSuiteClientService<?> clientService = sink.getClientService(null);
 
         NetSuiteWriteOperation writeOperation = (NetSuiteWriteOperation) sink.createWriteOperation();
         NetSuiteOutputWriter writer = (NetSuiteOutputWriter) writeOperation.createWriter(

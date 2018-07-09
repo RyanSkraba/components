@@ -100,6 +100,11 @@ public class NetSuiteOutputProperties extends FixedConnectorsComponentProperties
     }
 
     @Override
+    public String getReferencedComponentId() {
+        return connection.getReferencedComponentId();
+    }
+
+    @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         Set<PropertyPathConnector> connectors = new HashSet<>();
         if (isOutputConnection) {

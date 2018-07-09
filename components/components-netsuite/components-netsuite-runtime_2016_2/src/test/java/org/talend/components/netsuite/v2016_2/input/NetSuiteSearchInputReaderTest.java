@@ -107,7 +107,7 @@ public class NetSuiteSearchInputReaderTest extends NetSuiteMockTestBase {
         List<Account> recordList = makeNsObjects(new SimpleObjectComposer<>(Account.class), 150);
         mockSearchRequestResults(recordList, 100);
 
-        NetSuiteClientService<?> clientService = source.getClientService();
+        NetSuiteClientService<?> clientService = source.getClientService(null);
         TypeDesc typeDesc = clientService.getMetaDataSource().getTypeInfo(Account.class);
 
         NetSuiteSearchInputReader reader = (NetSuiteSearchInputReader) source.createReader(

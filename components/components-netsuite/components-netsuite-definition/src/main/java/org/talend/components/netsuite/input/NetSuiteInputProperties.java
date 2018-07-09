@@ -79,6 +79,11 @@ public class NetSuiteInputProperties extends FixedConnectorsComponentProperties
     }
 
     @Override
+    public String getReferencedComponentId() {
+        return connection.getReferencedComponentId();
+    }
+
+    @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         if (isOutputConnection) {
             return Collections.singleton(mainConnector);

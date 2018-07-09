@@ -68,7 +68,7 @@ public class NetSuiteSourceOrSink implements SourceOrSink {
     @Override
     public ValidationResult validate(RuntimeContainer container) {
         try {
-            endpoint.connect();
+            endpoint.getClientService(container);
 
             return ValidationResult.OK;
         } catch (NetSuiteException e) {
@@ -80,7 +80,7 @@ public class NetSuiteSourceOrSink implements SourceOrSink {
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
         try {
             NetSuiteDatasetRuntime dataSetRuntime = new NetSuiteDatasetRuntimeImpl(
-                    getClientService().getMetaDataSource());
+                    getClientService(container).getMetaDataSource());
             return dataSetRuntime.getRecordTypes();
         } catch (NetSuiteException e) {
             throw new IOException(e);
@@ -91,7 +91,7 @@ public class NetSuiteSourceOrSink implements SourceOrSink {
     public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
         try {
             NetSuiteDatasetRuntime dataSetRuntime = new NetSuiteDatasetRuntimeImpl(
-                    getClientService().getMetaDataSource());
+                    getClientService(container).getMetaDataSource());
             return dataSetRuntime.getSchema(schemaName);
         } catch (NetSuiteException e) {
             throw new IOException(e);
@@ -122,8 +122,8 @@ public class NetSuiteSourceOrSink implements SourceOrSink {
      * @return client
      * @throws NetSuiteException if an error occurs during connecting
      */
-    public NetSuiteClientService<?> getClientService() throws NetSuiteException {
-        return endpoint.getClientService();
+    public NetSuiteClientService<?> getClientService(RuntimeContainer container) throws NetSuiteException {
+        return endpoint.getClientService(container);
     }
 
     /**

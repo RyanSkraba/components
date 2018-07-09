@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -34,6 +35,7 @@ import org.apache.avro.Schema;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.test.TestFixture;
 import org.talend.components.netsuite.client.EmptyCustomMetaDataSource;
 import org.talend.components.netsuite.client.MetaDataSource;
@@ -47,6 +49,7 @@ import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.client.model.beans.BeanInfo;
 import org.talend.components.netsuite.client.model.beans.Beans;
 import org.talend.components.netsuite.client.model.beans.PropertyInfo;
+import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
 import org.talend.components.netsuite.test.TestUtils;
 import org.talend.daikon.avro.AvroUtils;
 
@@ -69,6 +72,8 @@ public abstract class AbstractNetSuiteTestBase {
     protected static final DatatypeFactory datatypeFactory;
 
     protected static final ObjectMapper objectMapper = new ObjectMapper();
+
+    protected static final String CONNECTION_COMPONENT_ID = "tNetsuiteTestConnection";
 
     static {
         try {
@@ -366,4 +371,43 @@ public abstract class AbstractNetSuiteTestBase {
 
     }
 
+    protected static NetSuiteConnectionProperties getConnectionProperties() {
+        NetSuiteConnectionProperties connectionProperties = new NetSuiteConnectionProperties("connection");
+        NetSuiteWebServiceTestFixture webServiceTestFixture = (NetSuiteWebServiceTestFixture) classScopedTestFixtures.testFixtures.get(0);
+        connectionProperties.init();
+        connectionProperties.endpoint.setValue(webServiceTestFixture.getEndpointUrl());
+        connectionProperties.email.setValue(webServiceTestFixture.getCredentials().getEmail());
+        connectionProperties.password.setValue(webServiceTestFixture.getCredentials().getPassword());
+        connectionProperties.account.setValue(webServiceTestFixture.getCredentials().getAccount());
+        connectionProperties.role.setValue(Integer.valueOf(webServiceTestFixture.getCredentials().getRoleId()));
+        connectionProperties.applicationId.setValue(webServiceTestFixture.getCredentials().getApplicationId());
+        return connectionProperties;
+    }
+
+    protected static RuntimeContainer getRuntimeContainer() {
+        return new RuntimeContainer() {
+
+            private final Map<String, Object> globalMap = new HashMap<>();
+
+            @Override
+            public void setComponentData(String componentId, String key, Object data) {
+                globalMap.put(componentId + key, data);
+            }
+
+            @Override
+            public Object getGlobalData(String key) {
+                return globalMap.get(key);
+            }
+
+            @Override
+            public String getCurrentComponentId() {
+                return CONNECTION_COMPONENT_ID;
+            }
+
+            @Override
+            public Object getComponentData(String componentId, String key) {
+                return globalMap.get(componentId + key);
+            }
+        };
+    }
 }

@@ -46,6 +46,7 @@ import com.netsuite.webservices.v2016_2.platform.core.Record;
  */
 public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
     protected static NetSuiteWebServiceTestFixture webServiceTestFixture;
+    private static NetSuiteClientService<?> connection;
 
     @BeforeClass
     public static void classSetUp() throws Exception {
@@ -53,6 +54,8 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
                 NetSuiteClientFactoryImpl.INSTANCE, "2016_2");
         classScopedTestFixtures.add(webServiceTestFixture);
         setUpClassScopedTestFixtures();
+        connection = webServiceTestFixture.getClientService();
+        connection.login();
     }
 
     @AfterClass
@@ -62,9 +65,6 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testConnectAndLogin() throws Exception {
-        NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
-        connection.login();
-
         SearchResultSet<Record> rs = connection.newSearch()
                 .target("Account")
                 .condition(new SearchCondition("Type", "List.anyOf", Arrays.asList("Bank")))
@@ -84,9 +84,6 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testSearchCustomRecord() throws Exception {
-        NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
-        connection.login();
-
         Collection<RecordTypeInfo> recordTypes = connection.getMetaDataSource().getRecordTypes();
         RecordTypeInfo recordType = getCustomRecordType(recordTypes, "customrecord_campaign_revenue");
 
@@ -103,9 +100,6 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testGetSearchableTypes() throws Exception {
-        NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
-        connection.login();
-
         Collection<NamedThing> searches = connection.getMetaDataSource().getSearchableTypes();
 
         for (NamedThing search : searches) {
@@ -121,9 +115,6 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testRetrieveCustomRecordTypes() throws Exception {
-        NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
-        connection.login();
-
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Collection<RecordTypeInfo> recordTypes = connection.getMetaDataSource().getRecordTypes();
@@ -136,9 +127,6 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testRetrieveCustomRecordCustomFields() throws Exception {
-        NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
-        connection.login();
-
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
@@ -153,9 +141,6 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testRetrieveAllCustomizations() throws Exception {
-        NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
-        connection.login();
-
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         for (RecordTypeDesc recordType : Arrays.asList(RecordTypeEnum.OPPORTUNITY, RecordTypeEnum.CALENDAR_EVENT)) {

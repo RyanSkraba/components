@@ -13,6 +13,7 @@
 
 package org.talend.components.netsuite;
 
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.netsuite.client.NetSuiteClientFactory;
 import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.util.ComponentExceptions;
@@ -47,15 +48,20 @@ public abstract class AbstractNetSuiteRuntime implements NetSuiteRuntime {
 
     @Override
     public NetSuiteDatasetRuntime getDatasetRuntime(NetSuiteProvideConnectionProperties properties) {
+        return getDatasetRuntime(null, properties);
+    }
+
+    @Override
+    public NetSuiteDatasetRuntime getDatasetRuntime(RuntimeContainer container, NetSuiteProvideConnectionProperties properties) {
         NetSuiteEndpoint endpoint = getEndpoint(context, properties);
-        return new NetSuiteDatasetRuntimeImpl(endpoint.getClientService().getMetaDataSource());
+        return new NetSuiteDatasetRuntimeImpl(endpoint.getClientService(container).getMetaDataSource());
     }
 
     @Override
     public ValidationResult validateConnection(NetSuiteProvideConnectionProperties properties) {
         try {
             NetSuiteEndpoint endpoint = getEndpoint(context, properties);
-            endpoint.connect();
+            endpoint.getClientService(null);
             return ValidationResult.OK;
         } catch (NetSuiteException e) {
             return ComponentExceptions.exceptionToValidationResult(e);

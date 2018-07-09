@@ -40,6 +40,7 @@ import com.netsuite.webservices.v2014_2.platform.core.Record;
  */
 public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
     protected static NetSuiteWebServiceTestFixture webServiceTestFixture;
+    private static NetSuiteClientService<?> connection;
 
     @BeforeClass
     public static void classSetUp() throws Exception {
@@ -47,6 +48,8 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
                 NetSuiteClientFactoryImpl.INSTANCE, "2014_2");
         classScopedTestFixtures.add(webServiceTestFixture);
         setUpClassScopedTestFixtures();
+        connection = webServiceTestFixture.getClientService();
+        connection.login();
     }
 
     @AfterClass
@@ -56,9 +59,6 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testConnectAndLogin() throws Exception {
-        NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
-        connection.login();
-
         SearchResultSet<Record> rs = connection.newSearch()
                 .target("Account")
                 .condition(new SearchCondition("Type", "List.anyOf", Arrays.asList("Bank")))
@@ -78,9 +78,6 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testGetSearchableTypes() throws Exception {
-        NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
-        connection.login();
-
         Collection<NamedThing> searches = connection.getMetaDataSource().getSearchableTypes();
 
         for (NamedThing search : searches) {

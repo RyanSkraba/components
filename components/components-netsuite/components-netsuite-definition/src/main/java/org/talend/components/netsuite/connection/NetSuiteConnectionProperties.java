@@ -197,11 +197,7 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
         return this;
     }
 
-    /**
-     * Return identifier of referenced connection component.
-     *
-     * @return referenced connection component's ID or {@code null}
-     */
+    @Override
     public String getReferencedComponentId() {
         return referencedComponent.componentInstanceId.getStringValue();
     }

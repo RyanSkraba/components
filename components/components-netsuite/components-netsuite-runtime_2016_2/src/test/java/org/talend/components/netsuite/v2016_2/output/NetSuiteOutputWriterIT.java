@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +36,7 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.netsuite.AbstractNetSuiteTestBase;
 import org.talend.components.netsuite.NetSuiteDatasetRuntime;
+import org.talend.components.netsuite.NetSuiteEndpoint;
 import org.talend.components.netsuite.NetSuiteSink;
 import org.talend.components.netsuite.NetSuiteWebServiceTestFixture;
 import org.talend.components.netsuite.client.NetSuiteClientFactory;
@@ -49,6 +49,7 @@ import org.talend.components.netsuite.client.model.CustomFieldDesc;
 import org.talend.components.netsuite.client.model.FieldDesc;
 import org.talend.components.netsuite.client.model.RefType;
 import org.talend.components.netsuite.client.model.TypeDesc;
+import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
 import org.talend.components.netsuite.input.NsObjectInputTransducer;
 import org.talend.components.netsuite.output.NetSuiteOutputProperties;
 import org.talend.components.netsuite.output.NetSuiteOutputWriter;
@@ -86,11 +87,17 @@ import com.netsuite.webservices.v2016_2.setup.customization.CustomRecord;
 public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
     private static NetSuiteWebServiceTestFixture webServiceTestFixture;
 
+    private static NetSuiteClientService<NetSuitePortType> clientService;
+
+    private static final RuntimeContainer CONTAINER = getRuntimeContainer();
+
+    private static NetSuiteConnectionProperties connectionProperties;
+
     private final NetSuiteClientFactory<NetSuitePortType> clientFactory = new NetSuiteClientFactoryImpl() {
-        @Override public NetSuiteClientService<NetSuitePortType> createClient() throws NetSuiteException {
-            NetSuiteClientService<NetSuitePortType> service = super.createClient();
-            service.getMetaDataSource().setCustomizationEnabled(webServiceTestFixture.getClientService().getMetaDataSource().isCustomizationEnabled());
-            return service;
+
+        @Override
+        public NetSuiteClientService<NetSuitePortType> createClient() throws NetSuiteException {
+            return clientService;
         }
     };
 
@@ -100,6 +107,10 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
                 NetSuiteClientFactoryImpl.INSTANCE, "2016_2");
         classScopedTestFixtures.add(webServiceTestFixture);
         setUpClassScopedTestFixtures();
+        connectionProperties = getConnectionProperties();
+        clientService = webServiceTestFixture.getClientService();
+        clientService.login();
+        CONTAINER.setComponentData(CONNECTION_COMPONENT_ID, NetSuiteEndpoint.CONNECTION, clientService);
     }
 
     @AfterClass
@@ -109,19 +120,12 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testUpdate() throws Exception {
-        final NetSuiteClientService<NetSuitePortType> clientService = webServiceTestFixture.getClientService();
         clientService.getMetaDataSource().setCustomizationEnabled(false);
-
-        RuntimeContainer container = mock(RuntimeContainer.class);
 
         NetSuiteOutputProperties properties = new NetSuiteOutputProperties("test");
         properties.init();
-        properties.connection.endpoint.setValue(webServiceTestFixture.getEndpointUrl());
-        properties.connection.email.setValue(webServiceTestFixture.getCredentials().getEmail());
-        properties.connection.password.setValue(webServiceTestFixture.getCredentials().getPassword());
-        properties.connection.account.setValue(webServiceTestFixture.getCredentials().getAccount());
-        properties.connection.role.setValue(Integer.valueOf(webServiceTestFixture.getCredentials().getRoleId()));
-        properties.connection.applicationId.setValue(webServiceTestFixture.getCredentials().getApplicationId());
+        properties.connection.referencedComponent.componentInstanceId.setValue(CONNECTION_COMPONENT_ID);
+        properties.connection.referencedComponent.setReference(connectionProperties);
 
         properties.module.moduleName.setValue(RecordTypeEnum.ACCOUNT.getTypeName());
         properties.module.action.setValue(OutputAction.UPDATE);
@@ -129,11 +133,10 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
         NetSuiteRuntimeImpl runtime = new NetSuiteRuntimeImpl();
         runtime.setClientFactory(clientFactory);
 
-        NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(properties.getConnectionProperties());
+        NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(CONTAINER, properties);
 
         Schema schema = dataSetRuntime.getSchema(properties.module.moduleName.getValue());
         properties.module.main.schema.setValue(schema);
-
         SubsidiarySearch subsidiarySearch = new SubsidiarySearch();
         SubsidiarySearchBasic subsidiarySearchBasic = new SubsidiarySearchBasic();
         subsidiarySearch.setBasic(subsidiarySearchBasic);
@@ -192,10 +195,10 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
 
         NetSuiteSink sink = new NetSuiteSinkImpl();
         sink.setClientFactory(clientFactory);
-        sink.initialize(container, properties);
+        sink.initialize(CONTAINER, properties);
 
         NetSuiteWriteOperation writeOperation = (NetSuiteWriteOperation) sink.createWriteOperation();
-        NetSuiteOutputWriter writer = (NetSuiteOutputWriter) writeOperation.createWriter(container);
+        NetSuiteOutputWriter writer = (NetSuiteOutputWriter) writeOperation.createWriter(CONTAINER);
         writer.open(UUID.randomUUID().toString());
 
         for (IndexedRecord indexedRecord : recordList) {
@@ -230,18 +233,11 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testUpdateWithCustomFields() throws Exception {
-        final NetSuiteClientService<NetSuitePortType> clientService = webServiceTestFixture.getClientService();
-
-        RuntimeContainer container = mock(RuntimeContainer.class);
-
+        clientService.getMetaDataSource().setCustomizationEnabled(true);
         NetSuiteOutputProperties properties = new NetSuiteOutputProperties("test");
         properties.init();
-        properties.connection.endpoint.setValue(webServiceTestFixture.getEndpointUrl());
-        properties.connection.email.setValue(webServiceTestFixture.getCredentials().getEmail());
-        properties.connection.password.setValue(webServiceTestFixture.getCredentials().getPassword());
-        properties.connection.account.setValue(webServiceTestFixture.getCredentials().getAccount());
-        properties.connection.role.setValue(Integer.valueOf(webServiceTestFixture.getCredentials().getRoleId()));
-        properties.connection.applicationId.setValue(webServiceTestFixture.getCredentials().getApplicationId());
+        properties.connection.referencedComponent.componentInstanceId.setValue(CONNECTION_COMPONENT_ID);
+        properties.connection.referencedComponent.setReference(connectionProperties);
 
         properties.module.moduleName.setValue(RecordTypeEnum.CONTACT.getTypeName());
         properties.module.action.setValue(OutputAction.UPDATE);
@@ -249,11 +245,10 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
         NetSuiteRuntimeImpl runtime = new NetSuiteRuntimeImpl();
         runtime.setClientFactory(clientFactory);
 
-        NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(properties.getConnectionProperties());
+        NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(CONTAINER, properties);
 
         Schema schema = dataSetRuntime.getSchema(properties.module.moduleName.getValue());
         properties.module.main.schema.setValue(schema);
-
         SubsidiarySearch subsidiarySearch = new SubsidiarySearch();
         SubsidiarySearchBasic subsidiarySearchBasic = new SubsidiarySearchBasic();
         subsidiarySearch.setBasic(subsidiarySearchBasic);
@@ -311,10 +306,10 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
 
         NetSuiteSink sink = new NetSuiteSinkImpl();
         sink.setClientFactory(clientFactory);
-        sink.initialize(container, properties);
+        sink.initialize(CONTAINER, properties);
 
         NetSuiteWriteOperation writeOperation = (NetSuiteWriteOperation) sink.createWriteOperation();
-        NetSuiteOutputWriter writer = (NetSuiteOutputWriter) writeOperation.createWriter(container);
+        NetSuiteOutputWriter writer = (NetSuiteOutputWriter) writeOperation.createWriter(CONTAINER);
         writer.open(UUID.randomUUID().toString());
 
         for (IndexedRecord indexedRecord : recordList) {
@@ -361,19 +356,11 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testDelete() throws Exception {
-        NetSuiteClientService<NetSuitePortType> clientService = webServiceTestFixture.getClientService();
         clientService.getMetaDataSource().setCustomizationEnabled(false);
-
-        RuntimeContainer container = mock(RuntimeContainer.class);
-
         NetSuiteOutputProperties properties = new NetSuiteOutputProperties("test");
         properties.init();
-        properties.connection.endpoint.setValue(webServiceTestFixture.getEndpointUrl());
-        properties.connection.email.setValue(webServiceTestFixture.getCredentials().getEmail());
-        properties.connection.password.setValue(webServiceTestFixture.getCredentials().getPassword());
-        properties.connection.account.setValue(webServiceTestFixture.getCredentials().getAccount());
-        properties.connection.role.setValue(Integer.valueOf(webServiceTestFixture.getCredentials().getRoleId()));
-        properties.connection.applicationId.setValue(webServiceTestFixture.getCredentials().getApplicationId());
+        properties.connection.referencedComponent.componentInstanceId.setValue(CONNECTION_COMPONENT_ID);
+        properties.connection.referencedComponent.setReference(connectionProperties);
 
         properties.module.moduleName.setValue(RecordTypeEnum.MESSAGE.getTypeName());
         properties.module.action.setValue(OutputAction.DELETE);
@@ -381,11 +368,10 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
         NetSuiteRuntimeImpl runtime = new NetSuiteRuntimeImpl();
         runtime.setClientFactory(clientFactory);
 
-        NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(properties.getConnectionProperties());
+        NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(CONTAINER, properties);
 
         Schema schema = dataSetRuntime.getSchema(RefType.RECORD_REF.getTypeName());
         properties.module.main.schema.setValue(schema);
-
         List<Message> recordsToAdd = makeMessageRecords(5);
 
         final List<RecordRef> refList = new ArrayList<>(recordsToAdd.size());
@@ -407,10 +393,10 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
                 return service;
             }
         });
-        sink.initialize(container, properties);
+        sink.initialize(CONTAINER, properties);
 
         NetSuiteWriteOperation writeOperation = (NetSuiteWriteOperation) sink.createWriteOperation();
-        NetSuiteOutputWriter writer = (NetSuiteOutputWriter) writeOperation.createWriter(container);
+        NetSuiteOutputWriter writer = (NetSuiteOutputWriter) writeOperation.createWriter(CONTAINER);
         writer.open(UUID.randomUUID().toString());
 
         for (IndexedRecord indexedRecord : indexedRecordList) {
@@ -439,19 +425,11 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testAddCustomRecord() throws Exception {
-        final NetSuiteClientService<NetSuitePortType> clientService = webServiceTestFixture.getClientService();
         clientService.getMetaDataSource().setCustomizationEnabled(true);
-
-        RuntimeContainer container = mock(RuntimeContainer.class);
-
         NetSuiteOutputProperties properties = new NetSuiteOutputProperties("test");
         properties.init();
-        properties.connection.endpoint.setValue(webServiceTestFixture.getEndpointUrl());
-        properties.connection.email.setValue(webServiceTestFixture.getCredentials().getEmail());
-        properties.connection.password.setValue(webServiceTestFixture.getCredentials().getPassword());
-        properties.connection.account.setValue(webServiceTestFixture.getCredentials().getAccount());
-        properties.connection.role.setValue(Integer.valueOf(webServiceTestFixture.getCredentials().getRoleId()));
-        properties.connection.applicationId.setValue(webServiceTestFixture.getCredentials().getApplicationId());
+        properties.connection.referencedComponent.componentInstanceId.setValue(CONNECTION_COMPONENT_ID);
+        properties.connection.referencedComponent.setReference(connectionProperties);
 
         properties.module.moduleName.setValue("customrecordqacomp_custom_recordtype");
         properties.module.action.setValue(OutputAction.ADD);
@@ -459,7 +437,7 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
         NetSuiteRuntimeImpl runtime = new NetSuiteRuntimeImpl();
         runtime.setClientFactory(clientFactory);
 
-        NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(properties.getConnectionProperties());
+        NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(CONTAINER, properties);
 
         Schema schema = dataSetRuntime.getSchema(properties.module.moduleName.getValue());
         Schema targetSchema = TestUtils.makeRecordSchema(schema, Arrays.asList(
@@ -474,7 +452,6 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
         Schema targetRejectSchema = dataSetRuntime.getSchemaForUpdateReject(
                 properties.module.moduleName.getValue(), targetSchema);
         properties.module.rejectSchema.schema.setValue(targetRejectSchema);
-
         GenericRecord indexedRecordToAdd = new GenericData.Record(targetSchema);
 
         String testId = Long.toString(System.currentTimeMillis());
@@ -489,10 +466,10 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
 
         NetSuiteSink sink = new NetSuiteSinkImpl();
         sink.setClientFactory(clientFactory);
-        sink.initialize(container, properties);
+        sink.initialize(CONTAINER, properties);
 
         NetSuiteWriteOperation writeOperation = (NetSuiteWriteOperation) sink.createWriteOperation();
-        NetSuiteOutputWriter<?, CustomRecordRef> writer = (NetSuiteOutputWriter) writeOperation.createWriter(container);
+        NetSuiteOutputWriter<?, CustomRecordRef> writer = (NetSuiteOutputWriter) writeOperation.createWriter(CONTAINER);
         writer.open(UUID.randomUUID().toString());
 
         for (IndexedRecord indexedRecord : indexedRecordList) {

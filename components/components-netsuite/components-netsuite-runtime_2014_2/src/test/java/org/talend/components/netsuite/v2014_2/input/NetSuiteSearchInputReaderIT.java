@@ -16,7 +16,6 @@ package org.talend.components.netsuite.v2014_2.input;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,8 +28,11 @@ import org.junit.Test;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.netsuite.AbstractNetSuiteTestBase;
 import org.talend.components.netsuite.NetSuiteDatasetRuntime;
+import org.talend.components.netsuite.NetSuiteEndpoint;
 import org.talend.components.netsuite.NetSuiteSource;
 import org.talend.components.netsuite.NetSuiteWebServiceTestFixture;
+import org.talend.components.netsuite.client.NetSuiteClientService;
+import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
 import org.talend.components.netsuite.input.NetSuiteInputProperties;
 import org.talend.components.netsuite.input.NetSuiteSearchInputReader;
 import org.talend.components.netsuite.v2014_2.NetSuiteRuntimeImpl;
@@ -38,6 +40,7 @@ import org.talend.components.netsuite.v2014_2.NetSuiteSourceImpl;
 import org.talend.components.netsuite.v2014_2.client.NetSuiteClientFactoryImpl;
 
 import com.netsuite.webservices.v2014_2.lists.accounting.types.AccountType;
+import com.netsuite.webservices.v2014_2.platform.NetSuitePortType;
 
 /**
  *
@@ -45,12 +48,22 @@ import com.netsuite.webservices.v2014_2.lists.accounting.types.AccountType;
 public class NetSuiteSearchInputReaderIT extends AbstractNetSuiteTestBase {
     private static NetSuiteWebServiceTestFixture webServiceTestFixture;
 
+    private static NetSuiteConnectionProperties connectionProperties;
+
+    private static NetSuiteClientService<NetSuitePortType> clientService;
+
+    private static final RuntimeContainer CONTAINER = getRuntimeContainer();
+
     @BeforeClass
     public static void classSetUp() throws Exception {
         webServiceTestFixture = new NetSuiteWebServiceTestFixture(
                 NetSuiteClientFactoryImpl.INSTANCE, "2014_2");
         classScopedTestFixtures.add(webServiceTestFixture);
         setUpClassScopedTestFixtures();
+        connectionProperties = getConnectionProperties();
+        clientService = webServiceTestFixture.getClientService();
+        clientService.login();
+        CONTAINER.setComponentData(CONNECTION_COMPONENT_ID, NetSuiteEndpoint.CONNECTION, clientService);
     }
 
     @AfterClass
@@ -60,34 +73,27 @@ public class NetSuiteSearchInputReaderIT extends AbstractNetSuiteTestBase {
 
     @Test
     public void testInput() throws Exception {
-        RuntimeContainer container = mock(RuntimeContainer.class);
-
         NetSuiteInputProperties properties = new NetSuiteInputProperties("test");
         properties.init();
-        properties.connection.endpoint.setValue(webServiceTestFixture.getEndpointUrl());
-        properties.connection.email.setValue(webServiceTestFixture.getCredentials().getEmail());
-        properties.connection.password.setValue(webServiceTestFixture.getCredentials().getPassword());
-        properties.connection.account.setValue(webServiceTestFixture.getCredentials().getAccount());
-        properties.connection.role.setValue(Integer.valueOf(webServiceTestFixture.getCredentials().getRoleId()));
-        properties.connection.applicationId.setValue(webServiceTestFixture.getCredentials().getApplicationId());
-        properties.connection.apiVersion.setValue("2014.2");
+
+        connectionProperties.apiVersion.setValue("2014.2");
+        properties.connection.referencedComponent.componentInstanceId.setValue(CONNECTION_COMPONENT_ID);
+        properties.connection.referencedComponent.setReference(connectionProperties);
         properties.module.moduleName.setValue("Account");
 
         NetSuiteRuntimeImpl runtime = new NetSuiteRuntimeImpl();
-        NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(properties.getConnectionProperties());
+        NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(CONTAINER, properties);
         Schema schema = dataSetRuntime.getSchema(properties.module.moduleName.getValue());
         properties.module.main.schema.setValue(schema);
 
-        properties.module.afterModuleName();
         properties.module.searchQuery.field.setValue(Arrays.asList("Type"));
         properties.module.searchQuery.operator.setValue(Arrays.asList("List.anyOf"));
         properties.module.searchQuery.value1.setValue(Arrays.<Object>asList("Bank"));
         properties.module.searchQuery.value2.setValue(Arrays.<Object>asList((String) null));
-
         NetSuiteSource source = new NetSuiteSourceImpl();
-        source.initialize(container, properties);
+        source.initialize(CONTAINER, properties);
 
-        NetSuiteSearchInputReader reader = (NetSuiteSearchInputReader) source.createReader(container);
+        NetSuiteSearchInputReader reader = (NetSuiteSearchInputReader) source.createReader(CONTAINER);
 
         boolean started = reader.start();
         assertTrue(started);

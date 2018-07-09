@@ -158,7 +158,7 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
     @Override
     public void open(String uId) throws IOException {
         try {
-            clientService = writeOperation.getSink().getClientService();
+            clientService = writeOperation.getSink().getClientService(container);
 
             // Get descriptor of target NetSuite data model object type.
             String typeName = writeOperation.getProperties().module.moduleName.getValue();
