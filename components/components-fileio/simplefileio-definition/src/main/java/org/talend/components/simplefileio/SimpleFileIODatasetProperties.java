@@ -20,8 +20,10 @@ import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class SimpleFileIODatasetProperties extends PropertiesImpl implements DatasetProperties<SimpleFileIODatastoreProperties> {
+public class SimpleFileIODatasetProperties extends PropertiesImpl implements DatasetProperties<SimpleFileIODatastoreProperties>, SerializeSetVersion {
 
     public Property<SimpleFileIOFormat> format = PropertyFactory.newEnum("format", SimpleFileIOFormat.class).setRequired();
 
@@ -265,5 +267,22 @@ public class SimpleFileIODatasetProperties extends PropertiesImpl implements Dat
   
     public String getTextEnclosureCharacter() {
         return textEnclosureCharacter.getValue();
+    }
+    
+    @Override
+    public int getVersionNumber() {
+        return 1;
+    }
+
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated = super.postDeserialize(version, setup, persistent);
+
+        if (version < this.getVersionNumber()) {
+            this.setHeaderLine.setValue(false);
+            migrated = true;
+        }
+
+        return migrated;
     }
 }

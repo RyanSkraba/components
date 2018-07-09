@@ -18,9 +18,9 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.common.dataset.DatasetProperties;
+import org.talend.components.simplefileio.ExcelFormat;
 import org.talend.components.simplefileio.SimpleFileIODatasetProperties.FieldDelimiterType;
 import org.talend.components.simplefileio.SimpleFileIODatasetProperties.RecordDelimiterType;
-import org.talend.components.simplefileio.ExcelFormat;
 import org.talend.components.simplefileio.SimpleFileIOFormat;
 import org.talend.components.simplefileio.local.EncodingType;
 import org.talend.components.simplefileio.s3.runtime.IS3DatasetRuntime;
@@ -33,8 +33,10 @@ import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class S3DatasetProperties extends PropertiesImpl implements DatasetProperties<S3DatastoreProperties> {
+public class S3DatasetProperties extends PropertiesImpl implements DatasetProperties<S3DatastoreProperties>, SerializeSetVersion {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(S3DatasetProperties.class);
   
@@ -314,5 +316,22 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
     
     public ExcelFormat getExcelFormat() {
         return excelFormat.getValue();
+    }
+    
+    @Override
+    public int getVersionNumber() {
+        return 1;
+    }
+
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated = super.postDeserialize(version, setup, persistent);
+
+        if (version < this.getVersionNumber()) {
+            this.setHeaderLine.setValue(false);
+            migrated = true;
+        }
+
+        return migrated;
     }
 }
