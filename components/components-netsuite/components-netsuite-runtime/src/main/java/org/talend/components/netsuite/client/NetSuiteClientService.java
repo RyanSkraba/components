@@ -117,9 +117,20 @@ public abstract class NetSuiteClientService<PortT> {
 
     protected NetSuiteClientService() {
         super();
-
-        // Disable eager initialization of JAXBContext
-        System.setProperty("com.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot", "true");
+        String prefix = null;
+        try {
+            prefix = Class.forName("com.sun.xml.bind.v2.runtime.JAXBContextImpl").getName();
+        } catch (ClassNotFoundException e) {
+            try {
+                prefix = Class.forName("com.sun.xml.internal.bind.v2.runtime.JAXBContextImpl").getName();
+            } catch (ClassNotFoundException e1) {
+              //ignore
+            }
+        }
+        if (prefix != null) {
+            // Disable eager initialization of JAXBContext
+            System.setProperty(prefix + ".fastBoot", "true");
+        }
     }
 
     public String getEndpointUrl() {
