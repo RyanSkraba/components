@@ -14,6 +14,8 @@ package org.talend.components.azurestorage.blob.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
@@ -34,21 +36,22 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.RuntimeContainerMock;
 import org.talend.components.azurestorage.blob.AzureStorageBlobService;
 import org.talend.components.azurestorage.blob.tazurestoragecontainercreate.TAzureStorageContainerCreateProperties;
-import org.talend.components.azurestorage.blob.tazurestoragecontainercreate.TAzureStorageContainerCreateProperties.AccessControl;
+import org.talend.components.azurestorage.blob.tazurestoragecontainercreate.TAzureStorageContainerCreateProperties
+        .AccessControl;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
-
 import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.blob.BlobContainerPublicAccessType;
 
 public class AzureStorageContainerCreateRuntimeTest {
 
     public static final String PROP_ = "PROP_";
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
-            .getI18nMessages(AzureStorageContainerCreateRuntime.class);
+                                                           .getI18nMessages(AzureStorageContainerCreateRuntime.class);
 
     private RuntimeContainer runtimeContainer;
 
@@ -108,7 +111,8 @@ public class AzureStorageContainerCreateRuntimeTest {
         assertEquals(messages.getMessage("error.LengthError"), validationResult.getMessage());
 
         // generate 64 string name for the container witch is invalide
-        properties.container.setValue(String.format("%0" + 64 + "d", 0).replace("0", "a"));
+        properties.container.setValue(String.format("%0" + 64 + "d", 0)
+                                            .replace("0", "a"));
         validationResult = containerCreate.initialize(runtimeContainer, properties);
         assertEquals(ValidationResult.Result.ERROR, validationResult.getStatus());
         assertEquals(messages.getMessage("error.LengthError"), validationResult.getMessage());
@@ -122,7 +126,8 @@ public class AzureStorageContainerCreateRuntimeTest {
     }
 
     /**
-     * The method {@link AzureStorageContainerCreateRuntime#runAtDriver(RuntimeContainer)} should not throw any exception if the
+     * The method {@link AzureStorageContainerCreateRuntime#runAtDriver(RuntimeContainer)} should not throw any
+     * exception if the
      * dieOnError is not set to true.
      */
     @Test
@@ -135,8 +140,8 @@ public class AzureStorageContainerCreateRuntimeTest {
 
         try {
 
-            when(blobService.createContainerIfNotExist(anyString()))
-                    .thenThrow(new StorageException("errorCode", "storage exception message", new RuntimeException()));
+            when(blobService.createContainerIfNotExist(anyString(), any(BlobContainerPublicAccessType.class))).thenThrow(
+                    new StorageException("errorCode", "storage exception message", new RuntimeException()));
             containerCreate.runAtDriver(runtimeContainer);
 
         } catch (StorageException | URISyntaxException | InvalidKeyException e) {
@@ -146,7 +151,8 @@ public class AzureStorageContainerCreateRuntimeTest {
     }
 
     /**
-     * The method {@link AzureStorageContainerCreateRuntime#runAtDriver(RuntimeContainer)} should not throw any exception if the
+     * The method {@link AzureStorageContainerCreateRuntime#runAtDriver(RuntimeContainer)} should not throw any
+     * exception if the
      * dieOnError is not set to true.
      */
     @Test
@@ -158,8 +164,8 @@ public class AzureStorageContainerCreateRuntimeTest {
         containerCreate.blobService = blobService;
 
         try {
-            when(blobService.createContainerIfNotExist(anyString()))
-                    .thenThrow(new URISyntaxException("bad url", "some reason"));
+            when(blobService.createContainerIfNotExist(anyString(), any(BlobContainerPublicAccessType.class))).thenThrow(
+                    new URISyntaxException("bad url", "some reason"));
             containerCreate.runAtDriver(runtimeContainer);
 
         } catch (StorageException | URISyntaxException | InvalidKeyException e) {
@@ -178,8 +184,8 @@ public class AzureStorageContainerCreateRuntimeTest {
         containerCreate.blobService = blobService;
 
         try {
-            when(blobService.createContainerIfNotExist(anyString()))
-                    .thenThrow(new StorageException("errorCode", "storage exception message", new RuntimeException()));
+            when(blobService.createContainerIfNotExist(anyString(), any(BlobContainerPublicAccessType.class))).thenThrow(
+                    new StorageException("errorCode", "storage exception message", new RuntimeException()));
             containerCreate.runAtDriver(runtimeContainer);
 
         } catch (StorageException | URISyntaxException | InvalidKeyException e) {
@@ -196,14 +202,15 @@ public class AzureStorageContainerCreateRuntimeTest {
         assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
 
         try {
-            when(blobService.createContainerIfNotExist(anyString())).thenReturn(true);
+            when(blobService.createContainerIfNotExist(anyString(),
+                    any(BlobContainerPublicAccessType.class))).thenReturn(true);
             doAnswer(new Answer<Void>() {
 
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
                     return null;
                 }
-            }).when(blobService).setPublicAccess(anyString());
+            }).when(blobService);
 
             containerCreate.blobService = blobService;
             containerCreate.runAtDriver(runtimeContainer);
@@ -221,14 +228,15 @@ public class AzureStorageContainerCreateRuntimeTest {
         assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
 
         try {
-            when(blobService.createContainerIfNotExist(anyString())).thenReturn(false);
+            when(blobService.createContainerIfNotExist(anyString(),
+                    any(BlobContainerPublicAccessType.class))).thenReturn(false);
             doAnswer(new Answer<Void>() {
 
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
                     return null;
                 }
-            }).when(blobService).setPublicAccess(anyString());
+            }).when(blobService);
 
             containerCreate.blobService = blobService;
             containerCreate.runAtDriver(runtimeContainer);

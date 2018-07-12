@@ -19,11 +19,12 @@ import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.blob.BlobContainerPublicAccessType;
 
 /**
  * Runtime implementation for Azure storage container create feature.<br/>
  * These methods are called only on Driver node in following order: <br/>
- * 1) {@link this#initialize(RuntimeContainer, TAzureStorageContainerCreateProperties)} <br/>
+ * 1) {@link this#initialize(RuntimeContainer, ComponentProperties)} <br/>
  * 2) {@link this#runAtDriver(RuntimeContainer)} <br/>
  * <b>Instances of this class should not be serialized and sent on worker nodes</b>
  */
@@ -60,20 +61,20 @@ public class AzureStorageContainerCreateRuntime extends AzureStorageContainerRun
     @Override
     public void runAtDriver(RuntimeContainer runtimeContainer) {
 
-        createAzureStorageBlobContainer(runtimeContainer);
+        createAzureStorageBlobContainer();
         setReturnValues(runtimeContainer);
     }
 
-    private void createAzureStorageBlobContainer(RuntimeContainer runtimeContainer) {
+    private void createAzureStorageBlobContainer() {
 
         try {
 
-            boolean containerCreated = blobService.createContainerIfNotExist(containerName);
-            // Manage accessControl
-            if (AccessControl.Public.equals(access) && containerCreated) {
-                blobService.setPublicAccess(containerName);
+            BlobContainerPublicAccessType accessType = BlobContainerPublicAccessType.OFF;
+            if (TAzureStorageContainerCreateProperties.AccessControl.Public.equals(access)) {
+                accessType = BlobContainerPublicAccessType.CONTAINER;
             }
 
+            boolean containerCreated = blobService.createContainerIfNotExist(containerName, accessType);
             if (!containerCreated) {
                 LOGGER.warn(messages.getMessage("warn.ContainerExists", containerName));
             }
