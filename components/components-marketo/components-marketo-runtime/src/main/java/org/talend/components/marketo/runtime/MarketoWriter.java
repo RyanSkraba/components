@@ -100,13 +100,11 @@ public abstract class MarketoWriter implements WriterWithFeedback<Result, Indexe
 
     @Override
     public List<IndexedRecord> getSuccessfulWrites() {
-        flush();
         return Collections.unmodifiableList(successfulWrites);
     }
 
     @Override
     public List<IndexedRecord> getRejectedWrites() {
-        flush();
         return Collections.unmodifiableList(rejectedWrites);
     }
 

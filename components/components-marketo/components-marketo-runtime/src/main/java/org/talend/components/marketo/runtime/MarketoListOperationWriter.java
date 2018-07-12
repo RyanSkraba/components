@@ -26,6 +26,7 @@ import static org.talend.components.marketo.tmarketolistoperation.TMarketoListOp
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -104,6 +105,18 @@ public class MarketoListOperationWriter extends MarketoWriter {
     }
 
     @Override
+    public List<IndexedRecord> getSuccessfulWrites() {
+        flush();
+        return Collections.unmodifiableList(successfulWrites);
+    }
+
+    @Override
+    public List<IndexedRecord> getRejectedWrites() {
+        flush();
+        return Collections.unmodifiableList(rejectedWrites);
+    }
+
+    @Override
     protected void flush() {
         if (!listOpeParms.isValid()) {
             return;
@@ -148,7 +161,8 @@ public class MarketoListOperationWriter extends MarketoWriter {
 
     public Boolean isSameListForListOperation(IndexedRecord record) {
         if (use_soap_api) {
-            return listOpeParms.getListKeyType().equals(record.get(inputSchema.getField(FIELD_LIST_KEY_TYPE).pos()).toString())
+            return listOpeParms.getListKeyType().equals(
+                    record.get(inputSchema.getField(FIELD_LIST_KEY_TYPE).pos()).toString())
                     && listOpeParms.getListKeyValue()
                             .equals(record.get(inputSchema.getField(FIELD_LIST_KEY_VALUE).pos()).toString());
         } else {
@@ -188,7 +202,8 @@ public class MarketoListOperationWriter extends MarketoWriter {
 
     public ListOperationParameters addLeadKeyToListOperationParameters(IndexedRecord record) {
         if (use_soap_api) {
-            listOpeParms.getLeadKeyValue().add(String.valueOf(record.get(inputSchema.getField(FIELD_LEAD_KEY_VALUE).pos())));
+            listOpeParms.getLeadKeyValue().add(
+                    String.valueOf(record.get(inputSchema.getField(FIELD_LEAD_KEY_VALUE).pos())));
         } else {
             listOpeParms.getLeadIds().add((Integer) record.get(inputSchema.getField(FIELD_LEAD_ID).pos()));
         }
@@ -245,8 +260,8 @@ public class MarketoListOperationWriter extends MarketoWriter {
             }
         }
         for (SyncStatus status : mktoResult.getRecords()) {
-            if (Arrays.asList("true", "added", "removed", "notmemberof", "memberof").contains(status.getStatus().toLowerCase())
-                    || (properties.isApiSOAP() && !addTo.equals(operation))) {
+            if (Arrays.asList("true", "added", "removed", "notmemberof", "memberof").contains(
+                    status.getStatus().toLowerCase()) || (properties.isApiSOAP() && !addTo.equals(operation))) {
                 handleSuccess(fillRecord(status, flowSchema));
             } else {
                 if (dieOnError) {
