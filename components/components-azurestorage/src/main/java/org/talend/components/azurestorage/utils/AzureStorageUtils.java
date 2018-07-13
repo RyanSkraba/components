@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.microsoft.azure.storage.OperationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.daikon.i18n.GlobalI18N;
@@ -35,6 +36,23 @@ public class AzureStorageUtils {
     private transient static final Logger LOG = LoggerFactory.getLogger(AzureStorageUtils.class);
 
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider().getI18nMessages(AzureStorageUtils.class);
+
+    private static OperationContext talendOperationContext;
+
+    private static final String USER_AGENT_KEY = "User-Agent";
+
+    private static final String USER_AGENT_VALUE = "APN/1.0 Talend/7.1 TCOMP/0.24";
+
+    public static OperationContext getTalendOperationContext() {
+        if (talendOperationContext == null) {
+            talendOperationContext = new OperationContext();
+            HashMap<String, String> talendUserHeaders = new HashMap<>();
+            talendUserHeaders.put(USER_AGENT_KEY, USER_AGENT_VALUE);
+            talendOperationContext.setUserHeaders(talendUserHeaders);
+        }
+
+        return talendOperationContext;
+    }
 
     class LocalFileFilter implements FileFilter {
 

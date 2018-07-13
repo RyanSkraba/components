@@ -12,26 +12,31 @@
 // ============================================================================
 package org.talend.components.azurestorage.blob;
 
+import com.microsoft.azure.storage.StorageErrorCodeStrings;
+import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.blob.BlobContainerPublicAccessType;
+import com.microsoft.azure.storage.blob.BlobListingDetails;
+import com.microsoft.azure.storage.blob.CloudBlob;
+import com.microsoft.azure.storage.blob.CloudBlobClient;
+import com.microsoft.azure.storage.blob.CloudBlobContainer;
+import com.microsoft.azure.storage.blob.CloudBlockBlob;
+import com.microsoft.azure.storage.blob.ContainerListingDetails;
+import com.microsoft.azure.storage.blob.DeleteSnapshotsOption;
+import com.microsoft.azure.storage.blob.ListBlobItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.talend.components.api.exception.ComponentException;
+import org.talend.components.azurestorage.AzureConnection;
+import org.talend.components.azurestorage.utils.AzureStorageUtils;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.talend.components.api.exception.ComponentException;
-import org.talend.components.azurestorage.AzureConnection;
-import org.talend.daikon.i18n.GlobalI18N;
-import org.talend.daikon.i18n.I18nMessages;
-import com.microsoft.azure.storage.StorageErrorCodeStrings;
-import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.blob.BlobContainerPublicAccessType;
-import com.microsoft.azure.storage.blob.CloudBlob;
-import com.microsoft.azure.storage.blob.CloudBlobClient;
-import com.microsoft.azure.storage.blob.CloudBlobContainer;
-import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import com.microsoft.azure.storage.blob.ListBlobItem;
+import java.util.EnumSet;
 
 /**
  * This class encapsulate and provide azure storage blob services
@@ -41,7 +46,7 @@ public class AzureStorageBlobService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageBlobService.class);
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
-                                                           .getI18nMessages(AzureStorageBlobService.class);
+            .getI18nMessages(AzureStorageBlobService.class);
 
     private AzureConnection connection;
 
@@ -61,16 +66,15 @@ public class AzureStorageBlobService {
      */
     public boolean createContainerIfNotExist(final String containerName, final BlobContainerPublicAccessType accessType)
             throws StorageException, URISyntaxException, InvalidKeyException {
-        CloudBlobClient cloudBlobClient = connection.getCloudStorageAccount()
-                                                    .createCloudBlobClient();
+        CloudBlobClient cloudBlobClient = connection.getCloudStorageAccount().createCloudBlobClient();
         CloudBlobContainer cloudBlobContainer = cloudBlobClient.getContainerReference(containerName);
 
         boolean containerCreated;
         try {
-            containerCreated = cloudBlobContainer.createIfNotExists(accessType, null, null);
+            containerCreated = cloudBlobContainer
+                    .createIfNotExists(BlobContainerPublicAccessType.OFF, null, AzureStorageUtils.getTalendOperationContext());
         } catch (StorageException e) {
-            if (!e.getErrorCode()
-                  .equals(StorageErrorCodeStrings.CONTAINER_BEING_DELETED)) {
+            if (!e.getErrorCode().equals(StorageErrorCodeStrings.CONTAINER_BEING_DELETED)) {
                 throw e;
             }
             LOGGER.warn(messages.getMessage("error.CONTAINER_BEING_DELETED", containerName));
@@ -82,7 +86,8 @@ public class AzureStorageBlobService {
                 LOGGER.error(messages.getMessage("error.InterruptedException"));
                 throw new ComponentException(eint);
             }
-            containerCreated = cloudBlobContainer.createIfNotExists();
+            containerCreated = cloudBlobContainer
+                    .createIfNotExists(BlobContainerPublicAccessType.OFF, null, AzureStorageUtils.getTalendOperationContext());
             LOGGER.debug(messages.getMessage("debug.ContainerCreated", containerName));
         }
 
@@ -94,54 +99,48 @@ public class AzureStorageBlobService {
      */
     public boolean deleteContainerIfExist(final String containerName)
             throws StorageException, URISyntaxException, InvalidKeyException {
-        CloudBlobClient cloudBlobClient = connection.getCloudStorageAccount()
-                                                    .createCloudBlobClient();
+        CloudBlobClient cloudBlobClient = connection.getCloudStorageAccount().createCloudBlobClient();
         CloudBlobContainer cloudBlobContainer = cloudBlobClient.getContainerReference(containerName);
-        return cloudBlobContainer.deleteIfExists();
+        return cloudBlobContainer.deleteIfExists(null, null, AzureStorageUtils.getTalendOperationContext());
     }
 
     /**
      * @return true if the a container exist with the given name, false otherwise
      */
-    public boolean containerExist(final String containerName)
-            throws StorageException, URISyntaxException, InvalidKeyException {
-        CloudBlobClient cloudBlobClient = connection.getCloudStorageAccount()
-                                                    .createCloudBlobClient();
+    public boolean containerExist(final String containerName) throws StorageException, URISyntaxException, InvalidKeyException {
+        CloudBlobClient cloudBlobClient = connection.getCloudStorageAccount().createCloudBlobClient();
         CloudBlobContainer cloudBlobContainer = cloudBlobClient.getContainerReference(containerName);
-        return cloudBlobContainer.exists();
+        return cloudBlobContainer.exists(null, null, AzureStorageUtils.getTalendOperationContext());
     }
 
     public Iterable<CloudBlobContainer> listContainers() throws InvalidKeyException, URISyntaxException {
-        CloudBlobClient cloudBlobClient = connection.getCloudStorageAccount()
-                                                    .createCloudBlobClient();
-        return cloudBlobClient.listContainers();
+        CloudBlobClient cloudBlobClient = connection.getCloudStorageAccount().createCloudBlobClient();
+        return cloudBlobClient
+                .listContainers(null, ContainerListingDetails.NONE, null, AzureStorageUtils.getTalendOperationContext());
     }
 
-    public Iterable<ListBlobItem> listBlobs(final String containerName, final String prefix, final boolean
-            useFlatBlobListing)
+    public Iterable<ListBlobItem> listBlobs(final String containerName, final String prefix, final boolean useFlatBlobListing)
             throws URISyntaxException, StorageException, InvalidKeyException {
-        CloudBlobClient cloudBlobClient = connection.getCloudStorageAccount()
-                                                    .createCloudBlobClient();
+        CloudBlobClient cloudBlobClient = connection.getCloudStorageAccount().createCloudBlobClient();
         CloudBlobContainer cloudBlobContainer = cloudBlobClient.getContainerReference(containerName);
-        return cloudBlobContainer.listBlobs(prefix, useFlatBlobListing);
+        return cloudBlobContainer.listBlobs(prefix, useFlatBlobListing, EnumSet.noneOf(BlobListingDetails.class), null,
+                AzureStorageUtils.getTalendOperationContext());
     }
 
     public boolean deleteBlobBlockIfExist(final CloudBlockBlob block) throws StorageException {
-        return block.deleteIfExists();
+        return block.deleteIfExists(DeleteSnapshotsOption.NONE, null, null, AzureStorageUtils.getTalendOperationContext());
     }
 
     public void download(final CloudBlob blob, final OutputStream outStream) throws StorageException {
-        blob.download(outStream);
+        blob.download(outStream, null, null, AzureStorageUtils.getTalendOperationContext());
     }
 
-    public void upload(final String containerName, final String blobName, final InputStream sourceStream, final long
-            length)
+    public void upload(final String containerName, final String blobName, final InputStream sourceStream, final long length)
             throws StorageException, IOException, URISyntaxException, InvalidKeyException {
-        CloudBlobClient cloudBlobClient = connection.getCloudStorageAccount()
-                                                    .createCloudBlobClient();
+        CloudBlobClient cloudBlobClient = connection.getCloudStorageAccount().createCloudBlobClient();
         CloudBlobContainer cloudBlobContainer = cloudBlobClient.getContainerReference(containerName);
         CloudBlockBlob blob = cloudBlobContainer.getBlockBlobReference(blobName);
-        blob.upload(sourceStream, length);
+        blob.upload(sourceStream, length, null, null, AzureStorageUtils.getTalendOperationContext());
     }
 
 }
