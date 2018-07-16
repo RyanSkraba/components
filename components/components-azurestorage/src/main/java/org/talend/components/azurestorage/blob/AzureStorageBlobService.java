@@ -72,7 +72,7 @@ public class AzureStorageBlobService {
         boolean containerCreated;
         try {
             containerCreated = cloudBlobContainer
-                    .createIfNotExists(BlobContainerPublicAccessType.OFF, null, AzureStorageUtils.getTalendOperationContext());
+                    .createIfNotExists(accessType, null, AzureStorageUtils.getTalendOperationContext());
         } catch (StorageException e) {
             if (!e.getErrorCode().equals(StorageErrorCodeStrings.CONTAINER_BEING_DELETED)) {
                 throw e;
