@@ -16,6 +16,8 @@ package org.talend.components.bigquery.runtime;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
@@ -29,22 +31,29 @@ import org.talend.components.adapter.beam.BeamLocalRunnerOption;
 import org.talend.components.adapter.beam.transform.DirectConsumerCollector;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.bigquery.BigQueryDatasetProperties;
 import org.talend.components.bigquery.input.BigQueryInputProperties;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.google.api.gax.paging.Page;
 import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.BigQueryException;
 import com.google.cloud.bigquery.Dataset;
 import com.google.cloud.bigquery.DatasetId;
+import com.google.cloud.bigquery.DatasetInfo;
+import com.google.cloud.bigquery.FieldValue;
+import com.google.cloud.bigquery.Job;
+import com.google.cloud.bigquery.JobInfo;
+import com.google.cloud.bigquery.QueryJobConfiguration;
 import com.google.cloud.bigquery.QueryRequest;
 import com.google.cloud.bigquery.QueryResponse;
 import com.google.cloud.bigquery.Table;
 import com.google.cloud.bigquery.TableId;
-
-// import org.apache.beam.runners.direct.DirectRunner;
 
 public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
 
@@ -61,6 +70,48 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
 
     @Override
     public void getSample(int limit, Consumer<IndexedRecord> consumer) {
+        BigQuery bigquery = BigQueryConnection.createClient(properties.getDatastoreProperties());
+        com.google.cloud.bigquery.Schema bqRowSchema = null;
+        String query = null;
+        boolean useLegacySql = true;
+        switch (properties.sourceType.getValue()) {
+        case TABLE_NAME: {
+            query = String.format("select * from `%s.%s.%s` LIMIT %d",
+                    properties.getDatastoreProperties().projectName.getValue(), properties.bqDataset.getValue(),
+                    properties.tableName.getValue(), limit);
+            useLegacySql = false;
+            break;
+        }
+        case QUERY: {
+            query = properties.query.getValue();
+            useLegacySql = properties.useLegacySql.getValue();
+            break;
+        }
+        default:
+            throw new RuntimeException("To be implemented: " + properties.sourceType.getValue());
+        }
+        QueryRequest queryRequest = QueryRequest
+                .newBuilder(query)
+                .setUseLegacySql(useLegacySql)
+                .setPageSize(Integer.valueOf(limit).longValue())
+                .build();
+        QueryResponse queryResponse =
+                query(bigquery, queryRequest, properties.getDatastoreProperties().projectName.getValue());
+        bqRowSchema = queryResponse.getResult().getSchema();
+        Schema schema = BigQueryAvroRegistry.get().inferSchema(bqRowSchema);
+        Iterator<List<FieldValue>> iterator = queryResponse.getResult().getValues().iterator();
+        IndexedRecordConverter<Map<String, Object>, IndexedRecord> converter =
+                new BigQueryFieldValueListIndexedRecordConverter();
+        converter.setSchema(schema);
+        int count = 0; // need this only for legacy sql with large result
+        while (iterator.hasNext() && count < limit) {
+            List<FieldValue> values = iterator.next();
+            consumer.accept(converter.convertToAvro(BigQueryAvroRegistry.get().convertFileds(values, schema)));
+            count++;
+        }
+    }
+
+    public void getSampleDeprecated(int limit, Consumer<IndexedRecord> consumer) {
         // Create a pipeline using the input component to get records.
         DirectOptions options = BeamLocalRunnerOption.getOptions();
         final Pipeline p = Pipeline.create(options);
@@ -138,7 +189,8 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
                     .newBuilder(properties.query.getValue())
                     .setUseLegacySql(properties.useLegacySql.getValue())
                     .build();
-            QueryResponse queryResponse = bigquery.query(queryRequest);
+            QueryResponse queryResponse =
+                    query(bigquery, queryRequest, properties.getDatastoreProperties().projectName.getValue());
             bqRowSchema = queryResponse.getResult().getSchema();
             break;
         }
@@ -146,5 +198,60 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
             throw new RuntimeException("To be implemented: " + properties.sourceType.getValue());
         }
         return BigQueryAvroRegistry.get().inferSchema(bqRowSchema);
+    }
+
+    private QueryResponse query(BigQuery bigquery, QueryRequest queryRequest, String projectId) {
+        QueryResponse queryResponse = null;
+        try {
+            queryResponse = bigquery.query(queryRequest);
+        } catch (BigQueryException exception) {
+            if ("responseTooLarge".equals(exception.getReason())) {
+                return queryWithLarge(bigquery, queryRequest, projectId);
+            }
+        }
+        return loopQueryResponse(bigquery, queryResponse);
+    }
+
+    private QueryResponse loopQueryResponse(BigQuery bigquery, QueryResponse queryResponse) {
+        if (queryResponse == null) {
+            TalendRuntimeException.build(ComponentsErrorCode.IO_EXCEPTION).throwIt();
+        }
+        while (!queryResponse.jobCompleted()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                TalendRuntimeException.build(ComponentsErrorCode.IO_EXCEPTION, e).throwIt();
+            }
+            queryResponse = bigquery.getQueryResults(queryResponse.getJobId());
+        }
+        if (queryResponse.hasErrors()) {
+            TalendRuntimeException.build(ComponentsErrorCode.IO_EXCEPTION).setAndThrow(
+                    queryResponse.getExecutionErrors().toArray(new String[] {}));
+        }
+        return queryResponse;
+    }
+
+    private QueryResponse queryWithLarge(BigQuery bigquery, QueryRequest queryRequest, String projectId) {
+        String tempDataset = genTempName("dataset");
+        String tempTable = genTempName("table");
+        bigquery.create(DatasetInfo.of(tempDataset));
+        TableId tableId = TableId.of(projectId, tempDataset, tempTable);
+        QueryJobConfiguration jobConfiguration = QueryJobConfiguration
+                .newBuilder(queryRequest.getQuery())
+                .setAllowLargeResults(true)
+                .setUseLegacySql(queryRequest.useLegacySql())
+                .setDestinationTable(tableId)
+                .build();
+        Job job = bigquery.create(JobInfo.of(jobConfiguration));
+        QueryResponse queryResponse = bigquery.getQueryResults(job.getJobId());
+        queryResponse = loopQueryResponse(bigquery, queryResponse);
+        bigquery.delete(tableId);
+        return queryResponse;
+    }
+
+    private String genTempName(String prefix) {
+        return "temp_" + prefix + java.util.UUID.randomUUID().toString().replaceAll("-", "")
+                + "<%=cid%>".toLowerCase().replaceAll("[^a-z0-9]", "0").replaceAll("^[^a-z]", "a")
+                + Integer.toHexString(java.util.concurrent.ThreadLocalRandom.current().nextInt());
     }
 }

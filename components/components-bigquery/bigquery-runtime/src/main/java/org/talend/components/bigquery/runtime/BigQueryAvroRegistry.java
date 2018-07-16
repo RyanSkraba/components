@@ -15,20 +15,24 @@ package org.talend.components.bigquery.runtime;
 
 import static org.talend.daikon.avro.SchemaConstants.TALEND_COLUMN_DB_TYPE;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.avro.SchemaBuilder;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
-import org.talend.daikon.avro.converter.AvroConverter;
-import org.talend.daikon.avro.converter.ConvertAvroList;
+import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.java8.SerializableFunction;
 
 import com.google.api.services.bigquery.model.TableFieldSchema;
 import com.google.api.services.bigquery.model.TableSchema;
 import com.google.cloud.bigquery.Field;
+import com.google.cloud.bigquery.FieldValue;
 import com.google.cloud.bigquery.LegacySQLTypeName;
 import com.google.cloud.bigquery.Schema;
 import com.google.cloud.bigquery.StandardSQLTypeName;
@@ -156,7 +160,8 @@ public class BigQueryAvroRegistry extends AvroRegistry {
             return SchemaBuilder.builder().record("EmptyRecord").fields().endRecord();
         }
 
-        SchemaBuilder.FieldAssembler<org.apache.avro.Schema> fieldAssembler = SchemaBuilder.record("BigQuerySchema").fields();
+        SchemaBuilder.FieldAssembler<org.apache.avro.Schema> fieldAssembler =
+                SchemaBuilder.record("BigQuerySchema").fields();
         for (Field bqField : bqFields) {
             String name = bqField.getName();
             org.apache.avro.Schema fieldSchema = inferSchemaField(bqField);
@@ -195,7 +200,8 @@ public class BigQueryAvroRegistry extends AvroRegistry {
             String name = field.getName();
             // Struct type
             // https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#struct-type
-            SchemaBuilder.FieldAssembler<org.apache.avro.Schema> itemFieldAssembler = SchemaBuilder.record(name).fields();
+            SchemaBuilder.FieldAssembler<org.apache.avro.Schema> itemFieldAssembler =
+                    SchemaBuilder.record(name).fields();
             for (Field itemField : sqlType.getFields()) {
                 itemFieldAssembler.name(itemField.getName()).type(inferSchemaField(itemField)).noDefault();
             }
@@ -236,106 +242,6 @@ public class BigQueryAvroRegistry extends AvroRegistry {
         }
     }
 
-    /**
-     *
-     * @param fieldSchema
-     * @param <T>
-     * @return
-     */
-    public <T> AvroConverter<? super T, ?> getConverter(org.apache.avro.Schema fieldSchema) {
-        fieldSchema = AvroUtils.unwrapIfNullable(fieldSchema);
-        if (AvroUtils.isSameType(fieldSchema, AvroUtils._boolean())) {
-            return (AvroConverter<? super T, ?>) getConverter(Boolean.class);
-        }
-        if (AvroUtils.isSameType(fieldSchema, AvroUtils._double())) {
-            return (AvroConverter<? super T, ?>) new AvroConverter<Number, Double>() {
-
-                @Override
-                public org.apache.avro.Schema getSchema() {
-                    return AvroUtils._double();
-                }
-
-                @Override
-                public Class<Number> getDatumClass() {
-                    return Number.class;
-                }
-
-                @Override
-                public Number convertToDatum(Double aDouble) {
-                    return aDouble;
-                }
-
-                @Override
-                public Double convertToAvro(Number number) {
-                    return number == null ? null : number.doubleValue();
-                }
-            };
-        }
-        if (AvroUtils.isSameType(fieldSchema, AvroUtils._long())) {
-            return (AvroConverter<? super T, ?>) new AvroConverter<Object, Long>() {
-
-                @Override
-                public org.apache.avro.Schema getSchema() {
-                    return AvroUtils._long();
-                }
-
-                @Override
-                public Class<Object> getDatumClass() {
-                    return Object.class;
-                }
-
-                @Override
-                public Number convertToDatum(Long aLong) {
-                    return aLong;
-                }
-
-                @Override
-                public Long convertToAvro(Object number) {
-                    if (number instanceof Number)
-                        return ((Number) number).longValue();
-                    return number == null ? null : Long.valueOf(String.valueOf(number));
-                }
-            };
-        }
-        if (AvroUtils.isSameType(fieldSchema, AvroUtils._bytes())) {
-            return new Unconverted(ByteBuffer.class, AvroUtils._bytes());
-        }
-        if (fieldSchema.getType() == org.apache.avro.Schema.Type.RECORD) {
-            BigQueryTableRowIndexedRecordConverter recordTypeIndexedRecordConverter = new BigQueryTableRowIndexedRecordConverter();
-            recordTypeIndexedRecordConverter.setSchema(fieldSchema);
-            return (AvroConverter<? super T, ?>) recordTypeIndexedRecordConverter;
-        }
-        if (fieldSchema.getType() == org.apache.avro.Schema.Type.ARRAY) {
-            org.apache.avro.Schema elementSchema = AvroUtils.unwrapIfNullable(fieldSchema.getElementType());
-            // List.class is enough here, ConvertAvroList do not use it actually
-            return new ConvertAvroList(List.class, elementSchema, getConverter(elementSchema));
-        }
-        // When construct BigQuery TableRow object, the value's java type is String for the rest of LegacySQLTypeName
-        // And after AvroCoder, the type of String changes to Utf8, so need to convert it to String too
-        return new AvroConverter<Object, Object>() {
-
-            @Override
-            public org.apache.avro.Schema getSchema() {
-                return org.apache.avro.Schema.create(org.apache.avro.Schema.Type.STRING);
-            }
-
-            @Override
-            public Class getDatumClass() {
-                return Object.class;
-            }
-
-            @Override
-            public Object convertToDatum(Object o) {
-                return o == null ? null : String.valueOf(o);
-            }
-
-            @Override
-            public Object convertToAvro(Object o) {
-                return o == null ? null : String.valueOf(o);
-            }
-        };
-    }
-
     public enum BigQueryType {
         RECORD,
         BOOLEAN,
@@ -349,4 +255,79 @@ public class BigQueryAvroRegistry extends AvroRegistry {
         STRING
     }
 
+    public Map<String, Object> convertFileds(List<FieldValue> fields, org.apache.avro.Schema schema) {
+        Map<String, Object> container = new HashMap<>();
+        for (int i = 0; i < fields.size(); i++) {
+            FieldValue fieldValue = fields.get(i);
+            org.apache.avro.Schema.Field fieldMeta = schema.getFields().get(i);
+            container.put(fieldMeta.name(), convertField(fieldValue, fieldMeta.schema()));
+        }
+        return container;
+    }
+
+    private Object convertField(FieldValue fieldValue, org.apache.avro.Schema fieldSchema) {
+        boolean nullable = AvroUtils.isNullable(fieldSchema);
+        if (nullable && fieldValue.isNull()) {
+            return null;
+        }
+        fieldSchema = AvroUtils.unwrapIfNullable(fieldSchema);
+        switch (fieldValue.getAttribute()) {
+        case PRIMITIVE:
+            if (BigQueryType.TIMESTAMP.toString().equals(fieldSchema.getProp(TALEND_COLUMN_DB_TYPE))) {
+                Double doubleValue = ((Long) fieldValue.getTimestampValue()) / 1000000.0;
+                return formatTimestamp(doubleValue.toString());
+            } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._double())) {
+                return fieldValue.getDoubleValue();
+            } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._boolean())) {
+                return fieldValue.getBooleanValue();
+            } else {
+                return fieldValue.getValue();
+            }
+        case REPEATED:
+            List<Object> listValue = new ArrayList<>();
+            List<FieldValue> repeatedChildValue = fieldValue.getRepeatedValue();
+            for (FieldValue childValue : repeatedChildValue) {
+                listValue.add(convertField(childValue, fieldSchema.getElementType()));
+            }
+            return listValue;
+        case RECORD:
+            return convertFileds(fieldValue.getRecordValue(), fieldSchema);
+        }
+        throw TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_ARGUMENT).create();
+    }
+
+    /**
+     * Formats BigQuery seconds-since-epoch into String matching JSON export. Thread-safe and
+     * immutable.
+     */
+    private static final DateTimeFormatter DATE_AND_SECONDS_FORMATTER =
+            DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withZoneUTC();
+
+    // Package private for BigQueryTableRowIterator to use.
+    static String formatTimestamp(String timestamp) {
+        // timestamp is in "seconds since epoch" format, with scientific notation.
+        // e.g., "1.45206229112345E9" to mean "2016-01-06 06:38:11.123456 UTC".
+        // Separate into seconds and microseconds.
+        double timestampDoubleMicros = Double.parseDouble(timestamp) * 1000000;
+        long timestampMicros = (long) timestampDoubleMicros;
+        long seconds = timestampMicros / 1000000;
+        int micros = (int) (timestampMicros % 1000000);
+        String dayAndTime = DATE_AND_SECONDS_FORMATTER.print(seconds * 1000);
+
+        // No sub-second component.
+        if (micros == 0) {
+            return String.format("%s UTC", dayAndTime);
+        }
+
+        // Sub-second component.
+        int digits = 6;
+        int subsecond = micros;
+        while (subsecond % 10 == 0) {
+            digits--;
+            subsecond /= 10;
+        }
+        String formatString = String.format("%%0%dd", digits);
+        String fractionalSeconds = String.format(formatString, subsecond);
+        return String.format("%s.%s UTC", dayAndTime, fractionalSeconds);
+    }
 }

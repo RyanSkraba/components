@@ -13,7 +13,6 @@
 
 package org.talend.components.bigquery.runtime;
 
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
@@ -26,7 +25,8 @@ public class BigQueryAvroRegistryTest {
 
     @Test
     public void testGetConverter_double() {
-        AvroConverter converter = BigQueryAvroRegistry.get().getConverter(Schema.create(Schema.Type.DOUBLE));
+        BigQueryBaseIndexedRecordConverter indexedRecordConverter = new BigQueryTableRowIndexedRecordConverter();
+        AvroConverter converter = indexedRecordConverter.getConverter(Schema.create(Schema.Type.DOUBLE));
         assertThat(converter.convertToAvro(123L), Matchers.<Object>is(123d));
         assertThat(converter.convertToAvro(123), Matchers.<Object>is(123d));
         assertThat(converter.convertToAvro((short)123), Matchers.<Object>is(123d));
@@ -38,7 +38,8 @@ public class BigQueryAvroRegistryTest {
 
     @Test
     public void testGetConverter_long() {
-        AvroConverter converter = BigQueryAvroRegistry.get().getConverter(Schema.create(Schema.Type.LONG));
+        BigQueryBaseIndexedRecordConverter indexedRecordConverter = new BigQueryTableRowIndexedRecordConverter();
+        AvroConverter converter = indexedRecordConverter.getConverter(Schema.create(Schema.Type.LONG));
         assertThat(converter.convertToAvro(123L), Matchers.<Object>is(123L));
         assertThat(converter.convertToAvro(123), Matchers.<Object>is(123L));
         assertThat(converter.convertToAvro((short)123), Matchers.<Object>is(123L));

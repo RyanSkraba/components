@@ -20,9 +20,11 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.avro.converter.ComparableIndexedRecordBase;
+import org.talend.daikon.avro.converter.ConvertAvroList;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 import com.google.api.client.util.Base64;
@@ -56,7 +58,7 @@ public abstract class BigQueryBaseIndexedRecordConverter<T extends Map> implemen
         List<Schema.Field> fields = schema.getFields();
         fieldConverters = new HashMap<>();
         for (Schema.Field field : fields) {
-            fieldConverters.put(field.name(), BigQueryAvroRegistry.get().getConverter(field.schema()));
+            fieldConverters.put(field.name(), getConverter(field.schema()));
         }
     }
 
@@ -96,5 +98,107 @@ public abstract class BigQueryBaseIndexedRecordConverter<T extends Map> implemen
         public Schema getSchema() {
             return schema;
         }
+    }
+
+    abstract BigQueryBaseIndexedRecordConverter createRecordConverter();
+
+    /**
+     *
+     * @param fieldSchema
+     * @param <T>
+     * @return
+     */
+    public <T> AvroConverter<? super T, ?> getConverter(org.apache.avro.Schema fieldSchema) {
+        fieldSchema = AvroUtils.unwrapIfNullable(fieldSchema);
+        if (AvroUtils.isSameType(fieldSchema, AvroUtils._boolean())) {
+            return (AvroConverter<? super T, ?>) BigQueryAvroRegistry.get().getConverter(Boolean.class);
+        }
+        if (AvroUtils.isSameType(fieldSchema, AvroUtils._double())) {
+            return (AvroConverter<? super T, ?>) new AvroConverter<Number, Double>() {
+
+                @Override
+                public org.apache.avro.Schema getSchema() {
+                    return AvroUtils._double();
+                }
+
+                @Override
+                public Class<Number> getDatumClass() {
+                    return Number.class;
+                }
+
+                @Override
+                public Number convertToDatum(Double aDouble) {
+                    return aDouble;
+                }
+
+                @Override
+                public Double convertToAvro(Number number) {
+                    return number == null ? null : number.doubleValue();
+                }
+            };
+        }
+        if (AvroUtils.isSameType(fieldSchema, AvroUtils._long())) {
+            return (AvroConverter<? super T, ?>) new AvroConverter<Object, Long>() {
+
+                @Override
+                public org.apache.avro.Schema getSchema() {
+                    return AvroUtils._long();
+                }
+
+                @Override
+                public Class<Object> getDatumClass() {
+                    return Object.class;
+                }
+
+                @Override
+                public Number convertToDatum(Long aLong) {
+                    return aLong;
+                }
+
+                @Override
+                public Long convertToAvro(Object number) {
+                    if (number instanceof Number)
+                        return ((Number) number).longValue();
+                    return number == null ? null : Long.valueOf(String.valueOf(number));
+                }
+            };
+        }
+        if (AvroUtils.isSameType(fieldSchema, AvroUtils._bytes())) {
+            return new AvroRegistry.Unconverted(ByteBuffer.class, AvroUtils._bytes());
+        }
+        if (fieldSchema.getType() == org.apache.avro.Schema.Type.RECORD) {
+            BigQueryBaseIndexedRecordConverter recordTypeIndexedRecordConverter = createRecordConverter();
+            recordTypeIndexedRecordConverter.setSchema(fieldSchema);
+            return (AvroConverter<? super T, ?>) recordTypeIndexedRecordConverter;
+        }
+        if (fieldSchema.getType() == org.apache.avro.Schema.Type.ARRAY) {
+            org.apache.avro.Schema elementSchema = AvroUtils.unwrapIfNullable(fieldSchema.getElementType());
+            // List.class is enough here, ConvertAvroList do not use it actually
+            return new ConvertAvroList(List.class, elementSchema, getConverter(elementSchema));
+        }
+        // When construct BigQuery TableRow object, the value's java type is String for the rest of LegacySQLTypeName
+        // And after AvroCoder, the type of String changes to Utf8, so need to convert it to String too
+        return new AvroConverter<Object, Object>() {
+
+            @Override
+            public org.apache.avro.Schema getSchema() {
+                return org.apache.avro.Schema.create(org.apache.avro.Schema.Type.STRING);
+            }
+
+            @Override
+            public Class getDatumClass() {
+                return Object.class;
+            }
+
+            @Override
+            public Object convertToDatum(Object o) {
+                return o == null ? null : String.valueOf(o);
+            }
+
+            @Override
+            public Object convertToAvro(Object o) {
+                return o == null ? null : String.valueOf(o);
+            }
+        };
     }
 }

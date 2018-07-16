@@ -96,16 +96,23 @@ public class BigQueryInputRuntime extends PTransform<PBegin, PCollection<Indexed
             table.setProjectId(datastore.projectName.getValue());
             table.setDatasetId(dataset.bqDataset.getValue());
             table.setTableId(dataset.tableName.getValue());
+            // TODO use {@link #BigQueryIO.read(SerializableFunction)} instead of readTableRows for good performance
+            // avoid redundance type convert, but take care of each filed type value when apply
             bigQueryIOPTransform = BigQueryIO.readTableRows().from(table);
             break;
         }
         case QUERY: {
+            // TODO use {@link #BigQueryIO.read(SerializableFunction)} instead of readTableRows for good performance
+            // reduce redundance type convert, but take care of each filed type value when apply
             bigQueryIOPTransform = BigQueryIO.readTableRows().fromQuery(dataset.query.getValue());
             if (!dataset.useLegacySql.getValue()) {
                 bigQueryIOPTransform = bigQueryIOPTransform.usingStandardSql();
             } else {
-                // flattenResults only for legacy sql, and we do not support flattenResults till now.
-                bigQueryIOPTransform = bigQueryIOPTransform.withoutResultFlattening();
+                // need to consider flattenResults only for legacy sql,
+                // stand sql don't support flatten result, legacy sql support flatten result by default
+                // withoutResultFlattening on legacy sql is not working well till fix schema issue,
+                // BigQueryDatasetRuntime.getSchema use flatten result indeed
+                // bigQueryIOPTransform = bigQueryIOPTransform.withoutResultFlattening();
             }
             break;
         }

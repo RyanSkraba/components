@@ -47,4 +47,8 @@ public class BigQueryTableRowIndexedRecordConverter extends BigQueryBaseIndexedR
         return row;
     }
 
+    @Override
+    BigQueryBaseIndexedRecordConverter createRecordConverter() {
+        return new BigQueryTableRowIndexedRecordConverter();
+    }
 }
