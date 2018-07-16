@@ -12,17 +12,6 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime.reader;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
@@ -36,13 +25,24 @@ import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.JdbcComponentErrorsCode;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.JDBCSource;
+import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
 /**
  * common JDBC reader
- *
  */
 public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
@@ -68,6 +68,8 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     private boolean useExistedConnection;
 
+    private int readLimit = -1;
+
     /**
      * Current {@link IndexedRecord} read by this {@link Reader}
      * It is returned in {@link Reader#getCurrent()} method.
@@ -84,6 +86,15 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
         this.useExistedConnection = setting.getReferencedComponentId() != null;
     }
 
+    /*
+     *  This alternative constructor allows to pass a limit of records to be read. It can be used when only a subset of
+     *  the table content is needed and avoid loading the whole table content into memory.
+     */
+    public JDBCInputReader(RuntimeContainer container, JDBCSource source, RuntimeSettingProvider props, int readLimit) {
+        this(container, source, props);
+        this.readLimit = readLimit;
+    }
+
     private Schema getSchema() throws IOException, SQLException {
         if (querySchema == null) {
             // we can't use the method below as the reader also work for dataset topic which don't support that.
@@ -95,7 +106,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
              * as in studio, we only use the design schema if no dynamic column exists.
              * Here, we will use the runtime schema too when no valid design schema found,
              * it work for data set topic.
-             * 
+             *
              * And another thing, the reader or other runtime execution object should be common,
              * and not depend on the platform, so should use the same action, so we use the same
              * reader for studio and dataprep(now for data store and set) execution platform. And
@@ -195,7 +206,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
                 statement.setFetchSize(setting.getCursor());
             }
 
-            resultSet = statement.executeQuery(setting.getSql());
+            resultSet = statement.executeQuery(JdbcRuntimeUtils.getQueryToExecute(setting, this.readLimit));
 
             return haveNext();
         } catch (SQLException e) {

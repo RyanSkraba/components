@@ -36,6 +36,10 @@ public class JDBCSource extends JDBCSourceOrSink implements BoundedSource {
         return new JDBCInputReader(container, this, properties);
     }
 
+    public BoundedReader createReader(RuntimeContainer container, int readLimit) {
+        return new JDBCInputReader(container, this, properties, readLimit);
+    }
+
     @Override
     public List<? extends BoundedSource> splitIntoBundles(long desiredBundleSizeBytes, RuntimeContainer adaptor)
             throws Exception {
