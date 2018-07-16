@@ -37,7 +37,7 @@ public enum KinesisRegion {
     US_EAST_2("us-east-2"),
     US_WEST_1("us-west-1"),
     US_WEST_2("us-west-2"),
-    OTHER("us-east-1");
+    OTHER("other");
 
     private String value;
 
