@@ -87,7 +87,7 @@ public class AzureStorageBlobService {
                 throw new ComponentException(eint);
             }
             containerCreated = cloudBlobContainer
-                    .createIfNotExists(BlobContainerPublicAccessType.OFF, null, AzureStorageUtils.getTalendOperationContext());
+                    .createIfNotExists(accessType, null, AzureStorageUtils.getTalendOperationContext());
             LOGGER.debug(messages.getMessage("debug.ContainerCreated", containerName));
         }
 
