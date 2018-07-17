@@ -24,7 +24,7 @@ public abstract class SalesforceSchemaUtils {
                 try {
                     return sds.guessSchema(query(sds, dataset, fields));
                 } catch (Exception exception) {
-                    throw new RuntimeException(MESSAGES.getMessage("error.retrieveSchema"), exception);
+                    throw new RuntimeException(MESSAGES.getMessage("error.retrieveSchemaFromSOQL"), exception);
                 }
             }
             throw new RuntimeException(MESSAGES.getMessage("error.retrieveSchemaNoField"));
