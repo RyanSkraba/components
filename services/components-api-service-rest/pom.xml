@@ -39,6 +39,8 @@
         <pax-url-aethe.version>2.4.7</pax-url-aethe.version>
         <rest-assured.version>2.6.0</rest-assured.version>
         <slf4.version>1.7.25</slf4.version>
+        <!-- Aligned with component-parent -->
+        <docker-maven-plugin.version>0.26.0</docker-maven-plugin.version>
     </properties>
     <url>https://github.com/Talend/components/tree/master/services/components-api-service-rest</url>
     <organization>
@@ -485,7 +487,7 @@
                     <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.20.1</version>
+                        <version>${docker-maven-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>start</id>
