@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -19,6 +19,7 @@ import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.marketo.tmarketocampaign.TMarketoCampaignProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperationProperties;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
@@ -51,6 +52,9 @@ public class MarketoWriteOperation implements WriteOperation<Result> {
         }
         if (sink.getProperties() instanceof TMarketoInputProperties) {
             return new MarketoInputWriter(this, adaptor);
+        }
+        if (sink.properties instanceof TMarketoCampaignProperties) {
+            return new MarketoCampaignWriter(this, adaptor);
         }
         return null;
     }

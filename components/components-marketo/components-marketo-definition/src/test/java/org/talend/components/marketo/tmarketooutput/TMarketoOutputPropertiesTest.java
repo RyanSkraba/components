@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -17,8 +17,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.deleteCompanies;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.deleteOpportunities;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.deleteOpportunityRoles;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.syncCompanies;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.syncLead;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.syncMultipleLeads;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.syncOpportunities;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation.syncOpportunityRoles;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,6 +41,7 @@ import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.Cus
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OperationType;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.RESTLookupFields;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectSyncAction;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
@@ -60,7 +67,8 @@ public class TMarketoOutputPropertiesTest {
 
     @Test
     public void testGetAllSchemaPropertiesConnectors() throws Exception {
-        Set<PropertyPathConnector> connectors = new HashSet<>(Arrays.asList(props.FLOW_CONNECTOR, props.REJECT_CONNECTOR));
+        Set<PropertyPathConnector> connectors =
+                new HashSet<>(Arrays.asList(props.FLOW_CONNECTOR, props.REJECT_CONNECTOR));
         assertEquals(connectors, props.getAllSchemaPropertiesConnectors(true));
         assertEquals(Collections.singleton(props.MAIN_CONNECTOR), props.getAllSchemaPropertiesConnectors(false));
     }
@@ -127,6 +135,31 @@ public class TMarketoOutputPropertiesTest {
                 props.schemaFlow.schema.getValue().getFields());
         assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncMultipleLeads().getFields(),
                 props.schemaReject.schema.getValue().getFields());
+        //
+        props.connection.apiMode.setValue(APIMode.REST);
+        props.outputOperation.setValue(syncCompanies);
+        props.afterOutputOperation();
+        assertEquals(MarketoConstants.getCompanySyncSchema(), props.schemaInput.schema.getValue());
+
+        props.outputOperation.setValue(syncOpportunities);
+        props.afterOutputOperation();
+        assertEquals(MarketoConstants.getOpportunitySyncSchema(), props.schemaInput.schema.getValue());
+
+        props.outputOperation.setValue(syncOpportunityRoles);
+        props.afterOutputOperation();
+        assertEquals(MarketoConstants.getOpportunityRoleSyncSchema(), props.schemaInput.schema.getValue());
+
+        props.outputOperation.setValue(deleteCompanies);
+        props.afterOutputOperation();
+        assertEquals(MarketoConstants.getCompanySyncSchema(), props.schemaInput.schema.getValue());
+
+        props.outputOperation.setValue(deleteOpportunities);
+        props.afterOutputOperation();
+        assertEquals(MarketoConstants.getOpportunitySyncSchema(), props.schemaInput.schema.getValue());
+
+        props.outputOperation.setValue(deleteOpportunityRoles);
+        props.afterOutputOperation();
+        assertEquals(MarketoConstants.getOpportunityRoleSyncSchema(), props.schemaInput.schema.getValue());
     }
 
     @Test
@@ -211,7 +244,7 @@ public class TMarketoOutputPropertiesTest {
         props.refreshLayout(f);
         assertTrue(f.getWidget(props.customObjectName.getName()).isVisible());
         assertTrue(f.getWidget(props.customObjectSyncAction.getName()).isVisible());
-        assertTrue(f.getWidget(props.customObjectDedupeBy.getName()).isVisible());
+        assertFalse(f.getWidget(props.customObjectDedupeBy.getName()).isVisible());
         assertFalse(f.getWidget(props.customObjectDeleteBy.getName()).isVisible());
         props.outputOperation.setValue(OutputOperation.deleteCustomObjects);
         props.updateSchemaRelated();
@@ -221,6 +254,16 @@ public class TMarketoOutputPropertiesTest {
         assertFalse(f.getWidget(props.customObjectSyncAction.getName()).isVisible());
         assertTrue(f.getWidget(props.customObjectDeleteBy.getName()).isVisible());
         assertFalse(f.getWidget(props.customObjectDedupeBy.getName()).isVisible());
+
+        props.outputOperation.setValue(OutputOperation.syncCustomObjects);
+        props.customObjectSyncAction.setValue(CustomObjectSyncAction.updateOnly);
+        props.updateSchemaRelated();
+        props.schemaListener.afterSchema();
+        props.afterCustomObjectSyncAction();
+        assertTrue(f.getWidget(props.customObjectName.getName()).isVisible());
+        assertTrue(f.getWidget(props.customObjectSyncAction.getName()).isVisible());
+        assertFalse(f.getWidget(props.customObjectDeleteBy.getName()).isVisible());
+        assertTrue(f.getWidget(props.customObjectDedupeBy.getName()).isVisible());
     }
 
     @Test
@@ -254,7 +297,8 @@ public class TMarketoOutputPropertiesTest {
         MarketoComponentWizardBaseProperties mprops = mock(MarketoComponentWizardBaseProperties.class);
         when(mprops.postDeserialize(eq(0), any(PostDeserializeSetup.class), eq(false))).thenReturn(true);
         assertFalse(props.postDeserialize(0, null, false));
-        when(mprops.postDeserialize(eq(0), any(PostDeserializeSetup.class), eq(false))).thenThrow(new ClassCastException());
+        when(mprops.postDeserialize(eq(0), any(PostDeserializeSetup.class), eq(false)))
+                .thenThrow(new ClassCastException());
         assertFalse(props.postDeserialize(0, null, false));
     }
 

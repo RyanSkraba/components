@@ -139,14 +139,16 @@ public class MarketoSourceOrSinkTest extends MarketoRuntimeTestBase {
                 .describeCustomObject(any(TMarketoInputProperties.class));
         assertNull(spy.getEndpointSchema(null, "car_c"));
         doReturn(getDescribeCO()).when(client).describeCustomObject(any(TMarketoInputProperties.class));
+        doReturn(getDescribeCO()).when(client).describeCompanies(any(TMarketoInputProperties.class));
+        doReturn(getDescribeCO()).when(client).describeOpportunity(any(TMarketoInputProperties.class));
         assertNotNull(spy.getEndpointSchema(null, "car_c"));
         assertNull(spy.getSchemaForCustomObject(""));
         assertNotNull(spy.getSchemaForCustomObject("car_c"));
         doReturn(getFailedRecordResult("REST", "", "error")).when(client)
                 .describeCustomObject(any(TMarketoInputProperties.class));
-        assertNull(spy.getSchemaForCompany());
-        assertNull(spy.getSchemaForOpportunity());
-        assertNull(spy.getSchemaForOpportunityRole());
+        assertNotNull(spy.getSchemaForCompany());
+        assertNotNull(spy.getSchemaForOpportunity());
+        assertNotNull(spy.getSchemaForOpportunityRole());
     }
 
     @Test

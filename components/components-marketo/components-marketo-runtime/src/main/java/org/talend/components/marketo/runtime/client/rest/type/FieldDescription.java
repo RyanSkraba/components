@@ -21,7 +21,6 @@ import org.apache.avro.SchemaBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.marketo.MarketoConstants;
-import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
 import com.google.gson.Gson;
@@ -208,6 +207,9 @@ public class FieldDescription {
         case ("date"):
         case ("datetime"):
             fs = SchemaBuilder.builder().unionOf().nullType().and().longType().endUnion();
+            fs.getTypes().get(1).addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, getName());
+            fs.getTypes().get(1).addProp(SchemaConstants.TALEND_COLUMN_PATTERN, MarketoConstants.DATETIME_PATTERN_REST);
+            fs.getTypes().get(1).addProp(SchemaConstants.JAVA_CLASS_FLAG, "java.util.Date");
             break;
         default:
             LOG.warn("Non managed type : {}. for {}. Defaulting to String.", getDataType(), this);
@@ -217,7 +219,7 @@ public class FieldDescription {
         if (getLength() != null) {
             f.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, getLength().toString());
         }
-        if (AvroUtils._long().equals(fs.getTypes().get(1))) {
+        if ("java.util.Date".equals(fs.getTypes().get(1).getProp(SchemaConstants.JAVA_CLASS_FLAG))) {
             f.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, MarketoConstants.DATETIME_PATTERN_REST);
             f.addProp(SchemaConstants.JAVA_CLASS_FLAG, "java.util.Date");
         }

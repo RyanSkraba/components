@@ -1,9 +1,14 @@
 package org.talend.components.marketo.runtime;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.marketo.tmarketocampaign.TMarketoCampaignProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector;
@@ -19,6 +24,8 @@ import org.talend.daikon.properties.ValidationResultMutable;
 public class MarketoSink extends MarketoSourceOrSink implements Sink {
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoSink.class);
+
+    private transient static final Logger LOG = getLogger(MarketoSink.class);
 
     @Override
     public WriteOperation<?> createWriteOperation() {
@@ -46,9 +53,6 @@ public class MarketoSink extends MarketoSourceOrSink implements Sink {
                     vr.setMessage(messages.getMessage("error.validation.customobject.customobjectname"));
                     return vr;
                 }
-                if (StringUtils.isEmpty(((TMarketoOutputProperties) properties).customObjectDedupeBy.getValue())) {
-                    // TODO check API if required. Not sure...
-                }
                 break;
             case deleteCustomObjects:
                 if (StringUtils.isEmpty(((TMarketoOutputProperties) properties).customObjectName.getValue())) {
@@ -66,7 +70,8 @@ public class MarketoSink extends MarketoSourceOrSink implements Sink {
         // check getMultipleLeads with an input
         if (properties instanceof TMarketoInputProperties) {
             // operation must be getMultipleLeads
-            if (!((TMarketoInputProperties) properties).inputOperation.getValue().equals(InputOperation.getMultipleLeads)) {
+            if (!((TMarketoInputProperties) properties).inputOperation.getValue().equals(
+                    InputOperation.getMultipleLeads)) {
                 vr.setStatus(Result.ERROR);
                 vr.setMessage(messages.getMessage("error.validation.sink.getmultipleleads.only"));
                 return vr;
@@ -87,6 +92,29 @@ public class MarketoSink extends MarketoSourceOrSink implements Sink {
             if (StringUtils.isEmpty(((TMarketoInputProperties) properties).leadKeyValues.getValue())) {
                 vr.setStatus(Result.ERROR);
                 vr.setMessage(messages.getMessage("error.validation.leadkeyvalues"));
+                return vr;
+            }
+        }
+        // Campaign
+        if (properties instanceof TMarketoCampaignProperties) {
+            TMarketoCampaignProperties p = (TMarketoCampaignProperties) properties;
+            switch (p.campaignAction.getValue()) {
+            case trigger:
+                if (StringUtils.isEmpty(p.campaignId.getStringValue())) {
+                    vr.setStatus(Result.ERROR);
+                    vr.setMessage(messages.getMessage("error.validation.campaign.byid"));
+                    return vr;
+                }
+                if (p.triggerCampaignForLeadsInBatch.getValue()) {
+                    if (p.batchSize.getValue() < 1 || p.batchSize.getValue() > 100) {
+                        p.batchSize.setValue(100);
+                        LOG.info(messages.getMessage("error.validation.batchSize.range", 100));
+                    }
+                }
+                break;
+            default:
+                vr.setStatus(Result.ERROR);
+                vr.setMessage(messages.getMessage("error.validation.campaign.operation"));
                 return vr;
             }
         }

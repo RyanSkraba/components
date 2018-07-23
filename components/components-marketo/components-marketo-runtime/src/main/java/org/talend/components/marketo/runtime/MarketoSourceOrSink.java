@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -40,6 +40,7 @@ import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
+import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.StandardAction;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation;
 import org.talend.daikon.NamedThing;
@@ -53,13 +54,8 @@ import org.talend.daikon.properties.ValidationResultMutable;
 
 import com.google.gson.Gson;
 
-public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRuntime, MarketoSourceOrSinkSchemaProvider {
-
-    public static final String RESOURCE_COMPANY = "resourceCompany";
-
-    public static final String RESOURCE_OPPORTUNITY = "resourceOpportunity";
-
-    public static final String RESOURCE_OPPORTUNITY_ROLE = "resourceOpportunityRole";
+public class MarketoSourceOrSink
+        implements SourceOrSink, MarketoSourceOrSinkRuntime, MarketoSourceOrSinkSchemaProvider {
 
     public static final String TALEND6_DYNAMIC_COLUMN_POSITION = "di.dynamic.column.position";
 
@@ -71,7 +67,8 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
 
     private static final Logger LOG = LoggerFactory.getLogger(MarketoSourceOrSink.class);
 
-    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoSourceOrSink.class);
+    private static final I18nMessages messages =
+            GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoSourceOrSink.class);
 
     public MarketoProvideConnectionProperties getProperties() {
         return properties;
@@ -139,11 +136,28 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
         TMarketoInputProperties ip = new TMarketoInputProperties("retrieveSchema");
         Schema describeSchema = MarketoConstants.getCustomObjectDescribeSchema();
         ip.connection = properties.getConnectionProperties();
-        ip.inputOperation.setValue(InputOperation.CustomObject);
-        ip.customObjectAction.setValue(CustomObjectAction.describe);
-        ip.customObjectName.setValue(schemaName);
         ip.schemaInput.schema.setValue(describeSchema);
-        MarketoRecordResult r = client.describeCustomObject(ip);
+        ip.standardAction.setValue(StandardAction.describe);
+        ip.customObjectAction.setValue(CustomObjectAction.describe);
+        MarketoRecordResult r = new MarketoRecordResult();
+        switch (schemaName) {
+        case RESOURCE_COMPANY:
+            ip.inputOperation.setValue(InputOperation.Company);
+            r = client.describeCompanies(ip);
+            break;
+        case RESOURCE_OPPORTUNITY:
+            ip.inputOperation.setValue(InputOperation.Opportunity);
+            r = client.describeOpportunity(ip);
+            break;
+        case RESOURCE_OPPORTUNITY_ROLE:
+            ip.inputOperation.setValue(InputOperation.OpportunityRole);
+            r = client.describeOpportunity(ip);
+            break;
+        default:
+            ip.inputOperation.setValue(InputOperation.CustomObject);
+            ip.customObjectName.setValue(schemaName);
+            r = client.describeCustomObject(ip);
+        }
         if (!r.isSuccess()) {
             return null;
         }
@@ -153,7 +167,8 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
         }
         IndexedRecord record = records.get(0);
 
-        return FieldDescription.getSchemaFromJson(schemaName, record.get(describeSchema.getField("fields").pos()).toString(),
+        return FieldDescription.getSchemaFromJson(schemaName,
+                record.get(describeSchema.getField("fields").pos()).toString(),
                 record.get(describeSchema.getField("dedupeFields").pos()).toString());
     }
 
@@ -186,11 +201,25 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
         TMarketoInputProperties ip = new TMarketoInputProperties("retrieveSchema");
         Schema describeSchema = MarketoConstants.getCustomObjectDescribeSchema();
         ip.connection = properties.getConnectionProperties();
-        ip.inputOperation.setValue(InputOperation.CustomObject);
         ip.customObjectAction.setValue(CustomObjectAction.describe);
-        ip.customObjectName.setValue(resource);
+        ip.standardAction.setValue(StandardAction.describe);
         ip.schemaInput.schema.setValue(describeSchema);
-        MarketoRecordResult r = client.describeCustomObject(ip);
+        MarketoRecordResult r;
+
+        switch (resource) {
+        case RESOURCE_OPPORTUNITY:
+            ip.inputOperation.setValue(InputOperation.Opportunity);
+            r = client.describeOpportunity(ip);
+            break;
+        case RESOURCE_OPPORTUNITY_ROLE:
+            ip.inputOperation.setValue(InputOperation.OpportunityRole);
+            r = client.describeOpportunity(ip);
+            break;
+        default:
+            ip.inputOperation.setValue(InputOperation.CustomObject);
+            ip.customObjectName.setValue(resource);
+            r = client.describeCustomObject(ip);
+        }
         if (!r.isSuccess()) {
             return null;
         }
@@ -199,7 +228,12 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
             return null;
         }
         IndexedRecord record = records.get(0);
-        String[] keys = new Gson().fromJson(record.get(describeSchema.getField("dedupeFields").pos()).toString(), String[].class);
+        String[] keys = new Gson().fromJson(record.get(describeSchema.getField("dedupeFields").pos()).toString(),
+                String[].class);
+        // quote keys
+        for (int i = 0; i < keys.length; i++) {
+            keys[i] = "\"" + keys[i] + "\"";
+        }
 
         return Arrays.asList(keys);
     }
@@ -246,7 +280,8 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
                 resultFields.add(f);
             }
         }
-        Schema resultSchema = Schema.createRecord(design.getName(), design.getDoc(), design.getNamespace(), design.isError());
+        Schema resultSchema =
+                Schema.createRecord(design.getName(), design.getDoc(), design.getNamespace(), design.isError());
         resultSchema.getObjectProps().putAll(design.getObjectProps());
         resultSchema.setFields(resultFields);
 
@@ -287,8 +322,8 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
         if (refComponentId != null) {
             // In a runtime container
             if (container != null) {
-                TMarketoConnectionProperties shared = (TMarketoConnectionProperties) container.getComponentData(refComponentId,
-                        KEY_CONNECTION_PROPERTIES);
+                TMarketoConnectionProperties shared = (TMarketoConnectionProperties) container
+                        .getComponentData(refComponentId, KEY_CONNECTION_PROPERTIES);
                 if (shared != null) {
                     return shared;
                 }

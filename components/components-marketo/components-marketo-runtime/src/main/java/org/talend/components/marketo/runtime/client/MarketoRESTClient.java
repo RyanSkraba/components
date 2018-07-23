@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.marketo.runtime.client.type.MarketoException;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 
-public class MarketoRESTClient extends MarketoBulkExecClient implements MarketoClientServiceExtended {
+public class MarketoRESTClient extends MarketoOpportunityClient implements MarketoClientServiceExtended {
 
     private static final Logger LOG = LoggerFactory.getLogger(MarketoRESTClient.class);
 

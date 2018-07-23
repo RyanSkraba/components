@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -25,16 +25,19 @@ import org.junit.Test;
 public class LeadResultTest {
 
     LeadResult r;
+
     @Before
     public void setUp() throws Exception {
         r = new LeadResult();
         Map<String, String> m = new HashMap<>();
         r.setResult(Arrays.asList(m));
     }
+
     @Test
     public void testGetResult() throws Exception {
         assertNotNull(r.getResult());
     }
+
     @Test
     public void testToString() throws Exception {
         String s = "LeadResult{requestId='null', success=false, errors=null, result=[{}], moreResult=false, nextPageToken=null}";

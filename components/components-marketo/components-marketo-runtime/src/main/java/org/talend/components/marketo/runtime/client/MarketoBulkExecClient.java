@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -17,13 +17,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
-
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.io.FileUtils;
@@ -89,16 +87,7 @@ public class MarketoBulkExecClient extends MarketoCustomObjectClient {
             wr.append("--" + boundary);
             wr.flush();
             wr.close();
-            int responseCode = urlConn.getResponseCode();
-            if (responseCode == 200) {
-                InputStream inStream = urlConn.getInputStream();
-                InputStreamReader reader = new InputStreamReader(inStream);
-                Gson gson = new Gson();
-                return (BulkImportResult) gson.fromJson(reader, resultClass);
-            } else {
-                LOG.error("POST request failed: {}", responseCode);
-                throw new MarketoException(REST, responseCode, "Request failed! Please check your request setting!");
-            }
+            return (BulkImportResult) new Gson().fromJson(getReaderFromHttpResponse(urlConn), resultClass);
         } catch (IOException e) {
             LOG.error("POST request failed: {}", e.getMessage());
             throw new MarketoException(REST, e.getMessage());

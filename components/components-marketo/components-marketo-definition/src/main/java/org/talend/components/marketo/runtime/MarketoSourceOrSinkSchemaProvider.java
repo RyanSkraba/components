@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -20,6 +20,12 @@ import org.apache.avro.Schema.Field;
 import org.talend.components.api.component.runtime.SourceOrSink;
 
 public interface MarketoSourceOrSinkSchemaProvider extends SourceOrSink {
+
+    String RESOURCE_COMPANY = "resourceCompany";
+
+    String RESOURCE_OPPORTUNITY = "resourceOpportunity";
+
+    String RESOURCE_OPPORTUNITY_ROLE = "resourceOpportunityRole";
 
     Schema getSchemaForCustomObject(String customObjectName) throws IOException;
 

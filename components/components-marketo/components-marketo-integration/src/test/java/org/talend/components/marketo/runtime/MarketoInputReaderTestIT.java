@@ -54,7 +54,9 @@ import org.talend.components.marketo.runtime.client.MarketoClientService;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeREST;
+import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.StandardAction;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation;
 import org.talend.daikon.avro.SchemaConstants;
 
 public class MarketoInputReaderTestIT extends MarketoBaseTestIT {
@@ -401,4 +403,19 @@ public class MarketoInputReaderTestIT extends MarketoBaseTestIT {
         assertNotNull(record.get(4));// createdAt shouldn't be null
         assertNotNull(record.get(5));// updatedAt shouldn't be null
     }
+
+    @Test(expected = MarketoRuntimeException.class)
+    public void testCompaniesFail() throws Exception {
+        TMarketoInputProperties props = getRESTProperties();
+        props.inputOperation.setValue(InputOperation.Company);
+        props.standardAction.setValue(StandardAction.get);
+        props.customObjectFilterType.setValue("billingCountry");
+        props.batchSize.setValue(300);
+        props.afterInputOperation();
+        props.beforeMappingInput();
+        reader = getReader(props);
+        assertTrue(reader.start());
+        fail("An exception should have been raised for '{message={[1003] filterValues not specified}'");
+    }
+
 }

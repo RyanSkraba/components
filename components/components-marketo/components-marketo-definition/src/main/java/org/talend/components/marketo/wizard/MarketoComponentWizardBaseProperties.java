@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -55,7 +55,10 @@ public class MarketoComponentWizardBaseProperties extends MarketoComponentProper
         getMultipleLeads, // retrieves lead records in batch.
         getLeadActivity, // retrieves the history of activity records for a single lead identified by the provided key.
         getLeadChanges, // checks the changes on Lead data in Marketo DB.
-        CustomObject // CO Operation
+        CustomObject, // CO Operation
+        Company, //
+        Opportunity, //
+        OpportunityRole //
     }
 
     /**
@@ -72,7 +75,13 @@ public class MarketoComponentWizardBaseProperties extends MarketoComponentProper
         syncMultipleLeads, // This operation requests an insert or update operation for lead records in batch.
         deleteLeads, // REST only
         syncCustomObjects, // REST only
-        deleteCustomObjects // REST only
+        deleteCustomObjects, // REST only
+        syncCompanies,
+        deleteCompanies,
+        syncOpportunities,
+        deleteOpportunities,
+        syncOpportunityRoles,
+        deleteOpportunityRoles
     }
 
     public enum CustomObjectSyncAction {

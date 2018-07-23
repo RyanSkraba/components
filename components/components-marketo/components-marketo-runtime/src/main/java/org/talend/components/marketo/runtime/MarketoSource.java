@@ -16,6 +16,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties.BulkImportTo;
+import org.talend.components.marketo.tmarketocampaign.TMarketoCampaignProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector;
@@ -33,7 +34,8 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
 
     private transient static final Logger LOG = LoggerFactory.getLogger(MarketoSource.class);
 
-    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoSource.class);
+    private static final I18nMessages messages =
+            GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoSource.class);
 
     public MarketoSource() {
     }
@@ -129,7 +131,8 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
                     break;
                 case LastUpdateAtSelector:
                     if (p.oldestUpdateDate.getValue().isEmpty() || p.latestUpdateDate.getValue().isEmpty()
-                            || isInvalidDate(p.oldestUpdateDate.getValue()) || isInvalidDate(p.latestUpdateDate.getValue())) {
+                            || isInvalidDate(p.oldestUpdateDate.getValue())
+                            || isInvalidDate(p.latestUpdateDate.getValue())) {
                         vr.setStatus(Result.ERROR);
                         vr.setMessage(messages.getMessage("error.validation.updatedates"));
                         return vr;
@@ -167,7 +170,8 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
                 }
                 if (useSOAP) {
                     if (p.oldestCreateDate.getValue().isEmpty() || p.latestCreateDate.getValue().isEmpty()
-                            || isInvalidDate(p.oldestCreateDate.getValue()) || isInvalidDate(p.latestCreateDate.getValue())) {
+                            || isInvalidDate(p.oldestCreateDate.getValue())
+                            || isInvalidDate(p.latestCreateDate.getValue())) {
                         vr.setStatus(Result.ERROR);
                         vr.setMessage(messages.getMessage("error.validation.createdates"));
                         return vr;
@@ -238,6 +242,10 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
                     }
                 }
             }
+            if (p.batchSize.getValue() < 1 || p.batchSize.getValue() > 300) {
+                p.batchSize.setValue(300);
+                LOG.info(messages.getMessage("error.validation.batchSize.range", 300));
+            }
         }
         // BulkExec
         if (properties instanceof TMarketoBulkExecProperties) {
@@ -278,6 +286,15 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
                 }
             }
         }
+        // Campaign
+        if (properties instanceof TMarketoCampaignProperties) {
+            TMarketoCampaignProperties p = (TMarketoCampaignProperties) properties;
+            if (p.batchSize.getValue() < 1 || p.batchSize.getValue() > 300) {
+                p.batchSize.setValue(300);
+                LOG.info(messages.getMessage("error.validation.batchSize.range", 300));
+            }
+        }
+        //
         return vr;
     }
 
@@ -288,6 +305,9 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
         }
         if (properties instanceof TMarketoBulkExecProperties) {
             return new MarketoBulkExecReader(adaptor, this, (TMarketoBulkExecProperties) properties);
+        }
+        if (properties instanceof TMarketoCampaignProperties) {
+            return new MarketoCampaignReader(adaptor, this, (TMarketoCampaignProperties) properties);
         }
         return null;
     }

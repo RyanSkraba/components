@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -17,7 +17,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.Company;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.CustomObject;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.Opportunity;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.OpportunityRole;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLead;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadActivity;
 import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadChanges;
@@ -41,6 +44,7 @@ import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.Stand
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation;
+import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.serialize.PostDeserializeSetup;
@@ -414,6 +418,57 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     }
 
     @Test
+    public void testOpportinutiesVisibility() throws Exception {
+        String tl_filter = props.customObjectFilterType.getName();
+        String tl_usecp = props.useCompoundKey.getName();
+        String tl_cp = props.compoundKey.getName();
+        String tl_fcp = props.fetchCompoundKey.getName();
+        // REST API Mode - opportunity
+        props.inputOperation.setValue(Opportunity);
+        props.standardAction.setValue(StandardAction.describe);
+        props.refreshLayout(props.getForm(Form.MAIN));
+        Form f = props.getForm(Form.MAIN);
+        assertFalse(f.getWidget(tl_filter).isVisible());
+        assertFalse(f.getWidget(tl_usecp).isVisible());
+        assertFalse(f.getWidget(tl_cp).isVisible());
+        assertFalse(f.getWidget(tl_fcp).isVisible());
+        //
+        props.standardAction.setValue(StandardAction.get);
+        props.refreshLayout(props.getForm(Form.MAIN));
+        assertTrue(f.getWidget(tl_filter).isVisible());
+        assertFalse(f.getWidget(tl_usecp).isVisible());
+        assertFalse(f.getWidget(tl_cp).isVisible());
+        assertFalse(f.getWidget(tl_fcp).isVisible());
+        // REST API Mode - opportunityRole
+        props.inputOperation.setValue(OpportunityRole);
+        props.standardAction.setValue(StandardAction.describe);
+        props.refreshLayout(props.getForm(Form.MAIN));
+        assertFalse(f.getWidget(tl_filter).isVisible());
+        assertFalse(f.getWidget(tl_usecp).isVisible());
+        assertFalse(f.getWidget(tl_cp).isVisible());
+        assertFalse(f.getWidget(tl_fcp).isVisible());
+        props.standardAction.setValue(StandardAction.get);
+        props.refreshLayout(props.getForm(Form.MAIN));
+        assertTrue(f.getWidget(tl_filter).isVisible());
+        assertTrue(f.getWidget(tl_usecp).isVisible());
+        assertFalse(f.getWidget(tl_cp).isVisible());
+        assertFalse(f.getWidget(tl_fcp).isVisible());
+        props.useCompoundKey.setValue(true);
+        props.refreshLayout(props.getForm(Form.MAIN));
+        assertFalse(f.getWidget(tl_filter).isVisible());
+        assertTrue(f.getWidget(tl_usecp).isVisible());
+        assertTrue(f.getWidget(tl_cp).isVisible());
+        assertTrue(f.getWidget(tl_fcp).isVisible());
+        //
+        props.inputOperation.setValue(Opportunity);
+        props.refreshLayout(props.getForm(Form.MAIN));
+        assertTrue(f.getWidget(tl_filter).isVisible());
+        assertFalse(f.getWidget(tl_usecp).isVisible());
+        assertFalse(f.getWidget(tl_cp).isVisible());
+        assertFalse(f.getWidget(tl_fcp).isVisible());
+    }
+
+    @Test
     public void testGetAllSchemaPropertiesConnectors() {
         assertEquals(Collections.singleton(props.MAIN_CONNECTOR), props.getAllSchemaPropertiesConnectors(true));
         assertEquals(Collections.singleton(props.FLOW_CONNECTOR), props.getAllSchemaPropertiesConnectors(false));
@@ -460,6 +515,38 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         props.updateSchemaRelated();
         props.afterInputOperation();
         assertEquals(MarketoConstants.getSOAPSchemaForGetLeadChanges(), props.schemaInput.schema.getValue());
+        //
+        props.connection.apiMode.setValue(APIMode.REST);
+        props.inputOperation.setValue(Company);
+        props.afterInputOperation();
+        props.standardAction.setValue(StandardAction.get);
+        props.afterStandardAction();
+        assertEquals(MarketoConstants.getCompanySchema(), props.schemaInput.schema.getValue());
+
+        props.standardAction.setValue(StandardAction.describe);
+        props.afterStandardAction();
+        assertEquals(MarketoConstants.getCustomObjectDescribeSchema(), props.schemaInput.schema.getValue());
+
+        props.inputOperation.setValue(Opportunity);
+        props.afterInputOperation();
+        props.standardAction.setValue(StandardAction.get);
+        props.afterStandardAction();
+        assertEquals(MarketoConstants.getOpportunitySchema(), props.schemaInput.schema.getValue());
+
+        props.standardAction.setValue(StandardAction.describe);
+        props.afterStandardAction();
+        assertEquals(MarketoConstants.getCustomObjectDescribeSchema(), props.schemaInput.schema.getValue());
+
+        props.inputOperation.setValue(OpportunityRole);
+        props.afterInputOperation();
+        props.standardAction.setValue(StandardAction.get);
+        props.afterStandardAction();
+        assertEquals(MarketoConstants.getOpportunityRoleSchema(), props.schemaInput.schema.getValue());
+
+        props.standardAction.setValue(StandardAction.describe);
+        props.afterStandardAction();
+        assertEquals(MarketoConstants.getCustomObjectDescribeSchema(), props.schemaInput.schema.getValue());
+
     }
 
     @Test
@@ -898,8 +985,8 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     @Test
     public void testBeforeInputOperation() throws Exception {
         props.beforeInputOperation();
-        assertEquals(Arrays.asList(getLead, getMultipleLeads, getLeadActivity, getLeadChanges, CustomObject),
-                props.inputOperation.getPossibleValues());
+        assertEquals(Arrays.asList(getLead, getMultipleLeads, getLeadActivity, getLeadChanges, CustomObject, Company, Opportunity,
+                OpportunityRole), props.inputOperation.getPossibleValues());
         props.connection.apiMode.setValue(APIMode.SOAP);
         props.beforeInputOperation();
         assertEquals(Arrays.asList(getLead, getMultipleLeads, getLeadActivity, getLeadChanges),
@@ -941,6 +1028,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     public void testValidateFetchCompoundKey() throws Exception {
         try (SandboxedInstanceTestFixture sandboxedInstanceTestFixture = new SandboxedInstanceTestFixture()) {
             sandboxedInstanceTestFixture.setUp();
+            props.inputOperation.setValue(InputOperation.CustomObject);
             props.customObjectName.setValue("car_c");
             assertEquals(Result.OK, props.validateFetchCompoundKey().getStatus());
             props.afterFetchCompoundKey();

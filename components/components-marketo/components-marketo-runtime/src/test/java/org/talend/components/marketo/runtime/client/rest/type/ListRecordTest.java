@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -23,6 +23,7 @@ import org.junit.Test;
 public class ListRecordTest {
 
     ListRecord r;
+
     @Before
     public void setUp() throws Exception {
         r = new ListRecord();
@@ -43,6 +44,7 @@ public class ListRecordTest {
         assertNotNull(r.getUpdatedAt());
         assertEquals("prog", r.getProgramName());
     }
+
     @Test
     public void testToString() throws Exception {
         String s = "ListRecord [id=1, name=name, description=desc, programName=prog, createdAt=null, updatedAt=null]";

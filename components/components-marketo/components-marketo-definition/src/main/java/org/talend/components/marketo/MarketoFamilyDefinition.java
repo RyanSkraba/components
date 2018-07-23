@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -21,6 +21,7 @@ import org.talend.components.marketo.data.MarketoDatasetDefinition;
 import org.talend.components.marketo.data.MarketoDatastoreDefinition;
 import org.talend.components.marketo.data.MarketoInputDefinition;
 import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecDefinition;
+import org.talend.components.marketo.tmarketocampaign.TMarketoCampaignDefinition;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionDefinition;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputDefinition;
 import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperationDefinition;
@@ -44,6 +45,7 @@ public class MarketoFamilyDefinition extends AbstractComponentFamilyDefinition i
                 new TMarketoBulkExecDefinition(), //
                 new MarketoConnectionWizardDefinition(), //
                 new MarketoConnectionEditWizardDefinition(), //
+                new TMarketoCampaignDefinition(), //
                 //
                 new MarketoDatastoreDefinition(), new MarketoDatasetDefinition(), new MarketoInputDefinition());
     }

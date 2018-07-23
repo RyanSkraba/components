@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -77,8 +77,7 @@ public class FieldDescriptionTest {
 
     @Test
     public void testToString() throws Exception {
-        assertEquals(
-                "FieldDescription{id=null, displayName='null', dataType='null', length=null, rest=null, soap=null}",
+        assertEquals("FieldDescription{id=null, displayName='null', dataType='null', length=null, rest=null, soap=null}",
                 fd.toString());
     }
 
@@ -120,6 +119,7 @@ public class FieldDescriptionTest {
         assertEquals("FLOAT", af.schema().getTypes().get(1).getType().toString());
         fd.setDataType("date");
         af = fd.toAvroField();
+        System.err.println("[testToAvroField] {}" + af.schema().getTypes());
         assertEquals("LONG", af.schema().getTypes().get(1).getType().toString());
         assertEquals(DATETIME_PATTERN_REST, af.getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertEquals("java.util.Date", af.getProp(SchemaConstants.JAVA_CLASS_FLAG));

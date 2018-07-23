@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -35,7 +33,7 @@ public class MarketoFamilyDefinitionTest extends MarketoTestBase {
     public final void testMarketoFamilyDefinition() {
         assertNotNull(getDefinitionRegistry());
         assertEquals("Marketo", new MarketoFamilyDefinition().getName());
-        assertEquals(10, testComponentRegistry.getDefinitions().size());
+        assertEquals(11, testComponentRegistry.getDefinitions().size());
     }
 
     @Test

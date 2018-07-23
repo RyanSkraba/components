@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -186,6 +186,27 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
                     break;
                 default:
                     throw new IOException(messages.getMessage("error.reader.invalid.operation"));
+                }
+                break;
+            case Company:
+                switch (properties.standardAction.getValue()) {
+                case describe:
+                    mkto = ((MarketoRESTClient) client).describeCompanies(properties);
+                    break;
+                case get:
+                    mkto = ((MarketoRESTClient) client).getCompanies(properties, position);
+                    break;
+                }
+                break;
+            case Opportunity:
+            case OpportunityRole:
+                switch (properties.standardAction.getValue()) {
+                case describe:
+                    mkto = ((MarketoRESTClient) client).describeOpportunity(properties);
+                    break;
+                case get:
+                    mkto = ((MarketoRESTClient) client).getOpportunities(properties, position);
+                    break;
                 }
                 break;
             default:

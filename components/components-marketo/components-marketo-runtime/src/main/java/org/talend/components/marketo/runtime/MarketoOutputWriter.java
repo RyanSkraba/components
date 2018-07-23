@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -131,6 +131,20 @@ public class MarketoOutputWriter extends MarketoWriter {
                 break;
             case deleteCustomObjects:
                 mktoResult = ((MarketoRESTClient) client).deleteCustomObjects(properties, recordsToProcess);
+                break;
+            case syncCompanies:
+                mktoResult = ((MarketoRESTClient) client).syncCompanies(properties, recordsToProcess);
+                break;
+            case deleteCompanies:
+                mktoResult = ((MarketoRESTClient) client).deleteCompany(properties, recordsToProcess);
+                break;
+            case syncOpportunities:
+            case syncOpportunityRoles:
+                mktoResult = ((MarketoRESTClient) client).syncOpportunities(properties, recordsToProcess);
+                break;
+            case deleteOpportunities:
+            case deleteOpportunityRoles:
+                mktoResult = ((MarketoRESTClient) client).deleteOpportunities(properties, recordsToProcess);
                 break;
             }
             //
