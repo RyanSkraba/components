@@ -27,7 +27,7 @@
         <aws.version>1.11.125</aws.version>
         <azure-keyvault-core.version>0.9.7</azure-keyvault-core.version>
         <azure-storage.version>5.0.0</azure-storage.version>
-        <beam.version>2.3.0</beam.version>
+        <beam.version>2.5.0</beam.version>
         <bnd-annotation.version>2.4.0</bnd-annotation.version>
         <com.fasterxml.classmate.version>1.3.3</com.fasterxml.classmate.version>
         <com.fasterxml.jackson.version>2.8.8</com.fasterxml.jackson.version>
@@ -68,7 +68,7 @@
         <google-api-client-java6.version>${google-api-client.version}</google-api-client-java6.version>
         <google-api-client-servlet.version>${google-api-client.version}</google-api-client-servlet.version>
         <google-api-client.version>1.23.0</google-api-client.version>
-        <google-api-services-bigquery.version>v2-rev370-${google-api-client.version}</google-api-services-bigquery.version>
+        <google-api-services-bigquery.version>v2-rev374-${google-api-client.version}</google-api-services-bigquery.version>
         <google-api-services-cloudresourcemanager.version>v1-rev466-${google-api-client.version}</google-api-services-cloudresourcemanager.version>
         <google-api-services-drive.version>v3-rev97-${google-api-client.version}</google-api-services-drive.version>
         <google-api-services-pubsub.version>v1-rev373-${google-api-client.version}</google-api-services-pubsub.version>
@@ -122,7 +122,7 @@
         <json-simple.version>1.1.1</json-simple.version>
         <jsr305.version>1.3.9</jsr305.version>
         <junit.version>4.12</junit.version>
-        <kafka-clients.version>0.9.0.1</kafka-clients.version>
+        <kafka-clients.version>1.0.0</kafka-clients.version>
         <littleproxy.version>1.1.0</littleproxy.version>
         <log4j.version>1.2.17</log4j.version>
         <logback-classic.version>1.1.9</logback-classic.version>

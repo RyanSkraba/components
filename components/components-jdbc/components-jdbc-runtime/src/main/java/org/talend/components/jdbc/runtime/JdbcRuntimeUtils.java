@@ -104,70 +104,70 @@ public class JdbcRuntimeUtils {
      * @throws SQLException
      */
     public static void setPreparedStatement(final PreparedStatement pstmt, final List<Integer> indexs, final List<String> types,
-                                            final List<Object> values) throws SQLException {
+            final List<Object> values) throws SQLException {
         for (int i = 0; i < indexs.size(); i++) {
             Integer index = indexs.get(i);
             PreparedStatementTable.Type type = PreparedStatementTable.Type.valueOf(types.get(i));
             Object value = values.get(i);
 
             switch (type) {
-                case BigDecimal:
-                    pstmt.setBigDecimal(index, (BigDecimal) value);
-                    break;
-                case Blob:
-                    pstmt.setBlob(index, (Blob) value);
-                    break;
-                case Boolean:
-                    pstmt.setBoolean(index, (boolean) value);
-                    break;
-                case Byte:
-                    pstmt.setByte(index, (byte) value);
-                    break;
-                case Bytes:
-                    pstmt.setBytes(index, (byte[]) value);
-                    break;
-                case Clob:
-                    pstmt.setClob(index, (Clob) value);
-                    break;
-                case Date:
-                    pstmt.setTimestamp(index, new Timestamp(((Date) value).getTime()));
-                    break;
-                case Double:
-                    pstmt.setDouble(index, (double) value);
-                    break;
-                case Float:
-                    pstmt.setFloat(index, (float) value);
-                    break;
-                case Int:
-                    pstmt.setInt(index, (int) value);
-                    break;
-                case Long:
-                    pstmt.setLong(index, (long) value);
-                    break;
-                case Object:
-                    pstmt.setObject(index, value);
-                    break;
-                case Short:
-                    pstmt.setShort(index, (short) value);
-                    break;
-                case String:
-                    pstmt.setString(index, (String) value);
-                    break;
-                case Time:
-                    pstmt.setTime(index, (Time) value);
-                    break;
-                case Null:
-                    pstmt.setNull(index, (int) value);
-                    break;
-                default:
-                    pstmt.setString(index, (String) value);
-                    break;
+            case BigDecimal:
+                pstmt.setBigDecimal(index, (BigDecimal) value);
+                break;
+            case Blob:
+                pstmt.setBlob(index, (Blob) value);
+                break;
+            case Boolean:
+                pstmt.setBoolean(index, (boolean) value);
+                break;
+            case Byte:
+                pstmt.setByte(index, (byte) value);
+                break;
+            case Bytes:
+                pstmt.setBytes(index, (byte[]) value);
+                break;
+            case Clob:
+                pstmt.setClob(index, (Clob) value);
+                break;
+            case Date:
+                pstmt.setTimestamp(index, new Timestamp(((Date) value).getTime()));
+                break;
+            case Double:
+                pstmt.setDouble(index, (double) value);
+                break;
+            case Float:
+                pstmt.setFloat(index, (float) value);
+                break;
+            case Int:
+                pstmt.setInt(index, (int) value);
+                break;
+            case Long:
+                pstmt.setLong(index, (long) value);
+                break;
+            case Object:
+                pstmt.setObject(index, value);
+                break;
+            case Short:
+                pstmt.setShort(index, (short) value);
+                break;
+            case String:
+                pstmt.setString(index, (String) value);
+                break;
+            case Time:
+                pstmt.setTime(index, (Time) value);
+                break;
+            case Null:
+                pstmt.setNull(index, (int) value);
+                break;
+            default:
+                pstmt.setString(index, (String) value);
+                break;
             }
         }
     }
 
     public static Connection createConnectionOrGetFromSharedConnectionPoolOrDataSource(RuntimeContainer runtime,
-                                                                                       AllSetting setting, boolean readonly) throws SQLException, ClassNotFoundException {
+            AllSetting setting, boolean readonly) throws SQLException, ClassNotFoundException {
         Connection conn = null;
 
         if (setting.getShareConnection()) {
@@ -215,8 +215,13 @@ public class JdbcRuntimeUtils {
     public static String getQueryToExecute(AllSetting setting, int readLimit) {
         String query = setting.getSql();
         if (readLimit > 0) {
-            String limitStatement = "LIMIT " + readLimit;
             String driverClass = setting.getDriverClass();
+            // MySQL and AzureSQL don't use limit.
+            if (driverClass != null && driverClass.equals("net.sourceforge.jtds.jdbc.Driver")) {
+                return "SELECT TOP "+readLimit+" * FROM ( "+query+") AS derived";
+            }
+
+            String limitStatement = "LIMIT " + readLimit;
             if (driverClass != null && driverClass.toLowerCase().contains("derby")) {
                 // different behaviour for the derby database, where the LIMIT statement does not exist.
                 limitStatement = "FETCH FIRST " + (readLimit == 1 ? "ROW ONLY" : readLimit + " ROWS ONLY");

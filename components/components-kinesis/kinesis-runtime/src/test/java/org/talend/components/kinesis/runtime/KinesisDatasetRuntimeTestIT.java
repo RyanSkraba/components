@@ -18,7 +18,10 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.avro.util.Utf8;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -47,12 +50,18 @@ public class KinesisDatasetRuntimeTestIT {
         }
 
         List<Person> expectedPersons = Person.genRandomList("csvBasicTest" + new Random().nextInt(), maxRecords);
-        KinesisInputRuntime.CsvConverter converter = new KinesisInputRuntime.CsvConverter(fieldDelimited.getDelimiter());
+        KinesisInputRuntime.CsvConverter converter =
+                new KinesisInputRuntime.CsvConverter(fieldDelimited.getDelimiter());
         for (Person expectedPerson : expectedPersons) {
             String strPerson = expectedPerson.toCSV(fieldDelimited.getDelimiter());
             amazonKinesis.putRecord(streamCsv, ByteBuffer.wrap(strPerson.getBytes("UTF-8")), expectedPerson.group);
             String[] data = strPerson.split(fieldDelimited.getDelimiter());
-            expectedCsv.add(new KinesisInputRuntime.StringArrayIndexedRecord(converter.inferStringArray(data), data));
+            GenericRecord record = new GenericData.Record(converter.inferStringArray(data));
+            record.put(0, new Utf8(data[0]));
+            record.put(1, new Utf8(data[1]));
+            record.put(2, new Utf8(data[2]));
+            record.put(3, new Utf8(data[3]));
+            expectedCsv.add(record);
         }
 
         expectedPersons = Person.genRandomList("avroBasicTest" + new Random().nextInt(), maxRecords);
@@ -121,6 +130,7 @@ public class KinesisDatasetRuntimeTestIT {
                 actual.add(indexedRecord);
             }
         });
+        assertEquals(10, actual.size());
         assertThat(actual, containsInAnyOrder(expectedCsv.toArray()));
     }
 

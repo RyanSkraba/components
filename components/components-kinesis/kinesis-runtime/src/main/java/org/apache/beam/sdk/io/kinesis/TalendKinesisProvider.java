@@ -25,6 +25,8 @@ import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
 import com.amazonaws.services.kinesis.AmazonKinesis;
 import com.amazonaws.services.kinesis.AmazonKinesisClientBuilder;
+import com.amazonaws.services.kinesis.producer.IKinesisProducer;
+import com.amazonaws.services.kinesis.producer.KinesisProducerConfiguration;
 
 public class TalendKinesisProvider implements AWSClientsProvider {
 
@@ -123,5 +125,11 @@ public class TalendKinesisProvider implements AWSClientsProvider {
             clientBuilder.setRegion(region.getName());
         }
         return clientBuilder.build();
+    }
+
+    @Override
+    public IKinesisProducer createKinesisProducer(KinesisProducerConfiguration config) {
+        // TODO implement when support Kinesis output, as it only used for write
+        return null;
     }
 }

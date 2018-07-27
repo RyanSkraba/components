@@ -13,7 +13,7 @@
 
 package org.talend.components.kinesis.runtime;
 
-import org.apache.beam.sdk.repackaged.org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.kinesis.KinesisDatasetProperties;
 import org.talend.components.kinesis.KinesisDatastoreProperties;
 import org.talend.components.kinesis.KinesisRegion;

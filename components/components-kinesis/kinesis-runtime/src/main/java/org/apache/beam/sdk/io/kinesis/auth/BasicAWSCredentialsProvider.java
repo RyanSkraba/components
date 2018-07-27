@@ -13,7 +13,7 @@
 
 package org.apache.beam.sdk.io.kinesis.auth;
 
-import org.apache.beam.sdk.repackaged.org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;

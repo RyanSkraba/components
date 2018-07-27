@@ -25,7 +25,7 @@ package org.talend.components.simplefileio.runtime.beamcopy;
  * specific language governing permissions and limitations under the License.
  */
 
-import static org.apache.beam.sdk.repackaged.com.google.common.base.Preconditions.checkState;
+import static org.apache.beam.repackaged.beam_sdks_java_core.com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 import java.net.URI;
@@ -33,12 +33,12 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.beam.repackaged.beam_sdks_java_core.com.google.common.collect.Lists;
+import org.apache.beam.repackaged.beam_sdks_java_core.com.google.common.collect.Maps;
+import org.apache.beam.repackaged.beam_sdks_java_core.com.google.common.collect.Sets;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.repackaged.com.google.common.collect.Lists;
-import org.apache.beam.sdk.repackaged.com.google.common.collect.Maps;
-import org.apache.beam.sdk.repackaged.com.google.common.collect.Sets;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -75,8 +75,8 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurableHDFSFileSink.class);
 
-    private static final JobID jobId = new JobID(Long.toString(System.currentTimeMillis()),
-            new Random().nextInt(Integer.MAX_VALUE));
+    private static final JobID jobId =
+            new JobID(Long.toString(System.currentTimeMillis()), new Random().nextInt(Integer.MAX_VALUE));
 
     protected final String path;
 
@@ -87,15 +87,16 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
     // workaround to make Configuration serializable
     private final Map<String, String> map;
 
-    public ConfigurableHDFSFileSink(String path, boolean mergeOutput, Class<? extends FileOutputFormat<K, V>> formatClass) {
+    public ConfigurableHDFSFileSink(String path, boolean mergeOutput,
+            Class<? extends FileOutputFormat<K, V>> formatClass) {
         this.path = path;
         this.mergeOutput = mergeOutput;
         this.formatClass = formatClass;
         this.map = Maps.newHashMap();
     }
 
-    public ConfigurableHDFSFileSink(String path, boolean mergeOutput, Class<? extends FileOutputFormat<K, V>> formatClass,
-            Configuration conf) {
+    public ConfigurableHDFSFileSink(String path, boolean mergeOutput,
+            Class<? extends FileOutputFormat<K, V>> formatClass, Configuration conf) {
         this(path, mergeOutput, formatClass);
         // serialize conf to map
         for (Map.Entry<String, String> entry : conf) {
@@ -208,13 +209,15 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
                 }
             }
 
-            FileStatus[] sourceStatuses = FileSystemUtil.listSubFiles(fs, path); // after rename, before generate merged file
+            FileStatus[] sourceStatuses = FileSystemUtil.listSubFiles(fs, path); // after rename, before generate merged
+                                                                                 // file
             if (sourceStatuses.length > 0 && mergeOutput) {
                 String sourceFileName = sourceStatuses[0].getPath().getName();
                 String extension =
                         sourceFileName.indexOf('.') > 0 ? sourceFileName.substring(sourceFileName.indexOf('.')) : "";
                 String finalPath = path + String.format("/part-r-merged%s", extension);
-                fs.delete(new Path(finalPath), true); // finalize method may be called multiple times, be sure idempotent
+                fs.delete(new Path(finalPath), true); // finalize method may be called multiple times, be sure
+                                                      // idempotent
                 LOG.info("Start to merge files in {} to {}", path, finalPath);
                 mergeOutput(fs, path, finalPath);
                 LOG.info("Merge files in {} to {} successful, start to delete the source files.", path, finalPath);

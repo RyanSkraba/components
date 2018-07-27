@@ -19,13 +19,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
+import org.apache.beam.repackaged.beam_sdks_java_core.com.google.common.base.Function;
+import org.apache.beam.repackaged.beam_sdks_java_core.com.google.common.collect.ImmutableList;
+import org.apache.beam.repackaged.beam_sdks_java_core.com.google.common.collect.Lists;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.io.BoundedSource;
 import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.repackaged.com.google.common.base.Function;
-import org.apache.beam.sdk.repackaged.com.google.common.collect.ImmutableList;
-import org.apache.beam.sdk.repackaged.com.google.common.collect.Lists;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;

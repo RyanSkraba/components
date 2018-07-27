@@ -16,7 +16,7 @@
 
     <properties>
         <avro.version>1.8.1</avro.version>
-        <beam.version>2.3.0</beam.version>
+        <beam.version>2.5.0</beam.version>
         <spark.version>2.2.1</spark.version>
         <hadoop.version>2.7.3</hadoop.version>
     </properties>
