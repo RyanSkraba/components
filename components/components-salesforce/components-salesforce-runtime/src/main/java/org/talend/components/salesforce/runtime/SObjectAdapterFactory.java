@@ -15,7 +15,6 @@ package org.talend.components.salesforce.runtime;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +29,7 @@ import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.bind.CalendarCodec;
+import com.sforce.ws.bind.DateCodec;
 import com.sforce.ws.bind.XmlObject;
 import com.sforce.ws.util.Base64;
 
@@ -38,17 +38,17 @@ import com.sforce.ws.util.Base64;
  */
 public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, IndexedRecord> {
 
-    private Schema schema;
-
-    private String names[];
-
-    private Map<String, AvroConverter> name2converter;
-
     /**
      * The cached AvroConverter objects for the fields of this record.
      */
     @SuppressWarnings("rawtypes")
     protected transient AvroConverter[] fieldConverter;
+
+    private Schema schema;
+
+    private String names[];
+
+    private Map<String, AvroConverter> name2converter;
 
     @Override
     public Schema getSchema() {
@@ -76,6 +76,10 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
     }
 
     private class SObjectIndexedRecord implements IndexedRecord {
+
+        final private CalendarCodec calendarCodec = new CalendarCodec();
+
+        final private DateCodec dateCodec = new DateCodec();
 
         private Map<String, Object> valueMap;
 
@@ -205,8 +209,6 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
             }
         }
 
-        final private CalendarCodec calendarCodec = new CalendarCodec();
-
         /**
          * Puts parsed values into value map by column names or complex column names.<br/>
          * For <b>Parent-to-Child</b> relation stores duplicates to grant a possibility<br/>
@@ -279,7 +281,13 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
                     text = value.toString();
                 }
             } else {
-                text = value.toString();
+                if (value instanceof Date) {
+                    text = dateCodec.getValueAsString(value);
+                } else if (value instanceof Calendar) {
+                    text = calendarCodec.getValueAsString(value);
+                } else {
+                    text = value.toString();
+                }
             }
             return text;
         }
