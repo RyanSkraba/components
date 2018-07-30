@@ -156,7 +156,7 @@ public class LoaderIT {
     }
 
     private ResultListener initLoader(
-            Map<LoaderProperty, Object> prop, boolean testMode) throws Exception {
+            Map<LoaderProperty, Object> prop) throws Exception {
 
         ResultListener _resultListener = new ResultListener();
 
@@ -179,18 +179,15 @@ public class LoaderIT {
 
         underTest.setListener(_resultListener);
 
-        // causes upload to fail
-        underTest.setTestMode(testMode);
-
         // Wait for 5 seconds on first put to buffer everything up.
         ((SnowflakeConnectionV1) putConnection).setInjectedDelay(5000);
 
         return _resultListener;
     }
 
-    private void populateTestData(boolean testMode) throws Exception {
+    private void populateTestData() throws Exception {
         Map<LoaderProperty, Object> prop = this.initLoaderProperties();
-        ResultListener listener = this.initLoader(prop, testMode);
+        ResultListener listener = this.initLoader(prop);
 
         underTest.start();
         Random rnd = new Random();
@@ -237,12 +234,12 @@ public class LoaderIT {
     public void testLoaderInsert() throws Exception {
         // mostly just populate test data but with delay injection to test
         // PUT retry
-        this.populateTestData(false);
+        this.populateTestData();
     }
 
     @Test
     public void testLoaderDelete() throws Exception {
-        this.populateTestData(false);
+        this.populateTestData();
 
         underTest.setProperty(LoaderProperty.columns, Arrays.asList(new String[]
                 {
@@ -283,7 +280,7 @@ public class LoaderIT {
 
     @Test
     public void testLoaderModify() throws Exception {
-        this.populateTestData(false); // this does INSERT operation
+        this.populateTestData(); // this does INSERT operation
         Map<LoaderProperty, Object> prop = this.initLoaderProperties();
 
         underTest = (StreamLoader) LoaderFactory.createLoader(
@@ -350,7 +347,7 @@ public class LoaderIT {
 
     @Test
     public void testLoaderModifyWithOneMatchOneNot() throws Exception {
-        this.populateTestData(false); // this does INSERT operation
+        this.populateTestData(); // this does INSERT operation
         Map<LoaderProperty, Object> prop = this.initLoaderProperties();
 
         underTest = (StreamLoader) LoaderFactory.createLoader(
@@ -409,7 +406,7 @@ public class LoaderIT {
 
     @Test
     public void testLoaderUpsert() throws Exception {
-        this.populateTestData(false);
+        this.populateTestData();
 
         Map<LoaderProperty, Object> prop = this.initLoaderProperties();
         underTest = (StreamLoader) LoaderFactory.createLoader(
@@ -473,7 +470,7 @@ public class LoaderIT {
 
     @Test
     public void testLoaderUpsertWithError() throws Exception {
-        this.populateTestData(false);
+        this.populateTestData();
 
         Map<LoaderProperty, Object> prop = this.initLoaderProperties();
         underTest = (StreamLoader) LoaderFactory.createLoader(
@@ -540,7 +537,7 @@ public class LoaderIT {
 
     @Test
     public void testLoaderUpsertWithErrorAndRollback() throws Exception {
-        this.populateTestData(false);
+        this.populateTestData();
 
         PreparedStatement pstmt = testConnection.prepareStatement(
                 "INSERT INTO " + schemaTable +
