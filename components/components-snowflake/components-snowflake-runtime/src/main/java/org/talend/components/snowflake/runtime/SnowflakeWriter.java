@@ -190,7 +190,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         return snowflakeWriteOperation;
     }
 
-    private Schema getSchema() throws IOException {
+    protected Schema getSchema() throws IOException {
         return sink.getRuntimeSchema(new SchemaResolver() {
 
             @Override
@@ -205,15 +205,21 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
     }
 
     protected Map<LoaderProperty, Object> getLoaderProps() {
-        SnowflakeConnectionProperties connectionProperties = sprops.getConnectionProperties();
+        return getLoaderProps(sprops, mainSchema);
+    }
+
+    public static Map<LoaderProperty, Object> getLoaderProps(
+            TSnowflakeOutputProperties outputProperties,
+            Schema mainSchema) {
+        SnowflakeConnectionProperties connectionProperties = outputProperties.getConnectionProperties();
 
         Map<LoaderProperty, Object> prop = new HashMap<>();
-        boolean isUpperCase = sprops.convertColumnsAndTableToUppercase.getValue();
-        String tableName = isUpperCase ? sprops.getTableName().toUpperCase() : sprops.getTableName();
+        boolean isUpperCase = outputProperties.convertColumnsAndTableToUppercase.getValue();
+        String tableName = isUpperCase ? outputProperties.getTableName().toUpperCase() : outputProperties.getTableName();
         prop.put(LoaderProperty.tableName, tableName);
         prop.put(LoaderProperty.schemaName, connectionProperties.schemaName.getStringValue());
         prop.put(LoaderProperty.databaseName, connectionProperties.db.getStringValue());
-        switch (sprops.outputAction.getValue()) {
+        switch (outputProperties.outputAction.getValue()) {
         case INSERT:
             prop.put(LoaderProperty.operation, Operation.INSERT);
             break;
@@ -241,9 +247,9 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         }
 
         prop.put(LoaderProperty.columns, columnsStr);
-        if (sprops.outputAction.getValue() == UPSERT) {
+        if (outputProperties.outputAction.getValue() == UPSERT) {
             keyStr.clear();
-            keyStr.add(sprops.upsertKeyColumn.getValue());
+            keyStr.add(outputProperties.upsertKeyColumn.getValue());
         }
         if (keyStr.size() > 0) {
             prop.put(LoaderProperty.keys, keyStr);
