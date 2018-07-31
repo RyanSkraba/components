@@ -47,6 +47,16 @@ public class ElasticsearchInputRuntime extends PTransform<PBegin, PCollection<In
 
     private JsonGenericRecordConverter jsonGenericRecordConverter = null;
 
+    private boolean readOnlyFirstBatch = false;
+
+    public ElasticsearchInputRuntime() {
+        // mandatory empty constructor
+    }
+
+    public ElasticsearchInputRuntime(boolean readOnlyFirstBatch) {
+        this.readOnlyFirstBatch = readOnlyFirstBatch;
+    }
+
     private static String[] resolveAddresses(String nodes) {
         String[] addresses = nodes.split(",");
         for (int i = 0; i < addresses.length; i++) {
@@ -77,8 +87,9 @@ public class ElasticsearchInputRuntime extends PTransform<PBegin, PCollection<In
 
     @Override
     public PCollection<IndexedRecord> expand(PBegin in) {
-        ElasticsearchIO.Read esRead = ElasticsearchIO.read().withConnectionConfiguration(
-                createConnectionConf(properties.getDatasetProperties()));
+        ElasticsearchIO.Read esRead = ElasticsearchIO.read()
+                .withConnectionConfiguration(createConnectionConf(properties.getDatasetProperties()))
+                .withReadOnlyFirstBatch(readOnlyFirstBatch);
         if (properties.query.getValue() != null) {
             esRead = esRead.withQuery(properties.query.getValue());
         }

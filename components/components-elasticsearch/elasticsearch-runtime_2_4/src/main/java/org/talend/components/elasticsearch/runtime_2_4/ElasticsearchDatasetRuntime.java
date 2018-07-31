@@ -60,8 +60,9 @@ public class ElasticsearchDatasetRuntime implements DatasetRuntime<Elasticsearch
 
     @Override
     public void getSample(int limit, Consumer<IndexedRecord> consumer) {
-        // Create an input runtime based on the properties.
-        ElasticsearchInputRuntime inputRuntime = new ElasticsearchInputRuntime();
+        // Create an input runtime based on the properties: ensure to read only the first batch of documents
+        // from the index since we're computing a sample
+        ElasticsearchInputRuntime inputRuntime = new ElasticsearchInputRuntime(true);
         ElasticsearchInputProperties inputProperties = new ElasticsearchInputProperties(null);
         inputProperties.init();
         inputProperties.setDatasetProperties(properties);
