@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
-import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Filter;
@@ -134,7 +133,7 @@ public class KafkaAvroBeamRuntimeTestIT {
         // ----------------- Read data from TOPIC_AVRO_OUT start --------------------
         props = new Properties();
         props.put("bootstrap.servers", BOOTSTRAP_HOST);
-        props.put("group.id", "getResult");
+        props.put("group.id", testID);
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
         props.put("auto.offset.reset", "earliest");
@@ -212,7 +211,7 @@ public class KafkaAvroBeamRuntimeTestIT {
         // ----------------- Read data from TOPIC_AVRO_OUT start --------------------
         props = new Properties();
         props.put("bootstrap.servers", BOOTSTRAP_HOST);
-        props.put("group.id", "getResult");
+        props.put("group.id", testID);
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
         props.put("auto.offset.reset", "earliest");

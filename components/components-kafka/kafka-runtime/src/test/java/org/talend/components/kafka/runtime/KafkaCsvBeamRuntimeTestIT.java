@@ -186,7 +186,7 @@ public class KafkaCsvBeamRuntimeTestIT {
         // ----------------- Read data from TOPIC_OUT start --------------------
         props = new Properties();
         props.put("bootstrap.servers", BOOTSTRAP_HOST);
-        props.put("group.id", "getResult");
+        props.put("group.id", testID);
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("auto.offset.reset", "earliest");
@@ -263,7 +263,7 @@ public class KafkaCsvBeamRuntimeTestIT {
         // ----------------- Read data from TOPIC_OUT start --------------------
         props = new Properties();
         props.put("bootstrap.servers", BOOTSTRAP_HOST);
-        props.put("group.id", "getResult");
+        props.put("group.id", testID);
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("auto.offset.reset", "earliest");
