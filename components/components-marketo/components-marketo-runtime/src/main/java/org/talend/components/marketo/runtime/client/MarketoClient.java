@@ -20,8 +20,6 @@ public abstract class MarketoClient implements MarketoClientService {
 
     protected String secretKey = null;
 
-    protected Integer timeout;
-
     protected Integer retryCount;
 
     protected Integer retryInterval;

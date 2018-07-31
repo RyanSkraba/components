@@ -38,7 +38,8 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
-public class TMarketoConnectionProperties extends ComponentPropertiesImpl implements MarketoProvideConnectionProperties {
+public class TMarketoConnectionProperties extends ComponentPropertiesImpl
+        implements MarketoProvideConnectionProperties {
 
     public static final String FORM_WIZARD = "Wizard";
 
@@ -49,8 +50,8 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
 
     public Property<String> endpoint = newString("endpoint").setRequired();
 
-    public Property<String> secretKey = newString("secretKey").setRequired()
-            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
+    public Property<String> secretKey = newString("secretKey").setRequired().setFlags(
+            EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     public Property<String> clientAccessId = newString("clientAccessId").setRequired();
 
@@ -61,8 +62,8 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
 
     public Property<Integer> maxReconnAttemps = newInteger("maxReconnAttemps");
 
-    public ComponentReferenceProperties<TMarketoConnectionProperties> referencedComponent = new ComponentReferenceProperties<>(
-            "referencedComponent", TMarketoConnectionDefinition.COMPONENT_NAME);
+    public ComponentReferenceProperties<TMarketoConnectionProperties> referencedComponent =
+            new ComponentReferenceProperties<>("referencedComponent", TMarketoConnectionDefinition.COMPONENT_NAME);
 
     public static final String DEFAULT_ENDPOINT_REST = "https://123-ABC-456.mktorest.com/rest";
 
@@ -114,8 +115,7 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
         // Advanced
         Form advancedForm = Form.create(this, Form.ADVANCED);
         advancedForm.addRow(apiMode);
-        advancedForm.addRow(timeout);
-        advancedForm.addColumn(maxReconnAttemps);
+        advancedForm.addRow(maxReconnAttemps);
         advancedForm.addColumn(attemptsIntervalTime);
 
         // A form for a reference to a connection
@@ -131,7 +131,6 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
         wizardForm.addRow(clientAccessId);
         wizardForm.addRow(widget(secretKey).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
         wizardForm.addRow(widget(testConnection).setLongRunning(true).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
-        wizardForm.addRow(timeout);
         wizardForm.addRow(maxReconnAttemps);
         wizardForm.addRow(attemptsIntervalTime);
     }
@@ -159,7 +158,6 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
         }
         if (form.getName().equals(Form.ADVANCED)) {
             form.getWidget(apiMode.getName()).setHidden(useOtherConnection);
-            form.getWidget(timeout.getName()).setHidden(useOtherConnection);
             form.getWidget(maxReconnAttemps.getName()).setHidden(useOtherConnection);
             form.getWidget(attemptsIntervalTime.getName()).setHidden(useOtherConnection);
         }
@@ -178,7 +176,8 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
     }
 
     public ValidationResult validateTestConnection() {
-        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
+        try (SandboxedInstance sandboxedInstance =
+                getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
             ValidationResult vr = sos.validateConnection(this);
@@ -194,7 +193,8 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
     }
 
     public ValidationResult afterFormFinishWizard(Repository<Properties> repo) {
-        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
+        try (SandboxedInstance sandboxedInstance =
+                getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
             ValidationResult vr = sos.validateConnection(this);

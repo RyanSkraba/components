@@ -15,9 +15,7 @@ package org.talend.components.marketo.runtime;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.REST;
 
 import java.io.IOException;
@@ -196,7 +194,6 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         props.lookupField.setValue(RESTLookupFields.email);
         props.deDupeEnabled.setValue(false);
         props.batchSize.setValue(1);
-        props.connection.timeout.setValue(10000);
         // test attributes
         List<Field> fields = new ArrayList<>();
         Field field = new Schema.Field("accountType", Schema.create(Schema.Type.STRING), null, (Object) null);
@@ -303,12 +300,29 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         props.schemaInput.setValue("schema", new org.apache.avro.Schema.Parser().parse(
                 "{\"type\":\"record\",\"name\":\"tMarketoOutput_1\",\"fields\":[{\"name\":\"id\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"id\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"id\",\"talend.field.isKey\":\"true\",\"di.column.relatedEntity\":\"\"},{\"name\":\"Status\",\"type\":[\"string\",\"null\"],\"di.table.comment\":\"\",\"talend.isLocked\":\"true\",\"talend.field.dbColumnName\":\"Status\",\"di.column.talendType\":\"id_String\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"Status\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"tMarketoOutput_1\",\"di.table.label\":\"tMarketoOutput_1\",\"di.dynamic.column.comment\":\"\",\"di.dynamic.column.name\":\"dynamic\",\"di.column.talendType\":\"id_Dynamic\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.isNullable\":\"true\",\"talend.field.scale\":\"0\",\"talend.field.dbColumnName\":\"dynamic\",\"di.column.relatedEntity\":\"\",\"di.column.relationshipType\":\"\",\"di.dynamic.column.position\":\"1\",\"include-all-fields\":\"true\"}"));
         props.updateOutputSchemas();
-        Schema fillin = SchemaBuilder.record("fillin").fields()//
-                .name("id").type().intType().noDefault()//
-                .name("email").type().stringType().noDefault() //
-                .name("firstName").type().stringType().noDefault()//
-                .name("lastName").type().stringType().noDefault()//
-                .name("Status").type().stringType().noDefault()//
+        Schema fillin = SchemaBuilder
+                .record("fillin")
+                .fields()//
+                .name("id")
+                .type()
+                .intType()
+                .noDefault()//
+                .name("email")
+                .type()
+                .stringType()
+                .noDefault() //
+                .name("firstName")
+                .type()
+                .stringType()
+                .noDefault()//
+                .name("lastName")
+                .type()
+                .stringType()
+                .noDefault()//
+                .name("Status")
+                .type()
+                .stringType()
+                .noDefault()//
                 .endRecord();
         fillin.addProp(SchemaConstants.INCLUDE_ALL_FIELDS, "true");
         List<IndexedRecord> records = new ArrayList<>();
