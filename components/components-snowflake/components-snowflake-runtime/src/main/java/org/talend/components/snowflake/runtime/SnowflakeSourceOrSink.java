@@ -128,6 +128,10 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         if (StringUtils.isEmpty(connectionProperties.db.getValue())) {
             missingProperties.append("'Database', ");
         }
+        if (connectionProperties.useCustomRegion.getValue()
+                && StringUtils.isEmpty(connectionProperties.customRegionID.getValue())) {
+            missingProperties.append("'CustomSnowflakeRegionID', ");
+        }
         if (!missingProperties.toString().isEmpty()) {
             vr.setStatus(Result.ERROR);
             vr.setMessage(i18nMessages.getMessage("error.requiredPropertyIsEmpty",

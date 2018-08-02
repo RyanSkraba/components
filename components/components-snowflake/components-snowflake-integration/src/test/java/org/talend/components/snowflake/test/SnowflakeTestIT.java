@@ -36,6 +36,7 @@ import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.common.CommonTestUtils;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.SnowflakeFamilyDefinition;
+import org.talend.components.snowflake.SnowflakeRegion;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
@@ -51,6 +52,8 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
     private DefinitionRegistry testComponentRegistry;
 
     protected static final String ACCOUNT_STR = System.getProperty("snowflake.account");
+
+    protected static final SnowflakeRegion SNOWFLAKE_REGION = SnowflakeRegion.AWS_US_WEST;
 
     protected static final String USER = System.getProperty("snowflake.user");
 
@@ -90,6 +93,7 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
         props.userPassword.userId.setStoredValue(USER);
         props.userPassword.password.setStoredValue(PASSWORD);
         props.account.setStoredValue(ACCOUNT_STR);
+        props.region.setStoredValue(SNOWFLAKE_REGION);
         props.warehouse.setStoredValue(WAREHOUSE);
         props.db.setStoredValue(DB);
         props.schemaName.setStoredValue(testSchema);

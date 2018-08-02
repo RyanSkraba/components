@@ -72,6 +72,7 @@ public class SnowflakeRowTestIT extends SnowflakeTestIT {
         connectionProperties.userPassword.userId.setStoredValue(USER);
         connectionProperties.userPassword.password.setStoredValue(PASSWORD);
         connectionProperties.account.setStoredValue(ACCOUNT_STR);
+        connectionProperties.region.setStoredValue(SNOWFLAKE_REGION);
         connectionProperties.warehouse.setStoredValue(WAREHOUSE);
         connectionProperties.db.setStoredValue(DB);
         connectionProperties.schemaName.setStoredValue(SCHEMA);
