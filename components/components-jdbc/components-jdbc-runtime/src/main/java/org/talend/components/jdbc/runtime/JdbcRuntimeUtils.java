@@ -196,7 +196,7 @@ public class JdbcRuntimeUtils {
             if (readonly) {
                 try {
                     conn.setReadOnly(setting.isReadOnly());
-                } catch (SQLFeatureNotSupportedException e) {
+                } catch (SQLException e) {
                     LOGGER.debug("JDBC driver '{}' does not support read only mode.", setting.getDriverClass(), e);
                 }
             }
