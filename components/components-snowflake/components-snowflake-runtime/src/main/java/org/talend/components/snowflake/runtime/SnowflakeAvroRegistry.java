@@ -128,7 +128,8 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
                         // Snowflake stores the value as the number of days. So it is possible to retrieve that as an
                         // int value instead of converting it to Date first and then to days from milliseconds. If we
                         // convert it to date, Snowflake jdbc shifts the time to 00:00 in current timezone.
-                        return value.getInt(index);
+                        Object date = value.getObject(index);
+                        return (date != null) ? value.getInt(index) : null;
                     } else if (basicSchema.getLogicalType() == LogicalTypes.timeMillis()) {
                         java.sql.Time time = value.getTime(index);
                         return (time != null) ? (int) time.getTime() : null;

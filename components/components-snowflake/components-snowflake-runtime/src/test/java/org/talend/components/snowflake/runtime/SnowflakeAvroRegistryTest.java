@@ -180,11 +180,23 @@ public class SnowflakeAvroRegistryTest {
     public void testGetConverterForDate() throws SQLException {
         Integer dayIntValue = 17_331;
         ResultSet rs = Mockito.mock(ResultSet.class);
+        Mockito.when(rs.getObject(0)).thenReturn(dayIntValue);
         Mockito.when(rs.getInt(0)).thenReturn(dayIntValue);
         Schema.Field field = snowflakeAvroRegistry
                 .sqlType2Avro(size, scale, Types.DATE, nullable, FIELD_NAME, DB_COLUMN_NAME, null);
         JDBCConverter dateJDBCConverter = snowflakeAvroRegistry.getConverter(field);
         Assert.assertEquals(dayIntValue, dateJDBCConverter.convertToAvro(rs));
+    }
+
+    @Test
+    public void testGetConverterForNullDate() throws SQLException {
+        Object date = null;
+        ResultSet rs = Mockito.mock(ResultSet.class);
+        Mockito.when(rs.getObject(0)).thenReturn(date);
+        Schema.Field field = snowflakeAvroRegistry
+                .sqlType2Avro(size, scale, Types.DATE, nullable, FIELD_NAME, DB_COLUMN_NAME, null);
+        JDBCConverter dateJDBCConverter = snowflakeAvroRegistry.getConverter(field);
+        Assert.assertEquals(date, dateJDBCConverter.convertToAvro(rs));
     }
 
     @Test
