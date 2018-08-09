@@ -20,10 +20,8 @@ import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
-import org.talend.daikon.serialize.PostDeserializeSetup;
-import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class SimpleFileIODatasetProperties extends PropertiesImpl implements DatasetProperties<SimpleFileIODatastoreProperties>, SerializeSetVersion {
+public class SimpleFileIODatasetProperties extends PropertiesImpl implements DatasetProperties<SimpleFileIODatastoreProperties> {
 
     public Property<SimpleFileIOFormat> format = PropertyFactory.newEnum("format", SimpleFileIOFormat.class).setRequired();
 
@@ -41,7 +39,7 @@ public class SimpleFileIODatasetProperties extends PropertiesImpl implements Dat
     
     public Property<EncodingType> encoding = PropertyFactory.newEnum("encoding", EncodingType.class).setValue(EncodingType.UTF8);
     public Property<String> specificEncoding = PropertyFactory.newString("specificEncoding", "");
-    public Property<Boolean> setHeaderLine = PropertyFactory.newBoolean("setHeaderLine", true);
+    public Property<Boolean> setHeaderLine = PropertyFactory.newBoolean("setHeaderLine", false);
     public Property<Integer> headerLine = PropertyFactory.newInteger("headerLine", 1);
     
     //advice not set them as default they break the split function for hadoop and beam
@@ -267,22 +265,5 @@ public class SimpleFileIODatasetProperties extends PropertiesImpl implements Dat
   
     public String getTextEnclosureCharacter() {
         return textEnclosureCharacter.getValue();
-    }
-    
-    @Override
-    public int getVersionNumber() {
-        return 1;
-    }
-
-    @Override
-    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
-        boolean migrated = super.postDeserialize(version, setup, persistent);
-
-        if (version < this.getVersionNumber()) {
-            this.setHeaderLine.setValue(false);
-            migrated = true;
-        }
-
-        return migrated;
     }
 }

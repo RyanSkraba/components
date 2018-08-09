@@ -131,7 +131,7 @@ public class SimpleFileIODatasetRuntimeTest {
         final List<IndexedRecord> actual = getSample(props,Integer.MAX_VALUE);
 
         // Check the expected values match.
-        assertThat(actual, hasSize(9));
+        assertThat(actual, hasSize(10));
         // assertThat(actual, (Matcher) equalTo(rs.getAllData()));
     }
     
@@ -168,7 +168,7 @@ public class SimpleFileIODatasetRuntimeTest {
 
         final List<IndexedRecord> actual = getSample(props,100);
 
-        assertThat(actual, hasSize(9));
+        assertThat(actual, hasSize(10));
     }
     
     @Test
@@ -218,7 +218,7 @@ public class SimpleFileIODatasetRuntimeTest {
             }
         });
   
-        assertThat(actual, hasSize(2));
+        assertThat(actual, hasSize(3));
     }
     
     @Test
@@ -248,7 +248,7 @@ public class SimpleFileIODatasetRuntimeTest {
             }
         });
   
-        assertThat(actual, hasSize(2));
+        assertThat(actual, hasSize(3));
     }
     
     @Test
@@ -279,7 +279,7 @@ public class SimpleFileIODatasetRuntimeTest {
             }
         });
   
-        assertThat(actual, hasSize(2));
+        assertThat(actual, hasSize(3));
     }
 
     @Test
@@ -356,6 +356,8 @@ public class SimpleFileIODatasetRuntimeTest {
         props.path.setValue(fileSpec);
         props.format.setValue(SimpleFileIOFormat.EXCEL);
         props.excelFormat.setValue(ExcelFormat.HTML);
+        props.setHeaderLine.setValue(true);
+        props.headerLine.setValue(1);
 
         final List<IndexedRecord> actual = getSample(props,100);
 
@@ -454,6 +456,8 @@ public class SimpleFileIODatasetRuntimeTest {
         props.path.setValue(fileSpec);
         props.format.setValue(SimpleFileIOFormat.EXCEL);
         props.excelFormat.setValue(ExcelFormat.EXCEL2007);
+        props.setHeaderLine.setValue(true);
+        props.headerLine.setValue(1);
 
         final List<IndexedRecord> actual = getSample(props,1000);
 
@@ -471,6 +475,8 @@ public class SimpleFileIODatasetRuntimeTest {
         props.path.setValue(fileSpec);
         props.format.setValue(SimpleFileIOFormat.EXCEL);
         props.excelFormat.setValue(ExcelFormat.EXCEL2007);
+        props.setHeaderLine.setValue(true);
+        props.headerLine.setValue(1);
 
         final List<IndexedRecord> actual = getSample(props,100);
 
@@ -500,6 +506,8 @@ public class SimpleFileIODatasetRuntimeTest {
         props.path.setValue(fileSpec);
         props.format.setValue(SimpleFileIOFormat.EXCEL);
         props.excelFormat.setValue(ExcelFormat.EXCEL97);
+        props.setHeaderLine.setValue(true);
+        props.headerLine.setValue(1);
 
         final List<IndexedRecord> actual = getSample(props,100);
 
@@ -530,6 +538,8 @@ public class SimpleFileIODatasetRuntimeTest {
         props.format.setValue(SimpleFileIOFormat.EXCEL);
         props.excelFormat.setValue(ExcelFormat.EXCEL97);
         props.sheet.setValue("Sheet1");
+        props.setHeaderLine.setValue(true);
+        props.headerLine.setValue(1);
 
         final List<IndexedRecord> actual = getSample(props,100);
 
@@ -551,6 +561,8 @@ public class SimpleFileIODatasetRuntimeTest {
         props.path.setValue(fileSpec);
         props.format.setValue(SimpleFileIOFormat.EXCEL);
         props.sheet.setValue("Sheet1");
+        props.setHeaderLine.setValue(true);
+        props.headerLine.setValue(1);
 
         final List<IndexedRecord> actual = getSample(props,100);
 
@@ -571,6 +583,8 @@ public class SimpleFileIODatasetRuntimeTest {
         SimpleFileIODatasetProperties props = createDatasetProperties();
         props.path.setValue(fileSpec);
         props.format.setValue(SimpleFileIOFormat.EXCEL);
+        props.setHeaderLine.setValue(true);
+        props.headerLine.setValue(1);
 
         final List<IndexedRecord> actual = getSample(props,100);
 

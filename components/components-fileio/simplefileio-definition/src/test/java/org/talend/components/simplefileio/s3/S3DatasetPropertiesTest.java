@@ -72,7 +72,7 @@ public class S3DatasetPropertiesTest {
         
         assertThat(properties.encoding.getValue(), is(EncodingType.UTF8));
         assertThat(properties.specificEncoding.getValue(), is(""));
-        assertThat(properties.setHeaderLine.getValue(), is(true));
+        assertThat(properties.setHeaderLine.getValue(), is(false));
         assertThat(properties.headerLine.getValue(), is(1));
         assertThat(properties.textEnclosureCharacter.getValue(), is(""));
         assertThat(properties.escapeCharacter.getValue(), is(""));
@@ -137,13 +137,13 @@ public class S3DatasetPropertiesTest {
                 assertThat(main.getWidget("encoding").isVisible(), is(true));
                 assertThat(main.getWidget("specificEncoding").isVisible(), is(false));
                 assertThat(main.getWidget("setHeaderLine").isVisible(), is(true));
-                assertThat(main.getWidget("headerLine").isVisible(), is(true));
+                assertThat(main.getWidget("headerLine").isVisible(), is(false));
                 assertThat(main.getWidget("textEnclosureCharacter").isVisible(), is(true));
                 assertThat(main.getWidget("escapeCharacter").isVisible(), is(true));
                 
-                properties.setHeaderLine.setValue(false);
+                properties.setHeaderLine.setValue(true);
                 properties.afterSetHeaderLine();
-                assertThat(main.getWidget("headerLine").isVisible(), is(false));
+                assertThat(main.getWidget("headerLine").isVisible(), is(true));
                 
                 properties.encoding.setValue(EncodingType.OTHER);
                 properties.afterEncoding();
@@ -164,7 +164,7 @@ public class S3DatasetPropertiesTest {
                 break;
             case EXCEL:
                 //reset back as above CSV change it
-                properties.setHeaderLine.setValue(true);
+                properties.setHeaderLine.setValue(false);
                 properties.afterSetHeaderLine();
                 properties.encoding.setValue(EncodingType.UTF8);
                 properties.afterEncoding();
@@ -177,7 +177,7 @@ public class S3DatasetPropertiesTest {
                 assertThat(main.getWidget("encoding").isVisible(), is(false));
                 assertThat(main.getWidget("specificEncoding").isVisible(), is(false));
                 assertThat(main.getWidget("setHeaderLine").isVisible(), is(true));
-                assertThat(main.getWidget("headerLine").isVisible(), is(true));
+                assertThat(main.getWidget("headerLine").isVisible(), is(false));
                 assertThat(main.getWidget("textEnclosureCharacter").isVisible(), is(false));
                 assertThat(main.getWidget("escapeCharacter").isVisible(), is(false));
                 
