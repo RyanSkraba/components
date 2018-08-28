@@ -35,6 +35,7 @@ import org.talend.daikon.properties.ValidationResult;
 public class JDBCInputPTransformRuntime extends PTransform<PBegin, PCollection<IndexedRecord>> implements
         RuntimableRuntime<JDBCInputProperties> {
 
+    private static final int FETCH_SIZE = 1000;
     private JDBCInputProperties properties;
 
     private transient IndexedRecordConverter<ResultSet, IndexedRecord> factory;
@@ -51,6 +52,7 @@ public class JDBCInputPTransformRuntime extends PTransform<PBegin, PCollection<I
                                         properties.getDatasetProperties().getDatastoreProperties().jdbcUrl.getValue())
                                 .withUsername(properties.getDatasetProperties().getDatastoreProperties().userId.getValue())
                                 .withPassword(properties.getDatasetProperties().getDatastoreProperties().password.getValue()))
+                .withFetchSize(FETCH_SIZE)
                 .withQuery(properties.getDatasetProperties().getSql()).withRowMapper(new JdbcIO.RowMapper<IndexedRecord>() {
 
                     @Override
