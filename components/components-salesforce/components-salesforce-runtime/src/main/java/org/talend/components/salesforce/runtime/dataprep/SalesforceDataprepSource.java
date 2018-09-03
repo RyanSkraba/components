@@ -12,13 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime.dataprep;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
@@ -60,8 +57,6 @@ public class SalesforceDataprepSource
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceDataprepSource.class);
 
-    private static final String CONFIG_FILE_lOCATION_KEY = "org.talend.component.salesforce.config.file";
-
     private static final int DEFAULT_TIMEOUT = 60000;
 
     private SalesforceInputProperties properties;
@@ -82,31 +77,11 @@ public class SalesforceDataprepSource
         dataset = this.properties.getDatasetProperties();
         datastore = dataset.getDatastoreProperties();
 
-        String config_file = System.getProperty(CONFIG_FILE_lOCATION_KEY);
-        try (InputStream is = config_file != null ? (new FileInputStream(config_file)) : null) {
-            if (is == null) {
-                LOG.warn("not found the property file, will use the default value for endpoint and timeout");
-                return ValidationResult.OK;
-            }
+        this.endpoint = datastore.getEndPoint();
 
-            Properties props = new Properties();
-            props.load(is);
-
-            String endpoint = props.getProperty("endpoint");
-            if (endpoint != null && !endpoint.isEmpty()) {
-                if (endpoint.contains(SalesforceConnectionProperties.RETIRED_ENDPOINT)) {
-                    endpoint = endpoint.replaceFirst(SalesforceConnectionProperties.RETIRED_ENDPOINT,
-                            SalesforceConnectionProperties.ACTIVE_ENDPOINT);
-                }
-                this.endpoint = endpoint;
-            }
-
-            String timeout = props.getProperty("timeout");
-            if (timeout != null && !timeout.isEmpty()) {
-                this.timeout = Integer.parseInt(timeout);
-            }
-        } catch (IOException e) {
-            LOG.warn("not found the property file, will use the default value for endpoint and timeout", e);
+        String timeout = datastore.getSalesforceProperties().getProperty("timeout");
+        if (timeout != null && !timeout.isEmpty()) {
+            this.timeout = Integer.parseInt(timeout);
         }
 
         return ValidationResult.OK;
@@ -277,7 +252,8 @@ public class SalesforceDataprepSource
                 }
                 newFieldList.add(newField);
             } else {
-                Schema.Field newField = new Schema.Field(fieldDescription.getFullName(), AvroUtils._string(), null, (String)null);
+                Schema.Field newField =
+                        new Schema.Field(fieldDescription.getFullName(), AvroUtils._string(), null, (String) null);
                 newFieldList.add(newField);
             }
         }
