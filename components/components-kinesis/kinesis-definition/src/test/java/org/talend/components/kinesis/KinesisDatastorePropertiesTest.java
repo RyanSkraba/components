@@ -93,14 +93,14 @@ public class KinesisDatastorePropertiesTest {
         assertTrue(main.getWidget("specifyCredentials").isVisible());
         assertTrue(main.getWidget("accessKey").isVisible());
         assertTrue(main.getWidget("secretKey").isVisible());
-        assertTrue(properties.specifyCredentials.isRequired());
+        assertFalse(properties.specifyCredentials.isRequired());
         assertTrue(properties.accessKey.isRequired());
         assertTrue(properties.secretKey.isRequired());
         assertThat(main.getWidget("secretKey").getWidgetType(), is(Widget.HIDDEN_TEXT_WIDGET_TYPE));
 
         assertTrue(main.getWidget("specifyEndpoint").isVisible());
         assertFalse(main.getWidget("endpoint").isVisible());
-        assertTrue(properties.specifyEndpoint.isRequired());
+        assertFalse(properties.specifyEndpoint.isRequired());
         assertFalse(properties.endpoint.isRequired());
 
         assertTrue(main.getWidget("specifySTS").isVisible());
@@ -110,7 +110,7 @@ public class KinesisDatastorePropertiesTest {
         assertFalse(main.getWidget("roleExternalId").isVisible());
         assertFalse(main.getWidget("specifySTSEndpoint").isVisible());
         assertFalse(main.getWidget("stsEndpoint").isVisible());
-        assertTrue(properties.specifySTS.isRequired());
+        assertFalse(properties.specifySTS.isRequired());
         assertFalse(properties.roleArn.isRequired());
         assertFalse(properties.roleSessionName.isRequired());
         assertFalse(properties.specifyRoleExternalId.isRequired());
@@ -136,7 +136,7 @@ public class KinesisDatastorePropertiesTest {
         assertTrue(main.getWidget("specifyCredentials").isVisible());
         assertFalse(main.getWidget("accessKey").isVisible());
         assertFalse(main.getWidget("secretKey").isVisible());
-        assertTrue(properties.specifyCredentials.isRequired());
+        assertFalse(properties.specifyCredentials.isRequired());
         assertFalse(properties.accessKey.isRequired());
         assertFalse(properties.secretKey.isRequired());
 
@@ -151,7 +151,7 @@ public class KinesisDatastorePropertiesTest {
 
         assertTrue(main.getWidget("specifyEndpoint").isVisible());
         assertTrue(main.getWidget("endpoint").isVisible());
-        assertTrue(properties.specifyEndpoint.isRequired());
+        assertFalse(properties.specifyEndpoint.isRequired());
         assertTrue(properties.endpoint.isRequired());
 
         // set back false to specify endpoint
@@ -170,7 +170,7 @@ public class KinesisDatastorePropertiesTest {
         assertFalse(main.getWidget("roleExternalId").isVisible());
         assertTrue(main.getWidget("specifySTSEndpoint").isVisible());
         assertFalse(main.getWidget("stsEndpoint").isVisible());
-        assertTrue(properties.specifySTS.isRequired());
+        assertFalse(properties.specifySTS.isRequired());
         assertTrue(properties.roleArn.isRequired());
         assertTrue(properties.roleSessionName.isRequired());
         assertTrue(properties.specifyRoleExternalId.isRequired());

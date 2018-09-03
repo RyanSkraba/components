@@ -91,12 +91,12 @@ public class KinesisInputPropertiesTest {
         assertTrue(properties.position.isRequired());
 
         assertTrue(main.getWidget("useMaxReadTime").isVisible());
-        assertTrue(properties.useMaxReadTime.isRequired());
+        assertFalse(properties.useMaxReadTime.isRequired());
         assertFalse(main.getWidget("maxReadTime").isVisible());
         assertFalse(properties.maxReadTime.isRequired());
 
         assertTrue(main.getWidget("useMaxNumRecords").isVisible());
-        assertTrue(properties.useMaxNumRecords.isRequired());
+        assertFalse(properties.useMaxNumRecords.isRequired());
         assertFalse(main.getWidget("maxNumRecords").isVisible());
         assertFalse(properties.maxNumRecords.isRequired());
 
@@ -115,7 +115,7 @@ public class KinesisInputPropertiesTest {
         properties.afterUseMaxReadTime();
 
         assertTrue(main.getWidget("useMaxReadTime").isVisible());
-        assertTrue(properties.useMaxReadTime.isRequired());
+        assertFalse(properties.useMaxReadTime.isRequired());
         assertTrue(main.getWidget("maxReadTime").isVisible());
         assertTrue(properties.maxReadTime.isRequired());
 
@@ -129,7 +129,7 @@ public class KinesisInputPropertiesTest {
         properties.afterUseMaxNumRecords();
 
         assertTrue(main.getWidget("useMaxNumRecords").isVisible());
-        assertTrue(properties.useMaxNumRecords.isRequired());
+        assertFalse(properties.useMaxNumRecords.isRequired());
         assertTrue(main.getWidget("maxNumRecords").isVisible());
         assertTrue(properties.maxNumRecords.isRequired());
 

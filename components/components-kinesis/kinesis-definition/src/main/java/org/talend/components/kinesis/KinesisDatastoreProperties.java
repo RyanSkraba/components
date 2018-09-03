@@ -26,19 +26,19 @@ import org.talend.daikon.properties.property.PropertyFactory;
 
 public class KinesisDatastoreProperties extends PropertiesImpl implements DatastoreProperties {
 
-    public Property<Boolean> specifyCredentials = PropertyFactory.newBoolean("specifyCredentials", true).setRequired();
+    public Property<Boolean> specifyCredentials = PropertyFactory.newBoolean("specifyCredentials", true);
 
     public Property<String> accessKey = PropertyFactory.newString("accessKey");
 
     public Property<String> secretKey = PropertyFactory.newString("secretKey").setFlags(
             EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
-    public Property<Boolean> specifyEndpoint = PropertyFactory.newBoolean("specifyEndpoint", false).setRequired();
+    public Property<Boolean> specifyEndpoint = PropertyFactory.newBoolean("specifyEndpoint", false);
 
     // http://docs.aws.amazon.com/general/latest/gr/rande.html#ak_region
     public Property<String> endpoint = PropertyFactory.newString("endpoint", "kinesis.us-east-1.amazonaws.com");
 
-    public Property<Boolean> specifySTS = PropertyFactory.newBoolean("specifySTS", false).setRequired();
+    public Property<Boolean> specifySTS = PropertyFactory.newBoolean("specifySTS", false);
 
     public Property<String> roleArn = PropertyFactory.newString("roleArn");
 
@@ -48,7 +48,7 @@ public class KinesisDatastoreProperties extends PropertiesImpl implements Datast
 
     public Property<String> roleExternalId = PropertyFactory.newString("roleExternalId");
 
-    public Property<Boolean> specifySTSEndpoint = PropertyFactory.newBoolean("specifySTSEndpoint", false).setRequired();
+    public Property<Boolean> specifySTSEndpoint = PropertyFactory.newBoolean("specifySTSEndpoint", false);
 
     // http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_enable-regions.html
     public Property<String> stsEndpoint = PropertyFactory.newString("stsEndpoint", "sts.amazonaws.com");

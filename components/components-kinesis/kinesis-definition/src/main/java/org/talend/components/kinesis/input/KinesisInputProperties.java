@@ -37,12 +37,12 @@ public class KinesisInputProperties extends FixedConnectorsComponentProperties i
     public Property<OffsetType> position =
             PropertyFactory.newEnum("position", OffsetType.class).setValue(OffsetType.LATEST).setRequired();
 
-    public Property<Boolean> useMaxReadTime = PropertyFactory.newBoolean("useMaxReadTime", false).setRequired();
+    public Property<Boolean> useMaxReadTime = PropertyFactory.newBoolean("useMaxReadTime", false);
 
     // Max duration(Millions) from start receiving
     public Property<Long> maxReadTime = PropertyFactory.newProperty(Long.class, "maxReadTime").setValue(600000L);
 
-    public Property<Boolean> useMaxNumRecords = PropertyFactory.newBoolean("useMaxNumRecords", false).setRequired();
+    public Property<Boolean> useMaxNumRecords = PropertyFactory.newBoolean("useMaxNumRecords", false);
 
     public Property<Integer> maxNumRecords = PropertyFactory.newProperty(Integer.class, "maxNumRecords").setValue(5000);
 

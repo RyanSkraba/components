@@ -60,7 +60,7 @@ public class FixedDatastoreDefinition extends I18nDefinition implements Datastor
 
     @Override
     public String getIconKey() {
-        return "streams";
+        return "flow-source-o";
     }
 
     @Override

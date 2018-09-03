@@ -43,7 +43,7 @@ public class FixedDatastoreDefinitionTest {
         assertThat(def.getOutputCompDefinitionName(), is("DevNullOutput"));
         assertThat(def.getImagePath(DefinitionImageType.PALETTE_ICON_32X32), nullValue());
         assertThat(def.getImagePath(DefinitionImageType.SVG_ICON), nullValue());
-        assertThat(def.getIconKey(), is("streams"));
+        assertThat(def.getIconKey(), is("flow-source-o"));
     }
 
     /**

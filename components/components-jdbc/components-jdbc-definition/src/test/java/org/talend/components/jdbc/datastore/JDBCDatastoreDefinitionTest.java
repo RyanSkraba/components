@@ -38,7 +38,7 @@ public class JDBCDatastoreDefinitionTest {
         assertEquals(null, result.getImagePath(DefinitionImageType.SVG_ICON));
         assertEquals(null, result.getOutputCompDefinitionName());
         assertEquals("DataPrepDBInput", result.getInputCompDefinitionName());
-        assertEquals(null, result.getIconKey());
+        assertEquals("db-input", result.getIconKey());
         assertEquals("Database", result.getDisplayName());
         assertEquals("JDBC Connection", result.getTitle());
         assertEquals("JDBCDatastore/Database/JDBC Connection", result.toString());

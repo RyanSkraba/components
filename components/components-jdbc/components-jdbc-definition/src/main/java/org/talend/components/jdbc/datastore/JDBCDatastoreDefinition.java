@@ -78,7 +78,7 @@ public class JDBCDatastoreDefinition extends I18nDefinition implements Datastore
 
     @Override
     public String getIconKey() {
-        return null;
+        return "db-input";
     }
 
     @Override
