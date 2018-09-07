@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -40,6 +39,9 @@ import org.talend.components.jdbc.query.EDatabaseTypeName;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
+import org.talend.components.jdbc.validation.QueryValidator;
+import org.talend.components.jdbc.validation.QueryValidatorFactory;
+import org.talend.components.jdbc.validation.QueryValidatorFactory.ValidationType;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.TalendRuntimeException;
@@ -150,7 +152,8 @@ public class CommonUtils {
         return newSchema(metadataSchema, newSchemaName, moreFields, metadataSchema.getFields().size());
     }
 
-    public static Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields, int insertPoint) {
+    public static Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields,
+            int insertPoint) {
         Schema newSchema = Schema.createRecord(newSchemaName, metadataSchema.getDoc(), metadataSchema.getNamespace(),
                 metadataSchema.isError());
 
@@ -244,24 +247,27 @@ public class CommonUtils {
         }
     }
 
-    public static boolean useExistedConnection(ComponentReferenceProperties<TJDBCConnectionProperties> referencedComponent) {
+    public static boolean
+            useExistedConnection(ComponentReferenceProperties<TJDBCConnectionProperties> referencedComponent) {
         String refComponentIdValue = referencedComponent.componentInstanceId.getStringValue();
 
         ReferenceType referenceType = referencedComponent.referenceType.getValue();
 
-        boolean useOtherConnection = refComponentIdValue != null
-                && (refComponentIdValue.startsWith(TJDBCConnectionDefinition.COMPONENT_NAME)
+        boolean useOtherConnection =
+                refComponentIdValue != null && (refComponentIdValue.startsWith(TJDBCConnectionDefinition.COMPONENT_NAME)
                         || (referenceType != null && (referenceType == ReferenceType.COMPONENT_INSTANCE)));
         return useOtherConnection;
     }
 
     public static void setReferenceInfoAndConnectionInfo(AllSetting setting,
-            ComponentReferenceProperties<TJDBCConnectionProperties> referencedComponent, JDBCConnectionModule connection) {
+            ComponentReferenceProperties<TJDBCConnectionProperties> referencedComponent,
+            JDBCConnectionModule connection) {
         boolean useExistedConnection = setReferenceInfo(setting, referencedComponent);
 
         if (useExistedConnection) {
             if (referencedComponent.getReference() != null) {// avoid the NPE in JdbcRuntimeInfo
-                setCommonConnectionInfo(setting, ((TJDBCConnectionProperties) referencedComponent.getReference()).connection);
+                setCommonConnectionInfo(setting,
+                        ((TJDBCConnectionProperties) referencedComponent.getReference()).connection);
             }
         } else {
             setCommonConnectionInfo(setting, connection);
@@ -282,24 +288,34 @@ public class CommonUtils {
         return values;
     }
 
-    private static Pattern pattern = Pattern.compile(
-            "^SELECT\\s+((?!((\\bINTO\\b)|(\\bFOR\\s+UPDATE\\b)|(\\bLOCK\\s+IN\\s+SHARE\\s+MODE\\b))).)+$",
-            Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
-
     /**
-     * validate if the sql is a pure query statement which don't write or lock something, if a query, return it, if not, throw
+     * validate if the sql is a pure query statement which don't write or lock something, if a query, return it, if not,
+     * throw
      * some exception
      * 
      * @param query
-     * @return
+     * @param validationType {@link ValidationType} to validate query.
+     * @return valid query
+     * @throws TalendRuntimeException if query is not valid
      */
-    public static String validateQuery(String query) {
-        if ((query == null) || "".equals(query) || pattern.matcher(query.trim()).matches()) {
+    public static String validateQuery(String query, ValidationType validationType) {
+        final QueryValidator validator = QueryValidatorFactory.createValidator(validationType);
+        if ((query == null) || query.isEmpty() || validator.isValid(query)) {
             return query;
         }
-
         throw TalendRuntimeException.createUnexpectedException(
                 "Please check your sql as we only allow the query which don't do write or lock action.");
+    }
+
+    /**
+     * Overloaded method for query validation, which will use {@linkplain ValidationType.CALCITE} by default.
+     * 
+     * @param query to validate
+     * @return valid query
+     * @throws TalendRuntimeException if query is not valid
+     */
+    public static String validateQuery(String query) {
+        return validateQuery(query, ValidationType.CALCITE);
     }
 
     public static List<String> getAllSchemaFieldDBNames(Schema schema) {
@@ -380,7 +396,8 @@ public class CommonUtils {
 
     public static Dbms getMapping(URL mappingFilesDir, AllSetting setting,
             String dbTypeByComponentType/*
-                                         * for example, if tjdbcxxx, the type is "General JDBC", if tmysqlxxx, the type is "MySQL"
+                                         * for example, if tjdbcxxx, the type is "General JDBC", if tmysqlxxx, the type
+                                         * is "MySQL"
                                          */,
             DBTypes dbTypeInComponentSetting/* in tjdbcinput, can choose the db type in advanced setting */) {
         final String realDbType = getRealDBType(setting, dbTypeByComponentType);
@@ -398,7 +415,8 @@ public class CommonUtils {
 
         File mappingFileFullPath = new File(mappingFilesDir.getFile(), "mapping_" + mappingFileSubfix + ".xml");
         if (!mappingFileFullPath.exists()) {
-            mappingFileFullPath = new File(mappingFilesDir.getFile(), "mapping_" + mappingFileSubfix.toLowerCase() + ".xml");
+            mappingFileFullPath =
+                    new File(mappingFilesDir.getFile(), "mapping_" + mappingFileSubfix.toLowerCase() + ".xml");
         }
 
         MappingFileLoader fileLoader = new MappingFileLoader();
@@ -410,7 +428,8 @@ public class CommonUtils {
 
     public static Dbms getMapping(String mappingFilesDir, AllSetting setting,
             String dbTypeByComponentType/*
-                                         * for example, if tjdbcxxx, the type is "General JDBC", if tmysqlxxx, the type is "MySQL"
+                                         * for example, if tjdbcxxx, the type is "General JDBC", if tmysqlxxx, the type
+                                         * is "MySQL"
                                          */,
             DBTypes dbTypeInComponentSetting/* in tjdbcinput, can choose the db type in advanced setting */) {
         try {
@@ -420,7 +439,8 @@ public class CommonUtils {
         }
     }
 
-    // now we use a inside mapping to do the mapping file search, not good and easy to break, TODO should load all the mapping
+    // now we use a inside mapping to do the mapping file search, not good and easy to break, TODO should load all the
+    // mapping
     // files to memory only once, and search by the memory object
     private static Map<String, String> productValue2DefaultMappingFileSubfix = new HashMap<>();
 
@@ -500,7 +520,8 @@ public class CommonUtils {
             // for some dbs use the same driverClassName.
             if (driverJar == null || "".equals(driverJar) || !driverJar.contains(".jar")) {
                 return t4d.get(0).getDbTypeName();
-            } else if (driverJar.contains("postgresql-8.3-603.jdbc3.jar") || driverJar.contains("postgresql-8.3-603.jdbc4.jar")
+            } else if (driverJar.contains("postgresql-8.3-603.jdbc3.jar")
+                    || driverJar.contains("postgresql-8.3-603.jdbc4.jar")
                     || driverJar.contains("postgresql-8.3-603.jdbc2.jar")) {
                 return EDatabase4DriverClassName.PSQL.getDbTypeName();
             } else {
@@ -519,46 +540,47 @@ public class CommonUtils {
             property.setStoredValue(null);
         }
     }
-    
+
     public static String getClearExceptionInfo(Exception e) {
-        if(e.getCause() != null) {
+        if (e.getCause() != null) {
             return correctExceptionInfo(e.getCause());
         }
-      
+
         return correctExceptionInfo(e);
     }
-    
+
     public static String correctExceptionInfo(Throwable e) {
-        if(e instanceof ClassNotFoundException) {
+        if (e instanceof ClassNotFoundException) {
             return "can't find the jdbc driver class : \"" + e.getMessage() + "\"";
         }
-        
+
         String message = e.getMessage();
-        if((message == null) || message.isEmpty()) {
+        if ((message == null) || message.isEmpty()) {
             return e.getClass().getName();
         }
-        
+
         return message;
     }
-    
+
     public static ComponentException newComponentException(Throwable cause) {
         ExceptionContext context = createExceptionContext(cause);
         return new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, cause, context);
     }
-    
+
     public static ComponentException newComponentException(ErrorCode errorCode, Throwable cause) {
         ExceptionContext context = createExceptionContext(cause);
         return new ComponentException(errorCode, cause, context);
     }
-    
+
     public static ComponentException newComponentException(ErrorCode errorCode, ExceptionContext context) {
         return new ComponentException(errorCode, context);
     }
-    
-    public static ComponentException newComponentException(ErrorCode errorCode, Throwable cause, ExceptionContext context) {
+
+    public static ComponentException newComponentException(ErrorCode errorCode, Throwable cause,
+            ExceptionContext context) {
         return new ComponentException(errorCode, cause, context);
     }
-    
+
     private static ExceptionContext createExceptionContext(Throwable cause) {
         String message = correctExceptionInfo(cause);
         return ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE, message);
