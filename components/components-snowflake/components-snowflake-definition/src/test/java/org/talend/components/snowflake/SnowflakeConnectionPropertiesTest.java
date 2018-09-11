@@ -53,6 +53,8 @@ public class SnowflakeConnectionPropertiesTest {
 
     private static final SnowflakeRegion AZURE_REGION = SnowflakeRegion.AZURE_EAST_US_2;
 
+    private static final String TALEND_PRODUCT_VERSION = "0.0";
+
     private SnowflakeConnectionProperties snowflakeConnectionProperties;
 
     @Rule
@@ -68,6 +70,7 @@ public class SnowflakeConnectionPropertiesTest {
         snowflakeConnectionProperties.db.setValue(DB);
         snowflakeConnectionProperties.schemaName.setValue(SCHEMA);
         snowflakeConnectionProperties.role.setValue(ROLE);
+        snowflakeConnectionProperties.talendProductVersion = TALEND_PRODUCT_VERSION;
     }
 
     private void setUpAzureRegion() {
@@ -85,6 +88,7 @@ public class SnowflakeConnectionPropertiesTest {
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
                 .append("schema=").append(SCHEMA).append("&").append("role=").append(ROLE).append("&").append("tracing=OFF")
+                .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION)
                 .toString();
 
         String resultUrl = snowflakeConnectionProperties.getConnectionUrl();
@@ -107,6 +111,7 @@ public class SnowflakeConnectionPropertiesTest {
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append(AZURE_REGION.getRegionID()).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
                 .append("schema=").append(SCHEMA).append("&").append("role=").append(ROLE).append("&").append("tracing=OFF")
+                .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION)
                 .toString();
 
         String resultUrl = snowflakeConnectionProperties.getConnectionUrl();
@@ -125,7 +130,8 @@ public class SnowflakeConnectionPropertiesTest {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("db=").append(DB).append("&").append("schema=").append(SCHEMA).append("&").append("role=")
-                .append(ROLE).append("&").append("tracing=OFF").toString();
+                .append(ROLE).append("&").append("tracing=OFF")
+                .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
 
         snowflakeConnectionProperties.warehouse.setValue(null);
         String resultUrlNullWarehouse = snowflakeConnectionProperties.getConnectionUrl();
@@ -149,7 +155,8 @@ public class SnowflakeConnectionPropertiesTest {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("schema=").append(SCHEMA).append("&")
-                .append("role=").append(ROLE).append("&").append("tracing=OFF").toString();
+                .append("role=").append(ROLE).append("&").append("tracing=OFF")
+                .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
 
         snowflakeConnectionProperties.db.setValue(null);
         String resultUrlNullDb = snowflakeConnectionProperties.getConnectionUrl();
@@ -173,7 +180,8 @@ public class SnowflakeConnectionPropertiesTest {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
-                .append("role=").append(ROLE).append("&").append("tracing=OFF").toString();
+                .append("role=").append(ROLE).append("&").append("tracing=OFF")
+                .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
 
         snowflakeConnectionProperties.schemaName.setValue(null);
         String resultUrlNullSchema = snowflakeConnectionProperties.getConnectionUrl();
@@ -197,7 +205,8 @@ public class SnowflakeConnectionPropertiesTest {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
-                .append("schema=").append(SCHEMA).append("&").append("tracing=OFF").toString();
+                .append("schema=").append(SCHEMA).append("&").append("tracing=OFF")
+                .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
 
         snowflakeConnectionProperties.role.setValue(null);
         String resultUrlNullSchema = snowflakeConnectionProperties.getConnectionUrl();

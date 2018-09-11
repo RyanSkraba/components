@@ -101,6 +101,8 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
 
     public Property<Tracing> tracing = newEnum("tracing", Tracing.class); //$NON-NLS-1$
 
+    public String talendProductVersion;
+
     // Presentation items
     public PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
 
@@ -289,6 +291,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         appendProperty("schema", schema, connectionParams);
         appendProperty("role", role, connectionParams);
         appendProperty("tracing", tracing, connectionParams);
+        appendProperty("application", getApplication(), connectionParams);
 
         StringBuilder url = new StringBuilder()
                 .append("jdbc:snowflake://")
@@ -307,6 +310,16 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         }
 
         return url.toString();
+    }
+
+    private String getApplication() {
+        StringBuilder application = new StringBuilder();
+        application.append("Talend");
+        if (StringUtils.isNotEmpty(talendProductVersion)) {
+            application.append('-');
+            application.append(talendProductVersion);
+        }
+        return application.toString();
     }
 
     private void appendProperty(String propertyName, String propertyValue, StringBuilder builder) {

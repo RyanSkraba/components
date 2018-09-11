@@ -35,6 +35,8 @@ public abstract class SnowflakeRuntime {
 
     public static final String KEY_CONNECTION_PROPERTIES = "ConnectionProperties";
 
+    public static final String KEY_TALEND_PRODUCT_VERSION = "TALEND_PRODUCT_VERSION";
+
     public abstract SnowflakeConnectionProperties getConnectionProperties();
 
     /**
@@ -75,6 +77,10 @@ public abstract class SnowflakeRuntime {
             if (connectionProperties == null) {
                 throw new IOException(I18N_MESSAGES.getMessage("error.refComponentWithoutProperties", refComponentId));
             }
+        }
+
+        if (container != null) {
+            connectionProperties.talendProductVersion = (String) container.getGlobalData(KEY_TALEND_PRODUCT_VERSION);
         }
 
         conn = DriverManagerUtils.getConnection(connectionProperties);
