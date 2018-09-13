@@ -14,6 +14,7 @@ import org.talend.components.azurestorage.AzureConnectionWithKeyService;
 import org.talend.components.azurestorage.AzureConnectionWithSasService;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
+import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
@@ -37,6 +38,11 @@ public class AzureStorageRuntime implements RuntimableRuntime<ComponentPropertie
         // init
         this.properties = (AzureStorageProvideConnectionProperties) properties;
         TAzureStorageConnectionProperties conn = getUsedConnection(runtimeContainer);
+
+        if (runtimeContainer != null) {
+            AzureStorageUtils.setApplicationVersion((String) runtimeContainer.getGlobalData(AzureStorageUtils.TALEND_PRODUCT_VERSION_GLOBAL_KEY));
+            AzureStorageUtils.setComponentVersion((String) runtimeContainer.getGlobalData(AzureStorageUtils.TALEND_COMPONENT_VERSION_GLOBAL_KEY));
+        }
 
         // Validate connection properties
 
@@ -74,8 +80,7 @@ public class AzureStorageRuntime implements RuntimableRuntime<ComponentPropertie
     }
 
     public TAzureStorageConnectionProperties getUsedConnection(RuntimeContainer runtimeContainer) {
-        TAzureStorageConnectionProperties connectionProperties = ((AzureStorageProvideConnectionProperties) properties)
-                .getConnectionProperties();
+        TAzureStorageConnectionProperties connectionProperties = properties.getConnectionProperties();
         String refComponentId = connectionProperties.getReferencedComponentId();
 
         // Using another component's connection

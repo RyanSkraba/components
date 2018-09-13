@@ -27,9 +27,9 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public abstract class AzureStorageDefinition extends AbstractComponentDefinition {
 
-    private static final String MAVEN_ARTIFACT_ID = "components-azurestorage";
+    public static final String MAVEN_ARTIFACT_ID = "components-azurestorage";
 
-    private static final String MAVEN_GROUP_ID = "org.talend.components";
+    public static final String MAVEN_GROUP_ID = "org.talend.components";
 
     /**
      * Instantiates a new AzureStorageDefinition(String componentName).

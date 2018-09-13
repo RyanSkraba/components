@@ -25,6 +25,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
+import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
@@ -43,6 +44,10 @@ public class AzureStorageSourceOrSink extends AzureStorageRuntime implements Sou
     @Override
     public ValidationResult initialize(RuntimeContainer runtimeContainer, ComponentProperties properties) {
         ValidationResult validationResult = super.initialize(runtimeContainer, properties);
+        if (runtimeContainer != null) {
+            AzureStorageUtils.setApplicationVersion((String) runtimeContainer.getGlobalData(AzureStorageUtils.TALEND_PRODUCT_VERSION_GLOBAL_KEY));
+            AzureStorageUtils.setComponentVersion((String) runtimeContainer.getGlobalData(AzureStorageUtils.TALEND_COMPONENT_VERSION_GLOBAL_KEY));
+        }
         if (validationResult.getStatus() == ValidationResult.Result.ERROR) {
             return validationResult;
         }

@@ -14,17 +14,23 @@ package org.talend.components.azurestorage.utils;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
-import com.microsoft.azure.storage.OperationContext;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
+
+import com.microsoft.azure.storage.OperationContext;
 
 /**
  * This class comes from a decompilation of the {@code talend-azure-storage-utils-1.0.0.jar} provided by the
@@ -37,21 +43,55 @@ public class AzureStorageUtils {
 
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider().getI18nMessages(AzureStorageUtils.class);
 
+    public static final String TALEND_PRODUCT_VERSION_GLOBAL_KEY = "TALEND_PRODUCT_VERSION";
+    public static final String TALEND_COMPONENT_VERSION_GLOBAL_KEY = "TALEND_COMPONENTS_VERSION";
+
     private static OperationContext talendOperationContext;
 
     private static final String USER_AGENT_KEY = "User-Agent";
 
-    private static final String USER_AGENT_VALUE = "APN/1.0 Talend/7.1 TCOMP/0.24";
+    private static final String UNKNOWN_VERSION = "UNKNOWN";
+
+    private static String applicationVersion = UNKNOWN_VERSION;
+    private static String componentVersion = UNKNOWN_VERSION;
+
+
+    public static void setApplicationVersion(String applicationVersion) {
+        if (StringUtils.isNotEmpty(applicationVersion)) {
+            AzureStorageUtils.applicationVersion = applicationVersion;
+        }
+    }
+
+    public static void setComponentVersion(String componentVersion) {
+        if (StringUtils.isNotEmpty(componentVersion)) {
+            AzureStorageUtils.componentVersion = componentVersion;
+        }
+    }
+
+    /**
+     * Would be set as User-agent when real user-agent creation would fail
+     */
+    private static final String USER_AGENT_FORMAT = "APN/1.0 Talend/%s TCOMP/%s";
 
     public static OperationContext getTalendOperationContext() {
         if (talendOperationContext == null) {
+            String userAgentString = getUserAgentString();
             talendOperationContext = new OperationContext();
             HashMap<String, String> talendUserHeaders = new HashMap<>();
-            talendUserHeaders.put(USER_AGENT_KEY, USER_AGENT_VALUE);
+            talendUserHeaders.put(USER_AGENT_KEY, userAgentString);
             talendOperationContext.setUserHeaders(talendUserHeaders);
         }
 
         return talendOperationContext;
+    }
+
+    /**
+     *
+     * @param applicationVersion - Talend studio version, retrieved from runtime globalMap
+     * @return user agent string with real
+     */
+    private static String getUserAgentString() {
+        return String.format(USER_AGENT_FORMAT, applicationVersion, componentVersion);
     }
 
     class LocalFileFilter implements FileFilter {
