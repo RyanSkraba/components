@@ -19,6 +19,7 @@
         <marklogic-client-api.version>4.0.4</marklogic-client-api.version>
         <marklogic.mlcp.version>9.0.5</marklogic.mlcp.version>
         <okio.version>1.14.0</okio.version>
+        <protobuf-java.version>3.3.0</protobuf-java.version>
     </properties>
 
     <repositories>
@@ -238,6 +239,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
+            <version>${protobuf-java.version}</version>
         </dependency>
     </dependencies>
 
