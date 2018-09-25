@@ -54,7 +54,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
 
     protected Connection processingConnection;
 
-    private Object[] row;
+    protected Object[] row;
 
     private SnowflakeResultListener listener;
 
@@ -72,7 +72,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private transient IndexedRecordConverter<Object, ? extends IndexedRecord> factory;
 
-    private transient Schema mainSchema;
+    protected transient Schema mainSchema;
 
     private transient boolean isFirst = true;
 
@@ -125,11 +125,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         if (null == datum) {
             return;
         }
-        if (null == factory) {
-            factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) SnowflakeAvroRegistry.get()
-                    .createIndexedRecordConverter(datum.getClass());
-        }
-        IndexedRecord input = factory.convertToAvro(datum);
+        IndexedRecord input = getInputRecord(datum);
         List<Schema.Field> remoteTableFields = mainSchema.getFields();
 
         /*
@@ -146,28 +142,41 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             Field remoteTableField = remoteTableFields.get(i);
             if (f == null) {
                 row[i] = remoteTableField.defaultVal();
-                continue;
-            }
-            Object inputValue = input.get(f.pos());
-            Schema s = AvroUtils.unwrapIfNullable(remoteTableField.schema());
-            if (null == inputValue || inputValue instanceof String) {
-                row[i] = inputValue;
-            } else if (AvroUtils.isSameType(s, AvroUtils._date())) {
-                Date date = (Date) inputValue;
-                row[i] = date.getTime();
-            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timeMillis()) {
-                row[i] = formatter.formatTimeMillis(inputValue);
-            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.date()) {
-                row[i] = formatter.formatDate(inputValue);
-            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timestampMillis()) {
-                row[i] = formatter.formatTimestampMillis(inputValue);
             } else {
-                row[i] = inputValue;
+                Object inputValue = input.get(f.pos());
+                row[i] = getFieldValue(inputValue, remoteTableField);
             }
         }
 
         loader.submitRow(row);
     }
+
+    protected IndexedRecord getInputRecord(Object datum) {
+        if (null == factory) {
+            factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) SnowflakeAvroRegistry.get()
+                    .createIndexedRecordConverter(datum.getClass());
+        }
+        return factory.convertToAvro(datum);
+    }
+
+    protected Object getFieldValue(Object inputValue, Field field) {
+        Schema s = AvroUtils.unwrapIfNullable(field.schema());
+        if (null == inputValue || inputValue instanceof String) {
+            return inputValue;
+        } else if (AvroUtils.isSameType(s, AvroUtils._date())) {
+            Date date = (Date) inputValue;
+            return date.getTime();
+        } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timeMillis()) {
+            return formatter.formatTimeMillis(inputValue);
+        } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.date()) {
+            return formatter.formatDate(inputValue);
+        } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timestampMillis()) {
+            return formatter.formatTimestampMillis(inputValue);
+        } else {
+            return inputValue;
+        }
+    }
+
 
     @Override
     public Result close() throws IOException {
