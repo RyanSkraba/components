@@ -47,7 +47,7 @@ public class CouchbaseStreamingConnection {
         connected = false;
         streaming = false;
         client = Client.configure()
-                .connectTimeout(10000L)
+                .connectTimeout(20000L)
                 .hostnames(bootstrapNodes)
                 .bucket(bucket)
                 .password(password == null ? "" : password)

@@ -18,6 +18,8 @@ package org.talend.components.couchbase.runtime;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.CouchbaseCluster;
 import com.couchbase.client.java.document.RawJsonDocument;
+import com.couchbase.client.java.env.CouchbaseEnvironment;
+import com.couchbase.client.java.env.DefaultCouchbaseEnvironment;
 
 public class CouchbaseConnection {
 
@@ -28,7 +30,8 @@ public class CouchbaseConnection {
     private int refCounter = 0;
 
     public CouchbaseConnection(String bootstrapNodes, String bucket, String password) {
-        this.cluster = CouchbaseCluster.create(bootstrapNodes);
+        CouchbaseEnvironment environment = new DefaultCouchbaseEnvironment.Builder().connectTimeout(20000L).build();
+        this.cluster = CouchbaseCluster.create(environment, bootstrapNodes);
         this.bucketName = bucket;
         this.password = password;
     }

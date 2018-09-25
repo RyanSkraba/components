@@ -11,6 +11,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.CouchbaseCluster;
 import com.couchbase.client.java.document.RawJsonDocument;
+import com.couchbase.client.java.env.CouchbaseEnvironment;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(CouchbaseCluster.class)
@@ -24,7 +25,7 @@ public class CouchbaseConnectionTest {
     public void setup() {
         PowerMockito.mockStatic(CouchbaseCluster.class);
         cluster = Mockito.mock(CouchbaseCluster.class);
-        Mockito.when(CouchbaseCluster.create("testNode")).thenReturn(cluster);
+        Mockito.when(CouchbaseCluster.create(Mockito.any(CouchbaseEnvironment.class), Mockito.eq("testNode"))).thenReturn(cluster);
         connection = new CouchbaseConnection("testNode", "testBucket", "defaultPassword");
         bucket = Mockito.mock(Bucket.class);
         Mockito.when(cluster.openBucket(Mockito.anyString(), Mockito.anyString())).thenReturn(bucket);
