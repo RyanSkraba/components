@@ -18,7 +18,6 @@
         <module>components-azurestorage</module>
         <module>components-fileio</module>
         <module>components-jms</module>
-        <module>components-kafka</module>
         <module>components-localio</module>
         <module>components-processing</module>
         <module>components-jdbc</module>
@@ -30,7 +29,6 @@
         <module>components-bigquery</module>
         <module>components-pubsub</module>
         <module>components-marketo</module>
-        <module>components-netsuite</module>
         <module>components-hadoopcluster</module>
         <module>components-couchbase</module>
         <module>components-kinesis</module>
@@ -39,5 +37,8 @@
         <!-- Slow-building components are built last. -->
         <module>components-salesforce</module>
         <module>components-snowflake</module>
+        <!-- Run some build which randomly failed at last. -->
+        <module>components-netsuite</module>
+        <module>components-kafka</module>
     </modules>
 </project>
