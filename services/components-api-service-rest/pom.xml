@@ -542,6 +542,9 @@
                                                     <com.talend.url>https://www.talend.com/</com.talend.url>
                                                     <com.talend.vendor>Talend</com.talend.vendor>
                                                     <com.talend.build-date>${maven.build.timestamp}</com.talend.build-date>
+                                                    <com.talend.docker.cmd></com.talend.docker.cmd>
+                                                    <com.talend.docker.params></com.talend.docker.params>
+                                                    <com.talend.docker.healthcheck></com.talend.docker.healthcheck>
                                                 </labels>
                                             </build>
                                         </image>
