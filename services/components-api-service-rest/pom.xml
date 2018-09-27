@@ -528,6 +528,21 @@
                                                     <LOG_PATH>/maven/logs</LOG_PATH>
                                                     <FILEBEAT_CONSOLE_OUTPUT>false</FILEBEAT_CONSOLE_OUTPUT>
                                                 </env>
+                                                <labels>
+                                                    <name>Talend Component REST API</name>
+                                                    <version>${project.version}</version>
+                                                    <com.talend.name>Talend Component REST API</com.talend.name>
+                                                    <com.talend.application>tcomp</com.talend.application>
+                                                    <com.talend.service>${project.artifactId}</com.talend.service>
+                                                    <com.talend.version>${project.version}</com.talend.version>
+                                                    <com.talend.git.repositories>https://github.com/talend/components</com.talend.git.repositories>
+                                                    <com.talend.git.branches>${git_branch}</com.talend.git.branches>
+                                                    <com.talend.git.commits>${git.commid.id}</com.talend.git.commits>
+                                                    <com.talend.description>Talend Component REST API</com.talend.description>
+                                                    <com.talend.url>https://www.talend.com/</com.talend.url>
+                                                    <com.talend.vendor>Talend</com.talend.vendor>
+                                                    <com.talend.build-date>${maven.build.timestamp}</com.talend.build-date>
+                                                </labels>
                                             </build>
                                         </image>
                                     </images>
