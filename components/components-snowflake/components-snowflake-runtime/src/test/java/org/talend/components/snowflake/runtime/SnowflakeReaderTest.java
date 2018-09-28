@@ -28,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
 import org.talend.daikon.avro.SchemaConstants;
@@ -223,9 +224,12 @@ public class SnowflakeReaderTest {
     @Test
     public void testGetSchemaFromSource() throws Exception {
         snowflakeReader.properties.manualQuery.setValue(false);
+
         Mockito.doCallRealMethod().when(snowflakeSourceMock).getRuntimeSchema(Mockito.any(SchemaResolver.class));
+        Mockito.doCallRealMethod().when(snowflakeSourceMock).getRuntimeSchema(Mockito.any(SchemaResolver.class), Mockito.any(TableAction.TableActionEnum.class));
         Mockito.when(snowflakeSourceMock.getSchema(Mockito.eq(runtimeContainerMock), Mockito.any(Connection.class),
                 Mockito.eq("Table"))).thenReturn(schema);
+
         Assert.assertEquals(schema, snowflakeReader.getSchema());
     }
 

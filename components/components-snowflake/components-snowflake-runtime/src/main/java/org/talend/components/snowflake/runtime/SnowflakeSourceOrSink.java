@@ -33,6 +33,7 @@ import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCTableMetadata;
+import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.SnowflakeGuessSchemaProperties;
@@ -198,9 +199,15 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
     }
 
     protected Schema getRuntimeSchema(SchemaResolver resolver) throws IOException {
+        return getRuntimeSchema(resolver, TableAction.TableActionEnum.NONE);
+    }
+
+    protected Schema getRuntimeSchema(SchemaResolver resolver, TableAction.TableActionEnum tableAction) throws IOException {
         SnowflakeConnectionTableProperties connectionTableProperties = ((SnowflakeConnectionTableProperties) properties);
         Schema schema = connectionTableProperties.getSchema();
-        if (AvroUtils.isIncludeAllFields(schema)) {
+
+        // Don't retrieve schema from database if there is a table action that will create the table
+        if (AvroUtils.isIncludeAllFields(schema) && tableAction == TableAction.TableActionEnum.NONE) {
             schema = resolver.getSchema();
         }
         return schema;

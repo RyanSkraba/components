@@ -65,6 +65,7 @@ public class SnowflakeTableProperties extends ComponentPropertiesImpl implements
     public void setupLayout() {
         super.setupLayout();
         Form tableForm = Form.create(this, Form.MAIN);
+
         tableForm.addRow(widget(tableName).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
         refreshLayout(tableForm);
 
@@ -111,4 +112,5 @@ public class SnowflakeTableProperties extends ComponentPropertiesImpl implements
     public SnowflakeConnectionProperties getConnectionProperties() {
         return connection;
     }
+
 }

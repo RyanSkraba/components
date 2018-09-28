@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -54,10 +55,13 @@ public class TSnowflakeOutputPropertiesTest {
         boolean isOutputActionPropertyVisible;
         boolean isUpsertKeyColumnVisible;
         boolean isUpsertKeyColumnVisibleWhenOutputActionIsUpsert;
+        boolean isTableActionProperyVisible;
 
         main = outputProperties.getForm(Form.MAIN);
         isOutputActionPropertyVisible = main.getWidget(outputProperties.outputAction).isVisible();
         isUpsertKeyColumnVisible = main.getWidget(outputProperties.upsertKeyColumn).isVisible();
+        isTableActionProperyVisible = main.getWidget(outputProperties.tableAction).isVisible();
+
 
         outputProperties.outputAction.setValue(OutputAction.UPSERT);
         outputProperties.refreshLayout(main);
@@ -67,18 +71,22 @@ public class TSnowflakeOutputPropertiesTest {
         assertTrue(isOutputActionPropertyVisible);
         assertFalse(isUpsertKeyColumnVisible);
         assertTrue(isUpsertKeyColumnVisibleWhenOutputActionIsUpsert);
+        assertTrue(isTableActionProperyVisible);
     }
 
     @Test
     public void testDefaultValue() {
         OutputAction defaultValueOutputAction;
         boolean defaultConvertColumnsAndTableToUppercase;
+        TableAction.TableActionEnum tableAction;
 
         defaultValueOutputAction = outputProperties.outputAction.getValue();
         defaultConvertColumnsAndTableToUppercase = outputProperties.convertColumnsAndTableToUppercase.getValue();
+        tableAction = outputProperties.tableAction.getValue();
 
         assertEquals(defaultValueOutputAction, OutputAction.INSERT);
         assertTrue(defaultConvertColumnsAndTableToUppercase);
+        assertEquals(TableAction.TableActionEnum.NONE, tableAction);
     }
 
     @Test
@@ -205,4 +213,5 @@ public class TSnowflakeOutputPropertiesTest {
         Assert.assertEquals(9, outputProperties.schemaReject.schema.getValue().getFields().size());
 
     }
+
 }

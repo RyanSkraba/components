@@ -26,13 +26,17 @@ import java.util.Map;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.runtime.DynamicSchemaUtils;
+import org.talend.components.common.tableaction.TableActionConfig;
+import org.talend.components.common.tableaction.TableActionManager;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
+import org.talend.components.snowflake.runtime.tableaction.SnowflakeTableActionConfig;
 import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
@@ -43,6 +47,8 @@ import net.snowflake.client.loader.Loader;
 import net.snowflake.client.loader.LoaderFactory;
 import net.snowflake.client.loader.LoaderProperty;
 import net.snowflake.client.loader.Operation;
+
+import static org.talend.components.common.tableaction.TableAction.TableActionEnum;
 
 public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
@@ -80,6 +86,11 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private Formatter formatter = new Formatter();
 
+    private transient List<Schema.Field> remoteTableFields;
+    private transient IndexedRecord input;
+
+    private transient boolean isFullDyn = false;
+
     @Override
     public Iterable<IndexedRecord> getSuccessfulWrites() {
         return new ArrayList<IndexedRecord>();
@@ -111,12 +122,90 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         if (null == mainSchema) {
             mainSchema = getSchema();
         }
-
         row = new Object[mainSchema.getFields().size()];
 
         loader = getLoader();
         loader.setListener(listener);
         loader.start();
+    }
+
+    private static StringSchemaInfo getStringSchemaInfo(TSnowflakeOutputProperties outputProperties, Schema mainSchema, List<Field> columns){
+        boolean isUpperCase = false;
+        boolean upsert = false;
+        if(outputProperties != null) {
+            isUpperCase = outputProperties.convertColumnsAndTableToUppercase.getValue();
+            UPSERT.equals(outputProperties.outputAction.getValue());
+        }
+
+        List<String> keyStr = new ArrayList<>();
+        List<String> columnsStr = new ArrayList<>();
+
+        int i = 0;
+        for (Field overlapField : columns) {
+            Field f = overlapField == null ? mainSchema.getFields().get(i) : overlapField;
+            i++;
+            String dbColumnName = f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+            if(dbColumnName == null){
+                dbColumnName = f.name();
+            }
+
+            String fName = isUpperCase ? dbColumnName.toUpperCase() : dbColumnName;
+            columnsStr.add(fName);
+            if (null != f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY)) {
+                keyStr.add(fName);
+            }
+        }
+
+        if (upsert) {
+            keyStr.clear();
+            keyStr.add(outputProperties.upsertKeyColumn.getValue());
+        }
+
+        return new StringSchemaInfo(keyStr, columnsStr);
+    }
+
+    protected void setLoaderColumnsPropertyAtRuntime(Loader loader, List<Field> columns){
+        StringSchemaInfo ssi = getStringSchemaInfo(sprops, mainSchema, columns);
+
+        row = new Object[ssi.columnsStr.size()];
+
+        loader.setProperty(LoaderProperty.columns, ssi.columnsStr);
+
+        if (ssi.keyStr.size() > 0) {
+            loader.setProperty(LoaderProperty.keys, ssi.keyStr);
+        }
+    }
+
+    private void execTableAction(Object datum) throws IOException {
+        TableActionEnum selectedTableAction = sprops.tableAction.getValue();
+        if (selectedTableAction != TableActionEnum.TRUNCATE) {
+            SnowflakeConnectionProperties connectionProperties = sprops.getConnectionProperties();
+            try {
+                SnowflakeConnectionProperties connectionProperties1 = connectionProperties.getReferencedConnectionProperties();
+                if (connectionProperties1 == null) {
+                    connectionProperties1 = sprops.getConnectionProperties();
+                }
+
+                TableActionConfig conf = new SnowflakeTableActionConfig(sprops.convertColumnsAndTableToUppercase.getValue());
+
+                Schema schemaForCreateTable = this.mainSchema;
+                if(isFullDyn) {
+                    schemaForCreateTable = ((GenericData.Record) datum).getSchema();
+                }
+
+                TableActionManager.exec(processingConnection, selectedTableAction,
+                        new String[] { connectionProperties1.db.getValue(), connectionProperties1.schemaName.getValue(),
+                                sprops.getTableName() }, schemaForCreateTable, conf);
+            } catch (IOException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new IOException(e.getMessage(), e);
+            }
+        }
+    }
+
+    protected void tableActionManagement(Object datum) throws IOException {
+        execTableAction(datum);
     }
 
     @SuppressWarnings("unchecked")
@@ -125,15 +214,29 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         if (null == datum) {
             return;
         }
-        IndexedRecord input = getInputRecord(datum);
-        List<Schema.Field> remoteTableFields = mainSchema.getFields();
+
+        input = getInputRecord(datum);
 
         /*
          * This piece will be executed only once per instance. Will not cause performance issue. Perform input and mainSchema
          * synchronization. Such situation is useful in case of Dynamic fields.
          */
-        if (isFirst) {
-            collectedFields = DynamicSchemaUtils.getCommonFieldsForDynamicSchema(mainSchema, input.getSchema());
+        if (isFirst && datum != null) {
+            remoteTableFields = mainSchema.getFields();
+
+            isFullDyn = mainSchema.getFields().isEmpty() && AvroUtils.isIncludeAllFields(mainSchema);
+
+            if(!isFullDyn) {
+                collectedFields = DynamicSchemaUtils.getCommonFieldsForDynamicSchema(mainSchema, input.getSchema());
+            }
+            else{
+                collectedFields = ((GenericData.Record) datum).getSchema().getFields();
+                remoteTableFields = new ArrayList<>(collectedFields);
+            }
+
+            setLoaderColumnsPropertyAtRuntime(loader, collectedFields);
+            tableActionManagement(datum);
+
             isFirst = false;
         }
 
@@ -142,6 +245,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             Field remoteTableField = remoteTableFields.get(i);
             if (f == null) {
                 row[i] = remoteTableField.defaultVal();
+                continue;
             } else {
                 Object inputValue = input.get(f.pos());
                 row[i] = getFieldValue(inputValue, remoteTableField);
@@ -206,7 +310,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             public Schema getSchema() throws IOException {
                 return sink.getSchema(container, processingConnection, sprops.getTableName());
             }
-        });
+        }, this.sprops.tableAction.getValue());
     }
 
     protected TSnowflakeOutputProperties getProps() {
@@ -244,27 +348,20 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         }
 
         List<Field> columns = mainSchema.getFields();
-        List<String> keyStr = new ArrayList<>();
-        List<String> columnsStr = new ArrayList<>();
-        for (Field f : columns) {
-            String dbColumnName = f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
-            String fName = isUpperCase ? dbColumnName.toUpperCase() : dbColumnName;
-            columnsStr.add(fName);
-            if (null != f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY)) {
-                keyStr.add(fName);
-            }
-        }
 
-        prop.put(LoaderProperty.columns, columnsStr);
-        if (outputProperties.outputAction.getValue() == UPSERT) {
-            keyStr.clear();
-            keyStr.add(outputProperties.upsertKeyColumn.getValue());
-        }
-        if (keyStr.size() > 0) {
-            prop.put(LoaderProperty.keys, keyStr);
+        StringSchemaInfo ssi = getStringSchemaInfo(outputProperties, mainSchema, columns);
+        prop.put(LoaderProperty.columns, ssi.columnsStr);
+
+        if (ssi.keyStr.size() > 0) {
+            prop.put(LoaderProperty.keys, ssi.keyStr);
         }
 
         prop.put(LoaderProperty.remoteStage, "~");
+
+        TableActionEnum selectedTableAction = outputProperties.tableAction.getValue();
+        if (TableActionEnum.TRUNCATE.equals(selectedTableAction)) {
+            prop.put(LoaderProperty.truncateTable, "true");
+        }
 
         return prop;
     }
@@ -286,4 +383,18 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         sink.closeConnection(container, processingConnection);
         sink.closeConnection(container, uploadConnection);
     }
+
+    private static class StringSchemaInfo{
+
+        public List<String> keyStr = new ArrayList<>();
+
+        public List<String> columnsStr = new ArrayList<>();
+
+        public StringSchemaInfo(List<String> keyStr, List<String> columnsStr) {
+            this.keyStr = keyStr;
+            this.columnsStr = columnsStr;
+        }
+
+    }
+
 }
