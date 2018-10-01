@@ -134,7 +134,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         boolean upsert = false;
         if(outputProperties != null) {
             isUpperCase = outputProperties.convertColumnsAndTableToUppercase.getValue();
-            UPSERT.equals(outputProperties.outputAction.getValue());
+            upsert = UPSERT.equals(outputProperties.outputAction.getValue());
         }
 
         List<String> keyStr = new ArrayList<>();
