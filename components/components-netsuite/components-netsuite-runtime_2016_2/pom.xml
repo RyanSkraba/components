@@ -14,11 +14,11 @@
     <packaging>jar</packaging>
 
     <properties>
+        <skipITs>true</skipITs>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
 
     <dependencies>
-
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-netsuite-definition</artifactId>

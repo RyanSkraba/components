@@ -9,8 +9,8 @@
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>components-netsuite-runtime_2014_2</artifactId>
-    <name>Components - NetSuite Runtime v2014.2</name>
+    <artifactId>components-netsuite-runtime_2018_2</artifactId>
+    <name>Components - NetSuite Runtime v2018.2</name>
     <packaging>jar</packaging>
 
     <properties>
@@ -50,7 +50,14 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+        </dependency>
         <!-- To include in dependencies.txt. -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -170,15 +177,15 @@
                             <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/src/main/resources/wsdl/2014.2/netsuite.wsdl</wsdl>
+                                    <wsdl>${basedir}/src/main/resources/wsdl/2018.2/netsuite.wsdl</wsdl>
                                     <serviceName>NetSuiteService</serviceName>
                                     <extraargs>
-                                        <extraarg>-xjc-b,${basedir}/src/main/resources/wsdl/2014.2/bindings.jaxb
+                                        <extraarg>-xjc-b,${basedir}/src/main/resources/wsdl/2018.2/bindings.jaxb
                                         </extraarg>
                                         <extraarg>-xjc-Xbg</extraarg>
                                         <extraarg>-p</extraarg>
                                         <extraarg>
-                                            urn:platform_2014_2.webservices.netsuite.com=com.netsuite.webservices.v2014_2.platform
+                                            urn:platform_2018_2.webservices.netsuite.com=com.netsuite.webservices.v2018_2.platform
                                         </extraarg>
                                     </extraargs>
                                 </wsdlOption>
@@ -214,8 +221,8 @@
                     <argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
                     <systemPropertyVariables>
                         <pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
-                        <netsuite.endpoint.url>${netsuite.endpoint.2014_2.url}</netsuite.endpoint.url>
-                        <netsuite.endpoint.2014_2.url>${netsuite.endpoint.2014_2.url}</netsuite.endpoint.2014_2.url>
+                        <netsuite.endpoint.url>${netsuite.endpoint.2018_2.url}</netsuite.endpoint.url>
+                        <netsuite.endpoint.2018_2.url>${netsuite.endpoint.2018_2.url}</netsuite.endpoint.2018_2.url>
                         <netsuite.email>${netsuite.email}</netsuite.email>
                         <netsuite.password>${netsuite.password}</netsuite.password>
                         <netsuite.roleId>${netsuite.roleId}</netsuite.roleId>
@@ -239,7 +246,7 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.netsuite.runtime.v2014_2.lib
+                                <Bundle-SymbolicName>org.talend.components.netsuite.runtime.v2018_2.lib
                                 </Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Include-Resource>
@@ -268,7 +275,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.0.2</version>
             </plugin>
         </plugins>
     </build>

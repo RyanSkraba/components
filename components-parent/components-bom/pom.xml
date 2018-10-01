@@ -176,7 +176,7 @@
         <spring-security-crypto.version>4.2.1.RELEASE</spring-security-crypto.version>
         <spring-security-rsa.version>1.0.3.RELEASE</spring-security-rsa.version>
         <spring-test.version>4.3.3.RELEASE</spring-test.version>
-        <stax2-api.version>3.1.4</stax2-api.version>
+        <stax2-api.version>4.1</stax2-api.version>
         <talend_file_enhanced_20070724.version>6.0.0</talend_file_enhanced_20070724.version>
         <talendcsv.version>6.0.0</talendcsv.version>
         <tomcat-jasper.version>5.5.23</tomcat-jasper.version>

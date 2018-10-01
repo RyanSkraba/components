@@ -26,15 +26,13 @@ public class NetSuiteVersionTest {
     @Test
     public void testGetMajorAsString() {
         NetSuiteVersion version = new NetSuiteVersion(2016, 2);
-        assertEquals("2016_2", version.getMajorAsString());
         assertEquals("2016.2", version.getMajorAsString("."));
     }
 
     @Test
     public void testGetAsString() {
-        NetSuiteVersion version = new NetSuiteVersion(2016, 2, 1);
-        assertEquals("2016_2_1", version.getAsString());
-        assertEquals("2016.2.1", version.getAsString("."));
+        NetSuiteVersion version = new NetSuiteVersion(2016, 2, -1);
+        assertEquals("2016.2", version.getAsString("."));
     }
 
     @Test
@@ -47,10 +45,10 @@ public class NetSuiteVersionTest {
 
     @Test
     public void testParseVersionMajorAndPatch() {
-        NetSuiteVersion version = NetSuiteVersion.parseVersion("2016.2.1");
+        NetSuiteVersion version = NetSuiteVersion.parseVersion("2016.2");
         assertEquals(2016, version.getMajorYear());
         assertEquals(2, version.getMajorRelease());
-        assertEquals(1, version.getMinor());
+        assertEquals(-1, version.getMinor());
     }
 
     @Test

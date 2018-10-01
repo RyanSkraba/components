@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -45,21 +45,23 @@ import org.talend.daikon.serialize.PostDeserializeSetup;
 /**
  * Properties of NetSuite connection component.
  */
-public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implements NetSuiteProvideConnectionProperties {
+public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
+        implements NetSuiteProvideConnectionProperties {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetSuiteConnectionProperties.class);
 
     public static final String FORM_WIZARD = "Wizard";
 
-    public static final NetSuiteVersion DEFAULT_API_VERSION = new NetSuiteVersion(2016, 2);
+    public static final NetSuiteVersion DEFAULT_API_VERSION = new NetSuiteVersion(2018, 2);
 
-    public static final String DEFAULT_ENDPOINT_URL = "https://webservices.netsuite.com/services/NetSuitePort_"
-            + DEFAULT_API_VERSION.getMajorAsString();
+    public static final String DEFAULT_ENDPOINT_URL =
+            "https://webservices.netsuite.com/services/NetSuitePort_" + DEFAULT_API_VERSION.getMajorAsString();
 
     /**
      * List of versions supported by NetSuite components.
      */
-    public static final List<String> API_VERSIONS = Collections.unmodifiableList(Arrays.asList("2016.2", "2014.2"));
+    public static final List<String> API_VERSIONS =
+            Collections.unmodifiableList(Arrays.asList("2018.2", "2016.2", "2014.2"));
 
     public final Property<String> name = newString("name").setRequired();
 
@@ -69,7 +71,8 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
 
     public final Property<String> email = newString("email").setRequired();
 
-    public final Property<String> password = newProperty("password").setRequired()
+    public final Property<String> password = newProperty("password")
+            .setRequired()
             .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     public final Property<Integer> role = newInteger("role").setRequired();
@@ -87,8 +90,8 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
 
     public final PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
 
-    public final ComponentReferenceProperties<NetSuiteConnectionProperties> referencedComponent = new ComponentReferenceProperties(
-            "referencedComponent", NetSuiteConnectionDefinition.COMPONENT_NAME);
+    public final ComponentReferenceProperties<NetSuiteConnectionProperties> referencedComponent =
+            new ComponentReferenceProperties("referencedComponent", NetSuiteConnectionDefinition.COMPONENT_NAME);
 
     /**
      * Holds data that can be used by NetSuite runtime when components are edited by a component designer.
@@ -154,8 +157,8 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
         super.refreshLayout(form);
 
         String refComponentId = getReferencedComponentId();
-        boolean refConnectionUsed = refComponentId != null
-                && refComponentId.startsWith(NetSuiteConnectionDefinition.COMPONENT_NAME);
+        boolean refConnectionUsed =
+                refComponentId != null && refComponentId.startsWith(NetSuiteConnectionDefinition.COMPONENT_NAME);
 
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
             form.getWidget(endpoint.getName()).setHidden(refConnectionUsed);
@@ -179,7 +182,8 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
     /**
      * Return connection properties object which is currently in effect.
      *
-     * <p>If this object references to another connection component then a referenced
+     * <p>
+     * If this object references to another connection component then a referenced
      * connection properties will be returned. Otherwise, this connection properties
      * object will be returned.
      *
