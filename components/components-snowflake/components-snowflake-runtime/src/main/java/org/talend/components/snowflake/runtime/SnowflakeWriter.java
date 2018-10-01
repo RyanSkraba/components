@@ -28,6 +28,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
@@ -91,6 +92,8 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private transient boolean isFullDyn = false;
 
+    private String emptyStringValue;
+
     @Override
     public Iterable<IndexedRecord> getSuccessfulWrites() {
         return new ArrayList<IndexedRecord>();
@@ -123,6 +126,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             mainSchema = getSchema();
         }
         row = new Object[mainSchema.getFields().size()];
+        emptyStringValue = getEmptryStringValue();
 
         loader = getLoader();
         loader.setListener(listener);
@@ -244,7 +248,8 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             Field f = collectedFields.get(i);
             Field remoteTableField = remoteTableFields.get(i);
             if (f == null) {
-                row[i] = remoteTableField.defaultVal();
+                Object defaultValue = remoteTableField.defaultVal();
+                row[i] = StringUtils.EMPTY.equals(defaultValue) ? null : defaultValue;
                 continue;
             } else {
                 Object inputValue = input.get(f.pos());
@@ -265,7 +270,9 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
 
     protected Object getFieldValue(Object inputValue, Field field) {
         Schema s = AvroUtils.unwrapIfNullable(field.schema());
-        if (null == inputValue || inputValue instanceof String) {
+        if (inputValue != null && inputValue instanceof String && ((String) inputValue).isEmpty()) {
+            return emptyStringValue;
+        } else if (null == inputValue || inputValue instanceof String) {
             return inputValue;
         } else if (AvroUtils.isSameType(s, AvroUtils._date())) {
             Date date = (Date) inputValue;
@@ -281,6 +288,9 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         }
     }
 
+    protected String getEmptryStringValue() {
+        return sprops.convertEmptyStringsToNull.getValue() ? null : "";
+    }
 
     @Override
     public Result close() throws IOException {
@@ -311,10 +321,6 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
                 return sink.getSchema(container, processingConnection, sprops.getTableName());
             }
         }, this.sprops.tableAction.getValue());
-    }
-
-    protected TSnowflakeOutputProperties getProps() {
-        return sprops;
     }
 
     protected Map<LoaderProperty, Object> getLoaderProps() {
