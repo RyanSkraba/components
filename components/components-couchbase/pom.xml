@@ -237,7 +237,7 @@
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.couchbase</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
-                                <Import-Package>
+                                <Import-Package>!org.apache.hadoop.*, !org.apache.http.*, !com.fasterxml.jackson.databind.*,
                                     !org.apache.logging.log4j.*,!com.couchbase.client.deps.io.netty.internal.tcnative,!org.conscrypt,!com.barchart.udt,!com.barchart.udt.nio,!com.google.protobuf,!com.jcraft.jzlib,!com.sun.*,!sun.*,!gnu.io,!javassist,!org.jboss.*,!org.joda.*,!org.apache.logging.log4j,!org.apache.tomcat,!org.apache.tomcat.jni,!org.bouncycastle.*,!org.eclipse.*,*
                                 </Import-Package>
                                 <Export-Package>
