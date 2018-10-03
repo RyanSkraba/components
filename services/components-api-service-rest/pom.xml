@@ -21,7 +21,6 @@
         <daikon.version>0.26.0-SNAPSHOT</daikon.version>
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
-        <docker_tag_suffix>${maven.build.timestamp}</docker_tag_suffix>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
 
         <biz.aQute.bnd.annotation.version>2.4.0</biz.aQute.bnd.annotation.version>
@@ -500,13 +499,13 @@
                                     <images>
                                         <image>
                                             <name>
-                                                ${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}
+                                                ${talend_docker_registry}/talend/tcomp-${project.artifactId}
                                             </name>
                                             <build>
                                                 <from>${talend_docker_registry}/talend/microservices-base:1.latest
                                                 </from>
                                                 <tags>
-                                                    <tag>${project.version}-${docker_tag_suffix}</tag>
+                                                    <tag>${project.version}-${maven.build.timestamp}</tag>
                                                 </tags>
                                                 <ports>
                                                     <port>8989</port>
@@ -529,6 +528,24 @@
                                                     <LOG_PATH>/maven/logs</LOG_PATH>
                                                     <FILEBEAT_CONSOLE_OUTPUT>false</FILEBEAT_CONSOLE_OUTPUT>
                                                 </env>
+                                                <labels>
+                                                    <name>Talend Component REST API</name>
+                                                    <version>${project.version}</version>
+                                                    <com.talend.name>Talend Component REST API</com.talend.name>
+                                                    <com.talend.application>tcomp</com.talend.application>
+                                                    <com.talend.service>${project.artifactId}</com.talend.service>
+                                                    <com.talend.version>${project.version}</com.talend.version>
+                                                    <com.talend.git.repositories>https://github.com/talend/components</com.talend.git.repositories>
+                                                    <com.talend.git.branches>${git_branch}</com.talend.git.branches>
+                                                    <com.talend.git.commits>${git.commid.id}</com.talend.git.commits>
+                                                    <com.talend.description>Talend Component REST API</com.talend.description>
+                                                    <com.talend.url>https://www.talend.com/</com.talend.url>
+                                                    <com.talend.vendor>Talend</com.talend.vendor>
+                                                    <com.talend.build-date>${maven.build.timestamp}</com.talend.build-date>
+                                                    <com.talend.docker.cmd></com.talend.docker.cmd>
+                                                    <com.talend.docker.params></com.talend.docker.params>
+                                                    <com.talend.docker.healthcheck></com.talend.docker.healthcheck>
+                                                </labels>
                                             </build>
                                         </image>
                                     </images>
