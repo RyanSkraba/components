@@ -158,7 +158,7 @@ public class JDBCOutputInsertOrUpdateWriter extends JDBCOutputWriter {
 
         } catch (SQLException e) {
             throw CommonUtils.newComponentException(e);
-        }-->
+        }
 
         try {
             if (dataExists) {// do update
