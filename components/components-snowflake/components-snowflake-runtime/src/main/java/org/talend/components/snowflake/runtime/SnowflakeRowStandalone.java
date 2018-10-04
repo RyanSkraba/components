@@ -15,6 +15,7 @@ package org.talend.components.snowflake.runtime;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -46,14 +47,18 @@ public class SnowflakeRowStandalone extends SnowflakeRuntime implements Componen
     private static final I18nMessages I18N_MESSAGES = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(SnowflakeRowStandalone.class);
 
+    static final String NB_LINE = "NB_LINE";
+
+    static final String ERROR_MESSAGE = "ERROR_MESSAGE";
+
     private TSnowflakeRowProperties rowProperties;
 
-    private Boolean dieOnError;
+    private RuntimeContainer container;
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         this.rowProperties = (TSnowflakeRowProperties) properties;
-        this.dieOnError = rowProperties.dieOnError.getValue();
+        this.container = container;
         return ValidationResult.OK;
     }
 
@@ -63,16 +68,18 @@ public class SnowflakeRowStandalone extends SnowflakeRuntime implements Componen
         Connection connection = null;
         try {
             connection = createConnection(container);
+            ResultSet rs = null;
             if (rowProperties.usePreparedStatement()) {
                 try (PreparedStatement pstmt = connection.prepareStatement(rowProperties.getQuery())) {
                     SnowflakePreparedStatementUtils.fillPreparedStatement(pstmt, rowProperties.preparedStatementTable);
-                    pstmt.execute();
+                    rs = pstmt.executeQuery();
                 }
             } else {
                 try (Statement statement = connection.createStatement()) {
-                    statement.executeQuery(rowProperties.getQuery());
+                    rs = statement.executeQuery(rowProperties.getQuery());
                 }
             }
+            storeReturnedRows(rs);
         } catch (SQLException e) {
             throwComponentException(e, "error.queryExecution");
         } catch (IOException ioe) {
@@ -88,11 +95,22 @@ public class SnowflakeRowStandalone extends SnowflakeRuntime implements Componen
         }
     }
 
+    private void storeReturnedRows(ResultSet rs) throws SQLException {
+        int count = 0;
+        if (rs != null) {
+            while (rs.next()) {
+                count++;
+            }
+        }
+        container.setComponentData(container.getCurrentComponentId(), NB_LINE, count);
+    }
+
     private void throwComponentException(Exception ex, String messageProperty) {
-        if (dieOnError) {
+        if (rowProperties.dieOnError.getValue()) {
             throw new ComponentException(ex);
         }
         LOGGER.error(I18N_MESSAGES.getMessage(messageProperty), ex);
+        container.setComponentData(container.getCurrentComponentId(), ERROR_MESSAGE, ex.getMessage());
     }
 
     @Override
