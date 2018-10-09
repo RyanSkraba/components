@@ -71,7 +71,7 @@
         <derby.version>10.12.1.1</derby.version>
         <dom4j.version>1.6.1</dom4j.version>
         <esri-geometry.version>2.0.0</esri-geometry.version>
-        <force-wsc.version>39.0.5</force-wsc.version>
+        <force-wsc.version>44.0.0</force-wsc.version>
         <glassfish-jersey.version>2.26</glassfish-jersey.version>
         <google-api-client-appengine.version>${google-api-client.version}</google-api-client-appengine.version>
         <google-api-client-jackson2.version>${google-api-client.version}</google-api-client-jackson2.version>

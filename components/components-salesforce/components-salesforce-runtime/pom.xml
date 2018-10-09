@@ -9,7 +9,7 @@
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <partner.version>42.0.0</partner.version>
+        <partner.version>44.0.0</partner.version>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
 
