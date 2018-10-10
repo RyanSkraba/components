@@ -238,7 +238,9 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
                 remoteTableFields = new ArrayList<>(collectedFields);
             }
 
-            setLoaderColumnsPropertyAtRuntime(loader, collectedFields);
+            if (sprops.tableAction.getValue() != TableActionEnum.NONE) {
+                setLoaderColumnsPropertyAtRuntime(loader, collectedFields);
+            }
             tableActionManagement(datum);
 
             isFirst = false;
