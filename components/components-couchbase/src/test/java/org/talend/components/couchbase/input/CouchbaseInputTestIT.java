@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,6 +31,8 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.couchbase.RequiresCouchbaseServer;
 import org.talend.components.couchbase.EventSchemaField;
@@ -45,10 +47,15 @@ import com.couchbase.client.java.document.json.JsonObject;
 import com.couchbase.client.java.env.CouchbaseEnvironment;
 import com.couchbase.client.java.env.DefaultCouchbaseEnvironment;
 
-@Category({RequiresCouchbaseServer.class})
+@Category({ RequiresCouchbaseServer.class })
 public class CouchbaseInputTestIT {
+
+    private transient static final Logger LOGGER = LoggerFactory.getLogger(CouchbaseInputTestIT.class);
+
     private static String bootstrapNodes;
+
     private static String bucketName;
+
     private static String password;
 
     private CouchbaseSource source;
@@ -56,7 +63,8 @@ public class CouchbaseInputTestIT {
     @BeforeClass
     public static void init() throws Exception {
         Properties props;
-        try (InputStream is = CouchbaseInputTestIT.class.getClassLoader().getResourceAsStream("connection.properties")) {
+        try (InputStream is =
+                CouchbaseInputTestIT.class.getClassLoader().getResourceAsStream("connection.properties")) {
             props = new Properties();
             props.load(is);
         }
@@ -66,13 +74,15 @@ public class CouchbaseInputTestIT {
             // Bootstrap nodes not specified, get from properties
             bootstrapNodes = props.getProperty("bootstrapNodes");
         }
+        LOGGER.info("Set bootstrapNodes to: " + bootstrapNodes);
 
         bucketName = System.getProperty("couchbase.bucketName");
         if (StringUtils.isEmpty(bucketName)) {
             // Bucket name not specified, get from properties
             bucketName = props.getProperty("bucket");
         }
-
+        LOGGER.info("Set bucketName to: " + bucketName);
+        
         password = System.getProperty("couchbase.password");
         if (password == null) { // Password can be empty, so check for null only
             // Password not specified, get from properties
@@ -95,26 +105,30 @@ public class CouchbaseInputTestIT {
     }
 
     private void populateBucket() {
-        CouchbaseEnvironment env = DefaultCouchbaseEnvironment.builder()
+        CouchbaseEnvironment env = DefaultCouchbaseEnvironment
+                .builder()
                 .socketConnectTimeout(60000)
                 .connectTimeout(60000)
                 .keepAliveInterval(60000)
                 .build();
         CouchbaseCluster cluster = CouchbaseCluster.create(env, bootstrapNodes);
         Bucket bucket = cluster.openBucket(bucketName, password);
+        LOGGER.info("Connected to bucket - " + bucketName);
         assertTrue(bucket.bucketManager().flush());
         JsonDocument document = JsonDocument.create("foo", JsonObject.create().put("bar", 42));
         bucket.upsert(document, PersistTo.MASTER);
         bucket.close();
-
-        cluster.disconnect();
+        LOGGER.info("Bucket is closed after upserting data");
+        if (cluster != null) {
+            cluster.disconnect();
+        }
     }
 
     @Test
     public void testReader() {
         populateBucket();
 
-        Reader reader = null;
+        Reader<?> reader = null;
         try {
             CouchbaseInputDefinition definition = new CouchbaseInputDefinition();
             CouchbaseInputProperties properties = (CouchbaseInputProperties) definition.createRuntimeProperties();
@@ -126,15 +140,18 @@ public class CouchbaseInputTestIT {
             source = new CouchbaseSource();
             source.initialize(null, properties);
             reader = source.createReader(null);
+            LOGGER.info("Fetch record.");
             boolean hasRecords = reader.start();
             assertTrue(hasRecords);
             IndexedRecord row = (IndexedRecord) reader.getCurrent();
+            LOGGER.info("Retrieved record.");
             assertNotNull(row);
 
             assertEquals("foo", row.get(EventSchemaField.KEY_IDX));
             assertEquals("{\"bar\":42}", new String(((byte[]) row.get(EventSchemaField.CONTENT_IDX))));
 
             reader.close();
+            LOGGER.info("Closing reader.");
         } catch (IOException e) {
             fail(e.getMessage());
         } finally {

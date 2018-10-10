@@ -20,7 +20,9 @@
         <couchbase-dcp.version>0.19.0</couchbase-dcp.version>
         <rx.version>1.3.8</rx.version>
         <opentracing-api.version>0.31.0</opentracing-api.version>
-        <couchbase.docker.image.name>igis/couchbase-server-itest:4.6.2</couchbase.docker.image.name>
+        <couchbase.docker.image.name>talend/components-integration-test-couchbase-server:5.1.1-20181005144600</couchbase.docker.image.name>
+        <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
+        <docker.host.address>localhost</docker.host.address>
     </properties>
 
     <dependencies>
@@ -269,7 +271,44 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>${docker-maven-plugin.version}</version>
+                <configuration>
+                    <skip>${really.skip.tests}</skip>
+                    <registry>${talend_docker_registry}</registry>
+                    <images>
+                        <image>
+                            <alias>couchbase</alias>
+                            <name>${couchbase.docker.image.name}</name>
+                            <run>
+                                <ports>
+                                    <port>8091:8091</port>
+                                    <port>8092:8092</port>
+                                    <port>8093:8093</port>
+                                    <port>8094:8094</port>
+                                    <port>8095:8095</port>
+                                    <port>8096:8096</port>
+                                    <port>11210:11210</port>
+                                    <port>11211:11211</port>
+                                </ports>
+                                <env>
+                                    <COUCHBASE_BASE_HOST>${docker.host.address}</COUCHBASE_BASE_HOST>
+                                    <COUCHBASE_CLUSTER>${couchbase.bucketName}</COUCHBASE_CLUSTER>
+                                    <COUCHBASE_CLUSTER_PASSWORD>${couchbase.password}</COUCHBASE_CLUSTER_PASSWORD>
+                                    <COUCHBASE_CLUSTER_RAM_SIZE>${couchbase.cluster.ram.size}</COUCHBASE_CLUSTER_RAM_SIZE>
+                                    <COUCHBASE_BUCKET>${couchbase.bucketName}</COUCHBASE_BUCKET>
+                                    <COUCHBASE_BUCKET_RAM_SIZE>${couchbase.bucket.ram.size}</COUCHBASE_BUCKET_RAM_SIZE>
+                                    <COUCHBASE_USER>${couchbase.bucketName}</COUCHBASE_USER>
+                                    <COUCHBASE_USER_PASSWORD>${couchbase.password}</COUCHBASE_USER_PASSWORD>
+                                </env>
+                                <wait>
+                                    <time>60000</time>
+                                </wait>
+                                <log>
+                                    <enabled>true</enabled>
+                                </log>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
                 <executions>
                     <execution>
                         <id>start</id>
@@ -277,26 +316,6 @@
                         <goals>
                             <goal>start</goal>
                         </goals>
-                        <configuration>
-                            <skip>${really.skip.tests}</skip>
-                            <images>
-                                <image>
-                                    <name>${couchbase.docker.image.name}</name>
-                                    <run>
-                                        <ports>
-                                            <port>8091:8091</port>
-                                            <port>8092:8092</port>
-                                            <port>8093:8093</port>
-                                            <port>8094:8094</port>
-                                            <port>11210:11210</port>
-                                        </ports>
-                                        <wait>
-                                            <time>10000</time>
-                                        </wait>
-                                    </run>
-                                </image>
-                            </images>
-                        </configuration>
                     </execution>
                     <execution>
                         <id>stop</id>
