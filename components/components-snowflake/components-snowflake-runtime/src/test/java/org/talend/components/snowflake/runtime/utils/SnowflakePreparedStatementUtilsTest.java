@@ -34,8 +34,6 @@ public class SnowflakePreparedStatementUtilsTest {
 
     private SnowflakePreparedStatementTableProperties prstmtTableProperties;
 
-    private Object[] values;
-
     @Before
     public void setup() {
         prstmtTableProperties = new SnowflakePreparedStatementTableProperties("preparedStatementProperties");
@@ -46,14 +44,15 @@ public class SnowflakePreparedStatementUtilsTest {
             types.add(type.name());
         }
         prstmtTableProperties.types.setValue(types);
-        values = new Object[] { new BigDecimal(Integer.MAX_VALUE), Mockito.mock(Blob.class), false, (byte) 1, new byte[] { 1, 3 },
-                Mockito.mock(Clob.class), new Date(), 0.1, 0.2f, 10, 15l, new Object(), (short) 655, "default string",
-                new java.sql.Time(new Date().getTime()), Types.INTEGER };
-        prstmtTableProperties.values.setValue(Arrays.asList(values));
     }
 
     @Test
     public void testFillPreparedStatement() throws SQLException {
+        Object[] values = new Object[] { new BigDecimal(Integer.MAX_VALUE), Mockito.mock(Blob.class), false, (byte) 1, new byte[] { 1, 3 },
+                Mockito.mock(Clob.class), new Date(), 0.1, 0.2f, 10, 15l, new Object(), (short) 655, "default string",
+                new java.sql.Time(new Date().getTime()), Types.INTEGER };
+        prstmtTableProperties.values.setValue(Arrays.asList(values));
+
         PreparedStatement prstmt = Mockito.mock(PreparedStatement.class);
 
         SnowflakePreparedStatementUtils.fillPreparedStatement(prstmt, prstmtTableProperties);
@@ -75,6 +74,20 @@ public class SnowflakePreparedStatementUtilsTest {
         Mockito.verify(prstmt, Mockito.times(1)).setTime(15, (java.sql.Time) values[14]);
         Mockito.verify(prstmt, Mockito.times(1)).setNull(16, (int) values[15]);
 
+    }
+
+    @Test
+    public void testFillPreparedStatementWithNullValues() throws SQLException {
+        Object[] values = new Object[] { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null };
+        prstmtTableProperties.values.setValue(Arrays.asList(values));
+
+        PreparedStatement prstmt = Mockito.mock(PreparedStatement.class);
+
+        SnowflakePreparedStatementUtils.fillPreparedStatement(prstmt, prstmtTableProperties);
+
+        for (int index = 1; index <= values.length; index++) {
+            Mockito.verify(prstmt, Mockito.times(1)).setNull(index, Types.NULL);
+        }
     }
 
 }
