@@ -345,7 +345,7 @@
                                                 ${talend_docker_registry}/talend/tcomp-${project.artifactId}
                                             </name>
                                             <build>
-                                                <from>${talend_docker_registry}/talend/microservices-base:1.latest
+                                                <from>${talend_docker_registry}/talend/microservices-base:1.0-20181017125147-gc446fd5
                                                 </from>
                                                 <tags>
                                                     <tag>${project.version}-${maven.build.timestamp}</tag>
