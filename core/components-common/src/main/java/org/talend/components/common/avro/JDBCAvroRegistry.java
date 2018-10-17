@@ -18,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,8 +28,10 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
 import org.codehaus.jackson.JsonNode;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.daikon.avro.AvroNamesValidationHelper;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.NameUtil;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.avro.converter.IndexedRecordConverter.UnmodifiableAdapterException;
@@ -132,7 +135,8 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 fields.add(field);
             } while (metadata.next());
 
-            return Schema.createRecord(tablename, null, null, false, fields);
+            return Schema.createRecord(
+                    AvroNamesValidationHelper.getAvroCompatibleName(NameUtil.correct(tablename, 0, Collections.<String>emptySet())), null, null, false, fields);
         }
     }
 
