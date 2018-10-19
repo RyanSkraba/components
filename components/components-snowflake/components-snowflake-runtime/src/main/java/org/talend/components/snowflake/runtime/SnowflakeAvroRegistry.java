@@ -20,6 +20,7 @@ import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.daikon.avro.AvroNamesValidationHelper;
@@ -39,9 +40,35 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
         return sqlType2Avro(size, scale, dbtype, nullable, name, dbColumnName, defaultValue, false);
     }
 
+    private Object checkNotNullableDefaultValueCorrect(int dbtype, Object defaultValue) {
+        if (defaultValue instanceof String && StringUtils.isEmpty((String) defaultValue)) {
+            switch (dbtype) {
+            case java.sql.Types.INTEGER:
+            case java.sql.Types.DECIMAL:
+            case java.sql.Types.BIGINT:
+            case java.sql.Types.NUMERIC:
+            case java.sql.Types.TINYINT:
+            case java.sql.Types.SMALLINT:
+            case java.sql.Types.DOUBLE:
+            case java.sql.Types.FLOAT:
+            case java.sql.Types.REAL:
+            case java.sql.Types.DATE:
+            case java.sql.Types.TIME:
+            case java.sql.Types.TIMESTAMP:
+            case java.sql.Types.BOOLEAN:
+                return null;
+            }
+        }
+        return defaultValue;
+    }
+
     @Override
     protected Field sqlType2Avro(int size, int scale, int dbtype, boolean nullable, String name, String dbColumnName,
             Object defaultValue, boolean isKey) {
+        if (!nullable) {
+            //snowflake schema contain empty string as default Values if not specified
+            defaultValue = checkNotNullableDefaultValueCorrect(dbtype, defaultValue);
+        }
         Field field = null;
         Schema schema = null;
         name = AvroNamesValidationHelper.getAvroCompatibleName(NameUtil.correct(dbColumnName, 0, Collections.<String>emptySet()));

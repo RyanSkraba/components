@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.snowflake.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -163,10 +166,10 @@ public class SnowflakeAvroRegistryTest {
 
         Field field = snowflakeAvroRegistry.wrap("nullableRecord", schema, true, null);
         Assert.assertEquals("nullableRecord", field.name());
-        Assert.assertNull(field.defaultVal());
+        assertNull(field.defaultVal());
 
         field = snowflakeAvroRegistry.wrap("nullableRecord", schema, false, null);
-        Assert.assertNull(field.defaultVal());
+        assertNull(field.defaultVal());
 
         field = snowflakeAvroRegistry.wrap("nullableRecord", schema, true, "");
         Assert.assertEquals("", field.defaultVal());
@@ -241,5 +244,21 @@ public class SnowflakeAvroRegistryTest {
                 .sqlType2Avro(size, scale, Types.INTEGER, nullable, FIELD_NAME, DB_COLUMN_NAME, null);
         JDBCConverter dateJDBCConverter = snowflakeAvroRegistry.getConverter(field);
         Assert.assertEquals(value, dateJDBCConverter.convertToAvro(rs));
+    }
+
+    @Test
+    public void testDefaultValueForNotNullableColumns() {
+        Field f = snowflakeAvroRegistry.sqlType2Avro(1, 1, java.sql.Types.DOUBLE, false, "anyName", "anyName", "");
+        assertNull(f.defaultVal());
+    }
+
+    @Test
+    public void testDefaultValueNotChangedForNotNullableVarchar() {
+        String snowflakeEmptyDefaultValue = "";
+        Field f = snowflakeAvroRegistry.sqlType2Avro(1, 1, Types.VARCHAR, false, "anyName", "anyName", snowflakeEmptyDefaultValue);
+
+
+        assertEquals(snowflakeEmptyDefaultValue, f.defaultVal());
+
     }
 }
