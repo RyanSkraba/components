@@ -19,7 +19,9 @@ import org.talend.daikon.avro.SchemaConstants;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DefaultSQLCreateTableAction extends TableAction {
 
@@ -35,7 +37,7 @@ public class DefaultSQLCreateTableAction extends TableAction {
     private boolean dropIfExists;
 
     public DefaultSQLCreateTableAction(final String[] fullTableName, final Schema schema, boolean createIfNotExists, boolean drop,
-            boolean dropIfExists) {
+        boolean dropIfExists) {
         if (fullTableName == null || fullTableName.length < 1) {
             throw new InvalidParameterException("Table name can't be null or empty");
         }
@@ -44,12 +46,8 @@ public class DefaultSQLCreateTableAction extends TableAction {
         this.schema = schema;
         this.createIfNotExists = createIfNotExists;
 
-        this.drop = drop;
+        this.drop = drop || dropIfExists;
         this.dropIfExists = dropIfExists;
-        if(dropIfExists){
-            this.drop = true;
-        }
-
     }
 
     @Override
@@ -121,12 +119,14 @@ public class DefaultSQLCreateTableAction extends TableAction {
                 sb.append(this.getConfig().SQL_CREATE_TABLE_FIELD_SEP);
             }
 
+
             String sDBLength = f.getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH);
             String sDBName = f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
             String sDBType = f.getProp(SchemaConstants.TALEND_COLUMN_DB_TYPE);
             String sDBDefault = f.getProp(SchemaConstants.TALEND_COLUMN_DEFAULT);
             String sDBPrecision = f.getProp(SchemaConstants.TALEND_COLUMN_PRECISION);
             boolean sDBIsKey = Boolean.valueOf(f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY)).booleanValue();
+            boolean sDBNullable = isNullable(f.schema());
 
             String name = sDBName == null ? f.name() : sDBName;
             if (sDBIsKey) {
@@ -134,6 +134,11 @@ public class DefaultSQLCreateTableAction extends TableAction {
             }
             sb.append(escape(updateCaseIdentifier(name)));
             sb.append(" ");
+
+            if(isNullOrEmpty(sDBType)){
+                // if SchemaConstants.TALEND_COLUMN_DB_TYPE not set, use given map
+                sDBType = this.getDbTypeMap().get(f.name());
+            }
 
             if (isNullOrEmpty(sDBType)) {
                 // If DB type not set, try to guess it
@@ -152,6 +157,9 @@ public class DefaultSQLCreateTableAction extends TableAction {
                 sb.append(this.getConfig().SQL_CREATE_TABLE_LENGTH_END);
             }
 
+            if(!sDBNullable){
+                sb.append(this.getConfig().SQL_CREATE_TABLE_NOT_NULL);
+            }
 
             if (this.getConfig().SQL_CREATE_TABLE_DEFAULT_ENABLED && !isNullOrEmpty(sDBDefault)) {
                 sb.append(" ");
@@ -198,5 +206,17 @@ public class DefaultSQLCreateTableAction extends TableAction {
         }
 
         return s.trim().isEmpty();
+    }
+
+    private boolean isNullable(Schema schema){
+        Schema.Type type = schema.getType();
+        if (type == Schema.Type.UNION) {
+            for (Schema s : schema.getTypes()) {
+                if (s.getType() == Schema.Type.NULL) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

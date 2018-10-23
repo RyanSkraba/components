@@ -29,6 +29,7 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
+import org.talend.components.snowflake.SnowflakeDbTypeProperties;
 import org.talend.components.snowflake.SnowflakeTableProperties;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
@@ -64,6 +65,9 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
 
     public Property<Boolean> convertColumnsAndTableToUppercase = newBoolean("convertColumnsAndTableToUppercase");
+
+    public Property<Boolean> usePersonalDBType = newBoolean("usePersonalDBType");
+    public SnowflakeDbTypeProperties dbtypeTable = new SnowflakeDbTypeProperties("dbtypeTable");
 
     public Property<Boolean> convertEmptyStringsToNull = newBoolean("convertEmptyStringsToNull");
 
@@ -129,6 +133,9 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
 
         convertColumnsAndTableToUppercase.setValue(true);
         convertEmptyStringsToNull.setValue(false);
+
+        usePersonalDBType.setValue(false);
+
     }
 
     @Override
@@ -142,9 +149,20 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(convertColumnsAndTableToUppercase);
         advancedForm.addRow(convertEmptyStringsToNull);
+
+        advancedForm.addRow(usePersonalDBType);
+        widget(usePersonalDBType).setVisible(false);
+
+        Widget dbTypeTableWidget = new Widget(dbtypeTable);
+        advancedForm.addRow(dbTypeTableWidget.setWidgetType(Widget.TABLE_WIDGET_TYPE));
+        dbTypeTableWidget.setVisible(false);
     }
 
     public void afterOutputAction() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterTableAction() {
         refreshLayout(getForm(Form.MAIN));
     }
 
@@ -152,8 +170,15 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
+
+            TableAction.TableActionEnum tableAction = this.tableAction.getValue();
+            boolean isCreateTableAction = tableAction != null && tableAction.isCreateTableAction();
+
             Form advForm = getForm(Form.ADVANCED);
             if (advForm != null) {
+                advForm.getWidget(dbtypeTable.getName()).setVisible(usePersonalDBType.getValue() && isCreateTableAction);
+                advForm.getWidget(usePersonalDBType.getName()).setVisible(isCreateTableAction);
+
                 boolean isUpsert = OutputAction.UPSERT.equals(outputAction.getValue());
                 form.getWidget(upsertKeyColumn.getName()).setHidden(!isUpsert);
                 if (isUpsert) {
@@ -178,6 +203,9 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         }
     }
 
+    public void afterUsePersonalDBType(){
+        refreshLayout(getForm(Form.MAIN));
+    }
 
     private void addSchemaField(String name, List<Schema.Field> fields) {
         Schema.Field field = new Schema.Field(name, Schema.create(Schema.Type.STRING), null, (Object) null);
@@ -227,6 +255,8 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     public void afterMainSchema() {
         updateOutputSchemas();
         beforeUpsertKeyColumn();
+        dbtypeTable.setFieldNames(getFieldNames(table.main.schema));
+        refreshLayout(getForm(Form.MAIN));
     }
 
     @Override
@@ -257,6 +287,8 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
             convertEmptyStringsToNull.setValue(true);
             migrated = true;
         }
+
+
         return migrated;
     }
 

@@ -2,21 +2,35 @@ package org.talend.components.common.tableaction;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class TableAction {
 
     public static enum TableActionEnum {
-        NONE,
-        DROP_CREATE,
-        CREATE,
-        CREATE_IF_NOT_EXISTS,
-        DROP_IF_EXISTS_AND_CREATE,
-        CLEAR,
-        TRUNCATE
+        NONE(false),
+        DROP_CREATE(true),
+        CREATE(true),
+        CREATE_IF_NOT_EXISTS(true),
+        DROP_IF_EXISTS_AND_CREATE(true),
+        CLEAR(false),
+        TRUNCATE(false);
+
+        boolean create;
+        TableActionEnum(boolean create){
+            this.create = create;
+        }
+
+        public boolean isCreateTableAction(){
+            return create;
+        }
     }
 
     private TableActionConfig config = new TableActionConfig();
+
+    // Map association to define db type if SchemaConstants.TALEND_COLUMN_DB_TYPE is not set in schema
+    private Map<String, String> dbTypeMap = new HashMap<>();
 
     /**
      *
@@ -28,8 +42,16 @@ public abstract class TableAction {
         this.config = config;
     }
 
+    public void setDbTypeMap(Map<String, String> dbTypeMap){
+        this.dbTypeMap = dbTypeMap;
+    }
+
     public TableActionConfig getConfig(){
         return this.config;
+    }
+
+    public Map<String, String> getDbTypeMap(){
+        return this.dbTypeMap;
     }
 
     public String escape(String value){

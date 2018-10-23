@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.tableaction.TableAction;
+import org.talend.components.snowflake.SnowflakeDbTypeProperties;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -51,20 +52,26 @@ public class TSnowflakeOutputPropertiesTest {
 
     @Test
     public void testLayoutOnOutputActionChange() {
-        Form main;
         boolean isOutputActionPropertyVisible;
         boolean isUpsertKeyColumnVisible;
         boolean isUpsertKeyColumnVisibleWhenOutputActionIsUpsert;
         boolean isTableActionProperyVisible;
 
-        main = outputProperties.getForm(Form.MAIN);
+        Form main = outputProperties.getForm(Form.MAIN);
+        Form advanced = outputProperties.getForm(Form.ADVANCED);
         isOutputActionPropertyVisible = main.getWidget(outputProperties.outputAction).isVisible();
         isUpsertKeyColumnVisible = main.getWidget(outputProperties.upsertKeyColumn).isVisible();
         isTableActionProperyVisible = main.getWidget(outputProperties.tableAction).isVisible();
-
+        boolean usePersonalDBTypePropertyVisible = advanced.getWidget(outputProperties.usePersonalDBType).isVisible();
+        boolean isDbTypePropertyVisible = advanced.getWidget(outputProperties.dbtypeTable).isVisible();
 
         outputProperties.outputAction.setValue(OutputAction.UPSERT);
-        outputProperties.refreshLayout(main);
+        outputProperties.afterOutputAction();
+        outputProperties.tableAction.setValue(TableAction.TableActionEnum.CREATE);
+        outputProperties.afterTableAction();
+
+        boolean usePersonalDBTypePropertyVisibleIfCreateAction = advanced.getWidget(outputProperties.usePersonalDBType).isVisible();
+        boolean isDbTypePropertyVisibleIfCreateAction = advanced.getWidget(outputProperties.dbtypeTable).isVisible();
 
         isUpsertKeyColumnVisibleWhenOutputActionIsUpsert = main.getWidget(outputProperties.upsertKeyColumn).isVisible();
 
@@ -72,6 +79,10 @@ public class TSnowflakeOutputPropertiesTest {
         assertFalse(isUpsertKeyColumnVisible);
         assertTrue(isUpsertKeyColumnVisibleWhenOutputActionIsUpsert);
         assertTrue(isTableActionProperyVisible);
+        assertFalse(usePersonalDBTypePropertyVisible);
+        assertFalse(isDbTypePropertyVisible);
+        assertTrue(usePersonalDBTypePropertyVisibleIfCreateAction);
+        assertFalse(isDbTypePropertyVisibleIfCreateAction);
     }
 
     @Test
@@ -84,20 +95,28 @@ public class TSnowflakeOutputPropertiesTest {
         defaultConvertColumnsAndTableToUppercase = outputProperties.convertColumnsAndTableToUppercase.getValue();
         tableAction = outputProperties.tableAction.getValue();
 
+        boolean defaultUsePersonalDBType = outputProperties.usePersonalDBType.getValue();
+        List<String> defaultDBTypeColumns = outputProperties.dbtypeTable.column.getValue();
+        List<String> defaultDBTypeType = outputProperties.dbtypeTable.dbtype.getValue();
+
         assertEquals(defaultValueOutputAction, OutputAction.INSERT);
         assertTrue(defaultConvertColumnsAndTableToUppercase);
         assertEquals(TableAction.TableActionEnum.NONE, tableAction);
+
+        assertFalse(defaultUsePersonalDBType);
+        assertEquals(null, defaultDBTypeColumns);
+        assertEquals(null, defaultDBTypeType);
     }
 
     @Test
     public void testTriggers() {
-        Form main;
-        boolean isOutputActionCalledAfter;
-
-        main = outputProperties.getForm(Form.MAIN);
-        isOutputActionCalledAfter = main.getWidget(outputProperties.outputAction).isCallAfter();
+        Form main = outputProperties.getForm(Form.MAIN);
+        Form advanced = outputProperties.getForm(Form.ADVANCED);
+        boolean isOutputActionCalledAfter = main.getWidget(outputProperties.outputAction).isCallAfter();
+        boolean isUsePersonalDBTypeAfter = advanced.getWidget(outputProperties.usePersonalDBType).isCallAfter();
 
         assertTrue(isOutputActionCalledAfter);
+        assertTrue(isUsePersonalDBTypeAfter);
     }
 
     @Test
@@ -211,7 +230,8 @@ public class TSnowflakeOutputPropertiesTest {
         Assert.assertTrue(outputProperties.schemaReject.schema.getValue().getFields().isEmpty());
         outputProperties.table.schemaListener.afterSchema();
         Assert.assertEquals(9, outputProperties.schemaReject.schema.getValue().getFields().size());
-
+        Assert.assertEquals(1, outputProperties.dbtypeTable.column.getPossibleValues().size());
+        Assert.assertEquals("id", outputProperties.dbtypeTable.column.getPossibleValues().get(0));
     }
 
 }

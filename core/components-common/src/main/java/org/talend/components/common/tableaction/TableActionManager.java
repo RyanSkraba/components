@@ -15,21 +15,20 @@ package org.talend.components.common.tableaction;
 import org.apache.avro.Schema;
 
 import java.sql.Connection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TableActionManager {
 
     private static TableAction noAction = new NoAction();
 
-    public final static void exec(Connection connection, TableAction.TableActionEnum action, String[] fullTableName,
-            Schema schema) throws Exception {
-        exec(connection, action, fullTableName, schema, new TableActionConfig());
-    }
-    public final static void exec(Connection connection, TableAction.TableActionEnum action, String[] fullTableName,
-            Schema schema, TableActionConfig config) throws Exception {
+    public final static List<String> buildQueries(TableAction.TableActionEnum action, String[] fullTableName,
+            Schema schema, TableActionConfig config, Map<String, String> dbTypeMap) throws Exception {
         TableAction tableAction = create(action, fullTableName, schema);
         tableAction.setConfig(config);
-        _exec(connection, tableAction.getQueries());
+        tableAction.setDbTypeMap(dbTypeMap);
+        return tableAction.getQueries();
     }
 
     public final static TableAction create(TableAction.TableActionEnum action, String[] fullTableName, Schema schema) {
@@ -51,8 +50,19 @@ public class TableActionManager {
         return noAction; // default
     }
 
-    private static void _exec(Connection connection, List<String> queries) throws Exception {
-        for (String q : queries) {
+    public final static void exec(Connection connection, TableAction.TableActionEnum action, String[] fullTableName,
+            Schema schema) throws Exception {
+        exec(connection, action, fullTableName, schema, new TableActionConfig());
+    }
+
+    public final static void exec(Connection connection, TableAction.TableActionEnum action, String[] fullTableName,
+            Schema schema, TableActionConfig config) throws Exception {
+        exec(connection, action, fullTableName, schema, config, new HashMap<String, String>());
+    }
+
+    public static void exec(Connection connection, TableAction.TableActionEnum action, String[] fullTableName,
+            Schema schema, TableActionConfig config, Map<String, String> dbTypeMap) throws Exception {
+        for (String q : buildQueries(action, fullTableName, schema, config, dbTypeMap)) {
             connection.createStatement().execute(q);
         }
     }

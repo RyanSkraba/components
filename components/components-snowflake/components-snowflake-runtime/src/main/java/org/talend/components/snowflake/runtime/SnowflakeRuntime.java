@@ -45,8 +45,6 @@ public abstract class SnowflakeRuntime {
      * else creates new connection using {@link DriverManager} and saves it in container.
      *
      * @param container - runtime container
-     * @param connProps - properties, than contain all required settings for establishing new connection or get it by stored
-     * reference id.
      * @return active connection.
      * @throws IOException may be thrown if referenced connection is closed or if failed to create connection using
      * {@link DriverManager}

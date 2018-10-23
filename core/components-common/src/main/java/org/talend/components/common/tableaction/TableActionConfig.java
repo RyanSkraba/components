@@ -50,6 +50,8 @@ public class TableActionConfig {
     public boolean SQL_CREATE_TABLE_DEFAULT_ENABLED = true;
     public String SQL_CREATE_TABLE_IF_NOT_EXISTS = "IF NOT EXISTS";
 
+    public String SQL_CREATE_TABLE_NOT_NULL = " NOT NULL";
+
     public String SQL_DROP_TABLE_PREFIX = "";
     public String SQL_DROP_TABLE_SUFFIX = "";
     public String SQL_DROP_TABLE = "DROP TABLE";
