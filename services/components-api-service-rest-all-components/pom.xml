@@ -22,11 +22,11 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <daikon.version>0.27.0-SNAPSHOT</daikon.version>
+        <daikon.version>0.28.0-SNAPSHOT</daikon.version>
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
-        <jackson.version>2.9.4</jackson.version>
+        <jackson.version>2.9.5</jackson.version>
         <jackson.version.annotations>2.9.0</jackson.version.annotations>
         <guava.version>20.0</guava.version>
         <logback.version>1.1.9</logback.version>

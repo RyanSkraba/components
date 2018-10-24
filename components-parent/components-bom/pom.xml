@@ -10,7 +10,7 @@
     <name>Component BOM</name>
     <properties>
         <components.version>0.26.0-SNAPSHOT</components.version>
-        <daikon.version>0.27.0-SNAPSHOT</daikon.version>
+        <daikon.version>0.28.0-SNAPSHOT</daikon.version>
         <!-- -->
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
         <!-- -->
@@ -106,7 +106,7 @@
         <jackson-xc.version>1.9.13</jackson-xc.version>
         <jackson.1x.version>1.9.14-TALEND</jackson.1x.version>
         <jackson.version.annotations>2.9.0</jackson.version.annotations>
-        <jackson.version>2.9.4</jackson.version>
+        <jackson.version>2.9.5</jackson.version>
         <javacsv.version>2.0</javacsv.version>
         <javapoet.version>1.8.0</javapoet.version>
         <javax.activation.version>1.1.1</javax.activation.version>
