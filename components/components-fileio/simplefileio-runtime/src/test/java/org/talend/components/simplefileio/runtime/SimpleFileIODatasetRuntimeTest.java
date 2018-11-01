@@ -666,5 +666,24 @@ public class SimpleFileIODatasetRuntimeTest {
         assertThat("gaoyan", equalTo(actual.get(0).get(1)));
         assertThat("Shunyi", equalTo(actual.get(0).get(2)));
     }
+    
+    //it prove the white space works for data set/input reading
+    @Test
+    public void testGetSampleWithSpecialPath() throws Exception {
+        RecordSet rs = getSimpleTestData(0);
+        writeRandomCsvFile(mini.getFs(), "/user/test/Marketing Customer Contacts US.CSV", rs, "UTF-8");
+        String fileSpec = mini.getFs().getUri().resolve(new Path("/user/test/Marketing Customer Contacts US.CSV").toUri()).toString();
+        //the method above will escape it, so make it back here as the customer set the path, should not escape one
+        fileSpec = fileSpec.replace("%20", " ");
+        
+        // Configure the component.
+        SimpleFileIODatasetProperties props = createDatasetProperties();
+        props.format.setValue(SimpleFileIOFormat.CSV);
+        props.path.setValue(fileSpec);
+
+        final List<IndexedRecord> actual = getSample(props,Integer.MAX_VALUE);
+
+        assertThat(actual, hasSize(10));
+    }
 
 }

@@ -90,11 +90,9 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
         super.validate(options);
         try {
             Job job = jobInstance();
-            FileSystem fs = FileSystem.get(new URI(path), job.getConfiguration());
+            FileSystem fs = FileSystem.get(new Path(path).toUri(), job.getConfiguration());
             checkState(!fs.exists(new Path(path)) || overwrite, "Output path " + path + " already exists");
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

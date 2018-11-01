@@ -163,7 +163,7 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
         @Override
         public void finalize(Iterable<String> writerResults, PipelineOptions options) throws Exception {
             Job job = ((ConfigurableHDFSFileSink<K, V>) getSink()).jobInstance();
-            FileSystem fs = FileSystem.get(new URI(path), job.getConfiguration());
+            FileSystem fs = FileSystem.get(new Path(path).toUri(), job.getConfiguration());
 
             // Finalize can be called several times. Don't try to recommit if the first part has already succeeded.
             boolean isCommitted = fs.exists(new Path(path, FileOutputCommitter.SUCCEEDED_FILE_NAME));

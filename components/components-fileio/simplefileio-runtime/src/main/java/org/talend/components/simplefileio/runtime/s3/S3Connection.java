@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.talend.components.simplefileio.runtime.ExtraHadoopConfiguration;
 import org.talend.components.simplefileio.s3.S3DatasetProperties;
 import org.talend.components.simplefileio.s3.S3DatastoreProperties;
@@ -59,12 +60,7 @@ public class S3Connection {
         ExtraHadoopConfiguration extraConfig = new ExtraHadoopConfiguration();
         S3Connection.setS3Configuration(extraConfig, properties);
         extraConfig.addTo(config);
-        try {
-            return (S3AFileSystem) FileSystem.get(new URI(Constants.FS_S3A + "://" + properties.bucket.getValue()), config);
-        } catch (URISyntaxException e) {
-            // The URI is constant, so this exception should never occur.
-            throw new RuntimeException(e);
-        }
+        return (S3AFileSystem) FileSystem.get(new Path(Constants.FS_S3A + "://" + properties.bucket.getValue()).toUri(), config);
     }
 
     public static String getUriPath(S3DatasetProperties properties, String path) {
@@ -129,4 +125,5 @@ public class S3Connection {
         String region = S3RegionUtil.getBucketRegionFromLocation(bucketLocation);
         return S3RegionUtil.regionToEndpoint(region);
     }
+    
 }

@@ -103,6 +103,36 @@ public class SimpleFileIOOutputRuntimeTest {
         // Check the expected values.
         mini.assertReadFile(mini.getLocalFs(), fileSpec, "1;one", "2;two");
     }
+    
+    @Test
+    public void testBasicDefaultsWithSpecialPath() throws IOException, URISyntaxException {
+        String fileSpec = mini.getLocalFs().getUri().resolve(
+                new Path(mini.newFolder().toString(), "Marketing Customer Contacts US.CSV").toUri()).toString();
+        
+        //the method above will escape it, so make it back here as the customer set the path, should not escape one
+        fileSpec = fileSpec.replace("%20", " ");
+
+        // Configure the component.
+        SimpleFileIOOutputProperties props = createOutputComponentProperties();
+        props.getDatasetProperties().path.setValue(fileSpec);
+
+        // Create the runtime.
+        SimpleFileIOOutputRuntime runtime = new SimpleFileIOOutputRuntime();
+        runtime.initialize(null, props);
+
+        // Use the runtime in a direct pipeline to test.
+        final Pipeline p = beam.createPipeline();
+        PCollection<IndexedRecord> input = p.apply( //
+                Create.of(ConvertToIndexedRecord.convertToAvro(new String[] { "1", "one" }), //
+                        ConvertToIndexedRecord.convertToAvro(new String[] { "2", "two" }))); //
+        input.apply(runtime);
+
+        // And run the test.
+        p.run().waitUntilFinish();
+
+        // Check the expected values.
+        mini.assertReadFile(mini.getLocalFs(), fileSpec, "1;one", "2;two");
+    }
 
     /**
      * Basic unit test using all default values (except for the path) on an in-memory DFS cluster.
