@@ -107,6 +107,16 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
             schema = AvroUtils._int();
             LogicalTypes.timeMillis().addToSchema(schema);
             field = wrap(name, schema, nullable, defaultValue);
+            field.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, SnowflakeConstants.TALEND_DAFEULT_TIME_PATTERN);
+            /** tell Avro converter how to process Original Avro logical type time
+             * if value is "TALEND_DATE", it mean use Talend Date, if not, will use Talend Integer like before
+             * we add this only one purpose : for the old job(before current commit), we keep Talend Integer, for new job, we use Talend Date
+             * 
+             * this affect the studio and DI model level which will affect the expected assign value type from input component(snowflakeinput)
+             * and the expected passed value type to output component(snowflakeoutput),
+             * and we adjust snowflake runtime to make it can process the DATE and INTEGER both for input/output
+             * */
+            field.addProp(SnowflakeConstants.LOGICAL_TIME_TYPE_AS, SnowflakeConstants.AS_TALEND_DATE);
             break;
         case java.sql.Types.TIMESTAMP:
             schema = AvroUtils._long();
@@ -147,6 +157,13 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
     public JDBCConverter getConverter(final Field f) {
         final Schema basicSchema = AvroUtils.unwrapIfNullable(f.schema());
 
+        //TODO after a check, not sure this overwrite is useful here, JDBCConverter should can work well enough, 
+        //need a check more for snowflake "DATE" type about time zone
+        
+        //also if schema is set by customer self instead of the retrieve schema function by button or after some trigger, 
+        //will no logical type, will use one in JDBCConverter instead of the one below
+        
+        //need to retrieve schema to know the database date type here for the case above if the code below is necessary
         return null == basicSchema.getLogicalType() ? super.getConverter(f) : new JDBCConverter() {
 
             @Override
@@ -161,7 +178,8 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
                         return (date != null) ? value.getInt(index) : null;
                     } else if (basicSchema.getLogicalType() == LogicalTypes.timeMillis()) {
                         java.sql.Time time = value.getTime(index);
-                        return (time != null) ? (int) time.getTime() : null;
+                        //TODO remove the (int) cast here, seems not necessary
+                        return (time != null) ? (int)time.getTime() : null;
                     } else {
                         java.sql.Timestamp timestamp = value.getTimestamp(index);
                         return (timestamp != null) ? timestamp.getTime() : null;

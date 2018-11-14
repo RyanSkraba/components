@@ -34,10 +34,12 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.runtime.DynamicSchemaUtils;
+import org.talend.components.common.tableaction.TableAction;
+import org.talend.components.common.tableaction.TableAction.TableActionEnum;
 import org.talend.components.common.tableaction.TableActionConfig;
 import org.talend.components.common.tableaction.TableActionManager;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
-import org.talend.components.snowflake.SnowflakeDbTypeProperties;
+import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.runtime.tableaction.SnowflakeTableActionConfig;
 import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
@@ -49,8 +51,6 @@ import net.snowflake.client.loader.Loader;
 import net.snowflake.client.loader.LoaderFactory;
 import net.snowflake.client.loader.LoaderProperty;
 import net.snowflake.client.loader.Operation;
-
-import static org.talend.components.common.tableaction.TableAction.TableActionEnum;
 
 public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
@@ -81,6 +81,8 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
     private transient IndexedRecordConverter<Object, ? extends IndexedRecord> factory;
 
     protected transient Schema mainSchema;
+    //we need it always for the runtime database column type to decide how to format the date type like : date, time, timestampntz, timestampltz, timestamptz
+    protected transient Map<String, Field> dbColumnName2RuntimeField = new HashMap<>();
 
     private transient boolean isFirst = true;
 
@@ -296,10 +298,39 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             return emptyStringValue;
         } else if (null == inputValue || inputValue instanceof String) {
             return inputValue;
-        } else if (AvroUtils.isSameType(s, AvroUtils._date())) {
-            Date date = (Date) inputValue;
-            return date.getTime();
-        } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timeMillis()) {
+        } else if (AvroUtils.isSameType(s, AvroUtils._date())) {//TODO improve the performance as no need to get the runtimefield object from map every time
+            //if customer set the schema by self instead of retrieve schema function, 
+            //the snowflake date type like : date, time, timestamp with time zone, timestamp with local time zone, timestamp without time zone all may be the column type in database table
+            //please see the test : SnowflakeDateTypeTestIT which show the details about terrible snowflake jdbc date type support, all control by client!
+            //so we have to process the date type and format it by different database data type
+            boolean isUpperCase = false;
+            if(sprops!=null) {
+                //keep the same logic with the method : getStringSchemaInfo as getStringSchemaInfo is used to init the loader with the right db column name(are you sure?)
+                isUpperCase = sprops.convertColumnsAndTableToUppercase.getValue();
+            }
+            String dbColumnName = field.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+            if(dbColumnName == null){
+                dbColumnName = field.name();
+            }
+            dbColumnName = isUpperCase ? dbColumnName.toUpperCase() : dbColumnName;
+            Field runtimeField = dbColumnName2RuntimeField.get(dbColumnName);
+            
+            if(runtimeField!=null) {
+                s = AvroUtils.unwrapIfNullable(runtimeField.schema());
+            } else {
+                //TODO this is the old action, we keep it if can't fetch the type by the schema db column name
+                //consider to adjust it
+                Date date = (Date) inputValue;
+                return date.getTime();
+            }
+        }
+        
+        return formatIfAnySnowflakeDateType(inputValue, s);
+    }
+    
+    //only retrieve schema function or dynamic may support logical types below as it runtime to fetch the schema by SnowflakeAvroRegistry
+    private Object formatIfAnySnowflakeDateType(Object inputValue, Schema s) {
+        if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timeMillis()) {
             return formatter.formatTimeMillis(inputValue);
         } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.date()) {
             return formatter.formatDate(inputValue);
@@ -336,13 +367,34 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
     }
 
     protected Schema getSchema() throws IOException {
-        return sink.getRuntimeSchema(new SchemaResolver() {
-
-            @Override
-            public Schema getSchema() throws IOException {
-                return sink.getSchema(container, processingConnection, sprops.getTableName());
+        SnowflakeConnectionTableProperties connectionTableProperties = ((SnowflakeConnectionTableProperties) sink.properties);
+        
+        if(connectionTableProperties == null) {//only work for mock test, will remove it later
+            return sink.getRuntimeSchema(new SchemaResolver() {
+    
+              @Override
+              public Schema getSchema() throws IOException {
+                  return sink.getSchema(container, processingConnection, sprops.getTableName());
+              }
+          }, this.sprops.tableAction.getValue());
+        }
+        
+        Schema designSchema = connectionTableProperties.getSchema();
+        
+        Schema runtimeSchema =  sink.getSchema(container, processingConnection, sprops.getTableName());
+        if(runtimeSchema != null) {
+            for(Field field : runtimeSchema.getFields()) {
+                String dbColumnName = field.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+                dbColumnName2RuntimeField.put(dbColumnName, field);
             }
-        }, this.sprops.tableAction.getValue());
+        }
+        
+        // Don't retrieve schema from database if there is a table action that will create the table
+        if (AvroUtils.isIncludeAllFields(designSchema) && this.sprops.tableAction.getValue() == TableAction.TableActionEnum.NONE) {
+            return runtimeSchema;
+        }
+        
+        return designSchema;
     }
 
     protected Map<LoaderProperty, Object> getLoaderProps() {

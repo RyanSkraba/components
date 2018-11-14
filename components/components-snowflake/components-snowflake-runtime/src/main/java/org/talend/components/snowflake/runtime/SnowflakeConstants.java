@@ -26,12 +26,21 @@ public final class SnowflakeConstants {
     public static final String TALEND_DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
 
     public static final String TALEND_DAFEULT_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+    
+    public static final String TALEND_DAFEULT_TIME_PATTERN = "HH:mm:ss";
 
     public static final String INCORRECT_SNOWFLAKE_ACCOUNT_MESSAGE = i18nMessages.getMessage("error.incorrectAccount");
 
     public static final String CONNECTION_SUCCESSFUL_MESSAGE = i18nMessages.getMessage("messages.success");
 
     public static final String SNOWFLAKE_DRIVER = "net.snowflake.client.jdbc.SnowflakeDriver";
+    
+    /** tell Avro converter how to process Original Avro logical type time
+     * if value is "TALEND_DATE", it mean use Talend Date, if not, will use Talend Integer like before
+     * we add this only one purpose : for the old job, we keep Talend Integer, for new job, we use Talend Date
+     * */
+    public static final String LOGICAL_TIME_TYPE_AS = "LOGICAL_TIME_TYPE_AS";
+    public static final String AS_TALEND_DATE = "TALEND_DATE";
 
     private SnowflakeConstants() {
         throw new AssertionError();

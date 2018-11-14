@@ -86,7 +86,7 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
     public SnowflakeTestIT() {
     }
 
-    public ComponentProperties setupProps(SnowflakeConnectionProperties props) {
+    public static ComponentProperties setupProps(SnowflakeConnectionProperties props) {
         if (props == null) {
             props = (SnowflakeConnectionProperties) new SnowflakeConnectionProperties("foo").init();
         }

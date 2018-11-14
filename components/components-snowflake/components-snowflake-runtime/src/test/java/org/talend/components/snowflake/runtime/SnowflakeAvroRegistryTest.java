@@ -48,6 +48,8 @@ public class SnowflakeAvroRegistryTest {
     private static final String TALEND_EXPECTED_DATE_PATTERN = "yyyy-MM-dd";
 
     private static final String TALEND_EXPECTED_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+    
+    private static final String TALEND_EXPECTED_TIME_PATTERN = "HH:mm:ss";
 
     private static final String FIELD_NAME = "fieldName";
 
@@ -109,6 +111,30 @@ public class SnowflakeAvroRegistryTest {
         Assert.assertEquals(-1, field.pos());
         Assert.assertEquals(TALEND_EXPECTED_DATE_PATTERN, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         Assert.assertEquals(java.sql.Types.DATE, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        Assert.assertEquals(DB_COLUMN_NAME, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+        Assert.assertEquals(DEFAULT_VALUE, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
+
+        LOGGER.debug(field.getObjectProps().toString());
+
+    }
+    
+    /**
+     * Checks {@link SnowflakeAvroRegistry#sqlType2Avro(int, int, int, boolean, String, String, Object)}
+     * returns the {@link org.apache.avro.Schema.Field} with logical TIME type
+     */
+    @Test
+    public void testSqlType2AvroTime() throws Exception {
+        final int dbtype = java.sql.Types.TIME;
+
+        Schema.Field field = snowflakeAvroRegistry
+                .sqlType2Avro(size, scale, dbtype, nullable, FIELD_NAME, DB_COLUMN_NAME, DEFAULT_VALUE);
+
+        LOGGER.debug("field: " + field.toString());
+
+        Assert.assertEquals(DB_COLUMN_NAME, field.name());
+        Assert.assertEquals(-1, field.pos());
+        Assert.assertEquals(TALEND_EXPECTED_TIME_PATTERN, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        Assert.assertEquals(java.sql.Types.TIME, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
         Assert.assertEquals(DB_COLUMN_NAME, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
         Assert.assertEquals(DEFAULT_VALUE, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
 

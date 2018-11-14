@@ -116,7 +116,13 @@ public class Formatter {
      * @return
      */
     String formatTimeMillis(Object inputValue) {
-        Date date = new Date((int) inputValue);
+        final Date date;
+        if (inputValue instanceof Date) {
+            date = (Date)inputValue;
+        } else {//support the old int type input for time type though it's wrong before
+            date = new Date((int) inputValue);
+        }
+        
         return getTimeFormatter().format(date);
     }
 

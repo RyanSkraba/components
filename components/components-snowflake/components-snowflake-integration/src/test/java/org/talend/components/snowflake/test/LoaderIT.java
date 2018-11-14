@@ -139,7 +139,6 @@ public class LoaderIT {
         prop.put(LoaderProperty.tableName, table);
         prop.put(LoaderProperty.schemaName, schema);
         prop.put(LoaderProperty.databaseName, "TEST_DB");
-        prop.put(LoaderProperty.remoteStage, prop);
         prop.put(LoaderProperty.columns, Arrays.asList(new String[]
                 {
                         "ID"

@@ -157,7 +157,7 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
         row.put("C3", Double.valueOf(i));
         // logical type date should be of int type - number of days since 1970
         row.put("C4", (int) TimeUnit.MILLISECONDS.toDays(testDate.getTime()));
-        row.put("C5", (int) testTime.getTime());
+        row.put("C5", testTime);//support java.util.Date and Integer/int input for SNOWFLAKE TIME TYPE both 
         row.put("C6", testTimestamp);
         row.put("C7", makeJson(i));
         return row;
