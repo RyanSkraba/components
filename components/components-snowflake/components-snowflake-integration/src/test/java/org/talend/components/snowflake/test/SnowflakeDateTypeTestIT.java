@@ -36,6 +36,8 @@ import org.junit.Test;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.common.tableaction.TableAction;
+import org.talend.components.common.tableaction.TableAction.TableActionEnum;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.SnowflakeTableProperties;
 import org.talend.components.snowflake.runtime.SnowflakeSink;
@@ -73,6 +75,8 @@ public class SnowflakeDateTypeTestIT {
     private final static String REMOTESTAGE = "LOADERTEST" + TESTNUMBER;
     
     private final static String SCHEMATABLE = TESTSCHEMA + "." + TESTTABLE;
+    
+    private final static String TESTTABLE_FULLNAME_FOR_DROP_IF_AND_CREATE = TESTSCHEMA + "TESTTABLE_FOR_DROP_IF_AND_CREATE" + "_" + TESTNUMBER;
 
     /*
     private static void setProxy() {
@@ -128,14 +132,56 @@ public class SnowflakeDateTypeTestIT {
         testConnection.createStatement().execute(
                 "DROP TABLE IF EXISTS " + SCHEMATABLE);
         testConnection.createStatement().execute(
+            "DROP TABLE IF EXISTS " + TESTTABLE_FULLNAME_FOR_DROP_IF_AND_CREATE);
+        testConnection.createStatement().execute(
                 "DROP STAGE IF EXISTS " + REMOTESTAGE);
         testConnection.createStatement().execute("DROP SCHEMA IF EXISTS " + TESTSCHEMA);
         testConnection.close();
     }
 
     @Test
+    public void testRetrieveSchemaAfterTableAction() throws Exception {
+      SnowflakeWriter writer = createWriter(true, TESTTABLE_FULLNAME_FOR_DROP_IF_AND_CREATE, TableActionEnum.DROP_IF_EXISTS_AND_CREATE);
+      
+      Result result = null;
+      writer.open("snowflake");
+      try {
+          for (int i = 0; i < 10; i++) {
+              IndexedRecord row = makeRowWithoutLogicalTypes(i);
+              writer.write(row);
+          }
+      } finally {
+          result = writer.close();
+      }
+      
+      assertEquals(10, result.getSuccessCount());
+      assertEquals(0, result.getRejectCount());
+      
+      ResultSet rs = testConnection.createStatement().executeQuery(
+          "SELECT * FROM " + TESTTABLE_FULLNAME_FOR_DROP_IF_AND_CREATE + " WHERE C1 = 'foo_0'");
+      
+      rs.next();
+      
+      Timestamp c2 = rs.getTimestamp(2);
+      Timestamp c3 = rs.getTimestamp(3);
+      Timestamp c4 = rs.getTimestamp(4);
+      Timestamp c5 = rs.getTimestamp(5);
+      Timestamp c6 = rs.getTimestamp(6);
+      
+      //create table use Snowflake Date type is custom schema and not config the DB type, so assert like this
+      //in my view, should use Snowflake Timestamp as default
+      Assert.assertEquals("2018-11-08", date_format.format(c2));
+      Assert.assertEquals("1970-01-01", date_format.format(c3));
+      Assert.assertEquals("2018-11-08", date_format.format(c4));
+      Assert.assertEquals("2018-11-08", date_format.format(c5));
+      Assert.assertEquals("2018-11-08", date_format.format(c6));
+      
+      rs.close();
+    }
+    
+    @Test
     public void testCustomSchemaAndDateInput4Time() throws Exception {
-      SnowflakeWriter writer = createWriter(true);
+      SnowflakeWriter writer = createWriter(true, TESTTABLE, TableActionEnum.NONE);
       
       Result result = null;
       writer.open("snowflake");
@@ -177,7 +223,7 @@ public class SnowflakeDateTypeTestIT {
     
     @Test
     public void testRetrievedSchemaAndDateInput4Time() throws Exception {
-      SnowflakeWriter writer = createWriter(false);
+      SnowflakeWriter writer = createWriter(false, TESTTABLE, TableActionEnum.NONE);
       
       Result result = null;
       writer.open("snowflake");
@@ -201,7 +247,7 @@ public class SnowflakeDateTypeTestIT {
     
     @Test
     public void testRetrievedSchemaAndIntInput4Time() throws Exception {
-      SnowflakeWriter writer = createWriter(false);
+      SnowflakeWriter writer = createWriter(false, TESTTABLE, TableActionEnum.NONE);
       
       Result result = null;
       writer.open("snowflake");
@@ -223,7 +269,7 @@ public class SnowflakeDateTypeTestIT {
       resultAssert(rs);
     }
 
-    private SnowflakeWriter createWriter(boolean custom_schema) {
+    private SnowflakeWriter createWriter(boolean custom_schema, String tableName, TableActionEnum tableaction) {
       TSnowflakeOutputProperties props = new TSnowflakeOutputProperties("snowflakeoutput");
       props.init();
       SnowflakeConnectionProperties connProperties = props.getConnectionProperties();
@@ -235,8 +281,10 @@ public class SnowflakeDateTypeTestIT {
       connProperties.schemaName.setStoredValue(TESTSCHEMA);
       
       SnowflakeTableProperties tableProps = props.table;
-      tableProps.tableName.setValue(TESTTABLE);
+      tableProps.tableName.setValue(tableName);
       
+      props.tableAction.setValue(tableaction);
+      props.afterTableAction();
       props.outputAction.setStoredValue(TSnowflakeOutputProperties.OutputAction.INSERT);
       props.afterOutputAction();
       

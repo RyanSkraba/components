@@ -264,6 +264,9 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
                 setLoaderColumnsPropertyAtRuntime(loader, collectedFields);
             }
             tableActionManagement(datum);
+            
+            //fetch the runtime schema after table action is over which make sure the table is create already
+            initRuntimeSchemaAndMapIfNecessary();
 
             isFirst = false;
         }
@@ -381,6 +384,19 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         
         Schema designSchema = connectionTableProperties.getSchema();
         
+        // Don't retrieve schema from database if there is a table action that will create the table
+        if (AvroUtils.isIncludeAllFields(designSchema) && this.sprops.tableAction.getValue() == TableAction.TableActionEnum.NONE) {
+            return initRuntimeSchemaAndMapIfNecessary();
+        }
+        
+        return designSchema;
+    }
+
+    private Schema initRuntimeSchemaAndMapIfNecessary() throws IOException {
+        if(!dbColumnName2RuntimeField.isEmpty()) {
+            return null;
+        }
+        
         Schema runtimeSchema =  sink.getSchema(container, processingConnection, sprops.getTableName());
         if(runtimeSchema != null) {
             for(Field field : runtimeSchema.getFields()) {
@@ -388,13 +404,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
                 dbColumnName2RuntimeField.put(dbColumnName, field);
             }
         }
-        
-        // Don't retrieve schema from database if there is a table action that will create the table
-        if (AvroUtils.isIncludeAllFields(designSchema) && this.sprops.tableAction.getValue() == TableAction.TableActionEnum.NONE) {
-            return runtimeSchema;
-        }
-        
-        return designSchema;
+        return runtimeSchema;
     }
 
     protected Map<LoaderProperty, Object> getLoaderProps() {
