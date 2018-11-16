@@ -87,7 +87,7 @@ public class SnowflakeConnectionPropertiesTest {
 
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
-                .append("schema=").append(SCHEMA).append("&").append("role=").append(ROLE).append("&").append("tracing=OFF")
+                .append("schema=").append(SCHEMA).append("&").append("role=").append(ROLE)
                 .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION)
                 .toString();
 
@@ -110,7 +110,7 @@ public class SnowflakeConnectionPropertiesTest {
 
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append(AZURE_REGION.getRegionID()).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
-                .append("schema=").append(SCHEMA).append("&").append("role=").append(ROLE).append("&").append("tracing=OFF")
+                .append("schema=").append(SCHEMA).append("&").append("role=").append(ROLE)
                 .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION)
                 .toString();
 
@@ -130,8 +130,7 @@ public class SnowflakeConnectionPropertiesTest {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("db=").append(DB).append("&").append("schema=").append(SCHEMA).append("&").append("role=")
-                .append(ROLE).append("&").append("tracing=OFF")
-                .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
+                .append(ROLE).append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
 
         snowflakeConnectionProperties.warehouse.setValue(null);
         String resultUrlNullWarehouse = snowflakeConnectionProperties.getConnectionUrl();
@@ -155,8 +154,7 @@ public class SnowflakeConnectionPropertiesTest {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("schema=").append(SCHEMA).append("&")
-                .append("role=").append(ROLE).append("&").append("tracing=OFF")
-                .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
+                .append("role=").append(ROLE).append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
 
         snowflakeConnectionProperties.db.setValue(null);
         String resultUrlNullDb = snowflakeConnectionProperties.getConnectionUrl();
@@ -180,8 +178,7 @@ public class SnowflakeConnectionPropertiesTest {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
-                .append("role=").append(ROLE).append("&").append("tracing=OFF")
-                .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
+                .append("role=").append(ROLE).append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
 
         snowflakeConnectionProperties.schemaName.setValue(null);
         String resultUrlNullSchema = snowflakeConnectionProperties.getConnectionUrl();
@@ -205,8 +202,7 @@ public class SnowflakeConnectionPropertiesTest {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
-                .append("schema=").append(SCHEMA).append("&").append("tracing=OFF")
-                .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
+                .append("schema=").append(SCHEMA).append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION).toString();
 
         snowflakeConnectionProperties.role.setValue(null);
         String resultUrlNullSchema = snowflakeConnectionProperties.getConnectionUrl();

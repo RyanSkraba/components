@@ -61,24 +61,6 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
     // Only for the wizard use
     public Property<String> name = newString("name").setRequired();
 
-    public enum Tracing {
-        OFF("OFF"),
-        SEVERE("SEVERE"),
-        WARNING("WARNING"),
-        INFO("INFO"),
-        CONFIG("CONFIG"),
-        FINE("FINE"),
-        FINER("FINER"),
-        FINEST("FINEST"),
-        ALL("ALL");
-
-        String value;
-
-        private Tracing(String val) {
-            this.value = val;
-        }
-    }
-
     public Property<Integer> loginTimeout = newInteger("loginTimeout");
 
     public Property<String> account = newString("account").setRequired(); //$NON-NLS-1$
@@ -99,8 +81,6 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
 
     public Property<String> role = newString("role"); //$NON-NLS-1$
 
-    public Property<Tracing> tracing = newEnum("tracing", Tracing.class); //$NON-NLS-1$
-
     public String talendProductVersion;
 
     // Presentation items
@@ -118,7 +98,6 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
     public void setupProperties() {
         super.setupProperties();
         loginTimeout.setValue(DEFAULT_LOGIN_TIMEOUT);
-        tracing.setValue(Tracing.OFF);
         region.setValue(SnowflakeRegion.AWS_US_WEST);
         useCustomRegion.setValue(false);
     }
@@ -150,7 +129,6 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         advancedForm.addRow(useCustomRegion);
         advancedForm.addColumn(customRegionID);
         advancedForm.addRow(loginTimeout);
-        advancedForm.addRow(widget(tracing).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         advancedForm.addRow(role);
         advanced.setFormtoShow(advancedForm);
 
@@ -284,13 +262,11 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         String db = this.db.getStringValue();
         String schema = this.schemaName.getStringValue();
         String role = this.role.getStringValue();
-        String tracing = this.tracing.getStringValue();
 
         appendProperty("warehouse", warehouse, connectionParams);
         appendProperty("db", db, connectionParams);
         appendProperty("schema", schema, connectionParams);
         appendProperty("role", role, connectionParams);
-        appendProperty("tracing", tracing, connectionParams);
         appendProperty("application", getApplication(), connectionParams);
 
         StringBuilder url = new StringBuilder()
