@@ -83,6 +83,7 @@ import com.netsuite.webservices.test.platform.messages.UpsertListRequest;
 import com.netsuite.webservices.test.platform.messages.UpsertRequest;
 import com.netsuite.webservices.test.platform.messages.WriteResponse;
 import com.netsuite.webservices.test.platform.messages.WriteResponseList;
+import com.netsuite.webservices.test.platform.ExceededRequestLimitFault;
 
 /**
  *
@@ -182,12 +183,13 @@ public class TestNetSuiteClientService extends NetSuiteClientService<NetSuitePor
 
         checkLoginError(toNsStatus(status), exceptionMessage);
 
-        removeLoginHeaders(port);
+        updateLoginHeaders(port);
     }
 
     @Override
     protected boolean errorCanBeWorkedAround(Throwable t) {
-        if (t instanceof InvalidSessionFault ||
+        if (t instanceof ExceededRequestLimitFault ||
+                t instanceof InvalidSessionFault ||
                 t instanceof RemoteException ||
                 t instanceof SOAPFaultException ||
                 t instanceof SocketException)

@@ -48,6 +48,7 @@ import org.talend.components.netsuite.client.NsWriteResponse;
 import org.talend.components.netsuite.client.model.BasicMetaData;
 import org.talend.components.netsuite.v2016_2.client.model.BasicMetaDataImpl;
 
+import com.netsuite.webservices.v2016_2.platform.ExceededRequestLimitFault;
 import com.netsuite.webservices.v2016_2.platform.ExceededRequestSizeFault;
 import com.netsuite.webservices.v2016_2.platform.InsufficientPermissionFault;
 import com.netsuite.webservices.v2016_2.platform.InvalidCredentialsFault;
@@ -188,7 +189,7 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
 
         checkLoginError(toNsStatus(status), exceptionMessage);
 
-        removeLoginHeaders(port);
+        updateLoginHeaders(port);
     }
 
     @Override
@@ -272,7 +273,7 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
             String wsDomain = urls.getWebservicesDomain();
             String endpointUrl = wsDomain.concat(new URL(defaultEndpointUrl).getPath());
 
-            requestContext.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+            requestContext.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, !isUseRequestLevelCredentials());
             requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointUrl);
 
             return port;
@@ -287,7 +288,8 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
 
     @Override
     protected boolean errorCanBeWorkedAround(Throwable t) {
-        if (t instanceof InvalidSessionFault ||
+        if (t instanceof ExceededRequestLimitFault ||
+                t instanceof InvalidSessionFault ||
                 t instanceof RemoteException ||
                 t instanceof SOAPFaultException ||
                 t instanceof SocketException)

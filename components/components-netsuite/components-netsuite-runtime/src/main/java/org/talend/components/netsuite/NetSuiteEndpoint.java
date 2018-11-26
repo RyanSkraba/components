@@ -140,6 +140,7 @@ public class NetSuiteEndpoint {
                     new URL(endpointUrl), apiVersion.getMajor(), credentials);
             connectionConfig.setReferenceComponentId(properties.getReferencedComponentId());
             connectionConfig.setCustomizationEnabled(customizationEnabled);
+            connectionConfig.setUseRequestLevelCredentials(connProps.useRequestLevelCredentials.getValue());
             return connectionConfig;
         } catch (MalformedURLException e) {
             throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
@@ -200,6 +201,7 @@ public class NetSuiteEndpoint {
         NetSuiteClientService<?> clientService = clientFactory.createClient();
         clientService.setEndpointUrl(connectionConfig.getEndpointUrl().toString());
         clientService.setCredentials(connectionConfig.getCredentials());
+        clientService.setUseRequestLevelCredentials(connectionConfig.isUseRequestLevelCredentials());
         MetaDataSource metaDataSource = clientService.getMetaDataSource();
         metaDataSource.setCustomizationEnabled(connectionConfig.isCustomizationEnabled());
 
@@ -216,7 +218,7 @@ public class NetSuiteEndpoint {
         private NetSuiteVersion apiVersion;
         private NetSuiteCredentials credentials;
         private boolean customizationEnabled;
-
+        private boolean useRequestLevelCredentials;
         private String referenceComponentId;
 
         public ConnectionConfig() {
@@ -258,6 +260,14 @@ public class NetSuiteEndpoint {
 
         public void setCustomizationEnabled(boolean customizationEnabled) {
             this.customizationEnabled = customizationEnabled;
+        }
+
+        public boolean isUseRequestLevelCredentials() {
+            return useRequestLevelCredentials;
+        }
+
+        public void setUseRequestLevelCredentials(boolean useRequestLevelCredentials) {
+            this.useRequestLevelCredentials = useRequestLevelCredentials;
         }
 
         public void setReferenceComponentId(String referenceComponentId) {
