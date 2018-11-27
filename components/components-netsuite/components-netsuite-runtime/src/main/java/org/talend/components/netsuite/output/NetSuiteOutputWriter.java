@@ -184,7 +184,7 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
     protected void initTransducer() {
         transducer = new NsObjectOutputTransducer(clientService, typeDesc.getTypeName());
         transducer.setMetaDataSource(metaDataSource);
-        transducer.setApiVersion(writeOperation.getProperties().connection.apiVersion.getValue());
+        transducer.setApiVersion(writeOperation.getProperties().getConnectionProperties().apiVersion.getValue());
     }
 
     @Override

@@ -149,7 +149,7 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
         // Set up object translator
         transducer = new NsObjectInputTransducer(clientService, schema, recordTypeInfo.getName());
         transducer.setMetaDataSource(metaDataSource);
-        transducer.setApiVersion(properties.connection.apiVersion.getValue());
+        transducer.setApiVersion(properties.getConnectionProperties().apiVersion.getValue());
 
         ResultSet<?> resultSet = search.search();
         return resultSet;
