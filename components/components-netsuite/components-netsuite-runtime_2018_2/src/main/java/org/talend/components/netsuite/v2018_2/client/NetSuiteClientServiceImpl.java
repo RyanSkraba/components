@@ -183,7 +183,7 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
             }
 
             if (i != getRetryCount() - 1) {
-                waitForRetryInterval();
+                waitForRetryInterval(i);
             }
         }
 
@@ -385,10 +385,24 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
         return nsStatus;
     }
 
+    /**
+     * Convert response {@link StatusDetail} into internal {@link NsStatus.Detail} representation
+     * 
+     * @param detail - response detail
+     * @return internal status detail
+     */
     public static NsStatus.Detail toNsStatusDetail(StatusDetail detail) {
+        /*
+         * StatusDetail in 2018_2 API version was extended by additional attribute {@link StatusDetail#setAfterSubmitFailed}
+         * Here is used abstract Detail class from common runtime part for all versions, so we don't set this value for now.
+         */
         NsStatus.Detail nsDetail = new NsStatus.Detail();
-        nsDetail.setType(NsStatus.Type.valueOf(detail.getType().value()));
-        nsDetail.setCode(detail.getCode().value());
+        if (detail.getType() != null) {
+            nsDetail.setType(NsStatus.Type.valueOf(detail.getType().value()));
+        }
+        if (detail.getCode() != null) {
+            nsDetail.setCode(detail.getCode().value());
+        }
         nsDetail.setMessage(detail.getMessage());
         return nsDetail;
     }

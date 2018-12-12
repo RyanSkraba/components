@@ -108,6 +108,7 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
         classScopedTestFixtures.add(webServiceTestFixture);
         setUpClassScopedTestFixtures();
         connectionProperties = getConnectionProperties();
+        connectionProperties.apiVersion.setValue("2016.2");
         clientService = webServiceTestFixture.getClientService();
         clientService.login();
         CONTAINER.setComponentData(CONNECTION_COMPONENT_ID, NetSuiteEndpoint.CONNECTION, clientService);

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:platformCore="urn:core_2018_2.platform.webservices.netsuite.com" xmlns:platformCoreTyp="urn:types.core_2018_2.platform.webservices.netsuite.com" xmlns:platformFaultTyp="urn:types.faults_2018_2.platform.webservices.netsuite.com" targetNamespace="urn:core_2018_2.platform.webservices.netsuite.com" elementFormDefault="qualified" attributeFormDefault="unqualified">
 <import namespace="urn:types.core_2018_2.platform.webservices.netsuite.com" schemaLocation="platform.coreTypes.xsd"/>
 <import namespace="urn:types.faults_2018_2.platform.webservices.netsuite.com" schemaLocation="platform.faultTypes.xsd"/>
@@ -68,8 +67,9 @@
  <!--  Status  -->
 <complexType name="StatusDetail">
 <sequence>
-<element name="code" type="platformFaultTyp:StatusDetailCodeType"/>
+<element name="code" type="platformFaultTyp:StatusDetailCodeType" minOccurs="0"/>
 <element name="message" type="xsd:string" minOccurs="0"/>
+<element name="afterSubmitFailed" type="xsd:boolean" minOccurs="0"/>
 </sequence>
 <attribute name="type" type="platformFaultTyp:StatusDetailType" default="ERROR"/>
 </complexType>
@@ -321,11 +321,11 @@
 <attribute name="getCustomizationType" type="platformCoreTyp:GetCustomizationType"/>
 </complexType>
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Custom Fields  -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  ListOrRecordRef  -->
 <complexType name="ListOrRecordRef">
@@ -422,11 +422,11 @@
 element name="customFieldList" type="platformCore:CustomFieldList"/
 -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Dimensions  -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  DimensiondRef  -->
 <complexType name="DimensionRef" abstract="true">
@@ -462,11 +462,11 @@ element name="customFieldList" type="platformCore:CustomFieldList"/
 element name="dimensionList" type="platformCore:DimensionList"/
 -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Search Types  -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  SearchBooleanField  -->
 <complexType name="SearchBooleanField">
@@ -529,11 +529,11 @@ element name="dimensionList" type="platformCore:DimensionList"/
 <attribute name="operator" type="platformCoreTyp:SearchMultiSelectFieldOperator"/>
 </complexType>
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Search Custom Field Types  -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  CustomFieldRef  -->
 <complexType name="SearchCustomField" abstract="true">
@@ -628,7 +628,7 @@ element name="dimensionList" type="platformCore:DimensionList"/
 </complexType>
  <!--  Search Column Types  -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  SearchColumnDoubleField  -->
 <complexType name="SearchColumnField" abstract="true">
@@ -717,11 +717,11 @@ element name="dimensionList" type="platformCore:DimensionList"/
 </complexContent>
 </complexType>
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Search Column Custom Field Types  -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
 <complexType name="SearchColumnCustomField" abstract="true">
 <sequence>
@@ -816,11 +816,11 @@ element name="dimensionList" type="platformCore:DimensionList"/
 </sequence>
 </complexType>
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Item Availability -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
 <complexType name="ItemAvailabilityFilter">
 <sequence>
@@ -857,11 +857,11 @@ element name="dimensionList" type="platformCore:DimensionList"/
 <element name="getItemAvailabilityResult" type="platformCore:GetItemAvailabilityResult"/>
  <!-- itemAvailability/end -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Budget Exchange Rate -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
 <complexType name="BudgetExchangeRateFilter">
 <sequence>
@@ -894,11 +894,11 @@ element name="dimensionList" type="platformCore:DimensionList"/
 <element name="getBudgetExchangeRateResult" type="platformCore:GetBudgetExchangeRateResult"/>
  <!-- Budget Exchange Rate/end -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Currency Rate -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
 <complexType name="CurrencyRateFilter">
 <sequence>
@@ -929,11 +929,11 @@ element name="dimensionList" type="platformCore:DimensionList"/
 <element name="getCurrencyRateResult" type="platformCore:GetCurrencyRateResult"/>
  <!--  Currency Rate/end -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Data Center URLs  -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
 <complexType name="DataCenterUrls">
 <sequence>
@@ -951,11 +951,11 @@ element name="dimensionList" type="platformCore:DimensionList"/
 <element name="getDataCenterUrlsResult" type="platformCore:GetDataCenterUrlsResult"/>
  <!--  Data Center URLs -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Posting Activity -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
 <complexType name="PostingTransactionSummaryField">
 <sequence>
@@ -1019,11 +1019,11 @@ element name="dimensionList" type="platformCore:DimensionList"/
 <element name="getPostingTransactionSummaryResult" type="platformCore:GetPostingTransactionSummaryResult"/>
  <!-- Posting Activity/end -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  GetSelectValue Fields  -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
 <complexType name="GetSelectValueFieldDescription">
 <sequence>
@@ -1057,11 +1057,11 @@ element name="dimensionList" type="platformCore:DimensionList"/
 </complexType>
  <!-- getSelectValue/end -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Server Time -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
 <complexType name="GetServerTimeResult">
 <sequence>
@@ -1072,11 +1072,11 @@ element name="dimensionList" type="platformCore:DimensionList"/
 <element name="getServerTimeResult" type="platformCore:GetServerTimeResult"/>
  <!-- Server Time/end -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Deletion -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
 <complexType name="DeletedRecord">
 <sequence>
@@ -1109,11 +1109,11 @@ element name="dimensionList" type="platformCore:DimensionList"/
 </sequence>
 </complexType>
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
  <!--  Attach  -->
  <!--
- ********************************************************************
+ ******************************************************************** 
 -->
 <complexType name="AttachReference" abstract="true">
 <sequence>

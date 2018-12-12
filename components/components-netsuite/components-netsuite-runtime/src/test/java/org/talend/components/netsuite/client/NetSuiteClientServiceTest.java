@@ -403,12 +403,11 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
 
     @Test
     public void testRetrying() throws Exception {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
 
         clientService.setRetryCount(3);
-        clientService.setRetryInterval(1);
-
         clientService.login();
-
         TypeDesc typeDesc = clientService.getMetaDataSource().getTypeInfo("RecordRef");
 
         RecordRef recordRef = new NsObjectComposer<RecordRef>(clientService.getMetaDataSource(), typeDesc)
@@ -435,18 +434,15 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
                 return response;
             }
         });
-
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
         clientService.delete(recordRef);
-
         stopWatch.stop();
-
         verify(port, times(3)).login(notNull(LoginRequest.class));
         verify(port, times(3)).delete(notNull(DeleteRequest.class));
-
-        assertTrue(stopWatch.getTime() >= 3 * clientService.getRetryInterval() * 1000);
+        // 1 call, 2 retry, 3 passing. So sleeping for 2 slots.
+        long sleeptSeconds = 2 * NetSuiteClientService.MINIMAL_WAIT_TIME_INTERVAL
+                + Double.valueOf(Math.pow(NetSuiteClientService.FIXED_RETRY_INTERVAL, 0)).longValue()
+                + Double.valueOf(Math.pow(NetSuiteClientService.FIXED_RETRY_INTERVAL, 1)).longValue();
+        assertTrue(stopWatch.getTime() >= sleeptSeconds * 1000);
     }
 
     @Test(expected = NetSuiteException.class)

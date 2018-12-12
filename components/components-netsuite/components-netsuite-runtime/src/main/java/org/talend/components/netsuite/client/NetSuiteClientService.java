@@ -54,6 +54,11 @@ public abstract class NetSuiteClientService<PortT> {
 
     public static final int DEFAULT_SEARCH_PAGE_SIZE = 100;
 
+    /** Base Interval between retries. */
+    public static final int FIXED_RETRY_INTERVAL = 2;
+
+    public static final int MINIMAL_WAIT_TIME_INTERVAL = 5;
+
     public static final String MESSAGE_LOGGING_ENABLED_PROPERTY_NAME =
             "org.talend.components.netsuite.client.messageLoggingEnabled";
 
@@ -78,13 +83,10 @@ public abstract class NetSuiteClientService<PortT> {
     protected long receiveTimeout = DEFAULT_RECEIVE_TIMEOUT;
 
     /** Number of retries for an operation. */
-    protected int retryCount = 3;
+    protected int retryCount = 5;
 
     /** Number of retries before (re-)login. */
     protected int retriesBeforeLogin = 2;
-
-    /** Interval between retries. */
-    protected int retryInterval = 5;
 
     /** Size of search result page. */
     protected int searchPageSize = DEFAULT_SEARCH_PAGE_SIZE;
@@ -582,11 +584,7 @@ public abstract class NetSuiteClientService<PortT> {
      * @throws NetSuiteException if an error occurs during performing of operation
      */
     public <R> R execute(PortOperation<R, PortT> op) throws NetSuiteException {
-        if (useRequestLevelCredentials) {
-            return executeUsingRequestLevelCredentials(op);
-        } else {
-            return executeUsingLogin(op);
-        }
+        return useRequestLevelCredentials ? executeUsingRequestLevelCredentials(op) : executeUsingLogin(op);
     }
 
     /**
@@ -661,7 +659,7 @@ public abstract class NetSuiteClientService<PortT> {
                 } catch (Exception e) {
                     if (errorCanBeWorkedAround(e)) {
                         logger.debug("Attempting workaround, retrying ({})", (i + 1));
-                        waitForRetryInterval();
+                        waitForRetryInterval(i);
                         if (errorRequiresNewLogin(e) || i >= getRetriesBeforeLogin() - 1) {
                             logger.debug("Re-logging in ({})", (i + 1));
                             relogin();
@@ -698,7 +696,7 @@ public abstract class NetSuiteClientService<PortT> {
                 } catch (Exception e) {
                     if (errorCanBeWorkedAround(e)) {
                         logger.debug("Attempting workaround, retrying ({})", (i + 1));
-                        waitForRetryInterval();
+                        waitForRetryInterval(i);
                         continue;
                     } else {
                         throw new NetSuiteException(e.getMessage(), e);
@@ -859,17 +857,6 @@ public abstract class NetSuiteClientService<PortT> {
         this.retryCount = retryCount;
     }
 
-    public int getRetryInterval() {
-        return retryInterval;
-    }
-
-    /**
-     * Sets the length of time (in seconds) that a session will sleep before attempting the retry of a failed operation.
-     */
-    public void setRetryInterval(int retryInterval) {
-        this.retryInterval = retryInterval;
-    }
-
     public int getRetriesBeforeLogin() {
         return retriesBeforeLogin;
     }
@@ -886,9 +873,10 @@ public abstract class NetSuiteClientService<PortT> {
         this.messageLoggingEnabled = messageLoggingEnabled;
     }
 
-    protected void waitForRetryInterval() {
+    protected void waitForRetryInterval(int i) {
+        long sleepSeconds = MINIMAL_WAIT_TIME_INTERVAL + Double.valueOf(Math.pow(FIXED_RETRY_INTERVAL, i)).longValue();
         try {
-            Thread.sleep(getRetryInterval() * 1000);
+            Thread.sleep(sleepSeconds * 1000);
         } catch (InterruptedException e) {
 
         }

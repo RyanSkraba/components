@@ -531,9 +531,10 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
     private static List<Message> makeMessageRecords(int count) {
         List<Message> messageList = new ArrayList<>(count);
         for (int i = 1; i <= count; i++) {
+            long t = i * System.currentTimeMillis();
             Message record = new Message();
-            record.setSubject("Test subject " + i);
-            record.setMessage("Test body text " + i);
+            record.setSubject("Test subject " + t);
+            record.setMessage("Test body text " + t);
             record.setAuthorEmail("doug@acme.com");
             record.setRecipientEmail("bob@acme.com");
             record.setIncoming(false);
