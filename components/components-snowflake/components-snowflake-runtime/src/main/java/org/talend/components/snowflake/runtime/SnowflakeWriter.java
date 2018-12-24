@@ -396,8 +396,9 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         if(!dbColumnName2RuntimeField.isEmpty()) {
             return null;
         }
-        
-        Schema runtimeSchema =  sink.getSchema(container, processingConnection, sprops.getTableName());
+        String tableName = sprops.convertColumnsAndTableToUppercase.getValue()
+                ? sprops.getTableName().toUpperCase() : sprops.getTableName();
+        Schema runtimeSchema =  sink.getSchema(container, processingConnection, tableName);
         if(runtimeSchema != null) {
             for(Field field : runtimeSchema.getFields()) {
                 String dbColumnName = field.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
