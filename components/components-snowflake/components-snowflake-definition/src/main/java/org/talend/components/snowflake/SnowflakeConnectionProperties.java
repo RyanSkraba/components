@@ -81,6 +81,8 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
 
     public Property<String> role = newString("role"); //$NON-NLS-1$
 
+    public Property<String> jdbcParameters = newString("jdbcParameters");
+
     public String talendProductVersion;
 
     // Presentation items
@@ -126,6 +128,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         mainForm.addRow(db);
 
         Form advancedForm = Form.create(this, Form.ADVANCED);
+        advancedForm.addRow(jdbcParameters);
         advancedForm.addRow(useCustomRegion);
         advancedForm.addColumn(customRegionID);
         advancedForm.addRow(loginTimeout);
@@ -278,8 +281,16 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         }
 
         url.append(".snowflakecomputing.com")
-                .append("/?")
-                .append(connectionParams);
+                .append("/?");
+
+        String jdbcParameters = this.jdbcParameters.getStringValue();
+        if (jdbcParameters != null && !jdbcParameters.isEmpty() && !"\"\"".equals(jdbcParameters)) {
+            if (connectionParams.length() > 0) {
+                connectionParams.append("&");
+            }
+            connectionParams.append(jdbcParameters);
+        }
+        url.append(connectionParams);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Snowflake connection jdbc URL : " + url);
