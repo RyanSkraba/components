@@ -166,10 +166,11 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
                     prepared_statement.execute();
                 }
             } else {
+                //Need to get updated sql query in case of dynamic(row) values usage
                 if (propagateQueryResultSet) {
-                    resultSet = statement.executeQuery(sql);
+                    resultSet = statement.executeQuery(setting.getSql());
                 } else {
-                    statement.execute(sql);
+                    statement.execute(setting.getSql());
                 }
             }
 
