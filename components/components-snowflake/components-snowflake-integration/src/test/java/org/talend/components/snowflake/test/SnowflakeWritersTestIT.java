@@ -102,7 +102,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
     }
 
     @Test
-    public void testOutputBadTable() throws Throwable {
+    public void testGetSchemaBadTableNotExecuted() throws Throwable {
         TSnowflakeOutputProperties outputProps = (TSnowflakeOutputProperties) getComponentService()
                 .getComponentProperties(TSnowflakeOutputDefinition.COMPONENT_NAME);
         setupProps(outputProps.connection);
@@ -115,8 +115,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
         tableProps = (SnowflakeTableProperties) PropertiesTestUtils.checkAndAfter(getComponentService(), f,
                 tableProps.tableName.getName(), tableProps);
         LOGGER.info(String.valueOf(tableProps.getValidationResult()));
-        assertEquals(ValidationResult.Result.ERROR, tableProps.getValidationResult().getStatus());
-        assertThat(tableProps.getValidationResult().getMessage(), containsString("BADONE"));
+        assertEquals(ValidationResult.Result.OK, tableProps.getValidationResult().getStatus());
     }
 
     @Test
@@ -127,8 +126,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
         // No connection information
         SnowflakeTableProperties tableProps = outputProps.table;
         Form f = tableProps.getForm(Form.REFERENCE);
-        tableProps.tableName.setValue("BADONE");
-        tableProps = (SnowflakeTableProperties) PropertiesTestUtils.checkAndAfter(getComponentService(), f,
+        tableProps = (SnowflakeTableProperties) PropertiesTestUtils.checkAndBeforeActivate(getComponentService(), f,
                 tableProps.tableName.getName(), tableProps);
         LOGGER.info(String.valueOf(tableProps.getValidationResult()));
         assertEquals(ValidationResult.Result.ERROR, tableProps.getValidationResult().getStatus());

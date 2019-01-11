@@ -209,6 +209,7 @@ public class SalesforceAnyTypeFieldTestIT extends SalesforceTestBase {
         setupProps(inputProps.connection, !ADD_QUOTES);
         inputProps.module.moduleName.setValue(CUSTOM_MODULE_HISTORY);
         if (isRetrieveSchema) {
+            inputProps.module.beforeModuleName();
             inputProps.module.afterModuleName();
         } else {
             inputProps.module.main.schema.setValue(SCHEMA_QUERY_HISTORY);

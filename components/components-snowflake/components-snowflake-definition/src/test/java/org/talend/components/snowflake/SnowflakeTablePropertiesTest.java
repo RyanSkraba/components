@@ -14,6 +14,7 @@ package org.talend.components.snowflake;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -76,15 +77,19 @@ public class SnowflakeTablePropertiesTest {
     @Test
     public void testAfterTableName() throws Exception {
         String tableName = "table1";
+        List<NamedThing> list = new ArrayList<>();
+        list.add(new SimpleNamedThing(tableName));
+
         Schema schema = SchemaBuilder.record("record").fields().endRecord();
         tableProperties.tableName.setValue(tableName);
 
         try (MockRuntimeSourceOrSinkTestFixture testFixture = new MockRuntimeSourceOrSinkTestFixture()) {
             testFixture.setUp();
-
+            Mockito.when(testFixture.runtimeSourceOrSink.getSchemaNames(null)).thenReturn(list);
             Mockito.when(testFixture.runtimeSourceOrSink.getEndpointSchema(null, tableName))
                     .thenReturn(schema);
 
+            tableProperties.beforeTableName();
             Assert.assertEquals(ValidationResult.Result.OK, tableProperties.afterTableName().getStatus());
             Assert.assertEquals(schema, tableProperties.main.schema.getValue());
         }
@@ -93,13 +98,17 @@ public class SnowflakeTablePropertiesTest {
     @Test
     public void testAfterTableNameFailedGetSchema() throws Exception {
         String tableName = "table1";
+        List<NamedThing> list = new ArrayList<>();
+        list.add(new SimpleNamedThing(tableName));
         tableProperties.tableName.setValue(tableName);
 
         try (MockRuntimeSourceOrSinkTestFixture testFixture = new MockRuntimeSourceOrSinkTestFixture()) {
             testFixture.setUp();
 
+            Mockito.when(testFixture.runtimeSourceOrSink.getSchemaNames(null)).thenReturn(list);
             Mockito.when(testFixture.runtimeSourceOrSink.getEndpointSchema(null, tableName))
                     .thenThrow(new IOException("Failed get schema from Snowflake"));
+            tableProperties.beforeTableName();
 
             Assert.assertEquals(ValidationResult.Result.ERROR, tableProperties.afterTableName().getStatus());
         }

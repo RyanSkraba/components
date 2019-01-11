@@ -17,7 +17,10 @@ import static org.talend.components.netsuite.util.ComponentExceptions.exceptionT
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.talend.components.netsuite.NetSuiteModuleProperties;
@@ -74,7 +77,6 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
         try {
             List<NamedThing> searchableTypes = getSearchableTypes();
             moduleName.setPossibleNamedThingValues(searchableTypes);
-
             return ValidationResult.OK;
         } catch (Exception ex) {
             return exceptionToValidationResult(ex);
@@ -85,17 +87,19 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
         // After selecting of target record type we should:
         // - Set up main schema which will be used for records emitted by component
         // - Set up search query design-time model
+        ValidationResult vr = ValidationResult.OK;
         try {
-            setupSchema();
-            setupSearchSchema();
-
+            if (isCachedModuleNameUsed()) {
+                setupSchema();
+                setupSearchSchema();
+            }
             refreshLayout(getForm(Form.MAIN));
 
-            return ValidationResult.OK;
-
         } catch (Exception ex) {
-            return exceptionToValidationResult(ex);
+            vr = exceptionToValidationResult(ex);
         }
+        moduleName.setPossibleNamedThingValues(Collections.<NamedThing>emptyList());
+        return vr;
     }
 
     public void afterSearchQuery() {
@@ -137,5 +141,16 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
         searchQuery.value2.setValue(new ArrayList<>());
 
         searchQuery.refreshLayout(searchQuery.getForm(Form.MAIN));
+    }
+
+    private boolean isCachedModuleNameUsed() {
+        for (Object cachedModuleName: this.moduleName.getPossibleValues()) {
+            if (cachedModuleName instanceof String) {
+                if (moduleName.getValue().equals(cachedModuleName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -27,7 +27,9 @@ import static org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutp
 import static org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.FIELD_SALESFORCE_ID;
 import static org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.FIELD_STATUS;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -37,12 +39,15 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.mockito.Mockito;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.SalesforceTestBase;
+import org.talend.daikon.NamedThing;
+import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.PropertiesDynamicMethodHelper;
@@ -186,18 +191,22 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
 
     @Test
     public void testAfterModuleName() throws Throwable {
+        String moduleName = "Account";
+        List<NamedThing> list = new ArrayList<>();
+        list.add(new SimpleNamedThing(moduleName));
 
         try (MockRuntimeSourceOrSinkTestFixture testFixture =
                 new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
             testFixture.setUp();
-
+            when(testFixture.runtimeSourceOrSink.getSchemaNames(null)).thenReturn(list);
             properties.outputAction.setValue(SalesforceOutputProperties.OutputAction.INSERT);
             propertiesService.afterProperty("outputAction", properties);
 
             properties.module.moduleName.setValue("Account");
+            properties.module.beforeModuleName();
             propertiesService.afterProperty("moduleName", properties.module);
 
-            assertEquals(testFixture.getTestDataset().getSchema("Account"), properties.module.main.schema.getValue());
+            assertEquals(testFixture.getTestDataset().getSchema(moduleName), properties.module.main.schema.getValue());
             assertThat((Iterable<String>) properties.upsertRelationTable.columnName.getPossibleValues(),
                     contains("Id", "Name"));
         }
@@ -205,14 +214,19 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
 
     @Test
     public void testAfterModuleNameForUpsert() throws Throwable {
+        String moduleName = "Account";
+        List<NamedThing> list = new ArrayList<>();
+        list.add(new SimpleNamedThing(moduleName));
+
         try (MockRuntimeSourceOrSinkTestFixture testFixture =
                 new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
             testFixture.setUp();
-
+            when(testFixture.runtimeSourceOrSink.getSchemaNames(null)).thenReturn(list);
             properties.outputAction.setValue(SalesforceOutputProperties.OutputAction.UPSERT);
             propertiesService.afterProperty("outputAction", properties);
 
-            properties.module.moduleName.setValue("Account");
+            properties.module.moduleName.setValue(moduleName);
+            properties.module.beforeModuleName();
             propertiesService.afterProperty("moduleName", properties.module);
 
             assertThat((Iterable<String>) properties.upsertKeyColumn.getPossibleValues(), contains("Id", "Name"));
@@ -220,19 +234,25 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
         }
     }
 
-    @Test(expected = TalendRuntimeException.class)
-    public void testAfterModuleNameException() throws Throwable {
+    @Test
+    public void testAfterModuleNameExceptionOccurs() throws Throwable {
+        String moduleName = "Customer";
+        List<NamedThing> list = new ArrayList<>();
+        list.add(new SimpleNamedThing(moduleName));
         properties.init();
 
         try (MockRuntimeSourceOrSinkTestFixture testFixture =
                 new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
             testFixture.setUp();
-
-            when(testFixture.runtimeSourceOrSink.getEndpointSchema(any(RuntimeContainer.class), eq("Customer")))
+            when(testFixture.runtimeSourceOrSink.getSchemaNames(null)).thenReturn(list);
+            when(testFixture.runtimeSourceOrSink.getEndpointSchema(any(RuntimeContainer.class), eq(moduleName)))
                     .thenThrow(TalendRuntimeException.createUnexpectedException("ERROR"));
 
+            properties.module.beforeModuleName();
             properties.module.moduleName.setValue("Customer");
-            propertiesService.afterProperty("moduleName", properties.module);
+            ValidationResult vr = properties.module.afterModuleName();
+
+            assertEquals(ValidationResult.Result.ERROR, vr.getStatus());
         }
     }
 

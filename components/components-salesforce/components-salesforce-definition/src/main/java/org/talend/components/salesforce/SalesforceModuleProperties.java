@@ -19,7 +19,9 @@ import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.ISchemaListener;
@@ -30,6 +32,7 @@ import org.talend.components.salesforce.common.ExceptionUtil;
 import org.talend.components.salesforce.common.SalesforceRuntimeSourceOrSink;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.StringProperty;
@@ -105,24 +108,20 @@ public class SalesforceModuleProperties extends ComponentPropertiesImpl implemen
     }
 
     public ValidationResult afterModuleName() throws Exception {
-        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS, USE_CURRENT_JVM_PROPS)) {
-            SalesforceRuntimeSourceOrSink ss = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
-            ss.initialize(null, getEffectiveConnection());
-            ValidationResult vr = ss.validate(null);
-            if (vr.getStatus() == ValidationResult.Result.OK) {
-                try {
-                    Schema schema = ss.getEndpointSchema(null, moduleName.getStringValue());
-                    main.schema.setValue(schema);
-                    moduleName.setPossibleValues(Collections.emptyList());
-                } catch (Exception ex) {
-                    throw new ComponentException(ExceptionUtil.exceptionToValidationResult(ex));
-                }
-            } else {
-                throw new ComponentException(vr);
+        ValidationResultMutable vr = new ValidationResultMutable();
+        //avoid retrieving schema of not existing table
+        if (isCachedModuleNameUsed()) {
+            try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS, USE_CURRENT_JVM_PROPS)) {
+                SalesforceRuntimeSourceOrSink ss = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
+                ss.initialize(null, getEffectiveConnection());
+                main.schema.setValue(ss.getEndpointSchema(null, moduleName.getValue()));
+            } catch (Exception ex) {
+                vr.setMessage(ex.getMessage());
+                vr.setStatus(ValidationResult.Result.ERROR);
             }
-
-            return ValidationResult.OK;
         }
+        moduleName.setPossibleNamedThingValues(Collections.<NamedThing>emptyList());
+        return vr;
     }
 
     private SalesforceConnectionProperties getEffectiveConnection() {
@@ -133,6 +132,16 @@ public class SalesforceModuleProperties extends ComponentPropertiesImpl implemen
         return getConnectionProperties();
     }
 
+    private boolean isCachedModuleNameUsed() {
+        for (Object cachedModuleName: this.moduleName.getPossibleValues()) {
+            if (cachedModuleName instanceof String) {
+                if (moduleName.getValue().equals(cachedModuleName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     @Override
     public SalesforceConnectionProperties getConnectionProperties() {
         return connection;

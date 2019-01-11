@@ -35,7 +35,6 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 public class SnowflakeTableProperties extends ComponentPropertiesImpl implements SnowflakeProvideConnectionProperties {
 
     public SnowflakeConnectionProperties connection;
-
     //
     // Properties
     //
@@ -94,23 +93,38 @@ public class SnowflakeTableProperties extends ComponentPropertiesImpl implements
         return vr;
     }
 
+
     public ValidationResult afterTableName() throws Exception {
         ValidationResultMutable vr = new ValidationResultMutable();
-        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS, USE_CURRENT_JVM_PROPS)) {
-            SnowflakeRuntimeSourceOrSink ss = (SnowflakeRuntimeSourceOrSink) sandboxedInstance.getInstance();
-            ss.initialize(null, connection);
-            main.schema.setValue(ss.getEndpointSchema(null, tableName.getValue()));
-            tableName.setPossibleValues(Collections.emptyList());
-        } catch (Exception ex) {
-            vr.setMessage(ex.getMessage());
-            vr.setStatus(ValidationResult.Result.ERROR);
+        //avoid retrieving schema of not existing table
+        if (isCachedTableNameUsed()) {
+            try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS, USE_CURRENT_JVM_PROPS)) {
+                SnowflakeRuntimeSourceOrSink ss = (SnowflakeRuntimeSourceOrSink) sandboxedInstance.getInstance();
+                ss.initialize(null, connection);
+                main.schema.setValue(ss.getEndpointSchema(null, tableName.getValue()));
+            } catch (Exception ex) {
+                vr.setMessage(ex.getMessage());
+                vr.setStatus(ValidationResult.Result.ERROR);
+            }
         }
+        tableName.setPossibleNamedThingValues(Collections.<NamedThing>emptyList());
         return vr;
     }
 
     @Override
     public SnowflakeConnectionProperties getConnectionProperties() {
         return connection;
+    }
+
+    private boolean isCachedTableNameUsed() {
+        for (Object cachedTableName: this.tableName.getPossibleValues()) {
+            if (cachedTableName instanceof String) {
+                if (tableName.getValue().equals(cachedTableName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

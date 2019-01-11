@@ -388,6 +388,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             // create a new props for reading the data, the schema may be altered in the original output props
             TSalesforceOutputProperties readprops = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
             setupProps(readprops.connection, !SalesforceTestBase.ADD_QUOTES);
+            readprops.module.beforeModuleName();
             readprops.module.moduleName.setValue(EXISTING_MODULE_NAME);
             readprops.module.afterModuleName();// to update the schema.
             inputRows = readRows(readprops);
