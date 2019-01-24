@@ -283,6 +283,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker-maven-plugin.version}</version>
                 <configuration>
                     <skip>${really.skip.tests}</skip>
                     <registry>${talend_docker_registry}</registry>

@@ -39,6 +39,7 @@ import org.talend.components.couchbase.EventSchemaField;
 import org.talend.components.couchbase.runtime.CouchbaseSource;
 import org.talend.components.couchbase.runtime.CouchbaseStreamingConnection;
 
+import com.couchbase.client.core.env.KeyValueServiceConfig;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.CouchbaseCluster;
 import com.couchbase.client.java.PersistTo;
@@ -110,6 +111,7 @@ public class CouchbaseInputTestIT {
                 .socketConnectTimeout(60000)
                 .connectTimeout(60000)
                 .keepAliveInterval(60000)
+                .keyValueServiceConfig(KeyValueServiceConfig.create(60)) // If skip this config, we may get TimeoutException https://forums.couchbase.com/t/kv-upsert-throwing-timeoutexception-couchbase-4-5/9399
                 .build();
         CouchbaseCluster cluster = CouchbaseCluster.create(env, bootstrapNodes);
         Bucket bucket = cluster.openBucket(bucketName, password);
