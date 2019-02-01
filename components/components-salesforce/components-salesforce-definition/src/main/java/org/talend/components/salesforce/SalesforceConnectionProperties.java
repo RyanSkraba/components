@@ -132,6 +132,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         apiVersion.setValue(DEFAULT_API_VERSION);
         timeout.setValue(60000);
         httpChunked.setValue(true);
+        oauth2JwtFlow.audience.setValue("https://login.salesforce.com");
     }
 
     @Override
@@ -317,12 +318,19 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
 
     @Override
     public int getVersionNumber() {
-        return 3;
+        return 4;
     }
 
     @Override
     public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
         boolean migrated = super.postDeserialize(version, setup, persistent);
+        if(version < this.getVersionNumber()){
+            if(oauth2JwtFlow.audience.getValue() == null || oauth2JwtFlow.audience.getValue().isEmpty()) {
+                oauth2JwtFlow.audience.setValue("\"https://login.salesforce.com\"");
+                migrated = true;
+            }
+        }
+
         if (version < this.getVersionNumber()) {
             if (apiVersion.getValue() == null) {
                 apiVersion.setValue("\"34.0\"");

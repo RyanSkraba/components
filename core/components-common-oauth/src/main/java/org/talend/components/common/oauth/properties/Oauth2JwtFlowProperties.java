@@ -43,6 +43,8 @@ public class Oauth2JwtFlowProperties extends ComponentPropertiesImpl {
 
     public Property<String> certificateAlias = newProperty("certificateAlias").setRequired(); //$NON-NLS-1$
 
+    public Property<String> audience = newProperty("audience").setRequired(); //$NON-NLS-1$
+
     public Oauth2JwtFlowProperties(String name) {
         super(name);
     }
@@ -55,6 +57,7 @@ public class Oauth2JwtFlowProperties extends ComponentPropertiesImpl {
         // JWT properties
         mainForm.addRow(issuer);
         mainForm.addRow(subject);
+        mainForm.addRow(audience);
         mainForm.addRow(expirationTime);
 
         // X509 certificate properties

@@ -79,7 +79,7 @@ public class SalesforceJwtConnection {
                 .id(UUID.randomUUID().toString())//
                 .issuer(oauth2Prop.issuer.getStringValue())// consumer id
                 .subject(oauth2Prop.subject.getStringValue())// user id
-                .audience("https://login.salesforce.com")//
+                .audience(oauth2Prop.audience.getStringValue())//
                 .issueTime(now)//
                 .notBeforeTime(now)//
                 .expirationTime(now + oauth2Prop.expirationTime.getValue())//
