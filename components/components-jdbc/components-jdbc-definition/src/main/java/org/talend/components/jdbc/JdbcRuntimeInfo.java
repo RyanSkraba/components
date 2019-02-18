@@ -84,6 +84,12 @@ public class JdbcRuntimeInfo extends JarRuntimeInfo {
                     String mavenPath = removeQuote(driver);
                     // there is some bug in the upriver in studio and the getMavenUrlDependencies is called at some strange time,
                     // so need to filter like below
+                    if (mavenPath == null) {
+                        continue;
+                    }
+                    if (mavenPath.length() <= 0) {
+                        continue;
+                    }
                     if ("newLine".equals(mavenPath)) {
                         continue;
                     }
