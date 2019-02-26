@@ -59,7 +59,7 @@ public class JDBCDatasetRuntime implements DatasetRuntime<JDBCDatasetProperties>
     public Schema getSchema() {
         JDBCSourceOrSink jss = new JDBCSourceOrSink();
         jss.initialize(container, dataset);
-        return jss.getSchemaFromQuery(container, JdbcRuntimeUtils.getQueryToExecute(dataset.getRuntimeSetting(), 1));
+        return jss.getSchemaFromQuery(container, dataset.getRuntimeSetting().getSql());
     }
 
     private void throwExceptionIfValidationResultIsError(ValidationResult validationResult) {

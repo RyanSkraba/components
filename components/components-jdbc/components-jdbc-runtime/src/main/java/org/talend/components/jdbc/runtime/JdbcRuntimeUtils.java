@@ -205,29 +205,29 @@ public class JdbcRuntimeUtils {
         return conn;
     }
 
-    /**
-     * Transforms the query of the {@see AllSetting} given in parameter to take the limit statement into account.
-     *
-     * @param setting   the JDBC dataset settings
-     * @param readLimit the number of records to read
-     * @return the original query if the limit is less than 1, else the transformed query
-     */
-    public static String getQueryToExecute(AllSetting setting, int readLimit) {
-        String query = setting.getSql();
-        if (readLimit > 0) {
-            String driverClass = setting.getDriverClass();
-            // MySQL and AzureSQL don't use limit.
-            if (driverClass != null && driverClass.equals("net.sourceforge.jtds.jdbc.Driver")) {
-                return "SELECT TOP "+readLimit+" * FROM ( "+query+") AS derived";
-            }
-
-            String limitStatement = "LIMIT " + readLimit;
-            if (driverClass != null && driverClass.toLowerCase().contains("derby")) {
-                // different behaviour for the derby database, where the LIMIT statement does not exist.
-                limitStatement = "FETCH FIRST " + (readLimit == 1 ? "ROW ONLY" : readLimit + " ROWS ONLY");
-            }
-            query = "SELECT * FROM (" + query + ") AS derived " + limitStatement;
-        }
-        return query;
-    }
+//    /**
+//     * Transforms the query of the {@see AllSetting} given in parameter to take the limit statement into account.
+//     *
+//     * @param setting   the JDBC dataset settings
+//     * @param readLimit the number of records to read
+//     * @return the original query if the limit is less than 1, else the transformed query
+//     */
+//    public static String getQueryToExecute(AllSetting setting, int readLimit) {
+//        String query = setting.getSql();
+//        if (readLimit > 0) {
+//            String driverClass = setting.getDriverClass();
+//            // MySQL and AzureSQL don't use limit.
+//            if (driverClass != null && driverClass.equals("net.sourceforge.jtds.jdbc.Driver")) {
+//                return "SELECT TOP "+readLimit+" * FROM ( "+query+") AS derived";
+//            }
+//
+//            String limitStatement = "LIMIT " + readLimit;
+//            if (driverClass != null && driverClass.toLowerCase().contains("derby")) {
+//                // different behaviour for the derby database, where the LIMIT statement does not exist.
+//                limitStatement = "FETCH FIRST " + (readLimit == 1 ? "ROW ONLY" : readLimit + " ROWS ONLY");
+//            }
+//            query = "SELECT * FROM (" + query + ") AS derived " + limitStatement;
+//        }
+//        return query;
+//    }
 }

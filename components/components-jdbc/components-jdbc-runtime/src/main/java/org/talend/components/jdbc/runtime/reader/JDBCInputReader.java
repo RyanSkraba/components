@@ -206,7 +206,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
                 statement.setFetchSize(setting.getCursor());
             }
 
-            resultSet = statement.executeQuery(JdbcRuntimeUtils.getQueryToExecute(setting, this.readLimit));
+            resultSet = statement.executeQuery(setting.getSql());
 
             return haveNext();
         } catch (SQLException e) {
