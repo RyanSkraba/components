@@ -39,6 +39,9 @@ public class ComponentsPaxExamOptions {
             throw new RuntimeException("maven.repo.local system properties must be absolute.");
         }
         return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
+                // following 2 bundles are dependencies of "org.apache.felix.scr"
+                mavenBundle( "org.osgi", "org.osgi.util.promise"), //
+                mavenBundle( "org.osgi", "org.osgi.util.function"), //
                 linkBundle("org.slf4j-slf4j-api"), //
                 linkBundle("org.slf4j-slf4j-simple").noStart(), //
                 linkBundle("com.fasterxml.jackson.core-jackson-annotations"), //
