@@ -23,6 +23,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -52,7 +53,7 @@ public class JdbcRuntimeUtils {
      * @throws ClassNotFoundException
      * @throws SQLException
      */
-    public static Connection createConnection(AllSetting setting) throws ClassNotFoundException, SQLException {
+    public static Connection createConnection(final AllSetting setting) throws ClassNotFoundException, SQLException {
         if (!valid(setting.getJdbcUrl())) {
             throw new RuntimeException("JDBC URL should not be empty, please set it");
         }
@@ -62,7 +63,18 @@ public class JdbcRuntimeUtils {
         }
 
         java.lang.Class.forName(setting.getDriverClass());
-        return java.sql.DriverManager.getConnection(setting.getJdbcUrl(), setting.getUsername(), setting.getPassword());
+        final Properties properties = new Properties(){{
+            if(setting.getUsername() != null) {
+                setProperty("user", setting.getUsername());
+            }
+            if(setting.getPassword() != null) {
+                setProperty("password", setting.getPassword());
+            }
+            // Security Issues with LOAD DATA LOCAL https://jira.talendforge.org/browse/TDI-42006
+            setProperty("allowLoadLocalInfile", "false"); // MySQL
+            setProperty("allowLocalInfile", "false"); // MariaDB
+        }};
+        return java.sql.DriverManager.getConnection(setting.getJdbcUrl(), properties);
     }
 
     private static boolean valid(String value) {
