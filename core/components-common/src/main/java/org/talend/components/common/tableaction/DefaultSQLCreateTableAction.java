@@ -12,16 +12,15 @@
 // ============================================================================
 package org.talend.components.common.tableaction;
 
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.common.config.jdbc.DbmsType;
 import org.talend.daikon.avro.SchemaConstants;
-
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class DefaultSQLCreateTableAction extends TableAction {
 
@@ -146,16 +145,7 @@ public class DefaultSQLCreateTableAction extends TableAction {
             }
             sb.append(updateCaseIdentifier(sDBType));
 
-            // Length
-            if (this.getConfig().SQL_CREATE_TABLE_LENGTH_ENABLED && !isNullOrEmpty(sDBLength)) {
-                sb.append(this.getConfig().SQL_CREATE_TABLE_LENGTH_START);
-                sb.append(sDBLength);
-                if (this.getConfig().SQL_CREATE_TABLE_PRECISION_ENABLED && !isNullOrEmpty(sDBPrecision)) {
-                    sb.append(this.getConfig().SQL_CREATE_TABLE_PRECISION_SEP);
-                    sb.append(sDBPrecision);
-                }
-                sb.append(this.getConfig().SQL_CREATE_TABLE_LENGTH_END);
-            }
+            buildLengthPrecision(sb, f, sDBType);
 
             if(!sDBNullable){
                 sb.append(this.getConfig().SQL_CREATE_TABLE_NOT_NULL);
@@ -198,6 +188,41 @@ public class DefaultSQLCreateTableAction extends TableAction {
         }
 
         return sb;
+    }
+
+    /**
+     * Appends type length and precision value in SQL query builder
+     * Component schema "length" parameter is used as length parameter for String types and as precision for numeric types
+     * Component schema "precision" parameter is used as scale parameter for numeric types. Usually, "precision" is
+     * ignored for String types
+     *
+     * @param sb StringBuilder, which constructs query
+     * @param field Schema field
+     * @param dbType Snowflake database type to be used
+     */
+    private void buildLengthPrecision(StringBuilder sb, Schema.Field field, String dbType) {
+        String length = field.getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH);
+        String precision = field.getProp(SchemaConstants.TALEND_COLUMN_PRECISION);
+
+        DbmsType dbmsType = getConfig().DB_TYPES.get(dbType);
+
+        boolean ignoreLength = false;
+        boolean ignorePrecision = false;
+
+        if (dbmsType != null) {
+            ignoreLength = dbmsType.isIgnoreLength();
+            ignorePrecision = dbmsType.isIgnorePrecision();
+        }
+
+        if (getConfig().SQL_CREATE_TABLE_LENGTH_ENABLED && !ignoreLength && !isNullOrEmpty(length)) {
+            sb.append(getConfig().SQL_CREATE_TABLE_LENGTH_START);
+            sb.append(length);
+            if (getConfig().SQL_CREATE_TABLE_PRECISION_ENABLED && !ignorePrecision && !isNullOrEmpty(precision)) {
+                sb.append(getConfig().SQL_CREATE_TABLE_PRECISION_SEP);
+                sb.append(precision);
+            }
+            sb.append(getConfig().SQL_CREATE_TABLE_LENGTH_END);
+        }
     }
 
     private static boolean isNullOrEmpty(String s) {

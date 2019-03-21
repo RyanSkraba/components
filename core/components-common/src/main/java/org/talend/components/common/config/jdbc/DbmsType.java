@@ -30,11 +30,11 @@ public class DbmsType {
     /**
      * Specify whether it is default type for type mapping
      */
-    private final boolean isDefault;
+    private boolean isDefault = false;
 
-    private final int defaultLength;
+    private int defaultLength = UNDEFINED;
 
-    private final int defaultPrecision;
+    private int defaultPrecision = UNDEFINED;
 
     private final boolean ignoreLength;
 
@@ -43,7 +43,39 @@ public class DbmsType {
     /**
      * Precision before length
      */
-    private final boolean preBeforeLength;
+    private boolean preBeforeLength = false;
+
+    /**
+     * Constructs DBMS type with default values:
+     * {@link #isDefault} = false,
+     * {@link #defaultLength} = undefined,
+     * {@link #defaultPrecision} = undefined,
+     * {@link #preBeforeLength} = false,
+     * {@link #ignoreLength} = true,
+     * {@link #ignorePrecision} = true
+     *
+     * @param typeName
+     */
+    public DbmsType(String typeName) {
+        this(typeName, true, true);
+    }
+
+    /**
+     * Constructs DBMS type with default values:
+     * {@link #isDefault} = false,
+     * {@link #defaultLength} = undefined,
+     * {@link #defaultPrecision} = undefined,
+     * {@link #preBeforeLength} = false
+     *
+     * @param typeName
+     * @param ignoreLength
+     * @param ignorePrecision
+     */
+    public DbmsType(String typeName, boolean ignoreLength, boolean ignorePrecision) {
+        this.typeName = typeName;
+        this.ignoreLength = ignoreLength;
+        this.ignorePrecision = ignorePrecision;
+    }
 
     /**
      * Constructs DBMS type

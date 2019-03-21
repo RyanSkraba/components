@@ -15,6 +15,7 @@ package org.talend.components.snowflake.runtime.tableaction;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.talend.components.common.tableaction.TableActionConfig;
+import org.talend.components.snowflake.SnowflakeTypes;
 
 import java.sql.Types;
 
@@ -33,6 +34,8 @@ public class SnowflakeTableActionConfig extends TableActionConfig {
         this.CONVERT_JAVATYPE_TO_SQLTYPE.put("java.math.BigDecimal", Types.FLOAT);
 
         this.CONVERT_SQLTYPE_TO_ANOTHER_SQLTYPE.put(Types.BLOB, Types.BINARY);
+
+        this.DB_TYPES = SnowflakeTypes.all();
     }
 
 }

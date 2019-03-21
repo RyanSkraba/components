@@ -14,6 +14,7 @@ package org.talend.components.common.tableaction;
 
 import org.apache.avro.LogicalType;
 import org.apache.avro.Schema;
+import org.talend.components.common.config.jdbc.DbmsType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,5 +72,7 @@ public class TableActionConfig {
     public Map<Integer, Integer> CONVERT_SQLTYPE_TO_ANOTHER_SQLTYPE = new HashMap<>();
 
     public Map<Integer, String> CUSTOMIZE_SQLTYPE_TYPENAME = new HashMap<>();
+
+    public Map<String, DbmsType> DB_TYPES = new HashMap<>();
 
 }
