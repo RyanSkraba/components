@@ -94,6 +94,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <trimStackTrace>false</trimStackTrace>
                     <argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
                     <systemPropertyVariables>
                         <s3.accesskey>${s3.accesskey}</s3.accesskey>

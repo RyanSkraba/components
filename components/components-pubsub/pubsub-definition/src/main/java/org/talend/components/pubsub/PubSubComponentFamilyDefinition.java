@@ -13,21 +13,21 @@
 
 package org.talend.components.pubsub;
 
-import com.google.auto.service.AutoService;
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.pubsub.input.PubSubInputDefinition;
 import org.talend.components.pubsub.output.PubSubOutputDefinition;
 
-import aQute.bnd.annotation.component.Component;
+import com.google.auto.service.AutoService;
 
 /**
  * Install all of the definitions provided for the PubSub family of components.
  */
 @AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX
-        + PubSubComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
+        + PubSubComponentFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class PubSubComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "PubSub";

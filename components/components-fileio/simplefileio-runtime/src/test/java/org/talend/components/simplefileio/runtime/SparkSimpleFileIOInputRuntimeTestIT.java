@@ -29,17 +29,22 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.hadoop.fs.FileSystem;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.TestRule;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.simplefileio.input.SimpleFileIOInputProperties;
+import org.talend.components.test.DisableAfterJava8;
 import org.talend.components.test.SparkIntegrationTestResource;
 
 /**
  * Unit tests for {@link SimpleFileIOInputRuntime} using the Spark runner.
  */
 public class SparkSimpleFileIOInputRuntimeTestIT {
+    @ClassRule
+    public static TestRule DISABLE_WHEN_NEEDED = new DisableAfterJava8();
 
     /** Resource that provides a {@link Pipeline} configured for Spark. */
     @Rule

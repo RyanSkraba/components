@@ -4,10 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createDatastore;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.daikon.properties.ValidationResult;
 
 public class BigQueryDatastoreRuntimeTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig("bigquery.project");
 
     BigQueryDatastoreRuntime runtime;
 

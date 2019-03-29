@@ -36,7 +36,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.framework.Bundle;
@@ -45,6 +44,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.talend.components.api.ComponentsPaxExamOptions;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.common.test.DisablablePaxExam;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.daikon.NamedThing;
@@ -53,7 +53,7 @@ import org.talend.daikon.properties.ValidationResult;
 /**
  * check static method call to {@link SalesforceSourceOrSink} used by the ESB
  */
-@RunWith(PaxExam.class)
+@RunWith(DisablablePaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class OsgiSalesforceEsbTestIT extends SalesforceTestBase {
 

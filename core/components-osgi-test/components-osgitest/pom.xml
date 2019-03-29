@@ -70,6 +70,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.talend.daikon</groupId>
+            <artifactId>daikon-exception</artifactId>
+            <version>${daikon.version}</version>
+            <classifier>bundle</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-junit4</artifactId>
             <version>${paxexamversion}</version>
@@ -91,12 +98,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.25</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.25</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>

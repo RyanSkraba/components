@@ -21,9 +21,11 @@ import javax.inject.Inject;
 
 import org.apache.avro.Schema;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.junit.rules.TestRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.ComponentDefinition;
@@ -43,6 +45,8 @@ import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 @SuppressWarnings("nls")
 public abstract class SnowflakeTestIT extends AbstractComponentTest {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
     @Inject
     private DefinitionRegistryService definitionService;

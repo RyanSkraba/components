@@ -5,13 +5,18 @@ import java.util.Arrays;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreDefinition;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreProperties;
+import org.talend.components.salesforce.runtime.DisableIfMissingConfig;
 import org.talend.daikon.java8.Consumer;
 
 public class SalesforceDatasetRuntimeTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
     @Test
     public void testGetSchemaForModule() {

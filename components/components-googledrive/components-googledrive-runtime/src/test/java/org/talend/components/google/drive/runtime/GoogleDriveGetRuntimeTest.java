@@ -1,8 +1,11 @@
 package org.talend.components.google.drive.runtime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -58,7 +61,7 @@ public class GoogleDriveGetRuntimeTest extends GoogleDriveTestBaseRuntime {
         file.setId("fileName-id");
         file.setMimeType(GoogleDriveMimeTypes.MIME_TYPE_JSON);
         file.setFileExtension("json");
-        when(drive.files().get(anyString()).setFields(anyString()).execute()).thenReturn(file);
+        when(drive.files().get(any()).setFields(anyString()).execute()).thenReturn(file);
     }
 
     @Test
@@ -81,9 +84,9 @@ public class GoogleDriveGetRuntimeTest extends GoogleDriveTestBaseRuntime {
         file.setId("fileName-id");
         file.setMimeType(GoogleDriveMimeTypes.MIME_TYPE_GOOGLE_DOCUMENT);
 
-        when(drive.files().list().setQ(eq(qA)).execute()).thenReturn(createFolderFileList("A", false));
-        when(drive.files().list().setQ(eq(qB)).execute()).thenReturn(createFolderFileList("B", false));
-        when(drive.files().list().setQ(eq(qC)).execute()).thenReturn(createFolderFileList("C", false));
+        when(drive.files().list().setQ(qA).execute()).thenReturn(createFolderFileList("A", false));
+        when(drive.files().list().setQ(qB).execute()).thenReturn(createFolderFileList("B", false));
+        when(drive.files().list().setQ(qC).execute()).thenReturn(createFolderFileList("C", false));
         when(drive.files().get(anyString()).setFields(anyString()).execute()).thenReturn(file);
         //
         properties.file.setValue("/A/B/C");
@@ -98,7 +101,7 @@ public class GoogleDriveGetRuntimeTest extends GoogleDriveTestBaseRuntime {
         File file = new File();
         file.setId("fileName-id");
         file.setMimeType(GoogleDriveMimeTypes.MIME_TYPE_GOOGLE_DOCUMENT);
-        when(drive.files().get(anyString()).setFields(anyString()).execute()).thenReturn(file);
+        when(drive.files().get(any()).setFields(anyString()).execute()).thenReturn(file);
         //
         testRuntime.initialize(container, properties);
         testRuntime.runAtDriver(container);
@@ -162,7 +165,7 @@ public class GoogleDriveGetRuntimeTest extends GoogleDriveTestBaseRuntime {
         files.setFiles(fl);
         String q1 = "name='A' and 'root' in parents and mimeType='application/vnd.google-apps.folder'";
         when(drive.files().list().setQ(q1).execute()).thenReturn(files);
-        when(drive.files().list().setQ(anyString()).execute()).thenReturn(files);
+        when(drive.files().list().setQ(any()).execute()).thenReturn(files);
         //
         properties.file.setValue("/A");
         testRuntime.initialize(container, properties);

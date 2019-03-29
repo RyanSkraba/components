@@ -5,12 +5,17 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.talend.components.salesforce.integration.DisableIfMissingConfig;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties.SourceType;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreProperties;
 import org.talend.components.salesforce.integration.SalesforceTestBase;
 
 public class SalesforceDatasetPropertiesTestIT extends SalesforceTestBase {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
     @Test
     public void testAfterSourceType() {

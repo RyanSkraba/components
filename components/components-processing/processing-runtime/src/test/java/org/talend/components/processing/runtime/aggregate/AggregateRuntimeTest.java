@@ -1,5 +1,7 @@
 package org.talend.components.processing.runtime.aggregate;
 
+import static org.junit.Assume.assumeTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -492,6 +494,7 @@ public class AggregateRuntimeTest {
 
     @Test
     public void basicTest_Spark() {
+        assumeTrue(System.getProperty("java.version").startsWith("1.8.")); // spark does not handle java 11 for now
         basicTest(new SparkRunnerTestUtils(this.getClass().getName()).createPipeline());
     }
 

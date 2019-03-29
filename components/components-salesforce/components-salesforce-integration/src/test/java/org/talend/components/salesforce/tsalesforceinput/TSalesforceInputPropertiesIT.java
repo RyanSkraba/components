@@ -16,9 +16,12 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.salesforce.integration.DisableIfMissingConfig;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -29,6 +32,9 @@ import org.talend.daikon.properties.ValidationResult;
  */
 
 public class TSalesforceInputPropertiesIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TSalesforceInputPropertiesIT.class);
 
     private static final String GUESS_SCHEMA_SOQL_ERROR_PROPERTY_KEY = "errorMessage.validateGuessSchemaSoqlError";

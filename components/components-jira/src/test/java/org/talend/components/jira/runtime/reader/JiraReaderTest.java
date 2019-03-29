@@ -21,6 +21,7 @@ import static org.talend.components.jira.testutils.JiraTestConstants.*;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.junit.Before;
@@ -145,7 +146,7 @@ public class JiraReaderTest {
         Rest rest = mock(Rest.class);
 
         JiraResponse jr = new JiraResponse(400, "Some error message");
-        when(rest.get(anyString(), anyMap())).thenReturn(jr);
+        when(rest.get(anyString(), Map.class.cast(anyMap()))).thenReturn(jr);
 
         jiraReader.setRest(rest);
 

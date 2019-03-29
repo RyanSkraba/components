@@ -18,8 +18,10 @@ import java.net.PasswordAuthentication;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.ProxyAuthenticator;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
@@ -37,6 +39,8 @@ import org.talend.daikon.properties.ValidationResult;
 
 @Ignore
 public class SalesforceProxyTestIT extends SalesforceTestBase {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
     private static HttpProxyServer server;
 

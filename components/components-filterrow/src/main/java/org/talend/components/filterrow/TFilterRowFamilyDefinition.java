@@ -13,16 +13,15 @@
 // ============================================================================
 package org.talend.components.filterrow;
 
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * Install all of the definitions provided for the TFilterRow family of components.
  */
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + TFilterRowFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + TFilterRowFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class TFilterRowFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "TFilterRow_POC";

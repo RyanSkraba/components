@@ -12,17 +12,24 @@
 // ============================================================================
 package org.talend.components.azurestorage.table.runtime;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -106,7 +113,7 @@ public class AzureStorageTableWriterTest {
                 public Void answer(InvocationOnMock invocation) throws Throwable {
                     return null;
                 }
-            }).when(tableService).handleActionOnTable(anyString(), any(ActionOnTable.class));
+            }).when(tableService).handleActionOnTable(Mockito.<String>any(), Mockito.<ActionOnTable>any());
 
             // open should not fail
             writer.open(RandomStringUtils.random(12));
@@ -192,8 +199,8 @@ public class AzureStorageTableWriterTest {
                 public Void answer(InvocationOnMock invocation) throws Throwable {
                     return null;
                 }
-            }).when(tableService).handleActionOnTable(anyString(), any(ActionOnTable.class));
-            when(tableService.executeOperation(anyString(), any(TableOperation.class))).thenReturn(new TableResult(200));
+            }).when(tableService).handleActionOnTable(Mockito.<String>any(), any(ActionOnTable.class));
+            when(tableService.executeOperation(Mockito.<String>any(), any(TableOperation.class))).thenReturn(new TableResult(200));
 
             // assert
             writer.open(RandomStringUtils.random(12));

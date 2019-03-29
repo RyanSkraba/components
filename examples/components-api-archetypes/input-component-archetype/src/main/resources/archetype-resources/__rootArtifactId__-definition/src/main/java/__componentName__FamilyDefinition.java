@@ -16,8 +16,7 @@ import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import ${package}.${componentPackage}.${componentName}Definition;
-
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 
 import com.google.auto.service.AutoService;
 
@@ -25,7 +24,7 @@ import com.google.auto.service.AutoService;
  * Install all of the definitions provided for the ${componentName} family of components.
  */
 @AutoService(ComponentInstaller.class)
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + ${componentName}FamilyDefinition.NAME, provide = ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + ${componentName}FamilyDefinition.NAME, service = ComponentInstaller.class)
 public class ${componentName}FamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "${componentName}";

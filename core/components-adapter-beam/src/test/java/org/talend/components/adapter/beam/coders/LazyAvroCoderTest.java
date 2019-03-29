@@ -12,6 +12,7 @@ import org.apache.beam.sdk.transforms.Keys;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.adapter.beam.io.rowgenerator.RowGeneratorIO;
@@ -25,9 +26,11 @@ public class LazyAvroCoderTest {
     @Rule
     public final TestPipeline p = TestPipeline.create();
 
+    @Before
     @After
     public void teardown() {
         // Always clean up the LazyAvroCoder static methods.
+        LazyAvroCoder.StaticSchemaHolderSupplier.reset();
         LazyAvroCoder.resetSchemaSupplier();
     }
 

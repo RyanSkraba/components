@@ -171,8 +171,6 @@ public class BigQueryAvroRegistry extends AvroRegistry {
     }
 
     private org.apache.avro.Schema inferSchemaField(Field field) {
-        String name = field.getName();
-        Field.Type sqlType = field.getType();
         Field.Mode mode = field.getMode();
 
         // Get the "basic" type of the field.
@@ -194,26 +192,26 @@ public class BigQueryAvroRegistry extends AvroRegistry {
      * wrapper for {@link StandardSQLTypeName}
      */
     private org.apache.avro.Schema inferSchemaFieldWithoutMode(Field field) {
-        Field.Type sqlType = field.getType();
-        switch (sqlType.getValue()) {
-        case RECORD:
+        LegacySQLTypeName sqlType = field.getType();
+        switch (sqlType.getStandardType()) {
+            case STRUCT:
             String name = field.getName();
             // Struct type
             // https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#struct-type
             SchemaBuilder.FieldAssembler<org.apache.avro.Schema> itemFieldAssembler =
                     SchemaBuilder.record(name).fields();
-            for (Field itemField : sqlType.getFields()) {
+            for (Field itemField : field.getSubFields()) {
                 itemFieldAssembler.name(itemField.getName()).type(inferSchemaField(itemField)).noDefault();
             }
             org.apache.avro.Schema recordSchema = itemFieldAssembler.endRecord();
             return recordSchema;
         case BYTES:
             return AvroUtils._bytes();
-        case INTEGER:
+        case INT64:
             return AvroUtils._long();
-        case FLOAT:
+        case FLOAT64:
             return AvroUtils._double();
-        case BOOLEAN:
+        case BOOL:
             return AvroUtils._boolean();
         case DATETIME:
             org.apache.avro.Schema schemaDT = AvroUtils._string();

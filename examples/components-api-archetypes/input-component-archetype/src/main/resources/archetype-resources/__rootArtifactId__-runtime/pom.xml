@@ -79,6 +79,7 @@
 				</executions>
 				<configuration>
 					<argLine>-Xms128m -Xmx256m ${jacoco.agent.it.argLine}</argLine>
+					<trimStackTrace>false</trimStackTrace>
 					<systemPropertyVariables>
 						<pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
 					</systemPropertyVariables>

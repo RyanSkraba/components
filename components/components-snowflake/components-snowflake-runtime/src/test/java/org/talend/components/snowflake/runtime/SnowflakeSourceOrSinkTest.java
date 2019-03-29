@@ -137,11 +137,11 @@ public class SnowflakeSourceOrSinkTest {
         Connection connection = Mockito.mock(Connection.class);
         Mockito.when(connection.isClosed()).thenReturn(false);
         DatabaseMetaData metaData = Mockito.mock(DatabaseMetaData.class);
-        Mockito.when(metaData.getTables(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+        Mockito.when(metaData.getTables(Mockito.any(), Mockito.any(), Mockito.any(),
                 Mockito.eq(new String[] { "TABLE" }))).thenReturn(Mockito.mock(ResultSet.class));
         Mockito.when(connection.getMetaData()).thenReturn(metaData);
         Mockito.when(
-                DriverManagerUtils.getConnection(Mockito.any(SnowflakeConnectionProperties.class)))
+                DriverManagerUtils.getConnection(Mockito.any()))
         .thenReturn(connection);
 
         SnowflakeSourceOrSink sss = new SnowflakeSourceOrSink();
@@ -214,10 +214,10 @@ public class SnowflakeSourceOrSinkTest {
         DatabaseMetaData metaData = Mockito.mock(DatabaseMetaData.class);
 
         ResultSet rs = Mockito.mock(ResultSet.class);
-        Mockito.when(metaData.getColumns(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+        Mockito.when(metaData.getColumns(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
         .thenReturn(rs);
         Mockito.when(connection.getMetaData()).thenReturn(metaData);
-        Mockito.when(DriverManagerUtils.getConnection(Mockito.any(SnowflakeConnectionProperties.class))).thenReturn(connection);
+        Mockito.when(DriverManagerUtils.getConnection(Mockito.any())).thenReturn(connection);
 
         snowflakeSourceOrSink.getEndpointSchema(null, "table1");
     }

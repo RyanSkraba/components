@@ -28,10 +28,12 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
@@ -61,6 +63,8 @@ import com.sforce.ws.ConnectionException;
  * Test Salesforce connection session
  */
 public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceSessionReuseTestIT.class);
 

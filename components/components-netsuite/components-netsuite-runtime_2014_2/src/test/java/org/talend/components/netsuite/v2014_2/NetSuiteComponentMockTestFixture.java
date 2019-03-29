@@ -44,7 +44,7 @@ public class NetSuiteComponentMockTestFixture extends AbstractNetSuiteComponentM
         LoginResponse response = new LoginResponse();
         response.setSessionResponse(sessionResponse);
 
-        when(port.login(any(LoginRequest.class))).thenReturn(response);
+        when(port.login(any())).thenReturn(response);
     }
 
 }

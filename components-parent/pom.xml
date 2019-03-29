@@ -9,9 +9,9 @@
     <name>Component Parent POM</name>
 
     <properties>
-        <java.version>1.7</java.version>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <log4j.rootLogger>INFO, stdout</log4j.rootLogger>
         <log4j.appender.stdout>org.apache.log4j.ConsoleAppender</log4j.appender.stdout>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,23 +23,23 @@
         <sonar.jacoco.itReportPath>${coverage.sonar.reportRoot}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
 
         <components.version>0.26.0-SNAPSHOT</components.version>
-        <daikon.version>0.29.0-SNAPSHOT</daikon.version>
+        <daikon.version>0.31.4-SNAPSHOT</daikon.version>
 
+        <osgi.core.version>6.0.0</osgi.core.version>
         <tycho-p2-extras-plugin.version>0.26.0</tycho-p2-extras-plugin.version>
         <docker-maven-plugin.version>0.26.0</docker-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.7.8</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.2</jacoco-maven-plugin.version>
         <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
         <maven-assembly-plugin.version>3.0.0</maven-assembly-plugin.version>
-        <maven-bundle-plugin.version>3.0.1</maven-bundle-plugin.version>
-        <maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
+        <maven-bundle-plugin.version>4.1.0</maven-bundle-plugin.version>
+        <maven-dependency-plugin.version>3.0.2</maven-dependency-plugin.version>
         <maven-failsafe-plugin-paxexam.version>2.20-PAXEXAM-PATCH</maven-failsafe-plugin-paxexam.version>
         <maven-failsafe-plugin.version>2.18</maven-failsafe-plugin.version>
         <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
         <maven-resources-plugin.version>3.0.2</maven-resources-plugin.version>
         <maven-scm-plugin.version>1.9.4</maven-scm-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-        <maven-surefire-plugin.version>2.18</maven-surefire-plugin.version>
-
+        <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
         <cxf.version>3.3.1</cxf.version>
     </properties>
 
@@ -178,10 +178,13 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>${maven-bundle-plugin.version}</version>
                     <extensions>true</extensions>
                     <configuration>
                         <instructions>
+                            <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                            <_noee>true</_noee>
+                            <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                             <DynamicImport-Package>org.talend.daikon.*</DynamicImport-Package>
                         </instructions>
                     </configuration>
@@ -240,6 +243,15 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>${maven-antrun-plugin.version}</version>
                 <executions>
@@ -262,7 +274,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18</version>
+                <version>3.0.0-M3</version>
+                <configuration>
+                    <trimStackTrace>false</trimStackTrace>
+                    <environmentVariables>
+                        <LC_ALL>en_US.UTF-8</LC_ALL>
+                    </environmentVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

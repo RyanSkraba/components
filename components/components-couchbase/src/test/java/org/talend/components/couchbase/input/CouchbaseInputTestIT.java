@@ -29,8 +29,12 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
@@ -50,6 +54,19 @@ import com.couchbase.client.java.env.DefaultCouchbaseEnvironment;
 
 @Category({ RequiresCouchbaseServer.class })
 public class CouchbaseInputTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = (base, description) -> {
+        if (System.getProperty("connection.properties", "").trim().isEmpty()) {
+            return new Statement() {
+                @Override
+                public void evaluate() {
+                    LoggerFactory.getLogger(CouchbaseInputTestIT.class)
+                                 .warn("Missing system property 'connection.properties', skipping {}", description);
+                }
+            };
+        }
+        return base;
+    };
 
     private transient static final Logger LOGGER = LoggerFactory.getLogger(CouchbaseInputTestIT.class);
 

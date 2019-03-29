@@ -19,8 +19,7 @@ import ${packageTalend}.api.ComponentInstaller;
 import ${packageTalend}.api.Constants;
 import ${package}.definition.input.${componentNameClass}InputDefinition;
 import ${package}.definition.output.${componentNameClass}OutputDefinition;
-
-import aQute.bnd.annotation.component.Component;
+import org.osgi.service.component.annotations.Component;
 
 
 /**
@@ -28,7 +27,7 @@ import aQute.bnd.annotation.component.Component;
  */
 @AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX
-        + ${componentNameClass}ComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
+        + ${componentNameClass}ComponentFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class ${componentNameClass}ComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "${componentName}";

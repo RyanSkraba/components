@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.marklogic.runtime;
 
+import java.util.Locale;
+
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -56,14 +58,13 @@ public class TMarkLogicConnectionStandaloneTest {
 
         PowerMockito.mockStatic(DatabaseClientFactory.class);
         client = Mockito.mock(DatabaseClient.class);
-        Mockito.when(DatabaseClientFactory.newClient(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.any(SecurityContext.class))).thenReturn(client);
+        Mockito.when(DatabaseClientFactory.newClient(Mockito.any(), Mockito.anyInt(), Mockito.any(),
+                Mockito.any())).thenReturn(client);
         container = Mockito.mock(RuntimeContainer.class);
         connectionProperties = new MarkLogicConnectionProperties("connection");
         connectionProperties.authentication.setValue("BASIC");
-        Mockito.when(container.getComponentData(Mockito.anyString(), Mockito.eq(MarkLogicConnection.CONNECTION)))
+        Mockito.when(container.getComponentData(Mockito.any(), Mockito.eq(MarkLogicConnection.CONNECTION)))
                 .thenReturn(client);
-
     }
 
     @Test
@@ -89,7 +90,7 @@ public class TMarkLogicConnectionStandaloneTest {
         connectionProperties.referencedComponent.componentInstanceId.setValue("ref1");
         connectionStandalone.initialize(container, connectionProperties);
         Mockito.when(container.getCurrentComponentId()).thenReturn("tMarkLogicConnection1");
-        Mockito.when(container.getComponentData(Mockito.anyString(), Mockito.eq(MarkLogicConnection.CONNECTION)))
+        Mockito.when(container.getComponentData(Mockito.any(), Mockito.eq(MarkLogicConnection.CONNECTION)))
                 .thenReturn(null);
 
         connectionStandalone.runAtDriver(container);
@@ -105,7 +106,7 @@ public class TMarkLogicConnectionStandaloneTest {
 
         connectionStandalone.runAtDriver(container);
 
-        Mockito.verify(container).getComponentData(Mockito.anyString(), Mockito.eq(MarkLogicConnection.CONNECTION));
+        Mockito.verify(container).getComponentData(Mockito.any(), Mockito.eq(MarkLogicConnection.CONNECTION));
     }
 
     @Test

@@ -29,12 +29,12 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.common.ComponentServiceImpl;
 import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.service.spi.ServiceSpiFactory;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
-import org.talend.daikon.runtime.RuntimeUtil;
 
 /**
  * Configuration that deals with ComponentRegistry setup.
@@ -78,7 +78,8 @@ public class ComponentsRegistrySetup {
     }
 
     DefinitionRegistry createDefinitionRegistry() {
-        RuntimeUtil.registerMavenUrlHandler();
+        new JarRuntimeInfo((URL) null, null, null); // ensure mvn url - pax url - is registered
+
         // read the list of components and register them
         try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(TCOMP_COMPONENTS_LIST_RESOURCE_PATH)) {
             if (is != null) {

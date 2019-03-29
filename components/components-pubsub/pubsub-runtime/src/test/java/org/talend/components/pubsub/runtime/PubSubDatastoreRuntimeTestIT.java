@@ -4,10 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.talend.components.pubsub.runtime.PubSubTestConstants.createDatastore;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.daikon.properties.ValidationResult;
 
 public class PubSubDatastoreRuntimeTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig("bigquery.project");
 
     PubSubDatastoreRuntime runtime;
 

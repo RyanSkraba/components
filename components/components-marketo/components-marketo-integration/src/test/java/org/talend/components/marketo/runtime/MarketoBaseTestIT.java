@@ -27,6 +27,7 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.junit.ClassRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.marketo.MarketoUtils;
@@ -98,6 +99,9 @@ public class MarketoBaseTestIT {
     public static final String LIST_KEY_TYPE_MKTOSALESUSERID = "MKTOSALESUSERID";
 
     public static final String LIST_KEY_TYPE_SFDCLEADOWNERID = "SFDCLEADOWNERID";
+
+    @ClassRule
+    public static final DisableIfMissingConfig DISABLE_IF_MISSING_CONFIG = new DisableIfMissingConfig("marketo.soap.endpoint");
 
     static {
         ENDPOINT_SOAP = getProperty("marketo.soap.endpoint");

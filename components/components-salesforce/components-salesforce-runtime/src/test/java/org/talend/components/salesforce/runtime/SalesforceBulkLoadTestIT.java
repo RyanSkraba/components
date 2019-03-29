@@ -19,9 +19,11 @@ import java.util.Map;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.salesforce.test.SalesforceRuntimeTestUtil;
@@ -37,6 +39,8 @@ import org.talend.daikon.avro.converter.IndexedRecordConverter;
  * Created by wwang on 2016-05-16.
  */
 public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
+	@ClassRule
+	public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
 	private SalesforceRuntimeTestUtil util = new SalesforceRuntimeTestUtil();
 

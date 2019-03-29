@@ -14,13 +14,13 @@
 package org.talend.components.bigquery;
 
 import com.google.auto.service.AutoService;
+
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.bigquery.input.BigQueryInputDefinition;
 import org.talend.components.bigquery.output.BigQueryOutputDefinition;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * Install all of the definitions provided for the BigQuery family of components.
@@ -28,7 +28,7 @@ import aQute.bnd.annotation.component.Component;
 
 @AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX
-        + BigQueryComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
+        + BigQueryComponentFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class BigQueryComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "BigQuery";

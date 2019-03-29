@@ -211,6 +211,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <trimStackTrace>false</trimStackTrace>
                     <argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
                     <systemPropertyVariables>
                         <pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
@@ -239,6 +240,9 @@
                         </goals>
                         <configuration>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.netsuite.runtime.v2014_2.lib
                                 </Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>

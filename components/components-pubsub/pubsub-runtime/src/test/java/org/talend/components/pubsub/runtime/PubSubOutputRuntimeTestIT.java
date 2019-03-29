@@ -25,8 +25,10 @@ import org.apache.beam.sdk.values.PCollection;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.components.adapter.beam.BeamJobRuntimeContainer;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
@@ -38,6 +40,8 @@ import org.talend.components.pubsub.output.PubSubOutputProperties;
 import com.google.api.services.pubsub.model.ReceivedMessage;
 
 public class PubSubOutputRuntimeTestIT implements Serializable {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig("bigquery.project");
 
     final static String uuid = UUID.randomUUID().toString();
 
@@ -50,7 +54,8 @@ public class PubSubOutputRuntimeTestIT implements Serializable {
 
     final static String newSubName = "tcomp-pubsub-createTopicSub-sub" + uuid;
 
-    static PubSubClient client = PubSubConnection.createClient(createDatastore());
+    static PubSubClient client = PubSubTestConstants.PROJECT == null || PubSubTestConstants.PROJECT.isEmpty() ?
+            null : PubSubConnection.createClient(createDatastore());
 
     static {
         PubSubAvroRegistry.get();

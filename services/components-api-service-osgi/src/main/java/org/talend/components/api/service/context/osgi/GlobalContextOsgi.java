@@ -12,17 +12,17 @@
 // ============================================================================
 package org.talend.components.api.service.context.osgi;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessageProvider;
 
-import aQute.bnd.annotation.component.Reference;
-
 /**
  * GlobalContext implementation for OSGI container
  */
-@aQute.bnd.annotation.component.Component(provide = GlobalI18N.class)
+@Component(service = GlobalI18N.class)
 public class GlobalContextOsgi extends GlobalI18N {
 
     private static final Logger LOG = LoggerFactory.getLogger(GlobalContextOsgi.class);

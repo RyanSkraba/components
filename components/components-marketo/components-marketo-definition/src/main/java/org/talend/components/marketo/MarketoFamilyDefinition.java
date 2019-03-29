@@ -12,8 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo;
 
-import aQute.bnd.annotation.component.Component;
-
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -32,7 +31,7 @@ import org.talend.components.marketo.wizard.MarketoConnectionWizardDefinition;
 import com.google.auto.service.AutoService;
 
 @AutoService(ComponentInstaller.class)
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + MarketoFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + MarketoFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class MarketoFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "Marketo";

@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.test;
 
+import static java.util.Collections.emptyList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -111,6 +113,7 @@ public class SparkIntegrationTestResource extends TemporaryFolder {
         if (options == null) {
             options = PipelineOptionsFactory.as(SparkContextOptions.class);
             options.setRunner(SparkRunner.class);
+            options.setFilesToStage(emptyList()); // useless for us and broken on java > 8 with beam <= 2.10.0
         }
         return options;
     }

@@ -105,9 +105,9 @@ public class MarketoTestBase extends AbstractComponentTest2 {
             //
             when(((MarketoSourceOrSinkSchemaProvider) runtimeSourceOrSink).getAllLeadFields()).thenReturn(fakeAllLeadFields());
             //
-            when(runtimeSourceOrSink.getSchemaNames(any(RuntimeContainer.class))).thenReturn(CO_SCHEMA_NAMES);
+            when(runtimeSourceOrSink.getSchemaNames(any())).thenReturn(CO_SCHEMA_NAMES);
             when(runtimeSourceOrSink.getEndpointSchema(any(RuntimeContainer.class), eq("car_c"))).thenReturn(CO_CARC_SCHEMA);
-            when(runtimeSourceOrSink.getEndpointSchema(any(RuntimeContainer.class), eq("car_except")))
+            when(runtimeSourceOrSink.getEndpointSchema(any(), eq("car_except")))
                     .thenThrow(new IOException("ERROR"));
             //
             when(((MarketoSourceOrSinkSchemaProvider) runtimeSourceOrSink).getSchemaForCustomObject(eq("car_c")))

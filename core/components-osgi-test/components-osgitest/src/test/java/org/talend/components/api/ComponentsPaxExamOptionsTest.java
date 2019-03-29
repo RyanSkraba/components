@@ -18,13 +18,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.test.ComponentTestUtils;
 
-@RunWith(PaxExam.class)
+@RunWith(DisablablePaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class ComponentsPaxExamOptionsTest {
 
@@ -43,5 +42,4 @@ public class ComponentsPaxExamOptionsTest {
         // api-service
         new ComponentTestUtils();
     }
-
 }

@@ -1,5 +1,7 @@
 package org.talend.components.adapter.beam.utils;
 
+import static java.util.Collections.emptyList;
+
 import org.apache.beam.runners.spark.SparkContextOptions;
 import org.apache.beam.runners.spark.SparkRunner;
 import org.apache.beam.sdk.Pipeline;
@@ -27,6 +29,7 @@ public class SparkRunnerTestUtils {
 
     public Pipeline createPipeline() {
         SparkContextOptions sparkOpts = options.as(SparkContextOptions.class);
+        sparkOpts.setFilesToStage(emptyList());
 
         SparkConf conf = new SparkConf();
         conf.setAppName(appName);

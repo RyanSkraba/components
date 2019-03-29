@@ -12,24 +12,18 @@
 // ============================================================================
 package org.talend.components.filterrow;
 
-import static org.ops4j.pax.exam.CoreOptions.*;
+import static org.ops4j.pax.exam.CoreOptions.composite;
+import static org.ops4j.pax.exam.CoreOptions.linkBundle;
+import static org.ops4j.pax.exam.CoreOptions.options;
 
-import javax.inject.Inject;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.talend.components.api.ComponentsPaxExamOptions;
-import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.ComponentTestUtils;
 
-@RunWith(PaxExam.class)
+@RunWith(DisablablePaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class OsgiTFilterRowTestIT extends TFilterRowTestBase {
 

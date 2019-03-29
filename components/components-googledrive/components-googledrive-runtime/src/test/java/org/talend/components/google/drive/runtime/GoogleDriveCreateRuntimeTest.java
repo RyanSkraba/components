@@ -59,21 +59,21 @@ public class GoogleDriveCreateRuntimeTest extends GoogleDriveTestBaseRuntime {
         fA.setId("A");
         fs.add(fA);
         flA.setFiles(fs);
-        when(drive.files().list().setQ(eq(qA)).execute()).thenReturn(flA);
+        when(drive.files().list().setQ(qA).execute()).thenReturn(flA);
         FileList flB = new FileList();
         List<File> fsA = new ArrayList<>();
         File fB = new File();
         fB.setId("B");
         fsA.add(fB);
         flB.setFiles(fsA);
-        when(drive.files().list().setQ(eq(qB)).execute()).thenReturn(flB);
+        when(drive.files().list().setQ(qB).execute()).thenReturn(flB);
         FileList flC = new FileList();
         List<File> fsC = new ArrayList<>();
         File fC = new File();
         fC.setId("C");
         fsC.add(fC);
         flC.setFiles(fsC);
-        when(drive.files().list().setQ(eq(qC)).execute()).thenReturn(flC);
+        when(drive.files().list().setQ(qC).execute()).thenReturn(flC);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class GoogleDriveCreateRuntimeTest extends GoogleDriveTestBaseRuntime {
 
     @Test
     public void testExceptionThrownInRuntime() throws Exception {
-        when(drive.files().create(any(File.class)).setFields("id").execute().getId()).thenThrow(new IOException("error"));
+        when(drive.files().create(any()).setFields("id").execute().getId()).thenThrow(new IOException("error"));
         testRuntime.initialize(container, properties);
         try {
             testRuntime.runAtDriver(container);

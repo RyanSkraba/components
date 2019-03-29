@@ -12,12 +12,13 @@
 // ============================================================================
 package org.talend.components.jira;
 
-import static org.ops4j.pax.exam.CoreOptions.*;
+import static org.ops4j.pax.exam.CoreOptions.composite;
+import static org.ops4j.pax.exam.CoreOptions.linkBundle;
+import static org.ops4j.pax.exam.CoreOptions.options;
 
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.talend.components.api.ComponentsPaxExamOptions;
@@ -26,7 +27,7 @@ import org.talend.components.api.ComponentsPaxExamOptions;
  * Integration tests for Jira Input component, which check if nothing was missed
  * during component implementation
  */
-@RunWith(PaxExam.class)
+@RunWith(DisablablePaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class OsgiJiraComponentsTestIT extends JiraComponentsTestBase {
 

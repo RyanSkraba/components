@@ -13,18 +13,18 @@
 package org.talend.components.fullexample;
 
 import com.google.auto.service.AutoService;
+
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.fullexample.datastore.FullExampleDatastoreDefinition;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * Install all of the definitions provided for the FullExample family of components.
  */
 @AutoService(ComponentInstaller.class)
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + FullExampleFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + FullExampleFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class FullExampleFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "FullExample";

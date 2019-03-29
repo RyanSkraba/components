@@ -12,16 +12,15 @@
 // ============================================================================
 package org.talend.components.api.service.i18n.osgi;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.talend.daikon.i18n.I18nMessageProvider;
 import org.talend.daikon.i18n.LocaleProvider;
-
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Reference;
 
 /**
  * I18nMessageProvider implementation for OSGI container
  */
-@Component(provide = I18nMessageProvider.class)
+@Component(service = I18nMessageProvider.class)
 public class I18nMessageProviderOsgi extends I18nMessageProvider {
 
     LocaleProvider localeProvider;

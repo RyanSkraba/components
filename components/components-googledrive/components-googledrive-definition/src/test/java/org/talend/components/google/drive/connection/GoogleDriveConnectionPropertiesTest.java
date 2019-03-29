@@ -13,9 +13,13 @@
 package org.talend.components.google.drive.connection;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.talend.components.google.drive.connection.GoogleDriveConnectionProperties.FORM_WIZARD;
@@ -24,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.google.drive.GoogleDriveTestBase;
 import org.talend.components.google.drive.connection.GoogleDriveConnectionProperties.OAuthMethod;
-import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
@@ -179,8 +182,8 @@ public class GoogleDriveConnectionPropertiesTest extends GoogleDriveTestBase {
         ValidationResult vr = properties.afterFormFinishWizard(repo);
         assertThat(vr.getStatus(), is(Result.OK));
         repo = mock(TestRepository.class);
-        doThrow(new RuntimeException("ERROR during storing connection")).when(repo).storeProperties(any(Properties.class),
-                anyString(), anyString(), anyString());
+        doThrow(new RuntimeException("ERROR during storing connection")).when(repo).storeProperties(any(),
+                any(), any(), any());
         vr = properties.afterFormFinishWizard(repo);
         assertThat(vr.getStatus(), is(Result.ERROR));
     }

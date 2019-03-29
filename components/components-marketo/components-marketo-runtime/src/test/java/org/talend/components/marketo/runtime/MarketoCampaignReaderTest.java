@@ -40,7 +40,7 @@ public class MarketoCampaignReaderTest extends MarketoRuntimeTestBase {
 
         source = mock(MarketoSource.class);
         source.initialize(null, props);
-        when(source.getClientService(any(RuntimeContainer.class))).thenReturn(client);
+        when(source.getClientService(any())).thenReturn(client);
         when(source.createReader(null)).thenReturn(new MarketoCampaignReader(null, source, props));
         reader = (MarketoCampaignReader) source.createReader(null);
         assertTrue(reader instanceof MarketoCampaignReader);
@@ -51,12 +51,12 @@ public class MarketoCampaignReaderTest extends MarketoRuntimeTestBase {
 
     @Test
     public void testGetCurrent() throws Exception {
-        when(client.getCampaigns(any(TMarketoCampaignProperties.class), any(String.class))).thenReturn(getLeadRecordResult(true));
+        when(client.getCampaigns(any(), any())).thenReturn(getLeadRecordResult(true));
         assertTrue(reader.start());
         assertNotNull(reader.getCurrent());
         assertTrue(reader.advance());
         assertNotNull(reader.getCurrent());
-        when(client.getCampaigns(any(TMarketoCampaignProperties.class), any(String.class)))
+        when(client.getCampaigns(any(), any()))
                 .thenReturn(getLeadRecordResult(false));
         assertTrue(reader.advance());
         assertNotNull(reader.getCurrent());

@@ -56,8 +56,8 @@ public class GoogleDriveDatasetRuntimeTest extends GoogleDriveDataBaseTest {
         GoogleDriveDataSource source = mock(GoogleDriveDataSource.class);
         GoogleDriveInputReader reader = mock(GoogleDriveInputReader.class);
         //
-        doReturn(source).when(rt).createDataSource(any(GoogleDriveInputProperties.class));
-        doReturn(reader).when(source).createReader(any(RuntimeContainer.class));
+        doReturn(source).when(rt).createDataSource(any());
+        doReturn(reader).when(source).createReader(any());
         doReturn(drive).when(source).getDriveService();
         doReturn(utils).when(source).getDriveUtils();
         //

@@ -60,23 +60,23 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
 
         source = mock(MarketoSource.class);
         source.initialize(null, props);
-        when(source.getClientService(any(RuntimeContainer.class))).thenReturn(client);
+        when(source.getClientService(any())).thenReturn(client);
         when(source.createReader(null)).thenReturn(new MarketoInputReader(null, source, props));
         reader = (MarketoInputReader) source.createReader(null);
         assertTrue(reader instanceof MarketoInputReader);
 
-        when(client.getLead(any(TMarketoInputProperties.class), any(String.class)))
+        when(client.getLead(any(), any()))
                 .thenReturn(getFailedRecordResult("REST", "", "error"));
-        when(client.getMultipleLeads(any(TMarketoInputProperties.class), any(String.class)))
+        when(client.getMultipleLeads(any(), any()))
                 .thenReturn(getFailedRecordResult("REST", "", "error"));
-        when(client.getLeadActivity(any(TMarketoInputProperties.class), any(String.class)))
+        when(client.getLeadActivity(any(), any()))
                 .thenReturn(getFailedRecordResult("REST", "", "error"));
-        when(client.getLeadChanges(any(TMarketoInputProperties.class), any(String.class)))
+        when(client.getLeadChanges(any(), any()))
                 .thenReturn(getFailedRecordResult("REST", "", "error"));
-        when(client.describeCustomObject(any(TMarketoInputProperties.class)))
+        when(client.describeCustomObject(any()))
                 .thenReturn(getFailedRecordResult("REST", "", "error"));
-        when(client.listCustomObjects(any(TMarketoInputProperties.class))).thenReturn(getFailedRecordResult("REST", "", "error"));
-        when(client.getCustomObjects(any(TMarketoInputProperties.class), any(String.class)))
+        when(client.listCustomObjects(any())).thenReturn(getFailedRecordResult("REST", "", "error"));
+        when(client.getCustomObjects(any(), any()))
                 .thenReturn(getFailedRecordResult("REST", "", "error"));
 
     }
@@ -87,14 +87,14 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
         mkto.setSuccess(false);
         mkto.setErrors(Arrays.asList(new MarketoError("REST", "error")));
 
-        when(client.bulkImport(any(TMarketoBulkExecProperties.class))).thenReturn(mkto);
-        when(client.getLead(any(TMarketoInputProperties.class), any(String.class))).thenReturn(mkto);
-        when(client.getMultipleLeads(any(TMarketoInputProperties.class), any(String.class))).thenReturn(mkto);
-        when(client.getLeadActivity(any(TMarketoInputProperties.class), any(String.class))).thenReturn(mkto);
-        when(client.getLeadChanges(any(TMarketoInputProperties.class), any(String.class))).thenReturn(mkto);
-        when(client.describeCustomObject(any(TMarketoInputProperties.class))).thenReturn(mkto);
-        when(client.listCustomObjects(any(TMarketoInputProperties.class))).thenReturn(mkto);
-        when(client.getCustomObjects(any(TMarketoInputProperties.class), any(String.class))).thenReturn(mkto);
+        when(client.bulkImport(any())).thenReturn(mkto);
+        when(client.getLead(any(), any())).thenReturn(mkto);
+        when(client.getMultipleLeads(any(), any())).thenReturn(mkto);
+        when(client.getLeadActivity(any(), any())).thenReturn(mkto);
+        when(client.getLeadChanges(any(), any())).thenReturn(mkto);
+        when(client.describeCustomObject(any())).thenReturn(mkto);
+        when(client.listCustomObjects(any())).thenReturn(mkto);
+        when(client.getCustomObjects(any(), any())).thenReturn(mkto);
 
         try {
             assertFalse(reader.start());
@@ -106,14 +106,14 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
         mkto.setSuccess(true);
         mkto.setRecords(Arrays.asList(record));
 
-        when(client.bulkImport(any(TMarketoBulkExecProperties.class))).thenReturn(mkto);
-        when(client.getLead(any(TMarketoInputProperties.class), any(String.class))).thenReturn(mkto);
-        when(client.getMultipleLeads(any(TMarketoInputProperties.class), any(String.class))).thenReturn(mkto);
-        when(client.getLeadActivity(any(TMarketoInputProperties.class), any(String.class))).thenReturn(mkto);
-        when(client.getLeadChanges(any(TMarketoInputProperties.class), any(String.class))).thenReturn(mkto);
-        when(client.describeCustomObject(any(TMarketoInputProperties.class))).thenReturn(mkto);
-        when(client.listCustomObjects(any(TMarketoInputProperties.class))).thenReturn(mkto);
-        when(client.getCustomObjects(any(TMarketoInputProperties.class), any(String.class))).thenReturn(mkto);
+        when(client.bulkImport(any())).thenReturn(mkto);
+        when(client.getLead(any(), any())).thenReturn(mkto);
+        when(client.getMultipleLeads(any(), any())).thenReturn(mkto);
+        when(client.getLeadActivity(any(), any())).thenReturn(mkto);
+        when(client.getLeadChanges(any(), any())).thenReturn(mkto);
+        when(client.describeCustomObject(any())).thenReturn(mkto);
+        when(client.listCustomObjects(any())).thenReturn(mkto);
+        when(client.getCustomObjects(any(), any())).thenReturn(mkto);
 
         assertFalse(reader.start());
 
@@ -121,12 +121,12 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
 
     @Test
     public void testGetCurrent() throws Exception {
-        when(client.getLead(any(TMarketoInputProperties.class), any(String.class))).thenReturn(getLeadRecordResult(true));
+        when(client.getLead(any(), any())).thenReturn(getLeadRecordResult(true));
         assertTrue(reader.start());
         assertNotNull(reader.getCurrent());
         assertTrue(reader.advance());
         assertNotNull(reader.getCurrent());
-        when(client.getLead(any(TMarketoInputProperties.class), any(String.class))).thenReturn(getLeadRecordResult(false));
+        when(client.getLead(any(), any())).thenReturn(getLeadRecordResult(false));
         assertTrue(reader.advance());
         assertNotNull(reader.getCurrent());
         assertTrue(reader.advance());
@@ -172,7 +172,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
         props.schemaInput.schema.setValue(getFullDynamicSchema());
         source.initialize(null, props);
         when(source.createReader(null)).thenReturn(new MarketoInputReader(null, source, props));
-        when(source.getDynamicSchema(any(String.class), any(Schema.class)))
+        when(source.getDynamicSchema(any(), any(Schema.class)))
                 .thenReturn(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads());
         reader = (MarketoInputReader) source.createReader(null);
         assertFalse(reader.start());
@@ -183,7 +183,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
         props.schemaInput.schema.setValue(getFullDynamicSchema());
         source.initialize(null, props);
         when(source.createReader(null)).thenReturn(new MarketoInputReader(null, source, props));
-        when(source.getDynamicSchema(any(String.class), any(Schema.class)))
+        when(source.getDynamicSchema(any(), any(Schema.class)))
                 .thenReturn(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads());
         reader = (MarketoInputReader) source.createReader(null);
         assertFalse(reader.start());
@@ -193,7 +193,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
         props.schemaInput.schema.setValue(getFullDynamicSchema());
         source.initialize(null, props);
         when(source.createReader(null)).thenReturn(new MarketoInputReader(null, source, props));
-        when(source.getDynamicSchema(any(String.class), any(Schema.class)))
+        when(source.getDynamicSchema(any(), any(Schema.class)))
                 .thenReturn(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads());
         reader = (MarketoInputReader) source.createReader(null);
         assertFalse(reader.start());
@@ -203,7 +203,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
         props.schemaInput.schema.setValue(getFullDynamicSchema());
         source.initialize(null, props);
         when(source.createReader(null)).thenReturn(new MarketoInputReader(null, source, props));
-        when(source.getDynamicSchema(any(String.class), any(Schema.class)))
+        when(source.getDynamicSchema(any(), any(Schema.class)))
                 .thenReturn(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads());
         reader = (MarketoInputReader) source.createReader(null);
         assertFalse(reader.start());
@@ -213,7 +213,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
         props.schemaInput.schema.setValue(getFullDynamicSchema());
         source.initialize(null, props);
         when(source.createReader(null)).thenReturn(new MarketoInputReader(null, source, props));
-        when(source.getDynamicSchema(any(String.class), any(Schema.class))).thenThrow(new IOException("error"));
+        when(source.getDynamicSchema(any(), any(Schema.class))).thenThrow(new IOException("error"));
         reader = (MarketoInputReader) source.createReader(null);
         try {
             assertFalse(reader.start());
@@ -233,7 +233,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
         source.initialize(null, props);
 
         when(source.createReader(null)).thenReturn(new MarketoInputReader(null, source, props));
-        when(client.getLeadActivity(any(TMarketoInputProperties.class), any(String.class)))
+        when(client.getLeadActivity(any(), any()))
                 .thenReturn(getLeadRecordResult(false));
 
         reader = (MarketoInputReader) source.createReader(null);
@@ -272,7 +272,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
 
     @Test
     public void testRetryOperationSuccess() throws Exception {
-        doReturn(getLeadRecordResult(false)).when(client).getMultipleLeads(any(TMarketoInputProperties.class), any(String.class));
+        doReturn(getLeadRecordResult(false)).when(client).getMultipleLeads(any(), any());
         reader = getReaderForRetryOperation(true);
         assertTrue(reader.start());
         assertTrue(reader.advance());
@@ -284,7 +284,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
     @Test
     public void testRetryOperationFailDieOnError() throws Exception {
         doReturn(getFailedRecordResult("REST", "902", "Invalid operation")).when(client)
-                .getMultipleLeads(any(TMarketoInputProperties.class), any(String.class));
+                .getMultipleLeads(any(), any());
         reader = getReaderForRetryOperation(true);
         try {
             reader.start();
@@ -298,7 +298,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
     public void testRetryOperationFailNonRecoverableErrror() throws Exception {
         doReturn(false).when(client).isErrorRecoverable(any(List.class));
         doReturn(getFailedRecordResult("REST", "902", "Invalid operation")).when(client)
-                .getMultipleLeads(any(TMarketoInputProperties.class), any(String.class));
+                .getMultipleLeads(any(), any());
         reader = getReaderForRetryOperation(false);
         assertFalse(reader.start());
         int result = (int) reader.getReturnValues().get(RETURN_NB_CALL);
@@ -309,7 +309,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
     public void testRetryOperationFailRecoverableErrror() throws Exception {
         doReturn(true).when(client).isErrorRecoverable(any(List.class));
         doReturn(getFailedRecordResult("REST", "602", "expired header")).when(client)
-                .getMultipleLeads(any(TMarketoInputProperties.class), any(String.class));
+                .getMultipleLeads(any(), any());
         reader = getReaderForRetryOperation(false);
         int minDelay = reader.getRetryAttemps() * reader.getRetryInterval();
         long start = System.currentTimeMillis();

@@ -7,6 +7,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.5.1.RELEASE</version>
+        <relativePath />
     </parent>
 
     <groupId>org.talend.components</groupId>
@@ -22,7 +23,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <daikon.version>0.29.0-SNAPSHOT</daikon.version>
+        <daikon.version>0.31.4-SNAPSHOT</daikon.version>
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
@@ -122,9 +123,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>biz.aQute.bnd</groupId>
-            <artifactId>annotation</artifactId>
-            <version>${bnd-annotation.version}</version>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
+            <version>1.3.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -210,7 +211,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.2</version>
                 <executions>
                     <execution>
                         <id>unpack</id>
@@ -309,6 +310,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <trimStackTrace>false</trimStackTrace>
                             <argLine>-Dorg.ops4j.pax.url.mvn.localRepository=${project.basedir}/target/mvn-repo/.m2
                             </argLine>
                         </configuration>

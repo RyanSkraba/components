@@ -12,8 +12,7 @@
 // ============================================================================
 package org.talend.components.google.drive;
 
-import aQute.bnd.annotation.component.Component;
-
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -33,7 +32,7 @@ import org.talend.components.google.drive.wizard.GoogleDriveConnectionWizardDefi
 import com.google.auto.service.AutoService;
 
 @AutoService(ComponentInstaller.class)
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + GoogleDriveFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + GoogleDriveFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class GoogleDriveFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "GoogleDrive";

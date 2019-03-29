@@ -13,7 +13,7 @@
 
 package org.talend.components.service.rest.impl;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
@@ -37,7 +37,7 @@ public class RuntimeControllerImplTest extends AbstractSpringIntegrationTests {
     public void validateConnectionUiSpecs() throws Exception {
         UiSpecsPropertiesDto propertiesDto = buildTestDataStoreFormData();
         given().accept(APPLICATION_JSON_UTF8_VALUE) //
-                .with().content(propertiesDto) //
+                .with().body(propertiesDto) //
                 .contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .when()//
                 .post(getVersionPrefix() + "/runtimes/check")//
@@ -52,7 +52,7 @@ public class RuntimeControllerImplTest extends AbstractSpringIntegrationTests {
         SerPropertiesDto propertiesDto = buildTestDataStoreSerProps();
 
         given().accept(APPLICATION_JSON_UTF8_VALUE) //
-                .with().content(propertiesDto) //
+                .with().body(propertiesDto) //
                 .contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
                 .when()//
                 .post(getVersionPrefix() + "/runtimes/check")//
@@ -68,7 +68,7 @@ public class RuntimeControllerImplTest extends AbstractSpringIntegrationTests {
         UiSpecsPropertiesDto formDataContainer = buildTestDataSetFormData();
 
         given().accept(APPLICATION_JSON_UTF8_VALUE) //
-                .with().content(formDataContainer) //
+                .with().body(formDataContainer) //
                 .contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .when()//
                 .post(getVersionPrefix() + "/runtimes/schema")//
@@ -84,7 +84,7 @@ public class RuntimeControllerImplTest extends AbstractSpringIntegrationTests {
         SerPropertiesDto formDataContainer = buildTestDataSetSerProps();
 
         given().accept(APPLICATION_JSON_UTF8_VALUE) //
-                .with().content(formDataContainer) //
+                .with().body(formDataContainer) //
                 .contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
                 .when()//
                 .post(getVersionPrefix() + "/runtimes/schema")//
@@ -99,7 +99,7 @@ public class RuntimeControllerImplTest extends AbstractSpringIntegrationTests {
         UiSpecsPropertiesDto formDataContainer = buildTestDataSetFormData();
 
         given().accept(APPLICATION_JSON_UTF8_VALUE) //
-                .with().content(formDataContainer) //
+                .with().body(formDataContainer) //
                 .contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .when()//
                 .post(getVersionPrefix() + "/runtimes/data")//
@@ -114,7 +114,7 @@ public class RuntimeControllerImplTest extends AbstractSpringIntegrationTests {
         SerPropertiesDto formDataContainer = buildTestDataSetSerProps();
 
         given().accept(APPLICATION_JSON_UTF8_VALUE) //
-                .with().content(formDataContainer) //
+                .with().body(formDataContainer) //
                 .contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
                 .when()//
                 .post(getVersionPrefix() + "/runtimes/data")//

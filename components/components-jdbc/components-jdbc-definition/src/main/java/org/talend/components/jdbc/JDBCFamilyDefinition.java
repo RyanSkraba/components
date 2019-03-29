@@ -15,6 +15,7 @@ package org.talend.components.jdbc;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -35,13 +36,11 @@ import org.talend.components.jdbc.wizard.JDBCConnectionWizardDefinition;
 
 import com.google.auto.service.AutoService;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * Install all of the definitions provided for the JDBC family of components.
  */
 @AutoService(ComponentInstaller.class)
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + JDBCFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + JDBCFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class JDBCFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "Jdbc";

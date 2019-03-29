@@ -17,8 +17,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.pubsub.PubSubDatasetDefinition;
 
-import java.util.UUID;
-
 public class PubSubDatasetTestIT {
     /**
      * Instance to test. Definitions are immutable.

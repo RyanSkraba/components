@@ -28,6 +28,11 @@ import org.talend.daikon.runtime.RuntimeInfo;
  * of multiple versions or dynamic dependencies.
  */
 public class SimpleRuntimeInfo implements RuntimeInfo {
+    static {
+        if (System.getProperty("sun.boot.class.path") == null) { // j11 workaround due to daikon
+            System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));
+        }
+    }
 
     private String runtimeClassName;
 

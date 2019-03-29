@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.framework.Bundle;
@@ -46,7 +45,7 @@ import org.talend.daikon.definition.service.DefinitionRegistryService;
 /**
  * created by sgandon on 7 sept. 2015 Detailled comment
  */
-@RunWith(PaxExam.class)
+@RunWith(DisablablePaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class OsgiComponentServiceTest {
 

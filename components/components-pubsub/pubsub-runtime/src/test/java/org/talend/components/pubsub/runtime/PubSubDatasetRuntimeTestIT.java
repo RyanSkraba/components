@@ -24,13 +24,17 @@ import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.daikon.java8.Consumer;
 
 import com.google.api.services.pubsub.model.PubsubMessage;
 
 public class PubSubDatasetRuntimeTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig("bigquery.project");
 
     final static String uuid = UUID.randomUUID().toString();
 
@@ -54,7 +58,8 @@ public class PubSubDatasetRuntimeTestIT {
 
     final static String fieldDelimited = ";";
 
-    static PubSubClient client = PubSubConnection.createClient(createDatastore());
+    static PubSubClient client = PubSubTestConstants.PROJECT == null || PubSubTestConstants.PROJECT.isEmpty() ?
+            null : PubSubConnection.createClient(createDatastore());
 
     static List<Person> expectedPersons;
 

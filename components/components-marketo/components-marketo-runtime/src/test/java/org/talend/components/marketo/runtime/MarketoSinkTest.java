@@ -56,7 +56,7 @@ public class MarketoSinkTest {
 
         MarketoSink spy = spy(sink);
         spy.initialize(null, oprops);
-        doReturn(oprops.connection).when(spy).getEffectiveConnection(any(RuntimeContainer.class));
+        doReturn(oprops.connection).when(spy).getEffectiveConnection(any());
         doReturn(new ValidationResult(Result.ERROR)).when(spy).validateConnection(any(MarketoProvideConnectionProperties.class));
 
         assertEquals(Result.ERROR, spy.validate(null).getStatus());

@@ -23,6 +23,17 @@ import org.springframework.context.annotation.FilterType;
 public class Application {
 
     public static void main(String[] args) {
+        workAroundJava11();
         SpringApplication.run(Application.class, args);
+    }
+
+    private static void workAroundJava11() {
+        daikonWorkaround();
+    }
+
+    private static void daikonWorkaround() {
+        if (System.getProperty("sun.boot.class.path") == null) {
+            System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));
+        }
     }
 }

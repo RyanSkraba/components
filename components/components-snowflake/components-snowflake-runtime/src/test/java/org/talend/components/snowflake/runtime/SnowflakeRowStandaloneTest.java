@@ -111,7 +111,7 @@ public class SnowflakeRowStandaloneTest {
 
         standalone.runAtDriver(container);
 
-        PowerMockito.verifyStatic();
+        PowerMockito.verifyStatic(DriverManagerUtils.class);
         DriverManagerUtils.getConnection(properties.getConnectionProperties());
     }
 

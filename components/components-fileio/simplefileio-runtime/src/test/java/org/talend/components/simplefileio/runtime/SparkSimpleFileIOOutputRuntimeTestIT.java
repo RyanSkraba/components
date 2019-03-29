@@ -23,14 +23,17 @@ import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.simplefileio.SimpleFileIOFormat;
 import org.talend.components.simplefileio.output.SimpleFileIOOutputProperties;
+import org.talend.components.test.DisableAfterJava8;
 import org.talend.components.test.MiniDfsResource;
 import org.talend.components.test.SparkIntegrationTestResource;
 
@@ -38,6 +41,8 @@ import org.talend.components.test.SparkIntegrationTestResource;
  * Unit tests for {@link SimpleFileIOOutputRuntime} using the Spark runner.
  */
 public class SparkSimpleFileIOOutputRuntimeTestIT {
+    @ClassRule
+    public static TestRule DISABLE_WHEN_NEEDED = new DisableAfterJava8();
 
     /** Resource that provides a {@link Pipeline} configured for Spark. */
     @Rule

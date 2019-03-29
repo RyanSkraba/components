@@ -15,17 +15,15 @@ package org.talend.components.hadoopcluster;
 
 import static org.talend.components.api.Constants.COMPONENT_INSTALLER_PREFIX;
 
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
-import org.talend.components.hadoopcluster.configuration.input
-        .HadoopClusterConfigurationInputDefinition;
+import org.talend.components.hadoopcluster.configuration.input.HadoopClusterConfigurationInputDefinition;
 
 import com.google.auto.service.AutoService;
 
-import aQute.bnd.annotation.component.Component;
-
 @AutoService(ComponentInstaller.class)
-@Component(name = COMPONENT_INSTALLER_PREFIX + HadoopClusterFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@Component(name = COMPONENT_INSTALLER_PREFIX + HadoopClusterFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class HadoopClusterFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "HadoopCluster";

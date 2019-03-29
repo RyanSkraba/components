@@ -12,16 +12,25 @@
 // ============================================================================
 package org.talend.components.api.component.runtime;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
+import java.net.URLStreamHandlerFactory;
 import java.util.List;
 import java.util.Objects;
 
+import org.ops4j.pax.url.mvn.MavenResolver;
+import org.ops4j.pax.url.mvn.MavenResolvers;
+import org.ops4j.pax.url.mvn.ServiceConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.runtime.RuntimeInfo;
-import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxControl;
 
 /**
@@ -41,7 +50,91 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
     private final boolean reusable;
 
     static {
-        RuntimeUtil.registerMavenUrlHandler();
+        try {
+            new URL("mvn:foo/bar");
+        } catch (MalformedURLException e) {
+
+            // handles mvn local repository
+            String mvnLocalRepo = System.getProperty("maven.repo.local");
+            if (mvnLocalRepo != null && !mvnLocalRepo.isEmpty()) {
+                System.setProperty("org.ops4j.pax.url.mvn.localRepository", mvnLocalRepo);
+            }
+
+            // If the URL above failed, the mvn protocol needs to be installed.
+            // not advice create a wrap URLStreamHandlerFactory class now
+            try {
+                final Field factoryField = URL.class.getDeclaredField("factory");
+                factoryField.setAccessible(true);
+                final Field lockField = URL.class.getDeclaredField("streamHandlerLock");
+                lockField.setAccessible(true);
+
+                synchronized (lockField.get(null)) {
+                    final URLStreamHandlerFactory factory = (URLStreamHandlerFactory) factoryField.get(null);
+                    // avoid the factory already defined error
+                    if (factory == null) {
+                        URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
+
+                            @Override
+                            public URLStreamHandler createURLStreamHandler(String protocol) {
+                                if (!ServiceConstants.PROTOCOL.equals(protocol)) {
+                                    return null;
+                                }
+                                return new URLStreamHandler() {
+                                    @Override
+                                    public URLConnection openConnection(URL url) throws IOException {
+                                        MavenResolver resolver = MavenResolvers.createMavenResolver(null, ServiceConstants.PID);
+                                        // java11 adds #runtime spec for (classloader) resource loading and breaks pax
+                                        Connection conn = new Connection(new URL(url.toExternalForm().replace("#runtime", "")), resolver);
+                                        conn.setUseCaches(false);// to avoid concurent thread to have an IllegalStateException.
+                                        return conn;
+                                    }
+
+                                    @Override
+                                    protected void parseURL(URL u, String spec, int start, int limit) {
+                                        if (!"mvn:".equals(u.toString())) {// remove the spec to only return the url.
+                                            LOG.debug("ignoring specs for parseUrl with url[" + u + "] and spec[" + spec + "]");
+                                            super.parseURL(u, "", 0, 0);
+                                        } else {// simple url being "mvn:" and the rest is specs.
+                                            super.parseURL(u, spec, start, limit);
+                                        }
+                                    }
+                                };
+                            }
+
+                        });
+                    }
+                }
+            } catch (Exception exception) {
+                LOG.warn(exception.getMessage());
+            }
+        }
+
+        if (System.getProperty("sun.boot.class.path") == null) { // j11 workaround due to daikon
+            System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));
+        }
+    }
+
+    private static class Connection extends URLConnection { // forked cause not exposed through OSGi meta
+        private static final Logger LOG = LoggerFactory.getLogger(Connection.class);
+
+        private final MavenResolver resolver;
+
+        private Connection(final URL url, final MavenResolver resolver) {
+            super( url );
+            this.resolver = resolver;
+        }
+
+        @Override
+        public void connect() {
+            // do nothing
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            connect();
+            LOG.debug( "Resolving [" + url.toExternalForm() + "]" );
+            return new FileInputStream(resolver.resolve(url.toExternalForm()));
+        }
     }
 
     /**

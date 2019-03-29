@@ -22,17 +22,26 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.hadoop.fs.FileSystem;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.simplefileio.SimpleFileIODatasetProperties;
 import org.talend.components.simplefileio.SimpleFileIOFormat;
 import org.talend.components.simplefileio.s3.S3DatasetProperties;
 import org.talend.components.simplefileio.s3.output.S3OutputProperties;
+import org.talend.components.test.DisableAfterJava8;
+import org.talend.components.test.DisableIfMissingConfig;
 import org.talend.components.test.MiniDfsResource;
 import org.talend.components.test.SparkIntegrationTestResource;
 
 public class S3OutputRuntimeTestIT {
+    @ClassRule
+    public static TestRule DISABLE_WHEN_NEEDED = new DisableAfterJava8();
+
+    @ClassRule
+    public static final TestRule DISABLE_WHEN_NEEDED2 = new DisableIfMissingConfig("s3.accesskey");
 
     /** Set up credentials for integration tests. */
     @Rule

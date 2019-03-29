@@ -161,7 +161,7 @@ public class SalesforceConnectionPropertiesTest extends SalesforceTestBase {
 
             // Not valid
 
-            when(testFixture.runtimeSourceOrSink.validate(any(RuntimeContainer.class)))
+            when(testFixture.runtimeSourceOrSink.validate(any()))
                     .thenReturn(new ValidationResultMutable().setStatus(ValidationResult.Result.ERROR).setMessage("Error"));
             ValidationResult vr2 = properties.validateTestConnection();
             assertEquals(ValidationResult.Result.ERROR, vr2.getStatus());

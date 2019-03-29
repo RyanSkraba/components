@@ -76,7 +76,7 @@ public class SnowflakeCloseSourceOrSinkTest {
         RuntimeContainer container = Mockito.mock(RuntimeContainer.class);
         Connection connection = Mockito.mock(Connection.class);
         Mockito.doThrow(new SQLException("Failed to close connection")).when(connection).close();
-        Mockito.when(container.getComponentData(Mockito.anyString(), Mockito.anyString())).thenReturn(connection);
+        Mockito.when(container.getComponentData(Mockito.any(), Mockito.any())).thenReturn(connection);
 
         Assert.assertEquals(ValidationResult.Result.ERROR, closeSourceOrSink.validate(container).getStatus());
     }

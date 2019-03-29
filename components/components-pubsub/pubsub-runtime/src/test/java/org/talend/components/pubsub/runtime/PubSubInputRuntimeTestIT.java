@@ -21,8 +21,10 @@ import org.apache.beam.sdk.values.PCollection;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.components.adapter.beam.BeamJobRuntimeContainer;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.adapter.beam.utils.SparkRunnerTestUtils;
@@ -32,6 +34,8 @@ import org.talend.components.pubsub.PubSubDatastoreProperties;
 import com.google.api.services.pubsub.model.PubsubMessage;
 
 public class PubSubInputRuntimeTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig("bigquery.project");
 
     final static String uuid = UUID.randomUUID().toString();
 
@@ -39,7 +43,8 @@ public class PubSubInputRuntimeTestIT {
 
     final static String subscriptionName = "tcomp-pubsub-inputtest-sub1" + uuid;
 
-    static PubSubClient client = PubSubConnection.createClient(createDatastore());
+    static PubSubClient client = PubSubTestConstants.PROJECT == null || PubSubTestConstants.PROJECT.isEmpty() ?
+            null : PubSubConnection.createClient(createDatastore());
 
     @Rule
     public final TestPipeline pipeline = TestPipeline.create();

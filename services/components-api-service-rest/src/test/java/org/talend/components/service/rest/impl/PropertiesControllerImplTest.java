@@ -13,12 +13,14 @@
 
 package org.talend.components.service.rest.impl;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 import static org.talend.components.service.rest.PropertiesController.IMAGE_SVG_VALUE;
 import static org.talend.components.service.rest.configuration.RequestParameterLocaleResolver.LANGUAGE_QUERY_PARAMETER_NAME;
+
+import io.restassured.response.Response;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
@@ -33,9 +35,7 @@ import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.serialize.SerializerDeserializer.Deserialized;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jayway.restassured.response.Response;
 
 public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests {
 
@@ -54,41 +54,36 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
 
     @Test
     public void testGetIcon_imageTypeNotFound() throws Exception {
-        given().expect() //
-                .statusCode(404) //
-                .log().ifValidationFails() //
-                .get(getVersionPrefix() + "/properties/{name}/icon/{type}", DATA_STORE_DEFINITION_NAME,
-                        DefinitionImageType.SVG_ICON);
+        given().get(getVersionPrefix() + "/properties/{name}/icon/{type}", DATA_STORE_DEFINITION_NAME,
+                        DefinitionImageType.SVG_ICON)
+        .then().statusCode(404).log().ifValidationFails();
     }
 
     @Test
     public void testGetIcon_pngImageTypeFound() throws Exception {
-        given().expect() //
-                .contentType(IMAGE_PNG_VALUE) //
-                .body(Matchers.startsWith("\uFFFDPNG")) // Magic header for PNG files.
-                .statusCode(200).log().ifError() //
-                .get(getVersionPrefix() + "/properties/{name}/icon/{type}", DATA_STORE_DEFINITION_NAME,
-                        DefinitionImageType.PALETTE_ICON_32X32);
+        given().get(getVersionPrefix() + "/properties/{name}/icon/{type}", DATA_STORE_DEFINITION_NAME, DefinitionImageType.PALETTE_ICON_32X32)
+               .then().statusCode(200).log().ifError()
+               .contentType(IMAGE_PNG_VALUE) //
+               .body(Matchers.startsWith("\uFFFDPNG")); // Magic header for PNG files.
     }
 
     @Test
     public void testGetIcon_svgImageTypeFound() throws Exception {
-        given().expect() //
+        given()
+                .get(getVersionPrefix() + "/properties/{name}/icon/{type}", DATA_SET_DEFINITION_NAME,
+                        DefinitionImageType.SVG_ICON).then() //
                 .statusCode(200).log().ifError() //
                 .body(Matchers.containsString("</svg>")) //
-                .contentType(IMAGE_SVG_VALUE) //
-                .get(getVersionPrefix() + "/properties/{name}/icon/{type}", DATA_SET_DEFINITION_NAME,
-                        DefinitionImageType.SVG_ICON);
+                .contentType(IMAGE_SVG_VALUE);
     }
 
     @Test
     public void testGetConnectors_badDefinition() throws Exception {
-        given().expect() //
+        given().get(getVersionPrefix() + "/properties/{name}/connectors", DATA_SET_DEFINITION_NAME).then() //
                 .statusCode(400) //
                 .log().ifValidationFails() //
                 // TODO: check returned error
-                .body(Matchers.containsString("definitionClass")) //
-                .get(getVersionPrefix() + "/properties/{name}/connectors", DATA_SET_DEFINITION_NAME);
+                .body(Matchers.containsString("definitionClass"));
     }
 
     @Test
@@ -122,12 +117,12 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
         String callback = "validate";
         String propName = "tagId";
         Response response = given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
-                .expect() //
-                .statusCode(200).log().ifError() //
-                .with() //
-                .content(buildTestDataStoreFormData()) //
-                .contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
-                .post(getVersionPrefix() + "/properties/trigger/{callback}/{propName}", callback, propName);
+                                   .expect() //
+                                   .statusCode(200).log().ifError() //
+                                   .with() //
+                                   .body(buildTestDataStoreFormData()) //
+                                   .contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                                   .post(getVersionPrefix() + "/properties/trigger/{callback}/{propName}", callback, propName);
         assertNotNull(response);
         String content = response.asString();
         assertNotNull(content);

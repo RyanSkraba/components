@@ -13,24 +13,28 @@
 
 package org.talend.components.netsuite;
 
-import static org.ops4j.pax.exam.CoreOptions.*;
+import static org.ops4j.pax.exam.CoreOptions.composite;
+import static org.ops4j.pax.exam.CoreOptions.linkBundle;
+import static org.ops4j.pax.exam.CoreOptions.options;
 
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.talend.components.api.ComponentsPaxExamOptions;
 
-@RunWith(PaxExam.class)
+@RunWith(DisablablePaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class OsgiNetSuiteComponentTestIT extends NetSuiteComponentTestBase {
 
     @Configuration
     public Option[] config() {
-
         return options(composite(ComponentsPaxExamOptions.getOptions()), //
+                linkBundle("javax.xml.bind-jaxb-api"), //
+                linkBundle("com.sun.xml.bind-jaxb-impl"), //
+                linkBundle("org.apache.geronimo.specs-geronimo-activation_1.1_spec"), //
+                linkBundle("org.apache.geronimo.specs-geronimo-saaj_1.3_spec"), //
                 linkBundle("org.talend.components-components-common-bundle"), //
                 linkBundle("org.talend.components-components-netsuite-definition-bundle"));
     }

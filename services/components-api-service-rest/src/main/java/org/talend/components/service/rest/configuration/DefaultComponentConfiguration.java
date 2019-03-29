@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
-import org.talend.daikon.runtime.RuntimeUtil;
+import org.talend.components.api.component.runtime.JarRuntimeInfo;
 
 /**
  * if default configuration is required then unzip the config artifact in the default config folder.
@@ -54,7 +55,7 @@ public class DefaultComponentConfiguration {
     }
 
     private void unzipMvnArtifact(String aConfigtMvnUrlStr, String aConfigFolderPath) throws IOException {
-        RuntimeUtil.registerMavenUrlHandler();
+        new JarRuntimeInfo((URL) null, null, null); // ensure mvn url - pax url - is registered
         MavenResolver mavenResolver = MavenResolvers.createMavenResolver(null, ServiceConstants.PID);
         File artifactToUnzip = mavenResolver.resolve(aConfigtMvnUrlStr);
         try (ZipFile zipFile = new ZipFile(artifactToUnzip)) {

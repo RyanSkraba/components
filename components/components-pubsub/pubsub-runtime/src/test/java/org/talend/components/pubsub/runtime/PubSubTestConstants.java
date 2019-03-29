@@ -40,8 +40,10 @@ public class PubSubTestConstants {
     public static PubSubDatastoreProperties createDatastore() {
         PubSubDatastoreProperties datastore = new PubSubDatastoreProperties("datastore");
         datastore.init();
-        datastore.projectName.setValue(PubSubTestConstants.PROJECT);
-        datastore.serviceAccountFile.setValue(PubSubTestConstants.SERVICE_ACCOUNT_FILE);
+        if (PubSubTestConstants.PROJECT != null) {
+            datastore.projectName.setValue(PubSubTestConstants.PROJECT);
+            datastore.serviceAccountFile.setValue(PubSubTestConstants.SERVICE_ACCOUNT_FILE);
+        }
         return datastore;
     }
 

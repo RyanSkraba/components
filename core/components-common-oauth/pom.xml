@@ -62,6 +62,9 @@
 						</goals>
 						<configuration>
 							<instructions>
+								<_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+								<_noee>true</_noee>
+								<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
 								<Bundle-SymbolicName>org.talend.components.common-oauth.lib</Bundle-SymbolicName>
 								<Bundle-Name>${project.name} lib</Bundle-Name>
 							</instructions>
@@ -76,6 +79,9 @@
 						<configuration>
 							<classifier>bundle</classifier>
 							<instructions>
+								<_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+								<_noee>true</_noee>
+								<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
 								<Bundle-SymbolicName>org.talend.components.common-oauth</Bundle-SymbolicName>
 								<Import-Package>org.talend*,
 									org.slf4j*,

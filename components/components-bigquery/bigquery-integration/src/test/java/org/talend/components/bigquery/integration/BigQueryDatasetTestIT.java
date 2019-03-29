@@ -22,7 +22,9 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.components.bigquery.BigQueryDatasetDefinition;
 import org.talend.components.bigquery.BigQueryDatasetProperties;
 import org.talend.components.bigquery.BigQueryDatasetProperties.SourceType;
@@ -37,6 +39,8 @@ import org.talend.daikon.sandbox.SandboxedInstance;
  * Unit tests for {@link BigQueryDatasetDefinition} runtimes loaded dynamically.
  */
 public class BigQueryDatasetTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig("bigquery.project");
 
     /**
      * Instance to test. Definitions are immutable.

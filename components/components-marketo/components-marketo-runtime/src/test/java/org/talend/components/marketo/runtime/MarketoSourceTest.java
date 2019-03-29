@@ -138,7 +138,7 @@ public class MarketoSourceTest extends MarketoRuntimeTestBase {
         assertEquals(ValidationResult.Result.ERROR, source.validate(null).getStatus());
         MarketoSource spy = spy(source);
         //
-        doReturn(iprops.connection).when(spy).getEffectiveConnection(any(RuntimeContainer.class));
+        doReturn(iprops.connection).when(spy).getEffectiveConnection(any());
         doReturn(ValidationResult.OK).when(spy).validateConnection(any(MarketoProvideConnectionProperties.class));
         //
         //

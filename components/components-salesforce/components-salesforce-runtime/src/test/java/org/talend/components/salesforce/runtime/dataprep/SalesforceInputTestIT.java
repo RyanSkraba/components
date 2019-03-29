@@ -23,7 +23,9 @@ import java.util.List;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.components.api.component.SupportedProduct;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Reader;
@@ -33,8 +35,11 @@ import org.talend.components.salesforce.dataprep.SalesforceInputProperties;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreDefinition;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreProperties;
+import org.talend.components.salesforce.runtime.DisableIfMissingConfig;
 
 public class SalesforceInputTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
     @Test
     public void testSerialization() throws IOException {

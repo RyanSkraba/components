@@ -59,6 +59,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <trimStackTrace>false</trimStackTrace>
                     <classpathDependencyExcludes>
                         <classpathDependencyExclude>org.talend.components:multiple-runtime-comp</classpathDependencyExclude>
                         <classpathDependencyExclude>org.talend.components:components-jdbc-definition</classpathDependencyExclude>

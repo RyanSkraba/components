@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.azurestorage;
 
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -36,12 +37,10 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.components.azurestorage.wizard.AzureStorageConnectionEditWizardDefinition;
 import org.talend.components.azurestorage.wizard.AzureStorageConnectionWizardDefinition;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * Install all of the definitions provided for the Azure Storage family of components.
  */
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + AzureStorageFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + AzureStorageFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class AzureStorageFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "Azure Storage"; //$NON-NLS-1$

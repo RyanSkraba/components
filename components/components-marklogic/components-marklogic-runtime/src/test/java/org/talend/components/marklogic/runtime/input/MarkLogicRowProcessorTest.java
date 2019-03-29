@@ -66,7 +66,7 @@ public class MarkLogicRowProcessorTest {
         inputProperties.init();
         MarkLogicInputWriteOperation writeOperation = new MarkLogicInputWriteOperation(mockedSink, inputProperties);
         MarkLogicRowProcessor rowProcessor = writeOperation.createWriter(null);
-        when(mockedSink.connect(any(RuntimeContainer.class))).thenReturn(mockedClient);
+        when(mockedSink.connect(any())).thenReturn(mockedClient);
 
 
         rowProcessor.open("123");
@@ -131,7 +131,7 @@ public class MarkLogicRowProcessorTest {
         inputProperties.init();
         MarkLogicInputWriteOperation writeOperation = new MarkLogicInputWriteOperation(mockedSink, inputProperties);
         MarkLogicRowProcessor rowProcessor = writeOperation.createWriter(null);
-        when(mockedSink.connect(any(RuntimeContainer.class))).thenReturn(mockedClient);
+        when(mockedSink.connect(any())).thenReturn(mockedClient);
 
         String uId = "123";
         rowProcessor.open(uId);
@@ -153,7 +153,7 @@ public class MarkLogicRowProcessorTest {
         inputProperties.connection.referencedComponent.componentInstanceId.setValue(MarkLogicConnectionDefinition.COMPONENT_NAME + "_1");
         MarkLogicInputWriteOperation writeOperation = new MarkLogicInputWriteOperation(mockedSink, inputProperties);
         MarkLogicRowProcessor rowProcessor = writeOperation.createWriter(null);
-        when(mockedSink.connect(any(RuntimeContainer.class))).thenReturn(mockedClient);
+        when(mockedSink.connect(any())).thenReturn(mockedClient);
 
         rowProcessor.open("1");
         verify(mockedClient).newDocumentManager();

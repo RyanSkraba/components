@@ -125,7 +125,7 @@ public class MarketoSourceOrSinkTest extends MarketoRuntimeTestBase {
     public void testGetSchemaNames() throws Exception {
         MarketoSourceOrSink spy = spy(sos);
         spy.initialize(null, getTestProps());
-        doReturn(client).when(spy).getClientService(any(RuntimeContainer.class));
+        doReturn(client).when(spy).getClientService(any());
         doReturn(getLeadRecordResult(false)).when(client).listCustomObjects(any(TMarketoInputProperties.class));
         assertNotNull(spy.getSchemaNames(null));
     }
@@ -134,7 +134,7 @@ public class MarketoSourceOrSinkTest extends MarketoRuntimeTestBase {
     public void testGetEnpointSchema() throws Exception {
         MarketoSourceOrSink spy = spy(sos);
         spy.initialize(null, getTestProps());
-        doReturn(client).when(spy).getClientService(any(RuntimeContainer.class));
+        doReturn(client).when(spy).getClientService(any());
         doReturn(getFailedRecordResult("REST", "", "error")).when(client)
                 .describeCustomObject(any(TMarketoInputProperties.class));
         assertNull(spy.getEndpointSchema(null, "car_c"));
@@ -155,7 +155,7 @@ public class MarketoSourceOrSinkTest extends MarketoRuntimeTestBase {
     public void testGetCompoundKeyFields() throws Exception {
         MarketoSourceOrSink spy = spy(sos);
         spy.initialize(null, getTestProps());
-        doReturn(client).when(spy).getClientService(any(RuntimeContainer.class));
+        doReturn(client).when(spy).getClientService(any());
         doReturn(getFailedRecordResult("REST", "", "error")).when(client)
                 .describeCustomObject(any(TMarketoInputProperties.class));
         assertNull(spy.getCompoundKeyFields("car_c"));
@@ -167,7 +167,7 @@ public class MarketoSourceOrSinkTest extends MarketoRuntimeTestBase {
     public void testGetDynamicSchema() throws Exception {
         MarketoSourceOrSink spy = spy(sos);
         spy.initialize(null, getTestProps());
-        doReturn(client).when(spy).getClientService(any(RuntimeContainer.class));
+        doReturn(client).when(spy).getClientService(any());
         doReturn(Collections.emptyList()).when(client).getAllLeadFields();
         doReturn(getDescribeCO()).when(client).describeCustomObject(any(TMarketoInputProperties.class));
         assertEquals(4, spy.getDynamicSchema("car_c", getLeadDynamicSchema()).getFields().size());

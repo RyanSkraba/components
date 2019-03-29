@@ -80,7 +80,7 @@ public class MarketoInputWriterTest extends MarketoRuntimeTestBase {
     public void testWriteDynamic() throws Exception {
         props.schemaInput.schema.setValue(getLeadDynamicSchema());
         when(sink.getProperties()).thenReturn(props);
-        when(sink.getDynamicSchema(any(String.class), any(Schema.class)))
+        when(sink.getDynamicSchema(any(), any()))
                 .thenReturn(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads());
 
         writer.open("test");
@@ -95,7 +95,7 @@ public class MarketoInputWriterTest extends MarketoRuntimeTestBase {
 
     @Test
     public void testRetryOperationSuccess() throws Exception {
-        doReturn(getLeadRecordResult(false)).when(client).getMultipleLeads(any(TMarketoInputProperties.class), anyString());
+        doReturn(getLeadRecordResult(false)).when(client).getMultipleLeads(any(), any());
         doReturn(false).when(client).isErrorRecoverable(any(List.class));
         writer.open("test");
         writer.write(record);
@@ -106,7 +106,7 @@ public class MarketoInputWriterTest extends MarketoRuntimeTestBase {
     @Test
     public void testRetryOperationFailDieOnError() throws Exception {
         doReturn(getFailedRecordResult("REST", "902", "Invalid operation")).when(client)
-                .getMultipleLeads(any(TMarketoInputProperties.class), anyString());
+                .getMultipleLeads(any(), any());
         writer.open("test");
         try {
             writer.write(record);
@@ -120,7 +120,7 @@ public class MarketoInputWriterTest extends MarketoRuntimeTestBase {
     @Test
     public void testRetryOperationFailNonRecoverableErrror() throws Exception {
         doReturn(getFailedRecordResult("REST", "902", "Invalid operation")).when(client)
-                .getMultipleLeads(any(TMarketoInputProperties.class), anyString());
+                .getMultipleLeads(any(), any());
         props.dieOnError.setValue(false);
         when(sink.getProperties()).thenReturn(props);
         writer.open("test");
@@ -133,7 +133,7 @@ public class MarketoInputWriterTest extends MarketoRuntimeTestBase {
     @Test
     public void testRetryOperationFailRecoverableErrror() throws Exception {
         doReturn(getFailedRecordResult("REST", "602", "expired header")).when(client)
-                .getMultipleLeads(any(TMarketoInputProperties.class), anyString());
+                .getMultipleLeads(any(), any());
         doReturn(true).when(client).isErrorRecoverable(any(List.class));
         props.dieOnError.setValue(false);
         when(sink.getProperties()).thenReturn(props);

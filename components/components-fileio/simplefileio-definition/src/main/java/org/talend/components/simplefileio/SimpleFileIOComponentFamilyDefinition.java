@@ -13,6 +13,7 @@
 
 package org.talend.components.simplefileio;
 
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -25,14 +26,12 @@ import org.talend.components.simplefileio.s3.output.S3OutputDefinition;
 
 import com.google.auto.service.AutoService;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * Install all of the definitions provided for the SimpleFileIO family of components.
  */
 @AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX
-        + SimpleFileIOComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
+        + SimpleFileIOComponentFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class SimpleFileIOComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     // The best practice is to use SimpleFileIO to align with Beam, but we don't want to change this identifier.

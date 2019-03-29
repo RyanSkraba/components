@@ -38,6 +38,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ElasticsearchInputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>>
         implements RuntimableRuntime<ElasticsearchInputProperties> {
 
+    private static int MAX_SAMPLING_SIZE = 1000;
+
     private static Logger LOG = LoggerFactory.getLogger(ElasticsearchInputRuntime.class);
 
     /**
@@ -88,10 +90,15 @@ public class ElasticsearchInputRuntime extends PTransform<PBegin, PCollection<In
     @Override
     public PCollection<IndexedRecord> expand(PBegin in) {
         ElasticsearchIO.Read esRead = ElasticsearchIO.read()
-                .withConnectionConfiguration(createConnectionConf(properties.getDatasetProperties()))
-                .withReadOnlyFirstBatch(readOnlyFirstBatch);
+                .withConnectionConfiguration(createConnectionConf(properties.getDatasetProperties()));
         if (properties.query.getValue() != null) {
-            esRead = esRead.withQuery(properties.query.getValue());
+            String query = properties.query.getValue();
+            if (query.startsWith("{") && !query.contains("\"size\"")) {
+                query = "{\"size\":" + MAX_SAMPLING_SIZE + "," + query.substring(1);
+            }
+            esRead = esRead.withQuery(query);
+        } else if (readOnlyFirstBatch) {
+            esRead = esRead.withQuery("{\"from\": 0,\"size\":" + MAX_SAMPLING_SIZE + ",\"query\": { \"match_all\": {} }}");
         }
         PCollection<String> readFromElasticsearch = in.apply(esRead);
         PCollection<IndexedRecord> elasticsearchDataAsAvro =
@@ -109,6 +116,15 @@ public class ElasticsearchInputRuntime extends PTransform<PBegin, PCollection<In
                     }
                 }));
         return elasticsearchDataAsAvro;
+    }
+
+    private String range(final int from, final int to) {
+        final StringBuilder out = new StringBuilder();
+        for (int i = from; i < to; i++) {
+            out.append('"').append(i).append("\",");
+        }
+        out.setLength(out.length() - 1);
+        return out.toString();
     }
 
     @Override

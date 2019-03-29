@@ -57,7 +57,7 @@ public class MarketoBulkExecReaderTest {
         when(client.bulkImport(any(TMarketoBulkExecProperties.class))).thenReturn(new MarketoRecordResult());
         MarketoSource source = mock(MarketoSource.class);
         source.initialize(null, props);
-        when(source.getClientService(any(RuntimeContainer.class))).thenReturn(client);
+        when(source.getClientService(any())).thenReturn(client);
         when(source.createReader(null)).thenReturn(new MarketoBulkExecReader(null, source, props));
         reader = (MarketoBulkExecReader) source.createReader(null);
         assertTrue(reader instanceof MarketoBulkExecReader);

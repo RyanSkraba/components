@@ -20,6 +20,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+import io.restassured.RestAssured;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +54,6 @@ import org.talend.daikon.properties.presentation.Form;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jayway.restassured.RestAssured;
 
 /**
  * Created so that integration tests shares the same spring context instead of recreating it each time.
@@ -61,6 +62,11 @@ import com.jayway.restassured.RestAssured;
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = { "server.contextPath=" })
 public abstract class AbstractSpringIntegrationTests {
+    static {
+        if (System.getProperty("sun.boot.class.path") == null) {
+            System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));
+        }
+    }
 
     @LocalServerPort
     protected int localServerPort;
@@ -88,6 +94,10 @@ public abstract class AbstractSpringIntegrationTests {
 
     @Before
     public void setUp() {
+        if (System.getProperty("sun.boot.class.path") == null) { // daikon workaround for j11
+            System.setProperty("sun.boot.class.path", "");
+        }
+
         // ensure any call from restassured goes to our server isntance
         RestAssured.port = localServerPort;
 

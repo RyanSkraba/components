@@ -178,7 +178,7 @@ public class DependenciesReader {
        * }
      * </pre>
      * 
-     * @param s
+     * @param dependencyString
      * @return pax-url formatted string
      */
     String parseMvnUri(String dependencyString) {

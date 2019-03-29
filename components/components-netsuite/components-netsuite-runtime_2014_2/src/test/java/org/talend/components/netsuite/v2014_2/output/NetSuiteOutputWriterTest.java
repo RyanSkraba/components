@@ -104,7 +104,7 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
         mockGetListRequestResults(null);
 
         final List<Opportunity> updatedRecordList = new ArrayList<>();
-        when(port.updateList(any(UpdateListRequest.class))).then(new Answer<UpdateListResponse>() {
+        when(port.updateList(any())).then(new Answer<UpdateListResponse>() {
             @Override public UpdateListResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
                 UpdateListRequest request = (UpdateListRequest) invocationOnMock.getArguments()[0];
                 assertFalse(request.getRecord().isEmpty());
@@ -165,7 +165,7 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
         assertNotNull(writerResult);
         assertEquals(indexedRecordList.size(), writerResult.totalCount);
 
-        verify(port, times(2)).updateList(any(UpdateListRequest.class));
+        verify(port, times(2)).updateList(any());
         assertEquals(indexedRecordList.size(), updatedRecordList.size());
     }
 
@@ -182,7 +182,7 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
         properties.module.action.setValue(OutputAction.DELETE);
 
         final List<RecordRef> deletedRecordRefList = new ArrayList<>();
-        when(port.deleteList(any(DeleteListRequest.class))).then(new Answer<DeleteListResponse>() {
+        when(port.deleteList(any())).then(new Answer<DeleteListResponse>() {
             @Override public DeleteListResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
                 DeleteListRequest request = (DeleteListRequest) invocationOnMock.getArguments()[0];
                 DeleteListResponse response = new DeleteListResponse();
@@ -234,7 +234,7 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
         assertNotNull(writerResult);
         assertEquals(indexedRecordList.size(), writerResult.totalCount);
 
-        verify(port, times(2)).deleteList(any(DeleteListRequest.class));
+        verify(port, times(2)).deleteList(any());
         assertEquals(indexedRecordList.size(), deletedRecordRefList.size());
     }
 }

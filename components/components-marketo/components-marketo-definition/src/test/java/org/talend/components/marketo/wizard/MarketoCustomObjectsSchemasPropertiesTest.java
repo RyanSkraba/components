@@ -75,7 +75,7 @@ public class MarketoCustomObjectsSchemasPropertiesTest extends MarketoTestBase {
             assertEquals(CO_SCHEMA_NAMES, properties.selectedCustomObjectsNames.getPossibleValues());
             assertTrue(properties.getForm(MarketoCustomObjectsSchemasProperties.FORM_CUSTOMOBJECTS).isAllowBack());
             assertTrue(properties.getForm(MarketoCustomObjectsSchemasProperties.FORM_CUSTOMOBJECTS).isAllowFinish());
-            when(sandboxedInstanceTestFixture.runtimeSourceOrSink.getSchemaNames(any(RuntimeContainer.class)))
+            when(sandboxedInstanceTestFixture.runtimeSourceOrSink.getSchemaNames(any()))
                     .thenThrow(new IOException("ERROR"));
             try {
                 properties.beforeFormPresentCustomObjects();
@@ -83,6 +83,7 @@ public class MarketoCustomObjectsSchemasPropertiesTest extends MarketoTestBase {
             } catch (Exception e) {
                 assertNotNull(e.getMessage());
             }
+            sandboxedInstanceTestFixture.tearDown();
         }
     }
 
@@ -99,6 +100,7 @@ public class MarketoCustomObjectsSchemasPropertiesTest extends MarketoTestBase {
             o.add(new SimpleNamedThing("car_except", "car_except"));
             properties.selectedCustomObjectsNames.setValue(o);
             assertEquals(Result.ERROR, properties.afterFormFinishCustomObjects(repo).getStatus());
+            sandboxedInstanceTestFixture.tearDown();
         }
     }
 

@@ -13,18 +13,17 @@
 
 package org.talend.components.jms;
 
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.jms.input.JmsInputDefinition;
 import org.talend.components.jms.output.JmsOutputDefinition;
 
-import aQute.bnd.annotation.component.Component;
-
 import com.google.auto.service.AutoService;
 
 @AutoService(ComponentInstaller.class)
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + JmsComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + JmsComponentFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class JmsComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "jms";

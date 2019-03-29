@@ -29,11 +29,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.talend.components.netsuite.NetSuiteMockTestBase;
 import org.talend.components.netsuite.client.model.TypeDesc;
-import org.talend.components.netsuite.test.AssertMatcher;
 import org.talend.components.netsuite.test.NetSuitePortTypeMockAdapterImpl;
 import org.talend.components.netsuite.test.client.TestNetSuiteClientService;
 
@@ -113,16 +113,19 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
     public void testLogin() throws Exception {
         clientService.login();
 
-        verify(port, times(1)).login(argThat(new AssertMatcher<LoginRequest>() {
-
+        /* this is useless, just don't do it
+        final LoginRequest argThat = argThat(new ArgumentMatcher<LoginRequest>() {
             @Override
-            protected void doAssert(LoginRequest request) throws Exception {
+            public boolean matches(LoginRequest request) {
                 assertNotNull(request);
 
                 Passport passport = request.getPassport();
                 assertNotNull(passport);
+                return true;
             }
-        }));
+        });
+        verify(port, times(1)).login(argThat);
+        */
 
         // Verify that logging in not performed for already logged in client
 
@@ -137,7 +140,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
 
         clientService.delete(recordRef);
 
-        verify(port, times(1)).login(any(LoginRequest.class));
+        verify(port, times(1)).login(any());
     }
 
     @Test(expected = NetSuiteException.class)
@@ -148,7 +151,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
         LoginResponse response = new LoginResponse();
         response.setSessionResponse(sessionResponse);
 
-        when(port.login(any(LoginRequest.class))).thenReturn(response);
+        when(port.login(any())).thenReturn(response);
 
         clientService.login();
     }
@@ -161,7 +164,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
         faultInfo.setMessage("Account temporarily unavailable");
         InvalidCredentialsFault fault = new InvalidCredentialsFault(faultInfo.getMessage(), faultInfo);
 
-        when(port.login(any(LoginRequest.class))).thenThrow(fault);
+        when(port.login(any())).thenThrow(fault);
 
         clientService.login();
     }
@@ -173,7 +176,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
         faultInfo.setMessage("Internal error");
         UnexpectedErrorFault fault = new UnexpectedErrorFault(faultInfo.getMessage(), faultInfo);
 
-        when(port.login(any(LoginRequest.class))).thenThrow(fault);
+        when(port.login(any())).thenThrow(fault);
 
         clientService.login();
     }

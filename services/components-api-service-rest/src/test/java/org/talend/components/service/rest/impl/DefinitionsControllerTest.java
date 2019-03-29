@@ -12,7 +12,7 @@
 // ==============================================================================
 package org.talend.components.service.rest.impl;
 
-import static com.jayway.restassured.RestAssured.when;
+import static io.restassured.RestAssured.when;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
@@ -28,6 +28,8 @@ import static org.talend.components.service.rest.dto.ConnectorTypology.CONFIGURA
 import static org.talend.components.service.rest.dto.ConnectorTypology.SINK;
 import static org.talend.components.service.rest.dto.ConnectorTypology.SOURCE;
 import static org.talend.components.service.rest.dto.ConnectorTypology.TRANSFORMER;
+
+import io.restassured.response.Response;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -55,7 +57,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.restassured.response.Response;
 
 /**
  * Unit test for the org.talend.components.service.rest.DefinitionsController class.

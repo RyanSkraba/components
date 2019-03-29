@@ -3,16 +3,21 @@ package org.talend.components.simplefileio.runtime.s3;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.components.simplefileio.s3.S3DatastoreProperties;
+import org.talend.components.test.DisableIfMissingConfig;
 import org.talend.daikon.properties.ValidationResult;
 
 /**
  * Unit tests for {@link S3DatastoreRuntime}.
  */
 public class S3DatastoreRuntimeTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_WHEN_NEEDED = new DisableIfMissingConfig("s3.accesskey");
 
     /** Set up credentials for integration tests. */
     @Rule

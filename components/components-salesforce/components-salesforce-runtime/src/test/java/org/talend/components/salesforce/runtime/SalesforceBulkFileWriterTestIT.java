@@ -15,9 +15,11 @@ package org.talend.components.salesforce.runtime;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
 import org.talend.components.salesforce.test.SalesforceRuntimeTestUtil;
 import org.talend.components.salesforce.test.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
@@ -27,6 +29,8 @@ import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputB
  * Created by wwang on 2016-03-09.
  */
 public class SalesforceBulkFileWriterTestIT extends SalesforceTestBase {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();

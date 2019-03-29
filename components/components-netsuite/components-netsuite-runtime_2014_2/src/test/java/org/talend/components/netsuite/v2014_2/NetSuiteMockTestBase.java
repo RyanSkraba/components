@@ -92,7 +92,7 @@ public abstract class NetSuiteMockTestBase extends AbstractNetSuiteTestBase {
     protected <T extends Record> void mockGetRequestResults(final T record) throws Exception {
         final NetSuitePortType port = webServiceMockTestFixture.getPortMock();
 
-        when(port.get(any(GetRequest.class))).then(new Answer<GetResponse>() {
+        when(port.get(any())).then(new Answer<GetResponse>() {
             @Override public GetResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
                 GetResponse response = new GetResponse();
                 ReadResponse readResponse = new ReadResponse();
@@ -107,7 +107,7 @@ public abstract class NetSuiteMockTestBase extends AbstractNetSuiteTestBase {
     protected <T extends Record> void mockGetListRequestResults(final List<T> records) throws Exception {
         final NetSuitePortType port = webServiceMockTestFixture.getPortMock();
 
-        when(port.getList(any(GetListRequest.class))).then(new Answer<GetListResponse>() {
+        when(port.getList(any())).then(new Answer<GetListResponse>() {
             @Override public GetListResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
                 GetListRequest request = (GetListRequest) invocationOnMock.getArguments()[0];
                 GetListResponse response = new GetListResponse();
@@ -134,14 +134,14 @@ public abstract class NetSuiteMockTestBase extends AbstractNetSuiteTestBase {
         final NetSuitePortType port = webServiceMockTestFixture.getPortMock();
 
         final List<SearchResult> pageResults = makeRecordPages(recordList, pageSize);
-        when(port.search(any(SearchRequest.class))).then(new Answer<SearchResponse>() {
+        when(port.search(any())).then(new Answer<SearchResponse>() {
             @Override public SearchResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
                 SearchResponse response = new SearchResponse();
                 response.setSearchResult(pageResults.get(0));
                 return response;
             }
         });
-        when(port.searchMoreWithId(any(SearchMoreWithIdRequest.class))).then(new Answer<SearchMoreWithIdResponse>() {
+        when(port.searchMoreWithId(any())).then(new Answer<SearchMoreWithIdResponse>() {
             @Override public SearchMoreWithIdResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
                 SearchMoreWithIdRequest request = (SearchMoreWithIdRequest) invocationOnMock.getArguments()[0];
                 SearchMoreWithIdResponse response = new SearchMoreWithIdResponse();
@@ -155,7 +155,7 @@ public abstract class NetSuiteMockTestBase extends AbstractNetSuiteTestBase {
             final Map<String, CustomFieldSpec<RecordType, CustomizationFieldType>> customFieldSpecs) throws Exception {
         final NetSuitePortType port = webServiceMockTestFixture.getPortMock();
 
-        when(port.getCustomizationId(any(GetCustomizationIdRequest.class))).then(new Answer<GetCustomizationIdResponse>() {
+        when(port.getCustomizationId(any())).then(new Answer<GetCustomizationIdResponse>() {
             @Override public GetCustomizationIdResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
                 GetCustomizationIdRequest request = (GetCustomizationIdRequest) invocationOnMock.getArguments()[0];
                 CustomizationType customizationType = request.getCustomizationType();
@@ -181,7 +181,7 @@ public abstract class NetSuiteMockTestBase extends AbstractNetSuiteTestBase {
             }
         });
 
-        when(port.getList(any(GetListRequest.class))).then(new Answer<GetListResponse>() {
+        when(port.getList(any())).then(new Answer<GetListResponse>() {
             @Override public GetListResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
                 GetListRequest request = (GetListRequest) invocationOnMock.getArguments()[0];
 

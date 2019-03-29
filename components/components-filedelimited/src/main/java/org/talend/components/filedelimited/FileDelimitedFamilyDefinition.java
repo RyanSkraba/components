@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.filedelimited;
 
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -20,15 +21,13 @@ import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelim
 import org.talend.components.filedelimited.wizard.FieldDelimitedEditWizardDefinition;
 import org.talend.components.filedelimited.wizard.FileDelimitedWizardDefinition;
 
-import aQute.bnd.annotation.component.Component;
-
 import com.google.auto.service.AutoService;
 
 /**
  * Install all of the definitions provided for the FileDelimited family of components.
  */
 @AutoService(ComponentInstaller.class)
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + FileDelimitedFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + FileDelimitedFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class FileDelimitedFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "FileDelimited";

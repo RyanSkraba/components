@@ -13,8 +13,7 @@
 
 package org.talend.components.netsuite;
 
-import aQute.bnd.annotation.component.Component;
-
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -27,7 +26,7 @@ import org.talend.components.netsuite.output.NetSuiteOutputDefinition;
  */
 @Component(
         name = Constants.COMPONENT_INSTALLER_PREFIX + NetSuiteFamilyDefinition.NAME,
-        provide = ComponentInstaller.class
+        service = ComponentInstaller.class
 )
 public class NetSuiteFamilyDefinition extends AbstractComponentFamilyDefinition
         implements ComponentInstaller {

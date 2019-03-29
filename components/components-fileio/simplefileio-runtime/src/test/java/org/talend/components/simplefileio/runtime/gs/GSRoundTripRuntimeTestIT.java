@@ -15,7 +15,7 @@ package org.talend.components.simplefileio.runtime.gs;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +30,9 @@ import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.values.PCollection;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.components.adapter.beam.gcp.GcpServiceAccountOptions;
 import org.talend.components.adapter.beam.gcp.ServiceAccountCredentialFactory;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
@@ -40,8 +42,11 @@ import org.talend.components.simplefileio.runtime.SimpleFileIOAvroRegistry;
 import org.talend.components.simplefileio.runtime.SimpleFileIODatasetRuntimeTest;
 import org.talend.components.simplefileio.runtime.SimpleFileIOInputRuntime;
 import org.talend.components.simplefileio.runtime.SimpleFileIOOutputRuntime;
+import org.talend.components.test.DisableIfMissingConfig;
 
 public class GSRoundTripRuntimeTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig("bigquery.project");
 
     static {
         SimpleFileIOAvroRegistry.get();
@@ -59,7 +64,6 @@ public class GSRoundTripRuntimeTestIT {
 
     @Before
     public void prepare() {
-
         // DataflowPipelineOptions dataflowPO = pipelineOptions.as(DataflowPipelineOptions.class);
         // dataflowPO.setRunner(DataflowRunner.class);
 
@@ -72,7 +76,7 @@ public class GSRoundTripRuntimeTestIT {
     @After
     public void clean() throws IOException {
         //TODO the directory is not really be removed, need a way to fix it
-        FileSystems.delete(Arrays.asList(FileSystems.matchNewResource(gsPath, true)),
+        FileSystems.delete(Collections.singletonList(FileSystems.matchNewResource(gsPath, true)),
                 MoveOptions.StandardMoveOptions.IGNORE_MISSING_FILES);
     }
 

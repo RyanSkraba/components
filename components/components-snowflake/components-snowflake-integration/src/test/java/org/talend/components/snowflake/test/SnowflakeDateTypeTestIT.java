@@ -32,7 +32,9 @@ import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
@@ -55,6 +57,8 @@ import org.talend.daikon.avro.SchemaConstants;
  * TODO need a test that the insert time zone is different with query time zone
  */
 public class SnowflakeDateTypeTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
     static Connection testConnection;
 

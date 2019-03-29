@@ -14,6 +14,7 @@ package org.talend.components.api.test;
 
 import static org.junit.Assert.*;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +23,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.components.api.service.ComponentService;
-import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 /**
  * @deprecated please use the {@link AbstractComponentTest2} instead
@@ -36,7 +37,10 @@ import org.talend.daikon.properties.test.PropertiesTestUtils;
 public abstract class AbstractComponentTest {
 
     static {
-        PropertiesTestUtils.setupPaxUrlFromMavenLaunch();
+        new JarRuntimeInfo((URL) null, null, null); // ensure mvn url - pax url - is registered
+        if (System.getProperty("sun.boot.class.path") == null) { // j11 workaround due to daikon
+            System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));
+        }
     }
 
     // for benchmarking the apis, one suggestion is to use http://openjdk.java.net/projects/code-tools/jmh/.

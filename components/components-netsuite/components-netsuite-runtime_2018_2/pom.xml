@@ -246,6 +246,9 @@
                         </goals>
                         <configuration>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.netsuite.runtime.v2018_2.lib
                                 </Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>

@@ -39,6 +39,7 @@ import org.apache.cxf.headers.Header;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.talend.components.netsuite.NetSuiteWebServiceMockTestFixture;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteCredentials;
@@ -46,7 +47,6 @@ import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.components.netsuite.client.model.SearchRecordTypeDesc;
 import org.talend.components.netsuite.client.model.search.SearchFieldOperatorName;
 import org.talend.components.netsuite.client.model.search.SearchFieldOperatorType;
-import org.talend.components.netsuite.test.AssertMatcher;
 import org.talend.components.netsuite.test.MessageContextHolder;
 import org.talend.components.netsuite.v2018_2.NetSuiteMockTestBase;
 import org.talend.components.netsuite.v2018_2.client.NetSuiteClientServiceImpl;
@@ -87,9 +87,9 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
         LoginResponse response = new LoginResponse();
         response.setSessionResponse(sessionResponse);
 
-        when(port.login(argThat(new AssertMatcher<LoginRequest>() {
+        when(port.login(argThat(new ArgumentMatcher<LoginRequest>() {
 
-            @Override protected void doAssert(LoginRequest target) throws Exception {
+            @Override public boolean matches(LoginRequest target) {
                 assertEquals(credentials.getEmail(), target.getPassport().getEmail());
                 assertEquals(credentials.getPassword(), target.getPassport().getPassword());
                 assertEquals(credentials.getRoleId(), target.getPassport().getRole().getInternalId());
@@ -102,6 +102,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
                 Header appInfoHeader = NetSuiteWebServiceMockTestFixture.getHeader(headers, new QName(
                         NetSuiteClientServiceImpl.NS_URI_PLATFORM_MESSAGES, "applicationInfo"));
                 assertNotNull(appInfoHeader);
+                return true;
             }
         }))).thenReturn(response);
 
@@ -109,7 +110,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
 
         clientService.login();
 
-        verify(port, times(1)).login(any(LoginRequest.class));
+        verify(port, times(1)).login(any());
     }
 
     @Test

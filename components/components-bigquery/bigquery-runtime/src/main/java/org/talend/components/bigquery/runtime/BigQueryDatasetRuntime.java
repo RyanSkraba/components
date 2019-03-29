@@ -47,13 +47,11 @@ import com.google.cloud.bigquery.Dataset;
 import com.google.cloud.bigquery.DatasetId;
 import com.google.cloud.bigquery.DatasetInfo;
 import com.google.cloud.bigquery.FieldValue;
-import com.google.cloud.bigquery.Job;
-import com.google.cloud.bigquery.JobInfo;
+import com.google.cloud.bigquery.FieldValueList;
 import com.google.cloud.bigquery.QueryJobConfiguration;
-import com.google.cloud.bigquery.QueryRequest;
-import com.google.cloud.bigquery.QueryResponse;
 import com.google.cloud.bigquery.Table;
 import com.google.cloud.bigquery.TableId;
+import com.google.cloud.bigquery.TableResult;
 
 public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
 
@@ -90,16 +88,16 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
         default:
             throw new RuntimeException("To be implemented: " + properties.sourceType.getValue());
         }
-        QueryRequest queryRequest = QueryRequest
+        QueryJobConfiguration queryRequest = QueryJobConfiguration
                 .newBuilder(query)
                 .setUseLegacySql(useLegacySql)
-                .setPageSize(Integer.valueOf(limit).longValue())
                 .build();
-        QueryResponse queryResponse =
+        // todo: proper pagination, not critical for getSample yet
+        TableResult queryResponse =
                 query(bigquery, queryRequest, properties.getDatastoreProperties().projectName.getValue());
-        bqRowSchema = queryResponse.getResult().getSchema();
+        bqRowSchema = queryResponse.getSchema();
         Schema schema = BigQueryAvroRegistry.get().inferSchema(bqRowSchema);
-        Iterator<List<FieldValue>> iterator = queryResponse.getResult().getValues().iterator();
+        Iterator<FieldValueList> iterator = queryResponse.getValues().iterator();
         IndexedRecordConverter<Map<String, Object>, IndexedRecord> converter =
                 new BigQueryFieldValueListIndexedRecordConverter();
         converter.setSchema(schema);
@@ -185,13 +183,13 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
             break;
         }
         case QUERY: {
-            QueryRequest queryRequest = QueryRequest
+            QueryJobConfiguration queryRequest = QueryJobConfiguration
                     .newBuilder(properties.query.getValue())
                     .setUseLegacySql(properties.useLegacySql.getValue())
                     .build();
-            QueryResponse queryResponse =
+            TableResult queryResponse =
                     query(bigquery, queryRequest, properties.getDatastoreProperties().projectName.getValue());
-            bqRowSchema = queryResponse.getResult().getSchema();
+            bqRowSchema = queryResponse.getSchema();
             break;
         }
         default:
@@ -200,38 +198,36 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
         return BigQueryAvroRegistry.get().inferSchema(bqRowSchema);
     }
 
-    private QueryResponse query(BigQuery bigquery, QueryRequest queryRequest, String projectId) {
-        QueryResponse queryResponse = null;
+    private TableResult query(BigQuery bigquery, QueryJobConfiguration queryRequest, String projectId,
+                              BigQuery.JobOption... options) {
+        TableResult queryResponse = null;
         try {
-            queryResponse = bigquery.query(queryRequest);
+            queryResponse = bigquery.query(queryRequest, options);
         } catch (BigQueryException exception) {
             if ("responseTooLarge".equals(exception.getReason())) {
-                return queryWithLarge(bigquery, queryRequest, projectId);
+                return queryWithLarge(bigquery, queryRequest, projectId, options);
             }
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
-        return loopQueryResponse(bigquery, queryResponse);
+        return loopQueryResponse(queryResponse);
     }
 
-    private QueryResponse loopQueryResponse(BigQuery bigquery, QueryResponse queryResponse) {
+    private TableResult loopQueryResponse(TableResult queryResponse) {
         if (queryResponse == null) {
             TalendRuntimeException.build(ComponentsErrorCode.IO_EXCEPTION).throwIt();
         }
-        while (!queryResponse.jobCompleted()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                TalendRuntimeException.build(ComponentsErrorCode.IO_EXCEPTION, e).throwIt();
-            }
-            queryResponse = bigquery.getQueryResults(queryResponse.getJobId());
-        }
+        /* JobException now
         if (queryResponse.hasErrors()) {
             TalendRuntimeException.build(ComponentsErrorCode.IO_EXCEPTION).setAndThrow(
                     queryResponse.getExecutionErrors().toArray(new String[] {}));
         }
+        */
         return queryResponse;
     }
 
-    private QueryResponse queryWithLarge(BigQuery bigquery, QueryRequest queryRequest, String projectId) {
+    private TableResult queryWithLarge(BigQuery bigquery, QueryJobConfiguration queryRequest, String projectId,
+                                       BigQuery.JobOption... options) {
         String tempDataset = genTempName("dataset");
         String tempTable = genTempName("table");
         bigquery.create(DatasetInfo.of(tempDataset));
@@ -242,11 +238,11 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
                 .setUseLegacySql(queryRequest.useLegacySql())
                 .setDestinationTable(tableId)
                 .build();
-        Job job = bigquery.create(JobInfo.of(jobConfiguration));
-        QueryResponse queryResponse = bigquery.getQueryResults(job.getJobId());
-        queryResponse = loopQueryResponse(bigquery, queryResponse);
-        bigquery.delete(tableId);
-        return queryResponse;
+        try {
+            return query(bigquery, jobConfiguration, projectId, options);
+        } finally {
+            bigquery.delete(tableId);
+        }
     }
 
     private String genTempName(String prefix) {

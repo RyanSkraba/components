@@ -15,6 +15,9 @@ package org.talend.components.api.service.internal.osgi;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.slf4j.Logger;
@@ -23,11 +26,7 @@ import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Deactivate;
-
-@Component(provide = { DefinitionRegistry.class, DefinitionRegistryService.class })
+@Component(service = { DefinitionRegistry.class, DefinitionRegistryService.class })
 public class DefinitionRegistryOsgi extends DefinitionRegistry {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefinitionRegistryOsgi.class);

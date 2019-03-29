@@ -71,7 +71,7 @@ public class SnowflakeReaderTest {
         tSnowflakeInputProperties.table.main.schema.setValue(schema);
         Mockito.when(snowflakeSourceMock.getRuntimeSchema(Mockito.any(SchemaResolver.class))).thenReturn(schema);
         tSnowflakeInputProperties.table.tableName.setValue("Table");
-        Mockito.doCallRealMethod().when(snowflakeSourceMock).initialize(Mockito.any(RuntimeContainer.class), Mockito.eq(tSnowflakeInputProperties));
+        Mockito.doCallRealMethod().when(snowflakeSourceMock).initialize(Mockito.any(), Mockito.eq(tSnowflakeInputProperties));
         snowflakeSourceMock.initialize(null, tSnowflakeInputProperties);
         snowflakeReader = new SnowflakeReader(runtimeContainerMock, snowflakeSourceMock, tSnowflakeInputProperties);
     }

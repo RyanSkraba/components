@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.marklogic;
 
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -27,13 +28,11 @@ import org.talend.components.marklogic.wizard.MarkLogicWizardDefinition;
 
 import com.google.auto.service.AutoService;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * Install all of the definitions provided for the FileInput family of components.
  */
 @AutoService(ComponentInstaller.class) @Component(name = Constants.COMPONENT_INSTALLER_PREFIX
-        + MarkLogicFamilyDefinition.NAME, provide = ComponentInstaller.class)
+        + MarkLogicFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class MarkLogicFamilyDefinition
         extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 

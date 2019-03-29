@@ -178,7 +178,7 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
                 new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
             testFixture.setUp();
 
-            when(testFixture.runtimeSourceOrSink.getSchemaNames(any(RuntimeContainer.class)))
+            when(testFixture.runtimeSourceOrSink.getSchemaNames(any()))
                     .thenThrow(TalendRuntimeException.createUnexpectedException("ERROR"));
 
             ValidationResult actualValidationResult =
@@ -245,7 +245,7 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
                 new MockRuntimeSourceOrSinkTestFixture(properties.connection, createDefaultTestDataset())) {
             testFixture.setUp();
             when(testFixture.runtimeSourceOrSink.getSchemaNames(null)).thenReturn(list);
-            when(testFixture.runtimeSourceOrSink.getEndpointSchema(any(RuntimeContainer.class), eq(moduleName)))
+            when(testFixture.runtimeSourceOrSink.getEndpointSchema(any(), eq(moduleName)))
                     .thenThrow(TalendRuntimeException.createUnexpectedException("ERROR"));
 
             properties.module.beforeModuleName();

@@ -14,9 +14,8 @@ package org.talend.components.api.service.i18n.osgi;
 
 import java.util.Locale;
 
+import org.osgi.service.component.annotations.Component;
 import org.talend.daikon.i18n.LocaleProvider;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * LocaleProvider implementation for OSGI container

@@ -147,7 +147,7 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
 
             properties.sourceType.setValue(SalesforceDatasetProperties.SourceType.MODULE_SELECTION);
 
-            when(testFixture.runtimeSourceOrSink.getSchemaNames(any(RuntimeContainer.class)))
+            when(testFixture.runtimeSourceOrSink.getSchemaNames(any()))
                     .thenThrow(new IOException("ERROR"));
 
             properties.setDatastoreProperties(datastoreProperties);
@@ -166,7 +166,7 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
 
             properties.sourceType.setValue(SalesforceDatasetProperties.SourceType.MODULE_SELECTION);
 
-            when(testFixture.runtimeSourceOrSink.validate(any(RuntimeContainer.class)))
+            when(testFixture.runtimeSourceOrSink.validate(any()))
                     .thenReturn(new ValidationResult(ValidationResult.Result.ERROR, "CONNECTION ERROR"));
 
             properties.setDatastoreProperties(datastoreProperties);
@@ -252,7 +252,7 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
 
             propertiesService.afterProperty("sourceType", properties);
 
-            assertThat((Iterable<String>) properties.moduleName.getPossibleValues(),
+            assertThat(properties.moduleName.getPossibleValues(),
                     containsInAnyOrder("Account", "Customer"));
 
             assertNull(properties.moduleName.getValue());

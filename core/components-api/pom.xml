@@ -67,14 +67,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        <!-- the following dependencies may be removed once we get rid off the
-            spring implementation and create a specific project for that. -->
-        <!-- SWAGGER DEPENDENCIES -->
-        <dependency>
-            <groupId>biz.aQute.bnd</groupId>
-            <artifactId>annotation</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -104,6 +96,9 @@
                         </goals>
                         <configuration>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.api.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                             </instructions>
@@ -120,6 +115,9 @@
                             <!-- removes the main classes we only want test classes -->
                             <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>!*internal,org.talend*,javax.xml.namespace,org.junit*,org.hamcrest*</Import-Package>
                                 <Bundle-SymbolicName>org.talend.components.api.test</Bundle-SymbolicName>
@@ -142,6 +140,9 @@
                             <classifier>bundle</classifier>
                             <unpackBundle>true</unpackBundle>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.api</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500,

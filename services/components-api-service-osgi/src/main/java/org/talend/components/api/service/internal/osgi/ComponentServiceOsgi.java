@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.ComponentDefinition;
@@ -36,9 +38,6 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.runtime.RuntimeContext;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.runtime.RuntimeInfo;
-
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Reference;
 
 /**
  * This is the OSGI specific service implementation that completely delegates the implementation to the Framework

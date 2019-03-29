@@ -13,6 +13,7 @@
 
 package org.talend.components.kinesis.runtime;
 
+import static org.junit.Assume.assumeTrue;
 import static org.talend.components.kinesis.runtime.KinesisTestConstants.getDatasetForAvro;
 import static org.talend.components.kinesis.runtime.KinesisTestConstants.getDatasetForCsv;
 import static org.talend.components.kinesis.runtime.KinesisTestConstants.getInputFromBeginning;
@@ -32,6 +33,7 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -91,6 +93,7 @@ public class KinesisInputRuntimeTestIT {
 
     @Test
     public void inputCsv_Spark() throws IOException {
+        assumeTrue(SystemUtils.JAVA_VERSION.startsWith("1.8."));
         inputCsv(new SparkRunnerTestUtils(this.getClass().getName()).createPipeline(), csvStream2);
     }
 
@@ -125,6 +128,7 @@ public class KinesisInputRuntimeTestIT {
 
     @Test
     public void inputAvro_Spark() throws IOException {
+        assumeTrue(SystemUtils.JAVA_VERSION.startsWith("1.8."));
         inputCsv(new SparkRunnerTestUtils(this.getClass().getName()).createPipeline(), avroStream2);
     }
 

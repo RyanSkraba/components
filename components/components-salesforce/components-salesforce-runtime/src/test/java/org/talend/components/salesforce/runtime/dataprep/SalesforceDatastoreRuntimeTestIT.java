@@ -1,11 +1,16 @@
 package org.talend.components.salesforce.runtime.dataprep;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreProperties;
+import org.talend.components.salesforce.runtime.DisableIfMissingConfig;
 import org.talend.daikon.properties.ValidationResult;
 
 public class SalesforceDatastoreRuntimeTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
     @Test
     public void testDoHealthChecksWithSuccess() {

@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.localio;
 
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -20,18 +21,15 @@ import org.talend.components.localio.fixed.FixedDatasetDefinition;
 import org.talend.components.localio.fixed.FixedDatastoreDefinition;
 import org.talend.components.localio.fixed.FixedInputDefinition;
 import org.talend.components.localio.fixedflowinput.FixedFlowInputDefinition;
-import org.talend.components.localio.rowgenerator.RowGeneratorDefinition;
 
 import com.google.auto.service.AutoService;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * Install all of the definitions provided for the LocalIO family of components.
  */
 @AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX
-        + LocalIOComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
+        + LocalIOComponentFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class LocalIOComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "LocalIO";

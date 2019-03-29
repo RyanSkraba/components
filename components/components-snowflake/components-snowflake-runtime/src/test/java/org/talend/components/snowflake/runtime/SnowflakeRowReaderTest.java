@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakerow.TSnowflakeRowProperties;
 import org.talend.daikon.avro.SchemaConstants;
@@ -60,8 +59,8 @@ public class SnowflakeRowReaderTest {
         source = Mockito.mock(SnowflakeRowSource.class);
 
         connection = Mockito.mock(Connection.class);
-        Mockito.when(source.createConnection(Mockito.any(RuntimeContainer.class))).thenReturn(connection);
-        Mockito.doNothing().when(source).closeConnection(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class));
+        Mockito.when(source.createConnection(Mockito.any())).thenReturn(connection);
+        Mockito.doNothing().when(source).closeConnection(Mockito.any(), Mockito.any(Connection.class));
         properties = new TSnowflakeRowProperties("rowProperties");
         schema = SchemaBuilder.builder().record("test").fields().requiredString("name").endRecord();
         query = "SELECT id, name from " + TABLE_NAME;
@@ -192,7 +191,7 @@ public class SnowflakeRowReaderTest {
     @Test(expected = IOException.class)
     public void testFailedCloseConnection() throws IOException, SQLException {
         Mockito.doThrow(new SQLException("Failed to close connectio")).when(source)
-                .closeConnection(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class));
+                .closeConnection(Mockito.any(), Mockito.any());
 
         reader.close();
 

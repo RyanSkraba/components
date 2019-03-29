@@ -60,7 +60,7 @@ public class MarkLogicWriterTest {
 
         RuntimeContainer mockedContainer = mock(RuntimeContainer.class);
         DatabaseClient mockedClient = mock(DatabaseClient.class);
-        Mockito.when(mockedContainer.getComponentData(anyString(), anyString())).thenReturn(mockedClient);
+        Mockito.when(mockedContainer.getComponentData(any(), any())).thenReturn(mockedClient);
 
         writer = sink.createWriteOperation().createWriter(mockedContainer);
 
@@ -80,7 +80,7 @@ public class MarkLogicWriterTest {
 
         RuntimeContainer mockedContainer = mock(RuntimeContainer.class);
         DatabaseClient mockedClient = mock(DatabaseClient.class);
-        Mockito.when(mockedContainer.getComponentData(anyString(), anyString())).thenReturn(mockedClient);
+        Mockito.when(mockedContainer.getComponentData(any(), any())).thenReturn(mockedClient);
 
         writer = sink.createWriteOperation().createWriter(mockedContainer);
 
@@ -100,7 +100,7 @@ public class MarkLogicWriterTest {
 
         RuntimeContainer mockedContainer = mock(RuntimeContainer.class);
         DatabaseClient mockedClient = mock(DatabaseClient.class);
-        Mockito.when(mockedContainer.getComponentData(anyString(), anyString())).thenReturn(mockedClient);
+        Mockito.when(mockedContainer.getComponentData(any(), any())).thenReturn(mockedClient);
 
         writer = sink.createWriteOperation().createWriter(mockedContainer);
 
@@ -120,7 +120,7 @@ public class MarkLogicWriterTest {
 
         RuntimeContainer mockedContainer = mock(RuntimeContainer.class);
         DatabaseClient mockedClient = mock(DatabaseClient.class);
-        Mockito.when(mockedContainer.getComponentData(anyString(), anyString())).thenReturn(mockedClient);
+        Mockito.when(mockedContainer.getComponentData(any(), any())).thenReturn(mockedClient);
 
         writer = sink.createWriteOperation().createWriter(mockedContainer);
 
@@ -140,7 +140,7 @@ public class MarkLogicWriterTest {
 
         RuntimeContainer mockedContainer = mock(RuntimeContainer.class);
         DatabaseClient mockedClient = mock(DatabaseClient.class);
-        Mockito.when(mockedContainer.getComponentData(anyString(), anyString())).thenReturn(mockedClient);
+        Mockito.when(mockedContainer.getComponentData(any(), any())).thenReturn(mockedClient);
 
         writer = sink.createWriteOperation().createWriter(mockedContainer);
 
@@ -156,7 +156,7 @@ public class MarkLogicWriterTest {
         properties.init();
         MarkLogicWriteOperation writeOperation = new MarkLogicWriteOperation(sink, properties);
 
-        Mockito.when(sink.connect((RuntimeContainer) anyObject())).thenReturn(null);
+        Mockito.when(sink.connect(any())).thenReturn(null);
 
         writer = writeOperation.createWriter(null);
 
@@ -230,7 +230,7 @@ public class MarkLogicWriterTest {
 
         RuntimeContainer mockedContainer = mock(RuntimeContainer.class);
         DatabaseClient mockedClient = mock(DatabaseClient.class);
-        Mockito.when(mockedContainer.getComponentData(anyString(), anyString())).thenReturn(mockedClient);
+        Mockito.when(mockedContainer.getComponentData(any(), any())).thenReturn(mockedClient);
 
         DocumentManager markLogicDocMngrMock = mock(DocumentManager.class);
 
@@ -259,7 +259,7 @@ public class MarkLogicWriterTest {
         DocumentManager markLogicDocMngrMock = prepareDocManagerText(MarkLogicOutputProperties.Action.UPSERT,
                 MarkLogicOutputProperties.DocType.PLAIN_TEXT);
 
-        verify(markLogicDocMngrMock).write(anyString(), (GenericWriteHandle) anyObject());
+        verify(markLogicDocMngrMock).write(anyString(), any());
     }
 
     @Test
@@ -267,7 +267,7 @@ public class MarkLogicWriterTest {
         DocumentManager markLogicDocMngrMock = prepareDocManagerText(MarkLogicOutputProperties.Action.UPSERT,
                 MarkLogicOutputProperties.DocType.BINARY);
 
-        verify(markLogicDocMngrMock).write(anyString(), (GenericWriteHandle) anyObject());
+        verify(markLogicDocMngrMock).write(anyString(), any());
     }
 
     @Test
@@ -293,13 +293,13 @@ public class MarkLogicWriterTest {
 
         RuntimeContainer mockedContainer = mock(RuntimeContainer.class);
         DatabaseClient mockedClient = mock(DatabaseClient.class);
-        Mockito.when(mockedContainer.getComponentData(anyString(), anyString())).thenReturn(mockedClient);
+        Mockito.when(mockedContainer.getComponentData(any(), any())).thenReturn(mockedClient);
 
         DocumentManager markLogicDocMngrMock = mock(DocumentManager.class);
         DocumentUriTemplate uriTemplateMock = mock(DocumentUriTemplate.class);
         DocumentDescriptor descriptorMock = mock(DocumentDescriptor.class);
-        when(markLogicDocMngrMock.newDocumentUriTemplate(anyString())).thenReturn(uriTemplateMock);
-        when(markLogicDocMngrMock.create(any(DocumentUriTemplate.class), any(AbstractWriteHandle.class)))
+        when(markLogicDocMngrMock.newDocumentUriTemplate(any())).thenReturn(uriTemplateMock);
+        when(markLogicDocMngrMock.create(any(), any()))
                 .thenReturn(descriptorMock);
         when(descriptorMock.getUri()).thenReturn("somePrefix/docId");
 
@@ -312,7 +312,7 @@ public class MarkLogicWriterTest {
         writer.open("123");
         writer.docMgr = markLogicDocMngrMock;
         writer.write(indexedRecord);
-        verify(markLogicDocMngrMock).write(eq("somePrefix/docId"), any(FileHandle.class));
+        verify(markLogicDocMngrMock).write(eq("somePrefix/docId"), any());
 
         assertFalse(((Collection<IndexedRecord>) writer.getSuccessfulWrites()).isEmpty());
     }
@@ -323,7 +323,7 @@ public class MarkLogicWriterTest {
 
         Result result = writer.close();
         assertEquals(1, result.totalCount);
-        verify(writer.container).setComponentData(anyString(), eq("NB_LINE_DELETED"), eq(1));
+        verify(writer.container).setComponentData(any(), eq("NB_LINE_DELETED"), eq(1));
     }
 
     @Test

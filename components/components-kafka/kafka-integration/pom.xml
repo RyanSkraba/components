@@ -64,6 +64,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <trimStackTrace>false</trimStackTrace>
                     <systemPropertyVariables>
                         <kafka.bootstrap>${docker.host.address}:${kafka.port}</kafka.bootstrap>
                     </systemPropertyVariables>

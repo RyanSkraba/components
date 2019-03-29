@@ -32,8 +32,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>biz.aQute.bnd</groupId>
-            <artifactId>annotation</artifactId>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
+            <scope>provided</scope>
         </dependency>
         <!-- the following dependencies may be removed once we get rid off the
             spring implementation and create a specific project for that. -->
@@ -82,6 +83,9 @@
                         </goals>
                         <configuration>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Service-Component>*</Service-Component>
                                 <Bundle-SymbolicName>org.talend.components.api.service.osgi</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name}</Bundle-Name>
@@ -102,6 +106,9 @@
                             <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded
                             </outputDirectory>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>!*internal,org.talend*,javax.xml.namespace,org.junit*,org.hamcrest*
                                 </Import-Package>

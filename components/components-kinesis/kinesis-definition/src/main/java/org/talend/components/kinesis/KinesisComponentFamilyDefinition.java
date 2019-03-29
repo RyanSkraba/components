@@ -13,6 +13,7 @@
 
 package org.talend.components.kinesis;
 
+import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -20,14 +21,12 @@ import org.talend.components.kinesis.input.KinesisInputDefinition;
 
 import com.google.auto.service.AutoService;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * Install all of the definitions provided for the Kinesis family of components.
  */
 @AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX + KinesisComponentFamilyDefinition.NAME,
-        provide = ComponentInstaller.class)
+        service = ComponentInstaller.class)
 public class KinesisComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "Kinesis";

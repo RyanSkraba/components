@@ -12,10 +12,12 @@
 // ============================================================================
 package org.talend.components.service.rest.fullexample;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
+import io.restassured.RestAssured;
 
 import java.util.Collections;
 
@@ -38,7 +40,6 @@ import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jayway.restassured.RestAssured;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringTestApp.class, webEnvironment = RANDOM_PORT)
@@ -76,7 +77,7 @@ public class FullExampleComponentTestIT {
         SerPropertiesDto serProperties = new SerPropertiesDto();
         serProperties.setProperties(new FullExampleDatastoreProperties("").init().toSerialized());
 
-        given().content(serProperties).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+        given().body(serProperties).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
                 .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect().statusCode(200).log().ifError() //
                 .when()//
@@ -93,7 +94,7 @@ public class FullExampleComponentTestIT {
     public void initializeFullExampleDatasetProperties() throws java.io.IOException {
         SerPropertiesDto serPropertiesDto = createDatasetDatastoreSerPropertiesDto();
 
-        given().content(serPropertiesDto).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+        given().body(serPropertiesDto).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
                 .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect().statusCode(200).log().ifError() //
                 .when()//
@@ -115,7 +116,7 @@ public class FullExampleComponentTestIT {
     @Test
     public void testAfterDatastoreCalled() throws java.io.IOException {
         SerPropertiesDto serPropertiesDto = createDatasetDatastoreSerPropertiesDto();
-        given().content(serPropertiesDto).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+        given().body(serPropertiesDto).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
                 .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .expect().statusCode(200).log().ifError() //
                 .when()//

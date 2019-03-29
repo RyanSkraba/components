@@ -23,12 +23,15 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.components.simplefileio.s3.S3DatasetProperties;
 import org.talend.components.simplefileio.s3.S3Region;
 import org.talend.components.simplefileio.s3.S3RegionUtil;
+import org.talend.components.test.DisableIfMissingConfig;
 
 import com.talend.shaded.com.amazonaws.services.s3.AmazonS3;
 
@@ -36,6 +39,8 @@ import com.talend.shaded.com.amazonaws.services.s3.AmazonS3;
  * Unit tests for {@link S3DatasetRuntime}.
  */
 public class S3DatasetRuntimeTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_WHEN_NEEDED = new DisableIfMissingConfig("s3.accesskey");
 
     /** Set up credentials for integration tests. */
     @Rule

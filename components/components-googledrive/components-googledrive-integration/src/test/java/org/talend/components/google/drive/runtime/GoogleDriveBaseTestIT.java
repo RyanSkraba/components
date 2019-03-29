@@ -26,6 +26,7 @@ import java.util.Map;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -96,6 +97,9 @@ public class GoogleDriveBaseTestIT {
     static {
         GOOGLEDRIVE_SERVICE_ACCOUNT_FILE = System.getProperty(GOOGLEDRIVE_SERVICE_ACCOUNT_PROP);
     }
+
+    @ClassRule
+    public static final TestRule DISABLE_IF_MISSING = new DisableIfMissingConfig(GOOGLEDRIVE_SERVICE_ACCOUNT_PROP);
 
     /**
      * Sometimes, we may have some SocketTimeOut exceptions, in that case we don't consider that the test has failed. It

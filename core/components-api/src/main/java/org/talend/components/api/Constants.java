@@ -13,6 +13,12 @@
 package org.talend.components.api;
 
 public class Constants {
+    static {
+        // j11 workaround assuming this constant will be loaded pretty early
+        if (System.getProperty("sun.boot.class.path") == null) {
+            System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));
+        }
+    }
 
     /**
      * Used in the name attribute of the aQute.bnd.annotation.component.Component annotation of a

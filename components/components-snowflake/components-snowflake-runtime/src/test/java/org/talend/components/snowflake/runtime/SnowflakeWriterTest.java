@@ -306,7 +306,7 @@ public class SnowflakeWriterTest {
         properties.outputAction.setValue(OutputAction.UPDATE);
         writer.open("uId");
         Mockito.doThrow(new SQLException("Failed to finish loader")).when(sink)
-                .closeConnection(Mockito.any(RuntimeContainer.class), Mockito.any(Connection.class));
+                .closeConnection(Mockito.any(), Mockito.any(Connection.class));
         writer.close();
     }
 }

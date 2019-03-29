@@ -71,6 +71,9 @@ public class LazyAvroCoder<T> extends AtomicCoder<Object> {
     }
 
     public static void resetSchemaSupplier() {
+        if (threadSchemaSupplierFactory == null) {
+            return;
+        }
         Supplier<AvroSchemaHolder> schemaSupplierFactory = threadSchemaSupplierFactory.get();
         if (schemaSupplierFactory instanceof StaticSchemaHolderSupplier) {
             ((StaticSchemaHolderSupplier) schemaSupplierFactory).reset();

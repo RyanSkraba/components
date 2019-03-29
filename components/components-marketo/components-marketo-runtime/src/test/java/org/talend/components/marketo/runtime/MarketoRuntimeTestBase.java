@@ -86,21 +86,21 @@ public class MarketoRuntimeTestBase {
 
         client = mock(MarketoRESTClient.class);
         when(client.getApi()).thenReturn("REST");
-        when(client.getMultipleLeads(any(TMarketoInputProperties.class), any(String.class)))
+        when(client.getMultipleLeads(any(), any()))
                 .thenReturn(getLeadRecordResult(false));
         when(client.getAllLeadFields()).thenReturn(fakeAllLeadFields());
 
         sourceOrSink = mock(MarketoSourceOrSink.class);
-        when(sourceOrSink.initialize(any(RuntimeContainer.class), any(ComponentProperties.class)))
+        when(sourceOrSink.initialize(any(), any()))
                 .thenReturn(ValidationResult.OK);
-        when(sourceOrSink.validate(any(RuntimeContainer.class))).thenReturn(ValidationResult.OK);
-        when(sourceOrSink.validateConnection(any(MarketoProvideConnectionProperties.class))).thenReturn(ValidationResult.OK);
-        when(sourceOrSink.getClientService(any(RuntimeContainer.class))).thenReturn(client);
+        when(sourceOrSink.validate(any())).thenReturn(ValidationResult.OK);
+        when(sourceOrSink.validateConnection(any())).thenReturn(ValidationResult.OK);
+        when(sourceOrSink.getClientService(any())).thenReturn(client);
 
         sink = mock(MarketoSink.class);
-        when(sink.validate(any(RuntimeContainer.class))).thenReturn(ValidationResult.OK);
-        when(sink.validateConnection(any(MarketoProvideConnectionProperties.class))).thenReturn(new ValidationResult(Result.OK));
-        when(sink.getClientService(any(RuntimeContainer.class))).thenReturn(client);
+        when(sink.validate(any())).thenReturn(ValidationResult.OK);
+        when(sink.validateConnection(any())).thenReturn(new ValidationResult(Result.OK));
+        when(sink.getClientService(any())).thenReturn(client);
     }
 
     public static MarketoRecordResult getLeadRecordResult(boolean withRemainCount) {

@@ -44,11 +44,16 @@ public class FiltersFactory {
             return new NotEqualsOperator<>(predefinedValue);
         default:
             if (predefinedValue instanceof Comparable) {
-                return createComparableOperator(operatorType, (Comparable) predefinedValue);
+                final Operator<?> operator = createComparableOperator(operatorType, asComparable((Comparable) predefinedValue));
+                return (Operator<T>) operator;
             } else {
                 return new EqualsOperator<>(predefinedValue);
             }
         }
+    }
+
+    private static <T extends Comparable<T>> T asComparable(final T predefinedValue) {
+        return predefinedValue;
     }
 
     private static <T extends Comparable<T>> Operator<T> createComparableOperator(OperatorType operatorType, T predefinedValue) {

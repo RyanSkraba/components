@@ -90,12 +90,12 @@ public class SnowflakeTableListPropertiesTest {
             Mockito.when(testFixture.runtimeSourceOrSink.validateConnection(properties)).thenReturn(ValidationResult.OK);
             Schema schema = SchemaBuilder.record("record").fields().requiredString("id").endRecord();
             Mockito.when(testFixture.runtimeSourceOrSink.getEndpointSchema(null, tableId)).thenReturn(schema);
-            Mockito.when(repo.storeProperties(Mockito.any(Properties.class), Mockito.anyString(), Mockito.anyString(),
-                    Mockito.anyString())).thenReturn("connRepoLocation");
+            Mockito.when(repo.storeProperties(Mockito.any(), Mockito.any(), Mockito.any(),
+                    Mockito.any())).thenReturn("connRepoLocation");
 
             Assert.assertEquals(ValidationResult.OK, properties.afterFormFinishMain(repo));
-            Mockito.verify(repo, Mockito.times(2)).storeProperties(Mockito.any(Properties.class), Mockito.anyString(),
-                    Mockito.anyString(), Mockito.anyString());
+            Mockito.verify(repo, Mockito.times(2)).storeProperties(Mockito.any(), Mockito.any(),
+                    Mockito.any(), Mockito.any());
         }
     }
 
