@@ -299,6 +299,32 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         return url.toString();
     }
 
+    /**
+     * Returns schema for permanent table
+     *
+     * @return schema for permanent table
+     */
+    public String getSchemaPermanent() {
+        String schemaValue = schemaName.getValue();
+        if (schemaValue == null) {
+            return "";
+        }
+        return schemaValue;
+    }
+
+    /**
+     * Returns database value specified by user
+     *
+     * @return database
+     */
+    public String getDatabase() {
+        String dbValue = db.getValue();
+        if (dbValue == null) {
+            return "";
+        }
+        return dbValue;
+    }
+
     private String getApplication() {
         StringBuilder application = new StringBuilder();
         application.append("Talend");
