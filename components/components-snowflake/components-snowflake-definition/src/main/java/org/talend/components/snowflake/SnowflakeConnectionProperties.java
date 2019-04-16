@@ -213,7 +213,11 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
 
     @Override
     public SnowflakeConnectionProperties getConnectionProperties() {
-        return this;
+        if (referencedComponent.referenceType.getValue() == null ||
+                referencedComponent.referenceType.getValue() == ComponentReferenceProperties.ReferenceType.THIS_COMPONENT) {
+            return this;
+        }
+        return referencedComponent.getReference();
     }
 
     public String getReferencedComponentId() {
@@ -300,12 +304,14 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
     }
 
     /**
-     * Returns schema for permanent table
+     * Returns schema for permanent table specified either in this properties or in referenced properties
+     * (other Connection component or metadata)
      *
      * @return schema for permanent table
      */
     public String getSchemaPermanent() {
-        String schemaValue = schemaName.getValue();
+        SnowflakeConnectionProperties connection = getConnectionProperties();
+        String schemaValue = connection.schemaName.getValue();
         if (schemaValue == null) {
             return "";
         }
@@ -313,12 +319,14 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
     }
 
     /**
-     * Returns database value specified by user
+     * Returns database value specified by user either in this properties or in referenced properties
+     * (other Connection component or metadata)
      *
      * @return database
      */
     public String getDatabase() {
-        String dbValue = db.getValue();
+        SnowflakeConnectionProperties connection = getConnectionProperties();
+        String dbValue = connection.db.getValue();
         if (dbValue == null) {
             return "";
         }
