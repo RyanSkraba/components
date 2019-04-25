@@ -116,6 +116,7 @@
         <javax.validation.version>1.1.0.Final</javax.validation.version>
         <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>
         <jaxb-impl.version>2.3.1</jaxb-impl.version>
+        <javax.annotation-api.version>1.3</javax.annotation-api.version>
         <jersey-apache-client4.version>1.19.1</jersey-apache-client4.version>
         <jersey-client.version>1.9</jersey-client.version>
         <jersey-core.version>1.9</jersey-core.version>
@@ -518,6 +519,11 @@
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>javax.ws.rs-api</artifactId>
                 <version>${javax.ws.rs-api.version}</version>
+            </dependency>
+             <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${javax.annotation-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
