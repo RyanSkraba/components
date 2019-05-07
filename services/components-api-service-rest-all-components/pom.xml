@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>org.talend.components</groupId>
-    <version>0.26.0-SNAPSHOT</version>
+    <version>0.27.0-SNAPSHOT</version>
 
     <artifactId>components-api-service-rest-all-components</artifactId>
 

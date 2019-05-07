@@ -4,7 +4,7 @@
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-pubsub-aggregator</artifactId>
-    <version>0.26.0-SNAPSHOT</version>
+    <version>0.27.0-SNAPSHOT</version>
 
     <name>Components - PubSub Aggregator</name>
     <packaging>pom</packaging>
