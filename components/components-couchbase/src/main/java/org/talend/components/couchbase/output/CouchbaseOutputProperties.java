@@ -31,6 +31,8 @@ public class CouchbaseOutputProperties extends CouchbaseProperties {
 
     public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
+    public Property<Boolean> containsJson = PropertyFactory.newBoolean("containsJson");
+
     public CouchbaseOutputProperties(String name) {
         super(name);
     }
@@ -39,6 +41,7 @@ public class CouchbaseOutputProperties extends CouchbaseProperties {
     public void setupProperties() {
         super.setupProperties();
         idFieldName.setValue("id");
+        containsJson.setValue(false);
     }
 
     @Override
@@ -46,6 +49,7 @@ public class CouchbaseOutputProperties extends CouchbaseProperties {
         super.setupLayout();
 
         getForm(Form.MAIN).addRow(idFieldName);
+        getForm(Form.MAIN).addRow(containsJson);
         getForm(Form.MAIN).addRow(dieOnError);
     }
 

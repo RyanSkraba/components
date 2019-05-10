@@ -33,6 +33,8 @@ public class CouchbaseSink extends CouchbaseSourceOrSink implements Sink {
 
     private boolean dieOnError;
 
+    private boolean containsJson;
+
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         if (properties instanceof CouchbaseOutputProperties) {
@@ -42,6 +44,7 @@ public class CouchbaseSink extends CouchbaseSourceOrSink implements Sink {
             this.password = outputProperties.password.getStringValue();
             this.idFieldName = outputProperties.idFieldName.getStringValue();
             this.dieOnError = outputProperties.dieOnError.getValue();
+            this.containsJson = outputProperties.containsJson.getValue();
             return ValidationResult.OK;
         }
         return new ValidationResult(Result.ERROR, "Wrong component properties, must be instanceof CouchbaseOutputProperties class");
@@ -68,6 +71,10 @@ public class CouchbaseSink extends CouchbaseSourceOrSink implements Sink {
 
     public boolean isDieOnError() {
         return dieOnError;
+    }
+
+    public boolean getContainsJson() {
+        return containsJson;
     }
 
     public CouchbaseConnection getConnection() {

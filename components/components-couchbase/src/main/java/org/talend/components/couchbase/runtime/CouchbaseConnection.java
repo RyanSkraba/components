@@ -17,7 +17,9 @@ package org.talend.components.couchbase.runtime;
 
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.CouchbaseCluster;
+import com.couchbase.client.java.document.JsonDocument;
 import com.couchbase.client.java.document.RawJsonDocument;
+import com.couchbase.client.java.document.json.JsonObject;
 import com.couchbase.client.java.env.CouchbaseEnvironment;
 import com.couchbase.client.java.env.DefaultCouchbaseEnvironment;
 
@@ -42,6 +44,10 @@ public class CouchbaseConnection {
 
     public void upsert(String id, String content) {
         bucket.upsert(RawJsonDocument.create(id, content));
+    }
+
+    public void insertJsonDocument(String id, JsonObject jsonObject){
+        bucket.upsert(JsonDocument.create(id, jsonObject));
     }
 
     public void increment() {

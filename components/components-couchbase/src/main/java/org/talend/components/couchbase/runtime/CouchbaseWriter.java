@@ -16,6 +16,8 @@
 
 package org.talend.components.couchbase.runtime;
 
+import com.couchbase.client.java.document.json.JsonObject;
+
 import java.io.IOException;
 
 import org.apache.avro.Schema;
@@ -33,6 +35,7 @@ public class CouchbaseWriter implements Writer<Result> {
     private final CouchbaseSink sink;
     private final String idFieldName;
     private final boolean dieOnError;
+    private final boolean containsJson;
     private volatile boolean opened;
     private Result result;
     private CouchbaseConnection connection;
@@ -42,6 +45,7 @@ public class CouchbaseWriter implements Writer<Result> {
         this.sink = (CouchbaseSink) operation.getSink();
         this.idFieldName = sink.getIdFieldName();
         this.dieOnError = sink.isDieOnError();
+        this.containsJson = sink.getContainsJson();
     }
 
     @Override
@@ -83,11 +87,31 @@ public class CouchbaseWriter implements Writer<Result> {
             return;
         }
         try {
-            connection.upsert(id.toString(), datum.toString());
+            if (containsJson){
+                connection.insertJsonDocument(id.toString(), createHierarchicalJson(schema, record, idPos));
+            } else {
+                connection.upsert(id.toString(), datum.toString());
+            }
             result.successCount++;
         } catch (Exception e) {
             handleException("Record is not processed. Failed to upsert value - " + datum.toString(), e);
         }
+    }
+
+    public JsonObject createHierarchicalJson(Schema schema, IndexedRecord record, int idPos){
+        JsonObject jsonObject = JsonObject.create();
+        for (int i = 0; i < schema.getFields().size(); i++){
+            if (i == idPos) continue;
+            Object value = record.get(i);
+            String fieldName = schema.getFields().get(i).name();
+            try {
+                JsonObject innerJson = JsonObject.fromJson(value.toString());
+                jsonObject.put(fieldName, innerJson);
+            } catch (Exception e) {
+                jsonObject.put(fieldName, value);
+            }
+        }
+        return jsonObject;
     }
 
     private void handleException(String message, Exception e) throws IOException {
