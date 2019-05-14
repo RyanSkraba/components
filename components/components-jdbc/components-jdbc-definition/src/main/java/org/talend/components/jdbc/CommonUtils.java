@@ -32,6 +32,7 @@ import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferenceProperties.ReferenceType;
 import org.talend.components.common.config.jdbc.Dbms;
 import org.talend.components.common.config.jdbc.MappingFileLoader;
+import org.talend.components.common.SchemaProperties;
 import org.talend.components.jdbc.module.DBTypes;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.query.EDatabase4DriverClassName;
@@ -149,7 +150,7 @@ public class CommonUtils {
      * @return
      */
     public static Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields) {
-        return newSchema(metadataSchema, newSchemaName, moreFields, metadataSchema.getFields().size());
+        return newSchema(metadataSchema, newSchemaName, moreFields, Integer.MAX_VALUE);
     }
 
     public static Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields,
@@ -158,11 +159,17 @@ public class CommonUtils {
                 metadataSchema.isError());
 
         List<Field> fields = metadataSchema.getFields();
-        List<Schema.Field> copyFieldList = cloneFieldsAndResetPosition(fields);
+        boolean removeDuplicatedNameField = (insertPoint == Integer.MAX_VALUE);
+        List<Schema.Field> copyFieldList = cloneFieldsAndResetPosition(fields, removeDuplicatedNameField, moreFields);
 
-        copyFieldList.addAll(insertPoint, moreFields);
+        if(removeDuplicatedNameField) {
+        	copyFieldList.addAll(moreFields);
+        } else {
+        	copyFieldList.addAll(insertPoint, moreFields);
+        }
 
-        newSchema.setFields(copyFieldList);
+    	newSchema.setFields(copyFieldList);
+        
         for (Map.Entry<String, Object> entry : metadataSchema.getObjectProps().entrySet()) {
             newSchema.addProp(entry.getKey(), entry.getValue());
         }
@@ -170,9 +177,18 @@ public class CommonUtils {
         return newSchema;
     }
 
-    private static List<Schema.Field> cloneFieldsAndResetPosition(List<Field> fields) {
+    private static List<Schema.Field> cloneFieldsAndResetPosition(List<Field> fields, boolean removeDuplicatedNameField, List<Field> more) {
         List<Schema.Field> copyFieldList = new ArrayList<>();
+        Set<String> moreFieldNames = new HashSet<String>();
+        if(removeDuplicatedNameField && (more!=null) && !more.isEmpty()) {
+        	for(Field field : more) {
+        		moreFieldNames.add(field.name());
+        	}
+        }
         for (Schema.Field se : fields) {
+        	if(moreFieldNames.contains(se.name())) {
+        		continue;
+        	}
             Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
             field.getObjectProps().putAll(se.getObjectProps());
             for (Map.Entry<String, Object> entry : se.getObjectProps().entrySet()) {
@@ -207,7 +223,7 @@ public class CommonUtils {
             }
         }
 
-        dynamicFields = cloneFieldsAndResetPosition(dynamicFields);
+        dynamicFields = cloneFieldsAndResetPosition(dynamicFields, false, null);
 
         return CommonUtils.newSchema(designSchema, designSchema.getName(), dynamicFields, dynPosition);
     }

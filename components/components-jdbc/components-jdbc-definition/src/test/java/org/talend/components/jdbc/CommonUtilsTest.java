@@ -93,6 +93,24 @@ public class CommonUtilsTest {
 
         Assert.assertEquals("true", newSchema.getProp(SchemaConstants.INCLUDE_ALL_FIELDS));
     }
+    
+    @Test
+    public void testNewSchemaWithDuplicatedFieldName() {
+        Schema schema = SchemaBuilder.builder().record("schema").prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true").fields()
+                .name("ID").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "1").type(AvroUtils._string()).noDefault().endRecord();
+
+        final List<Schema.Field> additionalFields = new ArrayList<Schema.Field>();
+
+        Schema.Field field = new Schema.Field("ID", Schema.create(Schema.Type.STRING), null, (Object) null);
+        field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "2");
+        additionalFields.add(field);
+
+        Schema newSchema = CommonUtils.newSchema(schema, "newName", additionalFields);
+
+        List<Schema.Field> fields = newSchema.getFields();
+        Assert.assertEquals(1, fields.size());
+        Assert.assertEquals("2", fields.get(0).getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+    }
 
     @Test
     public void testSetCommonConnectionInfo() {
