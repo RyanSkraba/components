@@ -186,6 +186,9 @@ public class MarketoBulkExecClient extends MarketoCustomObjectClient {
         Boolean isImportingLeads = parameters.bulkImportTo.getValue().equals(BulkImportTo.Leads);
         if (isImportingLeads) {
             lookupField = parameters.lookupField.getValue().name();
+            if ("Custom".equals(lookupField)) {
+                lookupField = parameters.customLookupField.getValue();
+            }
             listId = parameters.listId.getValue();
             partitionName = parameters.partitionName.getValue();
             current_uri.append(API_PATH_BULK_LEADS)//

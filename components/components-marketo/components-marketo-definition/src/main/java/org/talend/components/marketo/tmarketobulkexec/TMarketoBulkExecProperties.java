@@ -12,12 +12,6 @@
 // ============================================================================
 package org.talend.components.marketo.tmarketobulkexec;
 
-import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
-import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
-import static org.talend.daikon.properties.property.PropertyFactory.newString;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,6 +28,12 @@ import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
+
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
+import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 public class TMarketoBulkExecProperties extends MarketoComponentProperties {
 
@@ -53,6 +53,8 @@ public class TMarketoBulkExecProperties extends MarketoComponentProperties {
     public Property<BulkImportTo> bulkImportTo = newEnum("bulkImportTo", BulkImportTo.class).setRequired();
 
     public Property<RESTLookupFields> lookupField = newEnum("lookupField", RESTLookupFields.class).setRequired();
+
+    public Property<String> customLookupField = newString("customLookupField");
 
     public Property<Integer> listId = newInteger("listId");
 
@@ -99,6 +101,7 @@ public class TMarketoBulkExecProperties extends MarketoComponentProperties {
         bulkImportTo.setValue(BulkImportTo.Leads);
         lookupField.setPossibleValues(RESTLookupFields.values());
         lookupField.setValue(RESTLookupFields.email);
+        customLookupField.setValue("");
         bulkFileFormat.setPossibleValues(BulkFileFormat.values());
         bulkFileFormat.setValue(BulkFileFormat.csv);
 
@@ -113,6 +116,7 @@ public class TMarketoBulkExecProperties extends MarketoComponentProperties {
         mainForm.addRow(bulkImportTo);
         mainForm.addColumn(bulkFileFormat);
         mainForm.addRow(lookupField);
+        mainForm.addColumn(customLookupField);
         mainForm.addColumn(listId);
         mainForm.addColumn(partitionName);
         mainForm.addRow(customObjectName);
@@ -135,6 +139,8 @@ public class TMarketoBulkExecProperties extends MarketoComponentProperties {
             form.getWidget(listId.getName()).setVisible(leadParamsVisibles);
             form.getWidget(partitionName.getName()).setVisible(leadParamsVisibles);
             form.getWidget(customObjectName.getName()).setVisible(!leadParamsVisibles);
+            form.getWidget(customLookupField.getName()).setVisible(form.getWidget(lookupField.getName()).isVisible()
+                    && RESTLookupFields.Custom.equals(lookupField.getValue()));
         }
     }
 
@@ -146,6 +152,10 @@ public class TMarketoBulkExecProperties extends MarketoComponentProperties {
             schemaInput.schema.setValue(MarketoConstants.getBulkImportCustomObjectSchema());
         }
         //
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterLookupField() {
         refreshLayout(getForm(Form.MAIN));
     }
 
