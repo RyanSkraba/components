@@ -35,7 +35,7 @@
         <httpcore-nio.version>4.4.5</httpcore-nio.version>
         <httpcore.version>4.4.9</httpcore.version>
         <jackson.version.annotations>2.9.0</jackson.version.annotations>
-        <jackson.version>2.9.5</jackson.version>
+        <jackson.version>2.9.9</jackson.version>
         <org.talend.libraries.mysql.version>6.0.0</org.talend.libraries.mysql.version>
         <pax-url-aethe.version>2.4.7</pax-url-aethe.version>
         <rest-assured.version>3.3.0</rest-assured.version>
