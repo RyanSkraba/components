@@ -159,6 +159,20 @@
         </repository>
     </repositories>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>sonatype-public-repository</id>
+            <url>https://oss.sonatype.org/content/groups/public</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+
+
     <build>
         <plugins>
             <plugin>
@@ -240,6 +254,26 @@
                             <pomIncludes>
                                 <pomInclude>*/pom.xml</pomInclude>
                             </pomIncludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- JDBC drivers -->
+            <!-- Download and install drivers that are not available from a nexus repo-->
+            <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <version>1.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC_2.0.7/AthenaJDBC41_2.0.7.jar</url>
+                            <outputFileName>AthenaJDBC41-2.0.7.jar</outputFileName>
+                            <outputDirectory>${project.build.directory}/mvn-repo/Athena/AthenaJDBC41/2.0.7/</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
