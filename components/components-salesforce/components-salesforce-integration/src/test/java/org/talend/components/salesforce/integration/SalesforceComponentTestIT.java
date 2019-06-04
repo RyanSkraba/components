@@ -516,6 +516,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
 
     @Test
     public void testSchema() throws Throwable {
+        testSchemaWithAPIVersion("45.0");
         testSchemaWithAPIVersion("44.0");
         testSchemaWithAPIVersion("43.0");
         testSchemaWithAPIVersion("42.0");
