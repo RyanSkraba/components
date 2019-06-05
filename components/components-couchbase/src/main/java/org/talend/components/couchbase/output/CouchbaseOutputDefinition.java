@@ -29,7 +29,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
 
 public class CouchbaseOutputDefinition extends CouchbaseDefinition {
 
-    public static final String COMPONENT_NAME = "tCouchbaseOutput"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tCouchbaseDCPOutput"; //$NON-NLS-1$
 
     public CouchbaseOutputDefinition() {
         super(COMPONENT_NAME);
