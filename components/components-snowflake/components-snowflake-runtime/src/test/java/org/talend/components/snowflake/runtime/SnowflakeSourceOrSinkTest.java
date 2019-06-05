@@ -138,7 +138,7 @@ public class SnowflakeSourceOrSinkTest {
         Mockito.when(connection.isClosed()).thenReturn(false);
         DatabaseMetaData metaData = Mockito.mock(DatabaseMetaData.class);
         Mockito.when(metaData.getTables(Mockito.any(), Mockito.any(), Mockito.any(),
-                Mockito.eq(new String[] { "TABLE" }))).thenReturn(Mockito.mock(ResultSet.class));
+                Mockito.eq(new String[] { "TABLE", "VIEW" }))).thenReturn(Mockito.mock(ResultSet.class));
         Mockito.when(connection.getMetaData()).thenReturn(metaData);
         Mockito.when(
                 DriverManagerUtils.getConnection(Mockito.any()))
@@ -166,7 +166,7 @@ public class SnowflakeSourceOrSinkTest {
         Mockito.when(rs.getString("TABLE_NAME")).thenReturn("table 1")
         .thenThrow(new SQLException("Unexpected result in resultset"));
         Mockito.when(metaData.getTables(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-                Mockito.eq(new String[] { "TABLE" }))).thenReturn(rs);
+                Mockito.eq(new String[] { "TABLE", "VIEW" }))).thenReturn(rs);
         Mockito.when(connection.getMetaData()).thenReturn(metaData);
         Mockito.when(
                 DriverManagerUtils.getConnection(Mockito.any(SnowflakeConnectionProperties.class)))

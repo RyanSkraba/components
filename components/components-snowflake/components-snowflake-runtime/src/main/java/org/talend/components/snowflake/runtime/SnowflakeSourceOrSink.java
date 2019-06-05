@@ -179,7 +179,7 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
             DatabaseMetaData metaData = connection.getMetaData();
 
             // Fetch all tables in the db and schema provided
-            String[] types = { "TABLE" };
+            String[] types = { "TABLE", "VIEW" };
             ResultSet resultIter = metaData.getTables(getCatalog(connProps), getDbSchema(connProps), null, types);
             String tableName = null;
             while (resultIter.next()) {
