@@ -5,7 +5,7 @@
     <groupId>org.talend.components</groupId>
     <artifactId>components-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.27.0-SNAPSHOT</version>
+    <version>0.28.0-SNAPSHOT</version>
     <name>Component Parent POM</name>
 
     <properties>
@@ -22,8 +22,8 @@
         <sonar.jacoco.reportPath>${coverage.sonar.reportRoot}/target/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.jacoco.itReportPath>${coverage.sonar.reportRoot}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
 
-        <components.version>0.27.0-SNAPSHOT</components.version>
-        <daikon.version>0.31.5-SNAPSHOT</daikon.version>
+        <components.version>0.28.0-SNAPSHOT</components.version>
+        <daikon.version>0.31.7-SNAPSHOT</daikon.version>
 
         <osgi.core.version>6.0.0</osgi.core.version>
         <tycho-p2-extras-plugin.version>0.26.0</tycho-p2-extras-plugin.version>
