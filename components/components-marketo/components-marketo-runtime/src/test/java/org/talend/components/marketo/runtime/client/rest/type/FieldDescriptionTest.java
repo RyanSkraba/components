@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -12,15 +12,20 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client.rest.type;
 
-import static org.junit.Assert.*;
-import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_REST;
-
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.marketo.runtime.client.rest.type.FieldDescription.ApiFieldName;
 import org.talend.daikon.avro.SchemaConstants;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_REST;
 
 public class FieldDescriptionTest {
 

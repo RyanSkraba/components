@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -107,8 +107,7 @@ public class MarketoTestBase extends AbstractComponentTest2 {
             //
             when(runtimeSourceOrSink.getSchemaNames(any())).thenReturn(CO_SCHEMA_NAMES);
             when(runtimeSourceOrSink.getEndpointSchema(any(RuntimeContainer.class), eq("car_c"))).thenReturn(CO_CARC_SCHEMA);
-            when(runtimeSourceOrSink.getEndpointSchema(any(), eq("car_except")))
-                    .thenThrow(new IOException("ERROR"));
+            when(runtimeSourceOrSink.getEndpointSchema(any(), eq("car_except"))).thenThrow(new IOException("ERROR"));
             //
             when(((MarketoSourceOrSinkSchemaProvider) runtimeSourceOrSink).getSchemaForCustomObject(eq("car_c")))
                     .thenReturn(CO_CARC_SCHEMA);

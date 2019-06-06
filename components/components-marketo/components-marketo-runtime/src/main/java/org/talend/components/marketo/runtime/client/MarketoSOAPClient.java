@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -11,24 +11,6 @@
 //
 // ============================================================================
 package org.talend.components.marketo.runtime.client;
-
-import static com.marketo.mktows.ActivityType.fromValue;
-import static com.marketo.mktows.LeadKeyRef.valueOf;
-import static com.marketo.mktows.ListOperationType.ISMEMBEROFLIST;
-import static java.lang.String.format;
-import static javax.crypto.Mac.getInstance;
-import static javax.xml.datatype.DatatypeFactory.newInstance;
-import static org.apache.avro.Schema.Field;
-import static org.apache.avro.generic.GenericData.Record;
-import static org.apache.commons.codec.binary.Hex.encodeHex;
-import static org.slf4j.LoggerFactory.getLogger;
-import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
-import static org.talend.components.marketo.MarketoConstants.FIELD_MARKETO_GUID;
-import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LastUpdateAtSelector;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.StaticListSelector;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam.STATIC_LIST_NAME;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -115,6 +97,24 @@ import com.marketo.mktows.SuccessListOperation;
 import com.marketo.mktows.SuccessSyncLead;
 import com.marketo.mktows.SuccessSyncMultipleLeads;
 
+import static com.marketo.mktows.ActivityType.fromValue;
+import static com.marketo.mktows.LeadKeyRef.valueOf;
+import static com.marketo.mktows.ListOperationType.ISMEMBEROFLIST;
+import static java.lang.String.format;
+import static javax.crypto.Mac.getInstance;
+import static javax.xml.datatype.DatatypeFactory.newInstance;
+import static org.apache.avro.Schema.Field;
+import static org.apache.avro.generic.GenericData.Record;
+import static org.apache.commons.codec.binary.Hex.encodeHex;
+import static org.slf4j.LoggerFactory.getLogger;
+import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
+import static org.talend.components.marketo.MarketoConstants.FIELD_MARKETO_GUID;
+import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LastUpdateAtSelector;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.StaticListSelector;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam.STATIC_LIST_NAME;
+
 public class MarketoSOAPClient extends MarketoClient {
 
     private static final Logger LOG = getLogger(MarketoSOAPClient.class);
@@ -150,6 +150,8 @@ public class MarketoSOAPClient extends MarketoClient {
     private static final String MESSAGE_REQUEST_RETURNED_0_MATCHING_LEADS = "Request returned 0 matching leads.";
 
     private static final String MESSAGE_NO_LEADS_FOUND = "No leads found.";
+
+    public static final int SOAP_API_LIMIT = 300;
 
     private MktowsPort port;
 
@@ -660,7 +662,7 @@ public class MarketoSOAPClient extends MarketoClient {
     public MarketoRecordResult getLeadChanges(TMarketoInputProperties parameters, String offset) {
         Schema schema = parameters.schemaInput.schema.getValue();
         Map<String, String> mappings = parameters.mappingInput.getNameMappingsForMarketo();
-        int bSize = parameters.batchSize.getValue() > 100 ? 100 : parameters.batchSize.getValue();
+        int bSize = parameters.batchSize.getValue() > SOAP_API_LIMIT ? SOAP_API_LIMIT : parameters.batchSize.getValue();
         String sOldest = parameters.oldestCreateDate.getValue();
         String sLatest = parameters.latestCreateDate.getValue();
         LOG.debug("LeadChanges - from {} to {}.", sOldest, sLatest);
@@ -848,9 +850,9 @@ public class MarketoSOAPClient extends MarketoClient {
         return listOperation(ListOperationType.REMOVEFROMLIST, parameters);
     }
     /*
-     * 
+     *
      * SyncLeads operations
-     * 
+     *
      */
 
     public LeadRecord convertToLeadRecord(IndexedRecord record, Map<String, String> mappings) throws MarketoException {
@@ -918,7 +920,7 @@ public class MarketoSOAPClient extends MarketoClient {
 
     /**
      * Request<br/>
-     * 
+     * <p>
      * Field Name <br/>
      * <code>leadRecord->Id</code> Required – Only when Email or foreignSysPersonId is not present The Marketo Id of the
      * lead record<br/>
@@ -1023,7 +1025,7 @@ public class MarketoSOAPClient extends MarketoClient {
 
     /**
      * Check if one of errors is due to AuthentificationHeader expiration
-     * 
+     *
      * @param errors
      * @return
      */
@@ -1040,7 +1042,7 @@ public class MarketoSOAPClient extends MarketoClient {
 
     /**
      * Renew Authentification Header
-     * 
+     *
      * @throws InvalidKeyException
      * @throws NoSuchAlgorithmException
      */
@@ -1050,9 +1052,9 @@ public class MarketoSOAPClient extends MarketoClient {
 
     /**
      * Returns true if error is recoverable (we can retry operation).
-     *
+     * <p>
      * param error : Error string coming from a MarketoError.
-     *
+     * <p>
      * Potential recoverable errors returned by API:
      *
      * <li>10001 Internal Error Severe system failure</li>

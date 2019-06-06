@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -36,6 +36,8 @@ import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProper
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import static org.talend.components.marketo.MarketoConstants.REST_API_LIMIT;
+
 public class MarketoCampaignClient extends MarketoBulkExecClient {
 
     public static final String API_PATH_CAMPAIGNS = "/v1/campaigns";
@@ -66,7 +68,7 @@ public class MarketoCampaignClient extends MarketoBulkExecClient {
 
     /**
      * Returns a list of campaign records.
-     * 
+     *
      * @param parameters
      * @return
      */
@@ -75,8 +77,7 @@ public class MarketoCampaignClient extends MarketoBulkExecClient {
         String names = parameters.campaignNames.getValue();
         String programNames = parameters.programNames.getValue();
         String workspaceNames = parameters.workspaceNames.getValue();
-        int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
-                : parameters.batchSize.getValue();
+        int batchLimit = parameters.batchSize.getValue() > REST_API_LIMIT ? REST_API_LIMIT : parameters.batchSize.getValue();
         //
         current_uri = new StringBuilder(basicPath)//
                 .append(API_PATH_CAMPAIGNS)//
@@ -104,7 +105,7 @@ public class MarketoCampaignClient extends MarketoBulkExecClient {
 
     /**
      * Returns the record of a campaign by its id.
-     * 
+     *
      * @param parameters
      * @return
      */
@@ -122,10 +123,9 @@ public class MarketoCampaignClient extends MarketoBulkExecClient {
 
     /**
      * ScheduleCampaignRequest
-     *
+     * <p>
      * Remotely schedules a batch campaign to run at a given time. My tokens local to the campaign's parent program call be
      * overridden for the run to customize content.
-     *
      */
     public MarketoRecordResult scheduleCampaign(TMarketoCampaignProperties parameters) {
         String campaignId = parameters.campaignId.getStringValue();
@@ -176,7 +176,7 @@ public class MarketoCampaignClient extends MarketoBulkExecClient {
 
     /**
      * triggerCampaign (aka requestCampaign)
-     *
+     * <p>
      * Passes a set of leads to a trigger campaign to run through the campaign's flow. The designated campaign must have a
      * Campaign is Requested: Web Service API trigger, and must be active. My tokens local to the campaign's parent program
      * can be overridden for the run to customize content

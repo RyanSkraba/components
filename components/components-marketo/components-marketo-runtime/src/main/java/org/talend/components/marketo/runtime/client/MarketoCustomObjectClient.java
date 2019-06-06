@@ -29,6 +29,8 @@ import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import static org.talend.components.marketo.MarketoConstants.REST_API_LIMIT;
+
 public class MarketoCustomObjectClient extends MarketoLeadClient {
 
     public static final String API_PATH_CUSTOMOBJECTS = "/v1/customobjects/";
@@ -75,7 +77,7 @@ public class MarketoCustomObjectClient extends MarketoLeadClient {
     /**
      * This method implements
      * http://developers.marketo.com/rest-api/endpoint-reference/lead-database-endpoint-reference/#!/Custom_Objects/getCustomObjectsUsingGET
-     * 
+     * <p>
      * Retrieves a list of custom objects records based on filter and set of values. When action is createOnly, idField may
      * not be used as a key and marketoGUID cannot be a member of any object records.
      */
@@ -92,8 +94,7 @@ public class MarketoCustomObjectClient extends MarketoLeadClient {
             }
         }
         //
-        int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
-                : parameters.batchSize.getValue();
+        int batchLimit = parameters.batchSize.getValue() > REST_API_LIMIT ? REST_API_LIMIT : parameters.batchSize.getValue();
         current_uri = new StringBuilder(basicPath)//
                 .append(API_PATH_CUSTOMOBJECTS)//
                 .append(customObjectName)//
@@ -133,7 +134,7 @@ public class MarketoCustomObjectClient extends MarketoLeadClient {
     /**
      * This method implements
      * http://developers.marketo.com/rest-api/endpoint-reference/lead-database-endpoint-reference/#!/Custom_Objects/syncCustomObjectsUsingPOST
-     * 
+     * <p>
      * Inserts, updates, or upserts custom object records to the target instance.
      */
     public MarketoSyncResult syncCustomObjects(TMarketoOutputProperties parameters, List<IndexedRecord> records) {

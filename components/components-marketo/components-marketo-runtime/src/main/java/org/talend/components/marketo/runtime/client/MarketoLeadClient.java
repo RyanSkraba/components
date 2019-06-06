@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -11,9 +11,6 @@
 //
 // ============================================================================
 package org.talend.components.marketo.runtime.client;
-
-import static org.talend.components.marketo.MarketoConstants.FIELD_MARKETO_GUID;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,6 +49,10 @@ import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import static org.talend.components.marketo.MarketoConstants.FIELD_MARKETO_GUID;
+import static org.talend.components.marketo.MarketoConstants.REST_API_LIMIT;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
 
 public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoClientService {
 
@@ -366,8 +367,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         String filterValue = parameters.leadKeyValue.getValue();
         String[] fields = parameters.mappingInput.getMarketoColumns(parameters.schemaInput.schema.getValue())
                 .toArray(new String[] {});
-        int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
-                : parameters.batchSize.getValue();
+        int batchLimit = parameters.batchSize.getValue() > REST_API_LIMIT ? REST_API_LIMIT : parameters.batchSize.getValue();
 
         current_uri = new StringBuilder(basicPath) //
                 .append(API_PATH_LEADS)//
@@ -394,8 +394,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         String[] filterValues;
         String[] fields = parameters.mappingInput.getMarketoColumns(parameters.schemaInput.schema.getValue())
                 .toArray(new String[] {});
-        int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
-                : parameters.batchSize.getValue();
+        int batchLimit = parameters.batchSize.getValue() > REST_API_LIMIT ? REST_API_LIMIT : parameters.batchSize.getValue();
         StringBuilder input = new StringBuilder();
 
         if (parameters.leadSelectorREST.getValue().equals(LeadKeySelector)) {
@@ -460,8 +459,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         List<String> incs = parameters.includeTypes.type.getValue();
         List<String> excs = parameters.setExcludeTypes.getValue() ? parameters.excludeTypes.type.getValue()
                 : new ArrayList<String>();
-        int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
-                : parameters.batchSize.getValue();
+        int batchLimit = parameters.batchSize.getValue() > REST_API_LIMIT ? REST_API_LIMIT : parameters.batchSize.getValue();
         String pgOffset = offset;
         List<Integer> activityTypeIds = new ArrayList<>();
         // no activity provided, we take all
@@ -511,8 +509,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
     @Override
     public MarketoRecordResult getLeadChanges(TMarketoInputProperties parameters, String offset) {
         String sinceDateTime = parameters.sinceDateTime.getValue();
-        int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
-                : parameters.batchSize.getValue();
+        int batchLimit = parameters.batchSize.getValue() > REST_API_LIMIT ? REST_API_LIMIT : parameters.batchSize.getValue();
         String[] fields = parameters.fieldList.getValue().split(",");
         String pgOffset = offset;
         if (pgOffset == null) {

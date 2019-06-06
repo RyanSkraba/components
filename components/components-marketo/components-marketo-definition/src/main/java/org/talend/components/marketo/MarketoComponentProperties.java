@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -11,8 +11,6 @@
 //
 // ============================================================================
 package org.talend.components.marketo;
-
-import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,6 +26,8 @@ import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProper
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
+
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 
 public abstract class MarketoComponentProperties extends FixedConnectorsComponentProperties
         implements MarketoProvideConnectionProperties {

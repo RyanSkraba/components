@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -54,8 +54,7 @@ import org.talend.daikon.properties.ValidationResultMutable;
 
 import com.google.gson.Gson;
 
-public class MarketoSourceOrSink
-        implements SourceOrSink, MarketoSourceOrSinkRuntime, MarketoSourceOrSinkSchemaProvider {
+public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRuntime, MarketoSourceOrSinkSchemaProvider {
 
     public static final String TALEND6_DYNAMIC_COLUMN_POSITION = "di.dynamic.column.position";
 
@@ -67,8 +66,7 @@ public class MarketoSourceOrSink
 
     private static final Logger LOG = LoggerFactory.getLogger(MarketoSourceOrSink.class);
 
-    private static final I18nMessages messages =
-            GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoSourceOrSink.class);
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoSourceOrSink.class);
 
     public MarketoProvideConnectionProperties getProperties() {
         return properties;
@@ -167,8 +165,7 @@ public class MarketoSourceOrSink
         }
         IndexedRecord record = records.get(0);
 
-        return FieldDescription.getSchemaFromJson(schemaName,
-                record.get(describeSchema.getField("fields").pos()).toString(),
+        return FieldDescription.getSchemaFromJson(schemaName, record.get(describeSchema.getField("fields").pos()).toString(),
                 record.get(describeSchema.getField("dedupeFields").pos()).toString());
     }
 
@@ -228,8 +225,7 @@ public class MarketoSourceOrSink
             return null;
         }
         IndexedRecord record = records.get(0);
-        String[] keys = new Gson().fromJson(record.get(describeSchema.getField("dedupeFields").pos()).toString(),
-                String[].class);
+        String[] keys = new Gson().fromJson(record.get(describeSchema.getField("dedupeFields").pos()).toString(), String[].class);
         // quote keys
         for (int i = 0; i < keys.length; i++) {
             keys[i] = "\"" + keys[i] + "\"";
@@ -280,8 +276,7 @@ public class MarketoSourceOrSink
                 resultFields.add(f);
             }
         }
-        Schema resultSchema =
-                Schema.createRecord(design.getName(), design.getDoc(), design.getNamespace(), design.isError());
+        Schema resultSchema = Schema.createRecord(design.getName(), design.getDoc(), design.getNamespace(), design.isError());
         resultSchema.getObjectProps().putAll(design.getObjectProps());
         resultSchema.setFields(resultFields);
 
@@ -322,8 +317,8 @@ public class MarketoSourceOrSink
         if (refComponentId != null) {
             // In a runtime container
             if (container != null) {
-                TMarketoConnectionProperties shared = (TMarketoConnectionProperties) container
-                        .getComponentData(refComponentId, KEY_CONNECTION_PROPERTIES);
+                TMarketoConnectionProperties shared = (TMarketoConnectionProperties) container.getComponentData(refComponentId,
+                        KEY_CONNECTION_PROPERTIES);
                 if (shared != null) {
                     return shared;
                 }

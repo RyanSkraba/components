@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -161,8 +161,7 @@ public class MarketoListOperationWriter extends MarketoWriter {
 
     public Boolean isSameListForListOperation(IndexedRecord record) {
         if (use_soap_api) {
-            return listOpeParms.getListKeyType().equals(
-                    record.get(inputSchema.getField(FIELD_LIST_KEY_TYPE).pos()).toString())
+            return listOpeParms.getListKeyType().equals(record.get(inputSchema.getField(FIELD_LIST_KEY_TYPE).pos()).toString())
                     && listOpeParms.getListKeyValue()
                             .equals(record.get(inputSchema.getField(FIELD_LIST_KEY_VALUE).pos()).toString());
         } else {
@@ -202,8 +201,7 @@ public class MarketoListOperationWriter extends MarketoWriter {
 
     public ListOperationParameters addLeadKeyToListOperationParameters(IndexedRecord record) {
         if (use_soap_api) {
-            listOpeParms.getLeadKeyValue().add(
-                    String.valueOf(record.get(inputSchema.getField(FIELD_LEAD_KEY_VALUE).pos())));
+            listOpeParms.getLeadKeyValue().add(String.valueOf(record.get(inputSchema.getField(FIELD_LEAD_KEY_VALUE).pos())));
         } else {
             listOpeParms.getLeadIds().add((Integer) record.get(inputSchema.getField(FIELD_LEAD_ID).pos()));
         }
@@ -260,8 +258,8 @@ public class MarketoListOperationWriter extends MarketoWriter {
             }
         }
         for (SyncStatus status : mktoResult.getRecords()) {
-            if (Arrays.asList("true", "added", "removed", "notmemberof", "memberof").contains(
-                    status.getStatus().toLowerCase()) || (properties.isApiSOAP() && !addTo.equals(operation))) {
+            if (Arrays.asList("true", "added", "removed", "notmemberof", "memberof").contains(status.getStatus().toLowerCase())
+                    || (properties.isApiSOAP() && !addTo.equals(operation))) {
                 handleSuccess(fillRecord(status, flowSchema));
             } else {
                 if (dieOnError) {

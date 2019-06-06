@@ -12,10 +12,6 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client;
 
-import static java.lang.String.format;
-import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
-import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -60,11 +56,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.LinkedTreeMap;
 
+import static java.lang.String.format;
+import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
+import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
+
 public abstract class MarketoBaseRESTClient extends MarketoClient {
 
     public static final int REST_API_ACTIVITY_TYPE_IDS_LIMIT = 10;
-
-    public static final int REST_API_BATCH_LIMIT = 300;
 
     public static final int REST_API_LEAD_IDS_LIMIT = 30;
 
@@ -148,8 +146,8 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
 
     private transient static final Logger LOG = LoggerFactory.getLogger(MarketoBaseRESTClient.class);
 
-    protected static final I18nMessages messages =
-            GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoBaseRESTClient.class);
+    protected static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(MarketoBaseRESTClient.class);
 
     public MarketoBaseRESTClient(TMarketoConnectionProperties connection) throws MarketoException {
         endpoint = connection.endpoint.getValue();
@@ -238,8 +236,7 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
             HttpsURLConnection urlConn = (HttpsURLConnection) url.openConnection();
             urlConn.setRequestMethod(QUERY_METHOD_POST);
             if (isForLead) {
-                urlConn.setRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE,
-                        REQUEST_VALUE_APPLICATION_X_WWW_FORM_URLENCODED);
+                urlConn.setRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE, REQUEST_VALUE_APPLICATION_X_WWW_FORM_URLENCODED);
             } else {
                 urlConn.setRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE, REQUEST_VALUE_APPLICATION_JSON);
             }
@@ -403,8 +400,7 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
         return mkr;
     }
 
-    protected InputStreamReader getReaderFromHttpResponse(HttpsURLConnection conn)
-            throws MarketoException, IOException {
+    protected InputStreamReader getReaderFromHttpResponse(HttpsURLConnection conn) throws MarketoException, IOException {
         int responseCode = conn.getResponseCode();
         if (responseCode == 200) {
             InputStream inStream = conn.getInputStream();
@@ -447,17 +443,17 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
             LOG.error("POST request failed: {}", m.getMessage());
             mkto.setSuccess(false);
             mkto.setRecordCount(0);
-            mkto.setErrors(Collections
-                    .singletonList(new MarketoError(REST, "Request failed! Please check your request setting!")));
+            mkto.setErrors(
+                    Collections.singletonList(new MarketoError(REST, "Request failed! Please check your request setting!")));
         }
         return mkto;
     }
 
     /**
      * Returns true if error is recoverable (we can retry operation).
-     *
+     * <p>
      * param error : Error string coming from a MarketoError.
-     *
+     * <p>
      * Potential recoverable errors returned by API:
      *
      * <li><502 Bad Gateway The remote server returned an error. Likely a timeout. The request should be retried with
@@ -476,7 +472,6 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
      * <li>615 Concurrent access limit reached At most 10 requests can be processed by any subscription at a time. This
      * will
      * be returned if there are already 10 requests for the subscription ongoing.</li>
-     *
      */
     @Override
     public boolean isErrorRecoverable(List<MarketoError> errors) {
@@ -510,8 +505,7 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
                     continue;
                 }
                 if (MarketoClientUtils.isDateTypeField(f) && value != null) {
-                    result.put(f.name(),
-                            MarketoClientUtils.formatLongToDateString(Long.valueOf(String.valueOf(value))));
+                    result.put(f.name(), MarketoClientUtils.formatLongToDateString(Long.valueOf(String.valueOf(value))));
                     continue;
                 }
                 result.put(f.name(), value);
@@ -563,14 +557,13 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
 
     /**
      * Execute GET or fakeGET(POST in disguise) request and feed the MarketoRecordResult to return
-     * 
+     *
      * @param schema
      * @param isFakeGetRequest
      * @param paramPOST
      * @return
      */
-    public MarketoRecordResult getRecordResultForFromRequestBySchema(Schema schema, boolean isFakeGetRequest,
-            String paramPOST) {
+    public MarketoRecordResult getRecordResultForFromRequestBySchema(Schema schema, boolean isFakeGetRequest, String paramPOST) {
         MarketoRecordResult mkto = new MarketoRecordResult();
         try {
             if (isFakeGetRequest) {

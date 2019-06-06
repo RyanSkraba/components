@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -11,20 +11,6 @@
 //
 // ============================================================================
 package org.talend.components.marketo.tmarketoinput;
-
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.Company;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.CustomObject;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.Opportunity;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.OpportunityRole;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLead;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadActivity;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadChanges;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getMultipleLeads;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,6 +33,22 @@ import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.serialize.PostDeserializeSetup;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.Company;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.CustomObject;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.Opportunity;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.OpportunityRole;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLead;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadActivity;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadChanges;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getMultipleLeads;
 
 public class TMarketoInputPropertiesTest extends MarketoTestBase {
 
@@ -142,7 +144,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertFalse(f.getWidget(tl_sinceDateTime).isVisible());
         assertFalse(f.getWidget(tl_oldestCreateDate).isVisible());
         assertFalse(f.getWidget(tl_latestCreateDate).isVisible());
-        assertFalse(f.getWidget(tl_batchSize).isVisible());
+        assertTrue(f.getWidget(tl_batchSize).isVisible());
         // REST API Mode - getMultipleLeads - StaticList
         props.inputOperation.setValue(getMultipleLeads);
         props.leadSelectorREST.setValue(LeadSelector.StaticListSelector);
@@ -475,8 +477,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     @Test
     public void testGetSchema() {
         props.afterInputOperation();
-        assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads(),
-                props.getSchema(props.MAIN_CONNECTOR, false));
+        assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads(), props.getSchema(props.MAIN_CONNECTOR, false));
         assertEquals(6, props.getSchemaFields().size());
     }
 
@@ -657,12 +658,9 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertEquals(IncludeExcludeFieldsSOAP.RemoveFromList, IncludeExcludeFieldsSOAP.valueOf("RemoveFromList"));
         assertEquals(IncludeExcludeFieldsSOAP.SFDCActivity, IncludeExcludeFieldsSOAP.valueOf("SFDCActivity"));
         assertEquals(IncludeExcludeFieldsSOAP.EmailBouncedSoft, IncludeExcludeFieldsSOAP.valueOf("EmailBouncedSoft"));
-        assertEquals(IncludeExcludeFieldsSOAP.PushLeadUpdatesToSales,
-                IncludeExcludeFieldsSOAP.valueOf("PushLeadUpdatesToSales"));
-        assertEquals(IncludeExcludeFieldsSOAP.DeleteLeadFromSales,
-                IncludeExcludeFieldsSOAP.valueOf("DeleteLeadFromSales"));
-        assertEquals(IncludeExcludeFieldsSOAP.SFDCActivityUpdated,
-                IncludeExcludeFieldsSOAP.valueOf("SFDCActivityUpdated"));
+        assertEquals(IncludeExcludeFieldsSOAP.PushLeadUpdatesToSales, IncludeExcludeFieldsSOAP.valueOf("PushLeadUpdatesToSales"));
+        assertEquals(IncludeExcludeFieldsSOAP.DeleteLeadFromSales, IncludeExcludeFieldsSOAP.valueOf("DeleteLeadFromSales"));
+        assertEquals(IncludeExcludeFieldsSOAP.SFDCActivityUpdated, IncludeExcludeFieldsSOAP.valueOf("SFDCActivityUpdated"));
         assertEquals(IncludeExcludeFieldsSOAP.SFDCMergeLeads, IncludeExcludeFieldsSOAP.valueOf("SFDCMergeLeads"));
         assertEquals(IncludeExcludeFieldsSOAP.MergeLeads, IncludeExcludeFieldsSOAP.valueOf("MergeLeads"));
         assertEquals(IncludeExcludeFieldsSOAP.ResolveConflicts, IncludeExcludeFieldsSOAP.valueOf("ResolveConflicts"));
@@ -670,37 +668,31 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
                 IncludeExcludeFieldsSOAP.valueOf("AssocWithOpprtntyInSales"));
         assertEquals(IncludeExcludeFieldsSOAP.DissocFromOpprtntyInSales,
                 IncludeExcludeFieldsSOAP.valueOf("DissocFromOpprtntyInSales"));
-        assertEquals(IncludeExcludeFieldsSOAP.UpdateOpprtntyInSales,
-                IncludeExcludeFieldsSOAP.valueOf("UpdateOpprtntyInSales"));
+        assertEquals(IncludeExcludeFieldsSOAP.UpdateOpprtntyInSales, IncludeExcludeFieldsSOAP.valueOf("UpdateOpprtntyInSales"));
         assertEquals(IncludeExcludeFieldsSOAP.DeleteLead, IncludeExcludeFieldsSOAP.valueOf("DeleteLead"));
         assertEquals(IncludeExcludeFieldsSOAP.SendAlert, IncludeExcludeFieldsSOAP.valueOf("SendAlert"));
         assertEquals(IncludeExcludeFieldsSOAP.SendSalesEmail, IncludeExcludeFieldsSOAP.valueOf("SendSalesEmail"));
         assertEquals(IncludeExcludeFieldsSOAP.OpenSalesEmail, IncludeExcludeFieldsSOAP.valueOf("OpenSalesEmail"));
         assertEquals(IncludeExcludeFieldsSOAP.ClickSalesEmail, IncludeExcludeFieldsSOAP.valueOf("ClickSalesEmail"));
         assertEquals(IncludeExcludeFieldsSOAP.AddtoSFDCCampaign, IncludeExcludeFieldsSOAP.valueOf("AddtoSFDCCampaign"));
-        assertEquals(IncludeExcludeFieldsSOAP.RemoveFromSFDCCampaign,
-                IncludeExcludeFieldsSOAP.valueOf("RemoveFromSFDCCampaign"));
+        assertEquals(IncludeExcludeFieldsSOAP.RemoveFromSFDCCampaign, IncludeExcludeFieldsSOAP.valueOf("RemoveFromSFDCCampaign"));
         assertEquals(IncludeExcludeFieldsSOAP.ChangeStatusInSFDCCampaign,
                 IncludeExcludeFieldsSOAP.valueOf("ChangeStatusInSFDCCampaign"));
         assertEquals(IncludeExcludeFieldsSOAP.ReceiveSalesEmail, IncludeExcludeFieldsSOAP.valueOf("ReceiveSalesEmail"));
         assertEquals(IncludeExcludeFieldsSOAP.InterestingMoment, IncludeExcludeFieldsSOAP.valueOf("InterestingMoment"));
         assertEquals(IncludeExcludeFieldsSOAP.RequestCampaign, IncludeExcludeFieldsSOAP.valueOf("RequestCampaign"));
         assertEquals(IncludeExcludeFieldsSOAP.SalesEmailBounced, IncludeExcludeFieldsSOAP.valueOf("SalesEmailBounced"));
-        assertEquals(IncludeExcludeFieldsSOAP.ChangeLeadPartition,
-                IncludeExcludeFieldsSOAP.valueOf("ChangeLeadPartition"));
-        assertEquals(IncludeExcludeFieldsSOAP.ChangeRevenueStage,
-                IncludeExcludeFieldsSOAP.valueOf("ChangeRevenueStage"));
+        assertEquals(IncludeExcludeFieldsSOAP.ChangeLeadPartition, IncludeExcludeFieldsSOAP.valueOf("ChangeLeadPartition"));
+        assertEquals(IncludeExcludeFieldsSOAP.ChangeRevenueStage, IncludeExcludeFieldsSOAP.valueOf("ChangeRevenueStage"));
         assertEquals(IncludeExcludeFieldsSOAP.ChangeRevenueStageManually,
                 IncludeExcludeFieldsSOAP.valueOf("ChangeRevenueStageManually"));
         assertEquals(IncludeExcludeFieldsSOAP.ComputeDataValue, IncludeExcludeFieldsSOAP.valueOf("ComputeDataValue"));
         assertEquals(IncludeExcludeFieldsSOAP.ChangeStatusInProgression,
                 IncludeExcludeFieldsSOAP.valueOf("ChangeStatusInProgression"));
-        assertEquals(IncludeExcludeFieldsSOAP.ChangeFieldInProgram,
-                IncludeExcludeFieldsSOAP.valueOf("ChangeFieldInProgram"));
+        assertEquals(IncludeExcludeFieldsSOAP.ChangeFieldInProgram, IncludeExcludeFieldsSOAP.valueOf("ChangeFieldInProgram"));
         assertEquals(IncludeExcludeFieldsSOAP.EnrichWithDatacom, IncludeExcludeFieldsSOAP.valueOf("EnrichWithDatacom"));
         assertEquals(IncludeExcludeFieldsSOAP.ChangeSegment, IncludeExcludeFieldsSOAP.valueOf("ChangeSegment"));
-        assertEquals(IncludeExcludeFieldsSOAP.ComputeSegmentation,
-                IncludeExcludeFieldsSOAP.valueOf("ComputeSegmentation"));
+        assertEquals(IncludeExcludeFieldsSOAP.ComputeSegmentation, IncludeExcludeFieldsSOAP.valueOf("ComputeSegmentation"));
         assertEquals(IncludeExcludeFieldsSOAP.ResolveRuleset, IncludeExcludeFieldsSOAP.valueOf("ResolveRuleset"));
         assertEquals(IncludeExcludeFieldsSOAP.SmartCampaignTest, IncludeExcludeFieldsSOAP.valueOf("SmartCampaignTest"));
         assertEquals(IncludeExcludeFieldsSOAP.SmartCampaignTestTrigger,
@@ -763,12 +755,10 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertEquals(IncludeExcludeFieldsREST.EmailBouncedSoft, IncludeExcludeFieldsREST.valueOf("EmailBouncedSoft"));
         assertEquals(IncludeExcludeFieldsREST.EmailBouncedSoft, IncludeExcludeFieldsREST.valueOf(27));
         assertEquals(27, IncludeExcludeFieldsREST.EmailBouncedSoft.fieldVal);
-        assertEquals(IncludeExcludeFieldsREST.DeleteLeadFromSFDC,
-                IncludeExcludeFieldsREST.valueOf("DeleteLeadFromSFDC"));
+        assertEquals(IncludeExcludeFieldsREST.DeleteLeadFromSFDC, IncludeExcludeFieldsREST.valueOf("DeleteLeadFromSFDC"));
         assertEquals(IncludeExcludeFieldsREST.DeleteLeadFromSFDC, IncludeExcludeFieldsREST.valueOf(29));
         assertEquals(29, IncludeExcludeFieldsREST.DeleteLeadFromSFDC.fieldVal);
-        assertEquals(IncludeExcludeFieldsREST.SFDCActivityUpdated,
-                IncludeExcludeFieldsREST.valueOf("SFDCActivityUpdated"));
+        assertEquals(IncludeExcludeFieldsREST.SFDCActivityUpdated, IncludeExcludeFieldsREST.valueOf("SFDCActivityUpdated"));
         assertEquals(IncludeExcludeFieldsREST.SFDCActivityUpdated, IncludeExcludeFieldsREST.valueOf(30));
         assertEquals(30, IncludeExcludeFieldsREST.SFDCActivityUpdated.fieldVal);
         assertEquals(IncludeExcludeFieldsREST.MergeLeads, IncludeExcludeFieldsREST.valueOf("MergeLeads"));
@@ -777,8 +767,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertEquals(IncludeExcludeFieldsREST.AddToOpportunity, IncludeExcludeFieldsREST.valueOf("AddToOpportunity"));
         assertEquals(IncludeExcludeFieldsREST.AddToOpportunity, IncludeExcludeFieldsREST.valueOf(34));
         assertEquals(34, IncludeExcludeFieldsREST.AddToOpportunity.fieldVal);
-        assertEquals(IncludeExcludeFieldsREST.RemoveFromOpportunity,
-                IncludeExcludeFieldsREST.valueOf("RemoveFromOpportunity"));
+        assertEquals(IncludeExcludeFieldsREST.RemoveFromOpportunity, IncludeExcludeFieldsREST.valueOf("RemoveFromOpportunity"));
         assertEquals(IncludeExcludeFieldsREST.RemoveFromOpportunity, IncludeExcludeFieldsREST.valueOf(35));
         assertEquals(35, IncludeExcludeFieldsREST.RemoveFromOpportunity.fieldVal);
         assertEquals(IncludeExcludeFieldsREST.UpdateOpportunity, IncludeExcludeFieldsREST.valueOf("UpdateOpportunity"));
@@ -802,8 +791,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertEquals(IncludeExcludeFieldsREST.AddToSFDCCampaign, IncludeExcludeFieldsREST.valueOf("AddToSFDCCampaign"));
         assertEquals(IncludeExcludeFieldsREST.AddToSFDCCampaign, IncludeExcludeFieldsREST.valueOf(42));
         assertEquals(42, IncludeExcludeFieldsREST.AddToSFDCCampaign.fieldVal);
-        assertEquals(IncludeExcludeFieldsREST.RemoveFromSFDCCampaign,
-                IncludeExcludeFieldsREST.valueOf("RemoveFromSFDCCampaign"));
+        assertEquals(IncludeExcludeFieldsREST.RemoveFromSFDCCampaign, IncludeExcludeFieldsREST.valueOf("RemoveFromSFDCCampaign"));
         assertEquals(IncludeExcludeFieldsREST.RemoveFromSFDCCampaign, IncludeExcludeFieldsREST.valueOf(43));
         assertEquals(43, IncludeExcludeFieldsREST.RemoveFromSFDCCampaign.fieldVal);
         assertEquals(IncludeExcludeFieldsREST.ChangeStatusInSFDCCampaign,
@@ -822,12 +810,10 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertEquals(IncludeExcludeFieldsREST.SalesEmailBounced, IncludeExcludeFieldsREST.valueOf("SalesEmailBounced"));
         assertEquals(IncludeExcludeFieldsREST.SalesEmailBounced, IncludeExcludeFieldsREST.valueOf(48));
         assertEquals(48, IncludeExcludeFieldsREST.SalesEmailBounced.fieldVal);
-        assertEquals(IncludeExcludeFieldsREST.ChangeLeadPartition,
-                IncludeExcludeFieldsREST.valueOf("ChangeLeadPartition"));
+        assertEquals(IncludeExcludeFieldsREST.ChangeLeadPartition, IncludeExcludeFieldsREST.valueOf("ChangeLeadPartition"));
         assertEquals(IncludeExcludeFieldsREST.ChangeLeadPartition, IncludeExcludeFieldsREST.valueOf(100));
         assertEquals(100, IncludeExcludeFieldsREST.ChangeLeadPartition.fieldVal);
-        assertEquals(IncludeExcludeFieldsREST.ChangeRevenueStage,
-                IncludeExcludeFieldsREST.valueOf("ChangeRevenueStage"));
+        assertEquals(IncludeExcludeFieldsREST.ChangeRevenueStage, IncludeExcludeFieldsREST.valueOf("ChangeRevenueStage"));
         assertEquals(IncludeExcludeFieldsREST.ChangeRevenueStage, IncludeExcludeFieldsREST.valueOf(101));
         assertEquals(101, IncludeExcludeFieldsREST.ChangeRevenueStage.fieldVal);
         assertEquals(IncludeExcludeFieldsREST.ChangeRevenueStageManually,
@@ -858,12 +844,10 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertEquals(IncludeExcludeFieldsREST.AddToNurture, IncludeExcludeFieldsREST.valueOf("AddToNurture"));
         assertEquals(IncludeExcludeFieldsREST.AddToNurture, IncludeExcludeFieldsREST.valueOf(113));
         assertEquals(113, IncludeExcludeFieldsREST.AddToNurture.fieldVal);
-        assertEquals(IncludeExcludeFieldsREST.ChangeNurtureTrack,
-                IncludeExcludeFieldsREST.valueOf("ChangeNurtureTrack"));
+        assertEquals(IncludeExcludeFieldsREST.ChangeNurtureTrack, IncludeExcludeFieldsREST.valueOf("ChangeNurtureTrack"));
         assertEquals(IncludeExcludeFieldsREST.ChangeNurtureTrack, IncludeExcludeFieldsREST.valueOf(114));
         assertEquals(114, IncludeExcludeFieldsREST.ChangeNurtureTrack.fieldVal);
-        assertEquals(IncludeExcludeFieldsREST.ChangeNurtureCadence,
-                IncludeExcludeFieldsREST.valueOf("ChangeNurtureCadence"));
+        assertEquals(IncludeExcludeFieldsREST.ChangeNurtureCadence, IncludeExcludeFieldsREST.valueOf("ChangeNurtureCadence"));
         assertEquals(IncludeExcludeFieldsREST.ChangeNurtureCadence, IncludeExcludeFieldsREST.valueOf(115));
         assertEquals(115, IncludeExcludeFieldsREST.ChangeNurtureCadence.fieldVal);
         assertEquals(IncludeExcludeFieldsREST.ShareContent, IncludeExcludeFieldsREST.valueOf("ShareContent"));
@@ -1001,8 +985,8 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     @Test
     public void testBeforeInputOperation() throws Exception {
         props.beforeInputOperation();
-        assertEquals(Arrays.asList(getLead, getMultipleLeads, getLeadActivity, getLeadChanges, CustomObject, Company,
-                Opportunity, OpportunityRole), props.inputOperation.getPossibleValues());
+        assertEquals(Arrays.asList(getLead, getMultipleLeads, getLeadActivity, getLeadChanges, CustomObject, Company, Opportunity,
+                OpportunityRole), props.inputOperation.getPossibleValues());
         props.connection.apiMode.setValue(APIMode.SOAP);
         props.beforeInputOperation();
         assertEquals(Arrays.asList(getLead, getMultipleLeads, getLeadActivity, getLeadChanges),

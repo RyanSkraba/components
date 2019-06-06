@@ -20,6 +20,7 @@ import org.junit.Test;
 public class MarketoErrorTest {
 
     MarketoError error;
+
     @Before
     public void setUp() throws Exception {
         error = new MarketoError("REST", "666", "erreur");

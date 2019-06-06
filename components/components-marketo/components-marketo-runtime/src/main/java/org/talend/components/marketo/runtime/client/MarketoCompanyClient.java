@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -31,6 +31,8 @@ import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
+import static org.talend.components.marketo.MarketoConstants.REST_API_LIMIT;
 
 public class MarketoCompanyClient extends MarketoCampaignClient {
 
@@ -75,8 +77,7 @@ public class MarketoCompanyClient extends MarketoCampaignClient {
                 fields.add(f);
             }
         }
-        int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
-                : parameters.batchSize.getValue();
+        int batchLimit = parameters.batchSize.getValue() > REST_API_LIMIT ? REST_API_LIMIT : parameters.batchSize.getValue();
         current_uri = new StringBuilder(basicPath)//
                 .append(API_PATH_COMPANIES_GET)//
                 .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true))//

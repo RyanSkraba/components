@@ -21,6 +21,7 @@ import org.junit.runners.model.Statement;
 import org.slf4j.LoggerFactory;
 
 public class DisableIfMissingConfig implements TestRule {
+
     private final String systemPropName;
 
     public DisableIfMissingConfig(final String systemPropName) {
@@ -31,10 +32,11 @@ public class DisableIfMissingConfig implements TestRule {
     public Statement apply(Statement base, Description description) {
         if (System.getProperty(systemPropName, "").trim().isEmpty()) {
             return new Statement() {
+
                 @Override
                 public void evaluate() {
-                    LoggerFactory.getLogger(DisableIfMissingConfig.class)
-                                 .warn("Missing system property '{}', skipping {}", systemPropName, description);
+                    LoggerFactory.getLogger(DisableIfMissingConfig.class).warn("Missing system property '{}', skipping {}",
+                            systemPropName, description);
                 }
             };
         }

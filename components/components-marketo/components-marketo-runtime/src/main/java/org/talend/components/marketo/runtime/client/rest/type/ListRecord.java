@@ -3,6 +3,7 @@ package org.talend.components.marketo.runtime.client.rest.type;
 import java.util.Date;
 
 public class ListRecord {
+
     private Integer id;
 
     private String name;
@@ -65,9 +66,8 @@ public class ListRecord {
 
     @Override
     public String toString() {
-        return "ListRecord [id=" + id + ", name=" + name + ", description="
-                + description + ", programName=" + programName + ", createdAt="
-                + createdAt + ", updatedAt=" + updatedAt + "]";
+        return "ListRecord [id=" + id + ", name=" + name + ", description=" + description + ", programName=" + programName
+                + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + "]";
     }
 
 }

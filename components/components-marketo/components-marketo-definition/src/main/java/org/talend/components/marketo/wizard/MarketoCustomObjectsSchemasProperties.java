@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -11,13 +11,6 @@
 //
 // ============================================================================
 package org.talend.components.marketo.wizard;
-
-import static org.slf4j.LoggerFactory.getLogger;
-import static org.talend.components.marketo.MarketoComponentDefinition.RUNTIME_SOURCEORSINK_CLASS;
-import static org.talend.components.marketo.MarketoComponentDefinition.USE_CURRENT_JVM_PROPS;
-import static org.talend.components.marketo.MarketoComponentDefinition.getSandboxedInstance;
-import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,6 +35,13 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.sandbox.SandboxedInstance;
+
+import static org.slf4j.LoggerFactory.getLogger;
+import static org.talend.components.marketo.MarketoComponentDefinition.RUNTIME_SOURCEORSINK_CLASS;
+import static org.talend.components.marketo.MarketoComponentDefinition.USE_CURRENT_JVM_PROPS;
+import static org.talend.components.marketo.MarketoComponentDefinition.getSandboxedInstance;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesImpl implements MarketoProvideConnectionProperties {
 

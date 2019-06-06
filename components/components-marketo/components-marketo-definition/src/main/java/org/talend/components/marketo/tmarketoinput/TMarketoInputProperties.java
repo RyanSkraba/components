@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -11,33 +11,6 @@
 //
 // ============================================================================
 package org.talend.components.marketo.tmarketoinput;
-
-import static org.slf4j.LoggerFactory.getLogger;
-import static org.talend.components.marketo.MarketoComponentDefinition.RUNTIME_SOURCEORSINK_CLASS;
-import static org.talend.components.marketo.MarketoComponentDefinition.USE_CURRENT_JVM_PROPS;
-import static org.talend.components.marketo.MarketoComponentDefinition.getSandboxedInstance;
-import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PARAM;
-import static org.talend.components.marketo.MarketoConstants.getRESTSchemaForGetLeadActivity;
-import static org.talend.components.marketo.MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads;
-import static org.talend.components.marketo.MarketoConstants.getSOAPSchemaForGetLeadActivity;
-import static org.talend.components.marketo.runtime.MarketoSourceOrSinkSchemaProvider.RESOURCE_COMPANY;
-import static org.talend.components.marketo.runtime.MarketoSourceOrSinkSchemaProvider.RESOURCE_OPPORTUNITY;
-import static org.talend.components.marketo.runtime.MarketoSourceOrSinkSchemaProvider.RESOURCE_OPPORTUNITY_ROLE;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction.describe;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.Company;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.CustomObject;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.Opportunity;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.OpportunityRole;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLead;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadActivity;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadChanges;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getMultipleLeads;
-import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
-import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
-import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -76,6 +49,34 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 import org.talend.daikon.serialize.PostDeserializeSetup;
 import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
+import static org.slf4j.LoggerFactory.getLogger;
+import static org.talend.components.marketo.MarketoComponentDefinition.RUNTIME_SOURCEORSINK_CLASS;
+import static org.talend.components.marketo.MarketoComponentDefinition.USE_CURRENT_JVM_PROPS;
+import static org.talend.components.marketo.MarketoComponentDefinition.getSandboxedInstance;
+import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PARAM;
+import static org.talend.components.marketo.MarketoConstants.REST_API_LIMIT;
+import static org.talend.components.marketo.MarketoConstants.getRESTSchemaForGetLeadActivity;
+import static org.talend.components.marketo.MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads;
+import static org.talend.components.marketo.MarketoConstants.getSOAPSchemaForGetLeadActivity;
+import static org.talend.components.marketo.runtime.MarketoSourceOrSinkSchemaProvider.RESOURCE_COMPANY;
+import static org.talend.components.marketo.runtime.MarketoSourceOrSinkSchemaProvider.RESOURCE_OPPORTUNITY;
+import static org.talend.components.marketo.runtime.MarketoSourceOrSinkSchemaProvider.RESOURCE_OPPORTUNITY_ROLE;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction.describe;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.Company;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.CustomObject;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.Opportunity;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.OpportunityRole;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLead;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadActivity;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadChanges;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getMultipleLeads;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
+import static org.talend.daikon.properties.property.PropertyFactory.newString;
+
 public class TMarketoInputProperties extends MarketoComponentWizardBaseProperties implements SerializeSetVersion {
 
     public Property<Integer> batchSize = newInteger("batchSize");
@@ -84,8 +85,8 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
 
     private static final Logger LOG = getLogger(TMarketoInputProperties.class);
 
-    private static final I18nMessages messages =
-            GlobalI18N.getI18nMessageProvider().getI18nMessages(TMarketoInputProperties.class);
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(TMarketoInputProperties.class);
 
     public enum LeadSelector {
         LeadKeySelector,
@@ -319,8 +320,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
 
     public Property<String> customObjectFilterValues = newString("customObjectFilterValues").setRequired();
 
-    public transient PresentationItem fetchCustomObjectSchema =
-            new PresentationItem("fetchCustomObjectSchema", "Fetch schema");
+    public transient PresentationItem fetchCustomObjectSchema = new PresentationItem("fetchCustomObjectSchema", "Fetch schema");
 
     public Property<Boolean> useCompoundKey = newBoolean("useCompoundKey");
 
@@ -351,7 +351,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
         super.setupProperties();
 
         //
-        batchSize.setValue(100);
+        batchSize.setValue(REST_API_LIMIT);
         dieOnError.setValue(true);
         //
         inputOperation.setPossibleValues((Object[]) InputOperation.values());
@@ -409,8 +409,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
         mainForm.addColumn(customObjectAction);
         mainForm.addColumn(standardAction);
         mainForm.addRow(customObjectName);
-        mainForm.addColumn(
-                Widget.widget(fetchCustomObjectSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE).setLongRunning(true));
+        mainForm.addColumn(Widget.widget(fetchCustomObjectSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE).setLongRunning(true));
         mainForm.addRow(customObjectNames);
         mainForm.addRow(customObjectFilterType);
         mainForm.addColumn(customObjectFilterValues);
@@ -550,9 +549,9 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                         } else {
                             form.getWidget(listParamListId.getName()).setVisible(true);
                         }
-                        form.getWidget(batchSize.getName()).setVisible(true);
                         break;
                     }
+                    form.getWidget(batchSize.getName()).setVisible(true);
                 }
             }
             // getLeadActivity
@@ -681,8 +680,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
 
     public ValidationResult validateFetchCustomObjectSchema() {
         ValidationResultMutable vr = new ValidationResultMutable();
-        try (SandboxedInstance sandboxedInstance =
-                getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
+        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
             ValidationResult vConn = sos.validateConnection(this);
@@ -695,8 +693,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                 switch (inputOperation.getValue()) {
                 case CustomObject:
                     resource = customObjectName.getValue();
-                    schema = ((MarketoSourceOrSinkSchemaProvider) sos)
-                            .getSchemaForCustomObject(customObjectName.getValue());
+                    schema = ((MarketoSourceOrSinkSchemaProvider) sos).getSchemaForCustomObject(customObjectName.getValue());
                     break;
                 case Company:
                     resource = "Company";
@@ -712,15 +709,15 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                     break;
                 }
                 if (schema == null) {
-                    vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages
-                            .getMessage("error.validation.customobjects.fetchcustomobjectschema", resource, "NULL"));
+                    vr.setStatus(ValidationResult.Result.ERROR).setMessage(
+                            messages.getMessage("error.validation.customobjects.fetchcustomobjectschema", resource, "NULL"));
                     return vr;
                 }
                 schemaInput.schema.setValue(schema);
                 vr.setStatus(ValidationResult.Result.OK);
             } catch (RuntimeException | IOException e) {
-                vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages.getMessage(
-                        "error.validation.customobjects.fetchcustomobjectschema", resource, e.getMessage()));
+                vr.setStatus(ValidationResult.Result.ERROR).setMessage(
+                        messages.getMessage("error.validation.customobjects.fetchcustomobjectschema", resource, e.getMessage()));
             }
         }
         return vr;
@@ -728,8 +725,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
 
     public ValidationResult validateFetchCompoundKey() {
         ValidationResultMutable vr = new ValidationResultMutable();
-        try (SandboxedInstance sandboxedInstance =
-                getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
+        try (SandboxedInstance sandboxedInstance = getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS, USE_CURRENT_JVM_PROPS)) {
             MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
             ValidationResult vConn = sos.validateConnection(this);
@@ -756,17 +752,16 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                 keys = ((MarketoSourceOrSinkSchemaProvider) sos).getCompoundKeyFields(resource);
 
                 if (keys == null) {
-                    vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages.getMessage(
-                            "error.validation.customobjects.fetchcompoundkey", customObjectName.getValue(), "NULL"));
+                    vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages
+                            .getMessage("error.validation.customobjects.fetchcompoundkey", customObjectName.getValue(), "NULL"));
                     return vr;
                 }
                 compoundKey.keyName.setValue(keys);
                 compoundKey.keyValue.setValue(Arrays.asList(new String[keys.size()]));
                 vr.setStatus(ValidationResult.Result.OK);
             } catch (RuntimeException | IOException e) {
-                vr.setStatus(ValidationResult.Result.ERROR).setMessage(
-                        messages.getMessage("error.validation.customobjects.fetchcompoundkey",
-                                customObjectName.getValue(), e.getMessage()));
+                vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages.getMessage(
+                        "error.validation.customobjects.fetchcompoundkey", customObjectName.getValue(), e.getMessage()));
             }
         }
         return vr;
@@ -923,8 +918,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
     }
 
     private Field getMigratedField(Field origin, Schema expectedSchema, String expectedDIType) {
-        Field expectedField =
-                new Schema.Field(origin.name(), expectedSchema, origin.doc(), origin.defaultVal(), origin.order());
+        Field expectedField = new Schema.Field(origin.name(), expectedSchema, origin.doc(), origin.defaultVal(), origin.order());
         for (Map.Entry<String, Object> entry : origin.getObjectProps().entrySet()) {
             if ("di.column.talendType".equals(entry.getKey())) {
                 expectedField.addProp("di.column.talendType", expectedDIType);
@@ -945,8 +939,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
         }
         checkForInvalidStoredProperties();
         // migrate CustomLookup
-        if (isApiREST()
-                && (getMultipleLeads.equals(inputOperation.getValue()) || getLead.equals(inputOperation.getValue()))
+        if (isApiREST() && (getMultipleLeads.equals(inputOperation.getValue()) || getLead.equals(inputOperation.getValue()))
                 && (LeadKeySelector.equals(leadSelectorREST.getValue()))) {
             String value = getEnumStoredValue(leadKeyTypeREST.getStoredValue());
             boolean correctValue = false;
@@ -999,12 +992,11 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                 if (checkedField != null) {
                     expectedType = isApiSOAP() ? Type.LONG : Type.INT;
                     expectedDIType = isApiSOAP() ? "id_Long" : "id_Integer";
-                    LOG.info("Checking Migration for `{}`'s type: expected is {} and actual is {}.", fieldName,
-                            expectedType, MarketoUtils.getFieldType(checkedField));
+                    LOG.info("Checking Migration for `{}`'s type: expected is {} and actual is {}.", fieldName, expectedType,
+                            MarketoUtils.getFieldType(checkedField));
                     if (!expectedType.equals(MarketoUtils.getFieldType(checkedField))) {
-                        expectedFieldSchema =
-                                isApiSOAP() ? getSOAPSchemaForGetLeadActivity().getField(fieldName).schema()
-                                        : getRESTSchemaForGetLeadActivity().getField(fieldName).schema();
+                        expectedFieldSchema = isApiSOAP() ? getSOAPSchemaForGetLeadActivity().getField(fieldName).schema()
+                                : getRESTSchemaForGetLeadActivity().getField(fieldName).schema();
                         fieldsToMigrate.add(getMigratedField(checkedField, expectedFieldSchema, expectedDIType));
                     }
                 }
@@ -1015,8 +1007,8 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                     if (checkedField != null) {
                         expectedType = Type.INT;
                         expectedDIType = "id_Integer";
-                        LOG.info("Checking Migration for `{}`'s type: expected is {} and actual is {}.", fieldName,
-                                expectedType, MarketoUtils.getFieldType(checkedField));
+                        LOG.info("Checking Migration for `{}`'s type: expected is {} and actual is {}.", fieldName, expectedType,
+                                MarketoUtils.getFieldType(checkedField));
                         if (!expectedType.equals(MarketoUtils.getFieldType(checkedField))) {
                             expectedFieldSchema = getRESTSchemaForGetLeadActivity().getField(fieldName).schema();
                             fieldsToMigrate.add(getMigratedField(checkedField, expectedFieldSchema, expectedDIType));
@@ -1024,8 +1016,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                     }
                 }
                 if (fieldsToMigrate.size() > 0) {
-                    Schema correctedSchema =
-                            MarketoUtils.modifySchemaFields(schemaInput.schema.getValue(), fieldsToMigrate);
+                    Schema correctedSchema = MarketoUtils.modifySchemaFields(schemaInput.schema.getValue(), fieldsToMigrate);
                     schemaInput.schema.setValue(correctedSchema);
                     schemaFlow.schema.setValue(correctedSchema);
                     for (Field f : fieldsToMigrate) {
@@ -1050,7 +1041,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
 
     /*
      * translate int ids to include/exclude strings not translated be studio's migration
-     * 
+     *
      */
     private List<String> getFixedIncludeExcludeList(List<String> list) {
         if (list == null) {

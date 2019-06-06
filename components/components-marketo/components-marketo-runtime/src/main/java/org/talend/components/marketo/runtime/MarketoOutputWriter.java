@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -11,15 +11,6 @@
 //
 // ============================================================================
 package org.talend.components.marketo.runtime;
-
-import static org.talend.components.marketo.MarketoConstants.FIELD_CAMPAIGN_ID;
-import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
-import static org.talend.components.marketo.MarketoConstants.FIELD_LEAD_ID;
-import static org.talend.components.marketo.MarketoConstants.FIELD_MARKETO_GUID;
-import static org.talend.components.marketo.MarketoConstants.FIELD_REASON;
-import static org.talend.components.marketo.MarketoConstants.FIELD_SEQ;
-import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
-import static org.talend.components.marketo.MarketoConstants.FIELD_SUCCESS;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -40,6 +31,15 @@ import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation;
 import org.talend.daikon.avro.AvroUtils;
+
+import static org.talend.components.marketo.MarketoConstants.FIELD_CAMPAIGN_ID;
+import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
+import static org.talend.components.marketo.MarketoConstants.FIELD_LEAD_ID;
+import static org.talend.components.marketo.MarketoConstants.FIELD_MARKETO_GUID;
+import static org.talend.components.marketo.MarketoConstants.FIELD_REASON;
+import static org.talend.components.marketo.MarketoConstants.FIELD_SEQ;
+import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
+import static org.talend.components.marketo.MarketoConstants.FIELD_SUCCESS;
 
 public class MarketoOutputWriter extends MarketoWriter {
 
@@ -72,14 +72,7 @@ public class MarketoOutputWriter extends MarketoWriter {
         //
         operation = properties.outputOperation.getValue();
         dieOnError = properties.dieOnError.getValue();
-        if (operation.equals(OutputOperation.syncMultipleLeads) || operation.equals(OutputOperation.deleteLeads)) {
-            batchSize = properties.batchSize.getValue();
-        }
-        if (operation.equals(OutputOperation.deleteLeads) && !properties.deleteLeadsInBatch.getValue()) {
-            batchSize = 1;
-        }
-        isBatchMode = ((operation.equals(OutputOperation.syncMultipleLeads) || operation.equals(OutputOperation.deleteLeads))
-                && batchSize > 1);
+        batchSize = properties.batchSize.getValue();
     }
 
     @Override
@@ -172,45 +165,39 @@ public class MarketoOutputWriter extends MarketoWriter {
 
     public void processResult(MarketoSyncResult mktoResult) {
         cleanWrites();
+        LOG.debug("[processResult] {}.", mktoResult);
         if (!mktoResult.isSuccess()) {
             // build a SyncStatus for record which failed
             SyncStatus status = new SyncStatus();
             status.setStatus("failed");
             status.setErrorMessage(mktoResult.getErrorsString());
             if (mktoResult.getRecords().isEmpty()) {
+                LOG.debug("[processResult] Global fault, applying to all records.");
                 mktoResult.setRecords(Arrays.asList(status));
-            } else {
-                List<SyncStatus> tmp = mktoResult.getRecords();
-                tmp.add(status);
-                mktoResult.setRecords(tmp);
+                for (IndexedRecord statusRecord : recordsToProcess) {
+                    handleReject(fillRecord(status, rejectSchema, statusRecord));
+                }
+                return;
             }
+            List<SyncStatus> tmp = mktoResult.getRecords();
+            tmp.add(status);
+            mktoResult.setRecords(tmp);
         }
         int idx = 0;
+        LOG.debug("[processResult] recordsToProcess: {}.", recordsToProcess);
         for (SyncStatus status : mktoResult.getRecords()) {
             IndexedRecord statusRecord = recordsToProcess.get(idx);
+            LOG.debug("[processResult] [idx: {}] statusRecord: {}; status: {} ", idx, statusRecord, status);
             idx++;
             boolean isSuccess = Arrays.asList("created", "updated", "deleted", "scheduled", "triggered")
                     .contains(status.getStatus().toLowerCase());
-            if (isBatchMode) {
-                if (!isSuccess && dieOnError) {
+            if (isSuccess) {
+                handleSuccess(fillRecord(status, flowSchema, statusRecord));
+            } else {
+                if (dieOnError) {
                     throw new MarketoRuntimeException(status.getAvailableReason());
                 }
-                // in batchmode we have only 0 or 1 connector only
-                handleSuccess(fillRecord(status, flowSchema, statusRecord));
-                if (!isSuccess) {
-                    // readjust counts
-                    result.successCount--;
-                    result.rejectCount++;
-                }
-            } else {
-                if (isSuccess) {
-                    handleSuccess(fillRecord(status, flowSchema, statusRecord));
-                } else {
-                    if (dieOnError) {
-                        throw new MarketoRuntimeException(status.getAvailableReason());
-                    }
-                    handleReject(fillRecord(status, rejectSchema, statusRecord));
-                }
+                handleReject(fillRecord(status, rejectSchema, statusRecord));
             }
         }
     }

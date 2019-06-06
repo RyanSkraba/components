@@ -65,19 +65,13 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
         reader = (MarketoInputReader) source.createReader(null);
         assertTrue(reader instanceof MarketoInputReader);
 
-        when(client.getLead(any(), any()))
-                .thenReturn(getFailedRecordResult("REST", "", "error"));
-        when(client.getMultipleLeads(any(), any()))
-                .thenReturn(getFailedRecordResult("REST", "", "error"));
-        when(client.getLeadActivity(any(), any()))
-                .thenReturn(getFailedRecordResult("REST", "", "error"));
-        when(client.getLeadChanges(any(), any()))
-                .thenReturn(getFailedRecordResult("REST", "", "error"));
-        when(client.describeCustomObject(any()))
-                .thenReturn(getFailedRecordResult("REST", "", "error"));
+        when(client.getLead(any(), any())).thenReturn(getFailedRecordResult("REST", "", "error"));
+        when(client.getMultipleLeads(any(), any())).thenReturn(getFailedRecordResult("REST", "", "error"));
+        when(client.getLeadActivity(any(), any())).thenReturn(getFailedRecordResult("REST", "", "error"));
+        when(client.getLeadChanges(any(), any())).thenReturn(getFailedRecordResult("REST", "", "error"));
+        when(client.describeCustomObject(any())).thenReturn(getFailedRecordResult("REST", "", "error"));
         when(client.listCustomObjects(any())).thenReturn(getFailedRecordResult("REST", "", "error"));
-        when(client.getCustomObjects(any(), any()))
-                .thenReturn(getFailedRecordResult("REST", "", "error"));
+        when(client.getCustomObjects(any(), any())).thenReturn(getFailedRecordResult("REST", "", "error"));
 
     }
 
@@ -233,8 +227,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
         source.initialize(null, props);
 
         when(source.createReader(null)).thenReturn(new MarketoInputReader(null, source, props));
-        when(client.getLeadActivity(any(), any()))
-                .thenReturn(getLeadRecordResult(false));
+        when(client.getLeadActivity(any(), any())).thenReturn(getLeadRecordResult(false));
 
         reader = (MarketoInputReader) source.createReader(null);
         assertTrue(props.isApiREST());
@@ -283,8 +276,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
 
     @Test
     public void testRetryOperationFailDieOnError() throws Exception {
-        doReturn(getFailedRecordResult("REST", "902", "Invalid operation")).when(client)
-                .getMultipleLeads(any(), any());
+        doReturn(getFailedRecordResult("REST", "902", "Invalid operation")).when(client).getMultipleLeads(any(), any());
         reader = getReaderForRetryOperation(true);
         try {
             reader.start();
@@ -297,8 +289,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
     @Test
     public void testRetryOperationFailNonRecoverableErrror() throws Exception {
         doReturn(false).when(client).isErrorRecoverable(any(List.class));
-        doReturn(getFailedRecordResult("REST", "902", "Invalid operation")).when(client)
-                .getMultipleLeads(any(), any());
+        doReturn(getFailedRecordResult("REST", "902", "Invalid operation")).when(client).getMultipleLeads(any(), any());
         reader = getReaderForRetryOperation(false);
         assertFalse(reader.start());
         int result = (int) reader.getReturnValues().get(RETURN_NB_CALL);
@@ -308,8 +299,7 @@ public class MarketoInputReaderTest extends MarketoRuntimeTestBase {
     @Test
     public void testRetryOperationFailRecoverableErrror() throws Exception {
         doReturn(true).when(client).isErrorRecoverable(any(List.class));
-        doReturn(getFailedRecordResult("REST", "602", "expired header")).when(client)
-                .getMultipleLeads(any(), any());
+        doReturn(getFailedRecordResult("REST", "602", "expired header")).when(client).getMultipleLeads(any(), any());
         reader = getReaderForRetryOperation(false);
         int minDelay = reader.getRetryAttemps() * reader.getRetryInterval();
         long start = System.currentTimeMillis();

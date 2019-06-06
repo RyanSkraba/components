@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -34,11 +34,12 @@ import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import static org.talend.components.marketo.MarketoConstants.REST_API_LIMIT;
+
 /**
  * Marketers deliver leads to sales in the form of an opportunity. An opportunity represents a potential sales deal and
  * is associated with a lead or contact and an organization in Marketo. An opportunity role is the intersection between
  * a given lead and an organization. The opportunity role pertains to a lead’s function within the organization.
- *
  */
 public class MarketoOpportunityClient extends MarketoCompanyClient {
 
@@ -93,8 +94,7 @@ public class MarketoOpportunityClient extends MarketoCompanyClient {
                 fields.add(f);
             }
         }
-        int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
-                : parameters.batchSize.getValue();
+        int batchLimit = parameters.batchSize.getValue() > REST_API_LIMIT ? REST_API_LIMIT : parameters.batchSize.getValue();
         //
         current_uri = new StringBuilder(basicPath)//
                 .append(resource)//
@@ -134,7 +134,7 @@ public class MarketoOpportunityClient extends MarketoCompanyClient {
 
     /**
      * Allows inserting, updating, or upserting of opportunity records into the target instance.
-     * 
+     *
      * @param parameters
      * @param records
      * @return

@@ -86,13 +86,11 @@ public class MarketoRuntimeTestBase {
 
         client = mock(MarketoRESTClient.class);
         when(client.getApi()).thenReturn("REST");
-        when(client.getMultipleLeads(any(), any()))
-                .thenReturn(getLeadRecordResult(false));
+        when(client.getMultipleLeads(any(), any())).thenReturn(getLeadRecordResult(false));
         when(client.getAllLeadFields()).thenReturn(fakeAllLeadFields());
 
         sourceOrSink = mock(MarketoSourceOrSink.class);
-        when(sourceOrSink.initialize(any(), any()))
-                .thenReturn(ValidationResult.OK);
+        when(sourceOrSink.initialize(any(), any())).thenReturn(ValidationResult.OK);
         when(sourceOrSink.validate(any())).thenReturn(ValidationResult.OK);
         when(sourceOrSink.validateConnection(any())).thenReturn(ValidationResult.OK);
         when(sourceOrSink.getClientService(any())).thenReturn(client);

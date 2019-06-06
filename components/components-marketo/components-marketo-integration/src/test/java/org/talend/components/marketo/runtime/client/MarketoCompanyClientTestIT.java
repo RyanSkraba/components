@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -75,25 +75,10 @@ public class MarketoCompanyClientTestIT extends MarketoBaseTestIT {
         oprops.schemaInput.setupLayout();
         oprops.setupLayout();
         //
-        s = SchemaBuilder
-                .record("sn")
-                .fields()
-                .name("externalCompanyId")
-                .type()
-                .stringType()
-                .noDefault() //
-                .name("company")
-                .type()
-                .stringType()
-                .noDefault()//
-                .name("website")
-                .type()
-                .intType()
-                .noDefault()//
-                .name("numberOfEmployees")
-                .type()
-                .intType()
-                .noDefault()//
+        s = SchemaBuilder.record("sn").fields().name("externalCompanyId").type().stringType().noDefault() //
+                .name("company").type().stringType().noDefault()//
+                .name("website").type().intType().noDefault()//
+                .name("numberOfEmployees").type().intType().noDefault()//
                 .endRecord();
     }
 
