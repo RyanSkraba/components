@@ -12,25 +12,6 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client;
 
-import static java.util.Collections.emptyList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsSOAP.ChangeDataValue;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeREST.email;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeREST.linkedInId;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.StaticListSelector;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam.STATIC_LIST_ID;
-import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam.STATIC_LIST_NAME;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.CustomObject;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLead;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadActivity;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadChanges;
-import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getMultipleLeads;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +47,25 @@ import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.RES
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.CustomObjectAction;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.OutputOperation;
 import org.talend.daikon.avro.SchemaConstants;
+
+import static java.util.Collections.emptyList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsSOAP.ChangeDataValue;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeREST.email;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeREST.linkedInId;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.StaticListSelector;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam.STATIC_LIST_ID;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam.STATIC_LIST_NAME;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.CustomObject;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLead;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadActivity;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getLeadChanges;
+import static org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation.getMultipleLeads;
 
 public class MarketoRESTClientTestIT extends MarketoClientTestIT {
 

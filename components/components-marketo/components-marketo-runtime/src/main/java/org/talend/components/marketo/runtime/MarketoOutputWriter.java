@@ -53,8 +53,6 @@ public class MarketoOutputWriter extends MarketoWriter {
 
     private Schema dynamicSchema;
 
-    private Boolean isBatchMode = Boolean.FALSE;
-
     private static final Logger LOG = LoggerFactory.getLogger(MarketoOutputWriter.class);
 
     public MarketoOutputWriter(WriteOperation writeOperation, RuntimeContainer runtime) {
@@ -72,7 +70,11 @@ public class MarketoOutputWriter extends MarketoWriter {
         //
         operation = properties.outputOperation.getValue();
         dieOnError = properties.dieOnError.getValue();
-        batchSize = properties.batchSize.getValue();
+        if(operation == OutputOperation.syncLead){
+            batchSize = 1;
+        } else {
+            batchSize = properties.batchSize.getValue();
+        }
     }
 
     @Override
