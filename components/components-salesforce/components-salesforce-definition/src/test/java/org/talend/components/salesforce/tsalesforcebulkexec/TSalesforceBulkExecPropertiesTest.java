@@ -33,6 +33,7 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.components.common.oauth.OAuth2FlowType;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.SalesforceTestBase;
@@ -269,6 +270,24 @@ public class TSalesforceBulkExecPropertiesTest extends SalesforceTestBase {
         properties.connection.referencedComponent.setReference(null);
         properties.refreshLayout(advancedForm);
         assertFalse(bulkForm.getWidget(properties.bulkProperties.bulkApiV2.getName()).isVisible());
+
+    }
+
+    @Test
+    public void testRefershHardDelete(){
+        properties.init();
+        Form advancedForm = properties.getForm(Form.ADVANCED);
+        Form mainForm = properties.getForm(Form.MAIN);
+
+        assertEquals(Boolean.FALSE, mainForm.getWidget(properties.hardDelete.getName()).isVisible());
+        properties.outputAction.setValue(SalesforceOutputProperties.OutputAction.DELETE);
+        properties.refreshLayout(advancedForm);
+        assertEquals(Boolean.TRUE, mainForm.getWidget(properties.hardDelete.getName()).isVisible());
+        properties.bulkProperties.bulkApiV2.setValue(true);
+        properties.connection.loginType.setValue(SalesforceConnectionProperties.LoginType.OAuth);
+        properties.connection.oauth2FlowType.setValue(OAuth2FlowType.JWT_Flow);
+        properties.refreshLayout(advancedForm);
+        assertEquals(Boolean.FALSE, mainForm.getWidget(properties.hardDelete.getName()).isVisible());
 
     }
 

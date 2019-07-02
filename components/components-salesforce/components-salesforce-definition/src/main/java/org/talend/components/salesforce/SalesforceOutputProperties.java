@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
@@ -40,6 +41,8 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
     }
 
     public Property<OutputAction> outputAction = newEnum("outputAction", OutputAction.class); // $NON-NLS-1$
+
+    public Property<Boolean> hardDelete = newBoolean("hardDelete");
 
     public Property<String> upsertKeyColumn = newString("upsertKeyColumn"); //$NON-NLS-1$
 
@@ -120,6 +123,8 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(outputAction);
+        mainForm.addColumn(hardDelete);
+        mainForm.getWidget(hardDelete.getName()).setVisible(false);
 
         if (isUpsertKeyColumnClosedList()) {
             mainForm.addColumn(widget(upsertKeyColumn).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));

@@ -170,7 +170,7 @@ public class SalesforceBulkRuntime {
         this.jobTimeOut = timeout * 1000; // from seconds to milliseconds
     }
 
-    private void setBulkOperation(String sObjectType, OutputAction userOperation, String externalIdFieldName,
+    private void setBulkOperation(String sObjectType, OutputAction userOperation, boolean hardDelete, String externalIdFieldName,
             String contentTypeStr, String bulkFileName, int maxBytes, int maxRows) {
         this.sObjectType = sObjectType;
         switch (userOperation) {
@@ -184,7 +184,11 @@ public class SalesforceBulkRuntime {
             operation = OperationEnum.upsert;
             break;
         case DELETE:
-            operation = OperationEnum.delete;
+            if(hardDelete){
+                operation = OperationEnum.hardDelete;
+            }else{
+                operation = OperationEnum.delete;
+            }
             break;
 
         default:
@@ -206,9 +210,9 @@ public class SalesforceBulkRuntime {
         maxRowsPerBatch = (maxRows > sforceMaxRows) ? sforceMaxRows : maxRows;
     }
 
-    public void executeBulk(String sObjectType, OutputAction userOperation, String externalIdFieldName, String contentTypeStr,
+    public void executeBulk(String sObjectType, OutputAction userOperation, boolean hardDelete, String externalIdFieldName, String contentTypeStr,
             String bulkFileName, int maxBytes, int maxRows) throws AsyncApiException, ConnectionException, IOException {
-        setBulkOperation(sObjectType, userOperation, externalIdFieldName, contentTypeStr, bulkFileName, maxBytes, maxRows);
+        setBulkOperation(sObjectType, userOperation, hardDelete, externalIdFieldName, contentTypeStr, bulkFileName, maxBytes, maxRows);
         job = createJob();
         batchInfoList = createBatchesFromCSVFile();
         closeJob();

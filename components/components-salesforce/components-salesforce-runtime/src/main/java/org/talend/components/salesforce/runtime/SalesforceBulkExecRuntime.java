@@ -76,7 +76,7 @@ public class SalesforceBulkExecRuntime extends SalesforceSourceOrSink
             bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getValue());
             bulkRuntime.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getValue());
             // We only support CSV file for bulk output
-            bulkRuntime.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getValue(),
+            bulkRuntime.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getValue(), sprops.hardDelete.getValue(),
                     sprops.upsertKeyColumn.getStringValue(), "csv", sprops.bulkFilePath.getStringValue(),
                     sprops.bulkProperties.bytesToCommit.getValue(), sprops.bulkProperties.rowsToCommit.getValue());
             // count results

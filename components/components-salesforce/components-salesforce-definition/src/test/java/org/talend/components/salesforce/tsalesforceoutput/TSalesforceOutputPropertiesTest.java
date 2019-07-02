@@ -96,6 +96,7 @@ public class TSalesforceOutputPropertiesTest extends SalesforceTestBase {
         assertEquals(Form.MAIN, mainForm.getName());
         Form advancedForm = properties.getForm(Form.ADVANCED);
         assertTrue(mainForm.getWidget(properties.outputAction.getName()).isVisible());
+        assertFalse(mainForm.getWidget(properties.hardDelete.getName()).isVisible());
         assertEquals(TSalesforceOutputProperties.OutputAction.INSERT, properties.outputAction.getValue());
         Schema rejectSchema = properties.schemaReject.schema.getValue();
         assertNotNull(rejectSchema);

@@ -74,6 +74,8 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
                 boolean useBulkApiV2 = oauthLogin && bulkProperties.bulkApiV2.getValue();
                 bulkForm.getWidget(bulkProperties.rowsToCommit.getName()).setVisible(!useBulkApiV2);
                 bulkForm.getWidget(bulkProperties.bytesToCommit.getName()).setVisible(!useBulkApiV2);
+                Form main = getForm(Form.MAIN);
+                main.getWidget(hardDelete.getName()).setVisible(!useBulkApiV2 && outputAction.getValue().equals(OutputAction.DELETE));
                 bulkForm.getWidget(bulkProperties.concurrencyMode.getName()).setVisible(!useBulkApiV2);
                 bulkForm.getWidget(bulkProperties.columnDelimiter.getName()).setVisible(useBulkApiV2);
                 bulkForm.getWidget(bulkProperties.lineEnding.getName()).setVisible(useBulkApiV2);
