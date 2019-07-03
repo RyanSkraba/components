@@ -10,7 +10,7 @@
     <name>Component BOM</name>
     <properties>
         <components.version>0.28.0-SNAPSHOT</components.version>
-        <daikon.version>0.31.7-SNAPSHOT</daikon.version>
+        <daikon.version>0.31.9-SNAPSHOT</daikon.version>
         <!-- -->
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
         <!-- -->

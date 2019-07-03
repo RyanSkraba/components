@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.talend.daikon</groupId>
         <artifactId>service-parent</artifactId>
-        <version>0.31.7-SNAPSHOT</version>
+        <version>0.31.9-SNAPSHOT</version>
         <relativePath />
     </parent>
 
@@ -19,7 +19,7 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <daikon.version>0.31.7-SNAPSHOT</daikon.version>
+        <daikon.version>0.31.9-SNAPSHOT</daikon.version>
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
