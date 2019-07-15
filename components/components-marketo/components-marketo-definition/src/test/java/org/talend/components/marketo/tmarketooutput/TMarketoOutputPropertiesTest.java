@@ -294,9 +294,10 @@ public class TMarketoOutputPropertiesTest {
     public void testPostDeserialize() throws Exception {
         MarketoComponentWizardBaseProperties mprops = mock(MarketoComponentWizardBaseProperties.class);
         when(mprops.postDeserialize(eq(0), any(PostDeserializeSetup.class), eq(false))).thenReturn(true);
-        assertFalse(props.postDeserialize(0, null, false));
+        assertFalse(props.postDeserialize(3, null, false));
         when(mprops.postDeserialize(eq(0), any(PostDeserializeSetup.class), eq(false))).thenThrow(new ClassCastException());
-        assertFalse(props.postDeserialize(0, null, false));
+        assertFalse(props.postDeserialize(3, null, false));
+        assertTrue(props.postDeserialize(1, null, false));
     }
 
     @Test

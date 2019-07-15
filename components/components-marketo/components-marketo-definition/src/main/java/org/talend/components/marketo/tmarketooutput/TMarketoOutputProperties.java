@@ -466,7 +466,7 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
 
     @Override
     public int getVersionNumber() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -501,6 +501,20 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
                 customLookupField.setValue(value != null ? StringUtils.wrap(value, '"') : "");
                 LOG.warn("[postDeserialize] Fixing Custom lookupField with {}", customLookupField.getValue());
             }
+        }
+
+        if (version < 2) {
+            switch (outputOperation.getValue()) {
+                case syncLead:
+                case syncCustomObjects:
+                case syncCompanies:
+                case syncOpportunities:
+                case syncOpportunityRoles:
+                    batchSize.setValue(1);
+                    break;
+                default:
+            }
+            migrated = true;
         }
 
         return migrated;
