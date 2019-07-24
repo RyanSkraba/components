@@ -67,7 +67,12 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
 
     @Override
     public boolean advance() throws IOException {
-        currentRecord = bulkResultSet.next();
+        try {
+            currentRecord = bulkResultSet.next();
+        } catch (IOException e){
+            close();
+            throw e;
+        }
         if (currentRecord == null) {
             return retrieveNextResultSet();
         }
