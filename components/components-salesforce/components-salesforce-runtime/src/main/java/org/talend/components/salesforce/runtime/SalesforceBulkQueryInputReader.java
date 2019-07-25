@@ -27,6 +27,7 @@ import org.talend.daikon.avro.AvroUtils;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.ws.ConnectionException;
+import org.talend.daikon.exception.TalendRuntimeException;
 
 public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedRecord> {
 
@@ -66,9 +67,14 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
 
     @Override
     public boolean advance() throws IOException {
-        currentRecord = bulkResultSet.next();
-        if (currentRecord == null) {
-            return retrieveNextResultSet();
+        try {
+            currentRecord = bulkResultSet.next();
+            if (currentRecord == null) {
+                return retrieveNextResultSet();
+            }
+        } catch (IOException e) {
+            close();
+            throw e;
         }
         dataCount++;
         return true;
@@ -116,6 +122,9 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
             bulkRuntime.doBulkQuery(getModuleName(), queryText);
         } catch (AsyncApiException | InterruptedException | ConnectionException e) {
             throw new IOException(e);
+        } catch (TalendRuntimeException e) {
+            close();
+            throw e;
         }
     }
 
