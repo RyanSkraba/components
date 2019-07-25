@@ -69,12 +69,12 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
     public boolean advance() throws IOException {
         try {
             currentRecord = bulkResultSet.next();
-        } catch (IOException e){
+            if (currentRecord == null) {
+                return retrieveNextResultSet();
+            }
+        } catch (IOException e) {
             close();
             throw e;
-        }
-        if (currentRecord == null) {
-            return retrieveNextResultSet();
         }
         dataCount++;
         return true;
@@ -122,7 +122,7 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
             bulkRuntime.doBulkQuery(getModuleName(), queryText);
         } catch (AsyncApiException | InterruptedException | ConnectionException e) {
             throw new IOException(e);
-        } catch (TalendRuntimeException e){
+        } catch (TalendRuntimeException e) {
             close();
             throw e;
         }
