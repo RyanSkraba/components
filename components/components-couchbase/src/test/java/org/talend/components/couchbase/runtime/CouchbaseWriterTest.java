@@ -206,6 +206,51 @@ public class CouchbaseWriterTest {
         assertEquals(expectedJsonObject, writer.createHierarchicalJson(schema, record, idPos));
     }
 
+    @Test
+    public void testJsonArrayCreationWithMixedSchema(){
+        String jsonObjectSample = "{\"name\":\"John\", \"age\":30, \"car\":null}";
+        String jsonArraySample = "[{\"arr01\":1,\"arr02\":2,\"arr03\":3},{\"arr01\":4,\"arr02\":5,\"arr03\":6}]";
+        String strSample = "testStr";
+
+        Schema schema = SchemaBuilder.builder().record("record").fields()
+                .requiredInt("id")
+                .optionalString("jsonObj")
+                .optionalString("arr")
+                .optionalString("strValue")
+                .endRecord();
+        IndexedRecord record = new GenericRecordBuilder(schema)
+                .set("id", 1)
+                .set("jsonObj", jsonObjectSample)
+                .set("arr", jsonArraySample)
+                .set("strValue", strSample)
+                .build();
+
+
+        JsonObject jsonObjectInner = JsonObject.create();
+        jsonObjectInner.put("name", "John");
+        jsonObjectInner.put("age", 30);
+        jsonObjectInner.putNull("car");
+
+        JsonObject jsonObjectInner1 = JsonObject.create()
+                .put("arr01", 1)
+                .put("arr02", 2)
+                .put("arr03", 3);
+        JsonObject jsonObjectInner2 = JsonObject.create()
+                .put("arr01", 4)
+                .put("arr02", 5)
+                .put("arr03", 6);
+        JsonArray jsonArray = JsonArray.create();
+        jsonArray.add(jsonObjectInner1);
+        jsonArray.add(jsonObjectInner2);
+
+        JsonObject expectedJsonObject = JsonObject.create();
+        expectedJsonObject.put("jsonObj", jsonObjectInner);
+        expectedJsonObject.put("arr", jsonArray);
+        expectedJsonObject.put("strValue", strSample);
+
+        assertEquals(expectedJsonObject, writer.createHierarchicalJson(schema, record, 0));
+    }
+
     private JsonObject createStructuredJsonObject(){
         JsonObject jsonObjectInnerInner = JsonObject.create();
         jsonObjectInnerInner.put("val1", 40);

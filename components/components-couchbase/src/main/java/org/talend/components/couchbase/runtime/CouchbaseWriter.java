@@ -16,6 +16,7 @@
 
 package org.talend.components.couchbase.runtime;
 
+import com.couchbase.client.java.document.json.JsonArray;
 import com.couchbase.client.java.document.json.JsonObject;
 
 import java.io.IOException;
@@ -108,7 +109,13 @@ public class CouchbaseWriter implements Writer<Result> {
                 JsonObject innerJson = JsonObject.fromJson(value.toString());
                 jsonObject.put(fieldName, innerJson);
             } catch (Exception e) {
-                jsonObject.put(fieldName, value);
+                try {
+                    JsonArray jsonArray = JsonArray.fromJson(value.toString());
+                    jsonObject.put(fieldName, jsonArray);
+                } catch (Exception e2) {
+                    // This mean it's not JSON object
+                    jsonObject.put(fieldName, value);
+                }
             }
         }
         return jsonObject;
