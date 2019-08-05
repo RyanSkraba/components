@@ -13,6 +13,7 @@
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
 import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.util.ArrayList;
@@ -40,6 +41,8 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
     public SalesforceBulkProperties bulkProperties = new SalesforceBulkProperties("bulkProperties");
 
+    public Property<Boolean> outputUpsertKey = newBoolean("outputUpsertKey");
+
     public TSalesforceBulkExecProperties(String name) {
         super(name);
     }
@@ -48,6 +51,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
+        mainForm.addRow(outputUpsertKey);
         mainForm.addRow(widget(bulkFilePath).setWidgetType(Widget.FILE_WIDGET_TYPE));
 
         Form advancedForm = getForm(Form.ADVANCED);
@@ -58,6 +62,10 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
+
+        if (Form.MAIN.equals(form.getName())) {
+            form.getWidget(outputUpsertKey.getName()).setVisible(OutputAction.UPSERT.equals(outputAction.getValue()));
+        }
 
         if (Form.ADVANCED.equals(form.getName())) {
             form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
@@ -118,6 +126,15 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
         final List<Schema.Field> additionalMainFields = new ArrayList<Schema.Field>();
 
+        if (OutputAction.UPSERT.equals(outputAction.getValue()) && outputUpsertKey.getValue()
+                && inputSchema.getField(upsertKeyColumn.getValue()) == null) {
+            field = new Schema.Field("UpsertColumnValue", Schema.create(Schema.Type.STRING), null, (Object) null);
+            field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+            field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
+            field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+            additionalMainFields.add(field);
+        }
+
         field = new Schema.Field("salesforce_id", Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
         field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
@@ -134,6 +151,15 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         schemaFlow.schema.setValue(mainOutputSchema);
 
         final List<Schema.Field> additionalRejectFields = new ArrayList<Schema.Field>();
+
+        if (OutputAction.UPSERT.equals(outputAction.getValue()) && outputUpsertKey.getValue()
+                && inputSchema.getField(upsertKeyColumn.getValue()) == null) {
+            field = new Schema.Field("UpsertColumnValue", Schema.create(Schema.Type.STRING), null, (Object) null);
+            field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+            field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
+            field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+            additionalRejectFields.add(field);
+        }
 
         field = new Schema.Field("error", Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
@@ -210,6 +236,12 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         String refComponentIdValue = connection.getReferencedComponentId();
         return refComponentIdValue != null
                 && refComponentIdValue.startsWith(TSalesforceConnectionDefinition.COMPONENT_NAME);
+    }
+
+    public void afterOutputUpsertKey() {
+        refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
+        updateOutputSchemas();
     }
 
 }

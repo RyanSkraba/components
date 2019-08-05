@@ -23,6 +23,7 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.DataRejectException;
+import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 
 import com.sforce.async.AsyncApiException;
@@ -42,7 +43,10 @@ final class SalesforceBulkExecReader extends SalesforceReader {
 
     private int rejectCount;
 
-    public SalesforceBulkExecReader(RuntimeContainer container, SalesforceSource source, TSalesforceBulkExecProperties props) {
+    private boolean isOutputUpsertKey;
+
+    public SalesforceBulkExecReader(RuntimeContainer container, SalesforceSource source,
+            TSalesforceBulkExecProperties props) {
         super(container, source);
         properties = props;
     }
@@ -51,18 +55,28 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     public boolean start() throws IOException {
 
         TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
-        bulkRuntime = new SalesforceBulkRuntime(((SalesforceSource) getCurrentSource()).connect(container).bulkConnection);
+        bulkRuntime =
+                new SalesforceBulkRuntime(((SalesforceSource) getCurrentSource()).connect(container).bulkConnection);
         bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getValue());
         bulkRuntime.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getValue());
 
         try {
             // We only support CSV file for bulk output
-            bulkRuntime.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getValue(), sprops.hardDelete.getValue(),
-                    sprops.upsertKeyColumn.getStringValue(), "csv", sprops.bulkFilePath.getStringValue(),
-                    sprops.bulkProperties.bytesToCommit.getValue(), sprops.bulkProperties.rowsToCommit.getValue());
+            bulkRuntime
+                    .executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getValue(),
+                            sprops.hardDelete.getValue(), sprops.upsertKeyColumn.getStringValue(), "csv",
+                            sprops.bulkFilePath.getStringValue(), sprops.bulkProperties.bytesToCommit.getValue(),
+                            sprops.bulkProperties.rowsToCommit.getValue());
             if (bulkRuntime.getBatchCount() > 0) {
                 batchIndex = 0;
-                currentBatchResult = bulkRuntime.getBatchLog(0);
+                isOutputUpsertKey =
+                        SalesforceOutputProperties.OutputAction.UPSERT.equals(sprops.outputAction.getValue())
+                                && sprops.outputUpsertKey.getValue();
+                if (isOutputUpsertKey) {
+                    currentBatchResult = bulkRuntime.getBatchLog(0, sprops.upsertKeyColumn.getValue());
+                } else {
+                    currentBatchResult = bulkRuntime.getBatchLog(0);
+                }
                 resultIndex = 0;
                 boolean startable = currentBatchResult.size() > 0;
                 if (startable) {
@@ -87,7 +101,13 @@ final class SalesforceBulkExecReader extends SalesforceReader {
                 return false;
             } else {
                 try {
-                    currentBatchResult = bulkRuntime.getBatchLog(batchIndex);
+                    if (isOutputUpsertKey) {
+                        currentBatchResult = bulkRuntime
+                                .getBatchLog(batchIndex,
+                                        ((TSalesforceBulkExecProperties) properties).upsertKeyColumn.getValue());
+                    } else {
+                        currentBatchResult = bulkRuntime.getBatchLog(batchIndex);
+                    }
                     resultIndex = 0;
                     boolean isAdvanced = currentBatchResult.size() > 0;
                     if (isAdvanced) {
@@ -117,6 +137,11 @@ final class SalesforceBulkExecReader extends SalesforceReader {
             return record;
         } else {
             Map<String, Object> resultMessage = new HashMap<String, Object>();
+            if (isOutputUpsertKey) {
+                resultMessage
+                        .put("UpsertColumnValue", result
+                                .getValue(((TSalesforceBulkExecProperties) properties).upsertKeyColumn.getValue()));
+            }
             String error = (String) result.getValue("Error");
             resultMessage.put("error", error);
             resultMessage.put("talend_record", record);

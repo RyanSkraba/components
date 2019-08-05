@@ -12,12 +12,18 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-
 
 public class BulkResultAdapterFactory implements IndexedRecordConverter<BulkResult, IndexedRecord> {
 
@@ -48,6 +54,34 @@ public class BulkResultAdapterFactory implements IndexedRecordConverter<BulkResu
 
     @Override
     public IndexedRecord convertToAvro(BulkResult result) {
+        if (AvroUtils.isIncludeAllFields(schema)) {
+            List<Field> fields = new ArrayList<>();
+            Set<String> resultFieldNames = result.values.keySet();
+            for (String fieldName : resultFieldNames) {
+                // skip field which set in design schema or duplicate value
+                if (schema.getField(fieldName) != null || "Created".equals(fieldName) || "Error".equals(fieldName)
+                        || "Id".equals(fieldName) || "Success".equals(fieldName)) {
+                    continue;
+                }
+                // only can set String type, as we can't guess type here.
+                Field field = new Schema.Field(fieldName, Schema.create(Schema.Type.STRING), null, (Object) null);
+                field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+                field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
+                field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+                fields.add(field);
+            }
+            for (Schema.Field se : schema.getFields()) {
+                Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
+                field.getObjectProps().putAll(se.getObjectProps());
+                for (Map.Entry<String, Object> entry : se.getObjectProps().entrySet()) {
+                    field.addProp(entry.getKey(), entry.getValue());
+                }
+                fields.add(field);
+            }
+            // update runtime schema to correct one
+            schema = Schema.createRecord(schema.getName(), schema.getDoc(), schema.getNamespace(), schema.isError());
+            schema.setFields(fields);
+        }
         return new ResultIndexedRecord(result);
     }
 

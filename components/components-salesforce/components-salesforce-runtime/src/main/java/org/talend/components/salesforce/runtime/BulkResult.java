@@ -1,6 +1,5 @@
 package org.talend.components.salesforce.runtime;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -32,5 +31,12 @@ public class BulkResult {
                 values.put(key, value);
             }
         }
+    }
+
+    public boolean containField(String fieldName) {
+        if (values != null && values.containsKey(fieldName)) {
+            return true;
+        }
+        return false;
     }
 }

@@ -464,6 +464,13 @@ public class SalesforceBulkRuntime {
      * @throws ConnectionException
      */
     public List<BulkResult> getBatchLog(int batchNum) throws AsyncApiException, IOException, ConnectionException {
+
+        return getBatchLog(batchNum, null);
+
+    }
+
+    public List<BulkResult> getBatchLog(int batchNum, String upsertKeyName)
+            throws AsyncApiException, IOException, ConnectionException {
         // batchInfoList was populated when batches were created and submitted
         List<BulkResult> resultInfoList = new ArrayList<BulkResult>();
         BulkResult resultInfo;
@@ -476,6 +483,10 @@ public class SalesforceBulkRuntime {
         while ((row = rdr.nextRecord()) != null) {
             resultInfo = new BulkResult();
             resultInfo.copyValues(getBaseFileRow());
+            // save upsert key column name and value in result info
+            if (upsertKeyName != null && resultInfo.containField(upsertKeyName)) {
+                resultInfo.setValue("UpsertColumnValue", resultInfo.getValue(upsertKeyName));
+            }
             for (int i = 0; i < resultCols; i++) {
                 String header = resultHeader.get(i);
                 resultInfo.setValue(header, row.get(i));

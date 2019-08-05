@@ -22,6 +22,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.salesforce.runtime.BulkResult;
@@ -90,5 +91,32 @@ public class BulkResultAdapterFactoryTest {
 
         IndexedRecord indexedRecord = converter.convertToAvro(result);
         indexedRecord.put(1, "Asdfgh");
+    }
+
+    @Test
+    public void testDynamicSchema(){
+        Schema designSchema = SchemaBuilder.builder().record("Schema").prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true").fields() //
+                .name("salesforce_id").type().intType().noDefault() //
+                .name("salesforce_created").type().booleanType().noDefault() //
+                .endRecord();
+
+        converter.setSchema(designSchema);
+
+        BulkResult result = new BulkResult();
+        result.setValue("Created", "true");
+        result.setValue("Error", "");
+        result.setValue("Id", "a0M2v00000JSnn6EAD");
+        result.setValue("Success", "true");
+        result.setValue("field_1__c", "vlaue 1");
+        result.setValue("field_2__c", "vlaue 2");
+        result.setValue("test_uk__c", "0012v00002OGo4JAAT");
+
+        IndexedRecord indexedRecord = converter.convertToAvro(result);
+
+        Schema runtimSchema = indexedRecord.getSchema();
+        Assert.assertEquals(5,runtimSchema.getFields().size());
+        Assert.assertNotNull(runtimSchema.getField("field_1__c"));
+        Assert.assertNotNull(runtimSchema.getField("field_2__c"));
+        Assert.assertNotNull(runtimSchema.getField("test_uk__c"));
     }
 }

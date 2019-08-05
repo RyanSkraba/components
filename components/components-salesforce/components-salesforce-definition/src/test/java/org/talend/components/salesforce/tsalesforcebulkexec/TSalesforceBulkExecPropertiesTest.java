@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -288,6 +289,37 @@ public class TSalesforceBulkExecPropertiesTest extends SalesforceTestBase {
         properties.connection.oauth2FlowType.setValue(OAuth2FlowType.JWT_Flow);
         properties.refreshLayout(advancedForm);
         assertEquals(Boolean.FALSE, mainForm.getWidget(properties.hardDelete.getName()).isVisible());
+
+    }
+
+    @Test
+    public void testAfterOutputUpsertKey() throws Throwable {
+        properties.init();
+
+        properties.module.moduleName.setValue("Account");
+        properties.outputAction.setValue(SalesforceOutputProperties.OutputAction.UPSERT);
+        propertiesService.afterProperty("outputAction", properties);
+        properties.module.main.schema.setValue(DEFAULT_SCHEMA);
+
+        propertiesService.afterProperty("schema", properties.module.main);
+        assertThat(properties.upsertKeyColumn.getPossibleValues(), empty());
+
+        properties.upsertKeyColumn.setValue("test_uk__c");
+        propertiesService.afterProperty("schema", properties.module.main);
+
+        Assert.assertEquals(4, properties.schemaFlow.schema.getValue().getFields().size());
+        // activate output upsert key column value
+        properties.outputUpsertKey.setValue(true);
+        propertiesService.afterProperty("outputUpsertKey", properties);
+        Assert.assertEquals(5, properties.schemaFlow.schema.getValue().getFields().size());
+
+        Assert.assertEquals(4, properties.schemaReject.schema.getValue().getFields().size());
+        // deactivate output upsert key
+        properties.outputUpsertKey.setValue(false);
+        propertiesService.afterProperty("outputUpsertKey", properties);
+        Assert.assertEquals(4, properties.schemaFlow.schema.getValue().getFields().size());
+
+        Assert.assertEquals(3, properties.schemaReject.schema.getValue().getFields().size());
 
     }
 
