@@ -37,6 +37,7 @@ import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.module.DBTypes;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.module.JDBCTableSelectionModule;
+import org.talend.components.jdbc.module.PreparedStatementTable;
 import org.talend.components.jdbc.query.QueryUtils;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.setting.JdbcRuntimeSourceOrSink;
@@ -105,6 +106,10 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
     public Property<Boolean> enableDBMapping = PropertyFactory.newBoolean("enableDBMapping").setRequired();
 
     public Property<DBTypes> dbMapping = PropertyFactory.newEnum("dbMapping", DBTypes.class);
+    
+    public Property<Boolean> usePreparedStatement = PropertyFactory.newBoolean("usePreparedStatement").setRequired();
+
+    public PreparedStatementTable preparedStatementTable = new PreparedStatementTable("preparedStatementTable");
 
     @Override
     public void setupLayout() {
@@ -134,6 +139,8 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
         advancedForm.addRow(widget(trimTable).setWidgetType(Widget.TABLE_WIDGET_TYPE));
         advancedForm.addRow(enableDBMapping);
         advancedForm.addRow(widget(dbMapping).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        advancedForm.addRow(usePreparedStatement);
+        advancedForm.addRow(widget(preparedStatementTable).setWidgetType(Widget.TABLE_WIDGET_TYPE));
     }
 
     @Override
@@ -185,6 +192,7 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
             form.getWidget(cursor.getName()).setHidden(!useCursor.getValue());
             form.getWidget(trimTable.getName()).setHidden(trimStringOrCharColumns.getValue());
             form.getWidget(dbMapping.getName()).setVisible(enableDBMapping.getValue());
+            form.getWidget(preparedStatementTable.getName()).setHidden(!usePreparedStatement.getValue());
 
             updateTrimTable();
         }
@@ -239,6 +247,14 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
 
     public void afterEnableDBMapping() {
         refreshLayout(getForm(Form.ADVANCED));
+    }
+    
+    public void afterUsePreparedStatement() {
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+
+    public void beforePreparedStatementTable(){
+        preparedStatementTable.types.setPossibleValues(PreparedStatementTable.Type.values());
     }
 
     @Override
@@ -321,6 +337,11 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
         setting.setDbMapping(this.dbMapping.getValue());
 
         setting.setSchema(main.schema.getValue());
+        
+        setting.setUsePreparedStatement(this.usePreparedStatement.getValue());
+        setting.setIndexs(this.preparedStatementTable.indexs.getValue());
+        setting.setTypes(this.preparedStatementTable.types.getValue());
+        setting.setValues(this.preparedStatementTable.values.getValue());
 
         return setting;
     }

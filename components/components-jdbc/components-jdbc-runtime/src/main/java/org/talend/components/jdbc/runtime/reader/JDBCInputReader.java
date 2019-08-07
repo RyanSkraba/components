@@ -36,6 +36,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -181,13 +182,20 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
         }
 
         result = new Result();
+        boolean usePreparedStatement = setting.getUsePreparedStatement();
         try {
             conn = source.getConnection(container);
 
             String driverClass = setting.getDriverClass();
             if (driverClass != null && driverClass.toLowerCase().contains("mysql")) {
-                statement = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-
+                if (usePreparedStatement) {
+                    PreparedStatement prepared_statement = conn.prepareStatement(setting.getSql(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+                    JdbcRuntimeUtils.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
+                            setting.getValues());
+                    statement = prepared_statement;
+                }else{
+                    statement = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+                }
                 Class clazz = statement.getClass();
                 try {
                     Method method = clazz.getMethod("enableStreamingResults");
@@ -199,14 +207,28 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
                     // ignore anything
                 }
             } else {
-                statement = conn.createStatement();
+                if (usePreparedStatement) {
+                	PreparedStatement prepared_statement = conn.prepareStatement(setting.getSql());
+                    JdbcRuntimeUtils.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
+                            setting.getValues());
+                    statement = prepared_statement;
+
+                }else {
+                	statement = conn.createStatement();
+                }
             }
+
 
             if (setting.getUseCursor()) {
                 statement.setFetchSize(setting.getCursor());
             }
-
-            resultSet = statement.executeQuery(setting.getSql());
+            if (usePreparedStatement) {
+            	resultSet = ((PreparedStatement)statement).executeQuery();
+            }else {
+            	resultSet = statement.executeQuery(setting.getSql());
+            }
+            	
+            
 
             return haveNext();
         } catch (SQLException e) {

@@ -150,6 +150,23 @@ public class TJDBCInputPropertiesTest {
     }
 
     /**
+     * Run the void afterUsePreparedStatement() method test.
+     *
+     * @throws Exception
+     *
+     * @generatedBy CodePro at 17-6-20 PM3:13
+     */
+    @Test
+    public void testAfterUsePreparedStatement() throws Exception {
+        TJDBCInputProperties fixture = new TJDBCInputProperties("input");
+        fixture.init();
+        fixture.usePreparedStatement.setValue(true);
+        fixture.afterUsePreparedStatement();
+        Form advance = fixture.getForm(Form.ADVANCED);
+        Assert.assertFalse(!advance.getWidget(fixture.preparedStatementTable.getName()).isVisible());
+    }
+
+    /**
      * Run the void afterReferencedComponent() method test.
      *
      * @throws Exception

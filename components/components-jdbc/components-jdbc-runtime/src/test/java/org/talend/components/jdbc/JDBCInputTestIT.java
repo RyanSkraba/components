@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -304,6 +305,65 @@ public class JDBCInputTestIT {
         properties.main.schema.setValue(DBTestUtils.createAllTypesSchema(tablename_all_type));
         properties.tableSelection.tablename.setValue(tablename_all_type);
         properties.sql.setValue(DBTestUtils.getSQL(tablename_all_type));
+
+        Reader reader = DBTestUtils.createCommonJDBCInputReader(properties);
+
+        reader.start();
+
+        IndexedRecord record = (IndexedRecord) reader.getCurrent();
+        Short col0 = (Short) record.get(0);
+        Integer col1 = (Integer) record.get(1);
+        Long col2 = (Long) record.get(2);
+        Float col3 = (Float) record.get(3);
+        Double col4 = (Double) record.get(4);
+        BigDecimal col5 = (BigDecimal) record.get(5);
+        String col6 = (String) record.get(6);
+        String col7 = (String) record.get(7);
+        String col8 = (String) record.get(8);
+        String col9 = (String) record.get(9);
+        Long col10 = (Long) record.get(10);
+        Long col11 = (Long) record.get(11);
+        Long col12 = (Long) record.get(12);
+        Boolean col13 = (Boolean) record.get(13);
+
+        assertEquals(32767, col0.shortValue());
+        assertEquals(2147483647, col1.intValue());
+        assertEquals(9223372036854775807l, col2.longValue());
+        assertTrue(col3 > 1);
+        assertTrue(col4 > 2);
+        assertEquals(new BigDecimal("1234567890.1234567890"), col5);
+        assertEquals("abcd", col6);
+        assertEquals("abcdefg", col7);
+        assertEquals("00010203040506070809", col8);
+        assertEquals("abcdefg", col9);
+        assertEquals("2016-12-28", new SimpleDateFormat("yyyy-MM-dd").format(new Date(col10)));
+        assertEquals("14:30:33", new SimpleDateFormat("HH:mm:ss").format(new Date(col11)));
+        assertEquals("2016-12-28 14:31:56.123", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date(col12)));
+        assertEquals(true, col13);
+
+        Schema actualSchema = record.getSchema();
+        List<Field> actualFields = actualSchema.getFields();
+
+        assertEquals(14, actualFields.size());
+        reader.close();
+    }
+
+    /**
+     * Checks {@link JDBCInputReader} outputs {@link IndexedRecord} which contains nullable String type data for every SQL/JDBC
+     * type
+     */
+    @Test
+    public void testUsePrepareStatement() throws IOException {
+        TJDBCInputDefinition definition = new TJDBCInputDefinition();
+        TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
+
+        properties.main.schema.setValue(DBTestUtils.createAllTypesSchema(tablename_all_type));
+        properties.tableSelection.tablename.setValue(tablename_all_type);
+        properties.sql.setValue(DBTestUtils.getSQL(tablename_all_type ) + " where INT_COL = ? and VARCHAR_COL = ?");
+        properties.usePreparedStatement.setValue(true);
+        properties.preparedStatementTable.types.setValue(Arrays.asList("Int","String"));
+        properties.preparedStatementTable.indexs.setValue(Arrays.asList(1,2));
+        properties.preparedStatementTable.values.setValue(Arrays.asList( 2147483647 , "abcdefg" ));
 
         Reader reader = DBTestUtils.createCommonJDBCInputReader(properties);
 
