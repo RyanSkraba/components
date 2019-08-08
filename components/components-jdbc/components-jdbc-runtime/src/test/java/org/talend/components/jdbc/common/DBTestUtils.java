@@ -346,7 +346,7 @@ public class DBTestUtils {
 
     private static void loadTestDataForEveryType(Connection conn, String tablename) throws SQLException {
         try (PreparedStatement statement = conn
-                .prepareStatement("insert into " + tablename + " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
+                .prepareStatement("insert into " + tablename + " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
             statement.setInt(1, 1);
             statement.setShort(2, (short) 2);
             statement.setLong(3, 3l);
@@ -363,6 +363,7 @@ public class DBTestUtils {
             statement.setTimestamp(13, new java.sql.Timestamp(currentTimeMillis));
             statement.setString(14, "wangwei");
             statement.setString(15, "a long one : 1");
+            statement.setNull(16, java.sql.Types.BLOB);
             statement.executeUpdate();
 
             statement.setInt(1, 1);
@@ -380,6 +381,7 @@ public class DBTestUtils {
             statement.setTimestamp(13, new java.sql.Timestamp(currentTimeMillis));
             statement.setString(14, "gaoyan");
             statement.setString(15, "a long one : 2");
+            statement.setNull(16, java.sql.Types.BLOB);
             statement.executeUpdate();
 
             statement.setInt(1, 1);
@@ -397,6 +399,7 @@ public class DBTestUtils {
             statement.setTimestamp(13, new java.sql.Timestamp(currentTimeMillis));
             statement.setString(14, "dabao");
             statement.setString(15, "a long one : 3");
+            statement.setNull(16, java.sql.Types.BLOB);
             statement.executeUpdate();
 
             // used by testing the null value
@@ -415,6 +418,7 @@ public class DBTestUtils {
             statement.setNull(13, java.sql.Types.TIMESTAMP);
             statement.setNull(14, java.sql.Types.VARCHAR);
             statement.setNull(15, java.sql.Types.LONGVARCHAR);
+            statement.setNull(16, java.sql.Types.BLOB);
             statement.executeUpdate();
 
             statement.setNull(1, java.sql.Types.INTEGER);
@@ -432,6 +436,7 @@ public class DBTestUtils {
             statement.setNull(13, java.sql.Types.TIMESTAMP);
             statement.setString(14, "good luck");
             statement.setNull(15, java.sql.Types.LONGVARCHAR);
+            statement.setNull(16, java.sql.Types.BLOB);
             statement.executeUpdate();
         }
 
@@ -445,7 +450,7 @@ public class DBTestUtils {
     private static void createTestTableForEveryType(Connection conn, String tablename) throws SQLException {
         try (Statement statement = conn.createStatement()) {
             statement.execute("CREATE TABLE " + tablename
-                    + " (C1 INT, C2 SMALLINT, C3 BIGINT, C4 REAL,C5 DOUBLE, C6 FLOAT, C7 DECIMAL(10,2), C8 NUMERIC(10,2), C9 BOOLEAN, C10 CHAR(64), C11 DATE, C12 TIME, C13 TIMESTAMP, C14 VARCHAR(64), C15 LONG VARCHAR)");
+                    + " (C1 INT, C2 SMALLINT, C3 BIGINT, C4 REAL,C5 DOUBLE, C6 FLOAT, C7 DECIMAL(10,2), C8 NUMERIC(10,2), C9 BOOLEAN, C10 CHAR(64), C11 DATE, C12 TIME, C13 TIMESTAMP, C14 VARCHAR(64), C15 LONG VARCHAR, C16 BLOB(16M))");
         }
     }
 
@@ -512,6 +517,10 @@ public class DBTestUtils {
         schema = AvroUtils._string();
         schema = wrap(schema, nullableForAnyColumn);
         builder = builder.name("C15").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C15").type(schema).noDefault();
+        
+        schema = AvroUtils._bytes();
+        schema = wrap(schema, nullableForAnyColumn);
+        builder = builder.name("C16").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C16").type(schema).noDefault();
 
         return builder.endRecord();
     }
@@ -533,6 +542,8 @@ public class DBTestUtils {
 
         Schema schema = createTestSchema3(nullableForAnyColumn, tablename);
 
+        byte[] blob = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        
         IndexedRecord r = new GenericData.Record(schema);
         r.put(0, 1);
         r.put(1, (short) 2);
@@ -549,6 +560,7 @@ public class DBTestUtils {
         r.put(12, new java.util.Date());
         r.put(13, "wangwei");
         r.put(14, "long content : 1");
+        r.put(15, blob);
         result.add(r);
 
         r = new GenericData.Record(schema);
@@ -567,6 +579,7 @@ public class DBTestUtils {
         r.put(12, new java.util.Date());
         r.put(13, "gaoyan");
         r.put(14, "long content : 2");
+        r.put(15, blob);
         result.add(r);
 
         r = new GenericData.Record(schema);
@@ -585,6 +598,7 @@ public class DBTestUtils {
         r.put(12, new java.util.Date());
         r.put(13, "dabao");
         r.put(14, "long content : 3");
+        r.put(15, blob);
         result.add(r);
 
         // used by testing the null value
@@ -604,6 +618,7 @@ public class DBTestUtils {
         r.put(12, null);
         r.put(13, null);
         r.put(14, null);
+        r.put(15, blob);
         result.add(r);
 
         r = new GenericData.Record(schema);
@@ -622,6 +637,7 @@ public class DBTestUtils {
         r.put(12, null);
         r.put(13, "good luck");
         r.put(14, null);
+        r.put(15, blob);
         result.add(r);
 
         return result;

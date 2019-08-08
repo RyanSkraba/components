@@ -23,7 +23,7 @@ import org.talend.daikon.avro.AvroUtils;
 
 /**
  * the mapping tool for JDBC
- *
+ * this class only work for tJDBCSP component now
  */
 public class JDBCMapping {
 
@@ -63,8 +63,10 @@ public class JDBCMapping {
             } else if (AvroUtils.isSameType(basicSchema, AvroUtils._byte())) {
                 statement.setNull(index, java.sql.Types.SMALLINT);
             } else if (AvroUtils.isSameType(basicSchema, AvroUtils._bytes())) {
-                // TODO need to consider it
-                // statement.setNull(index, java.sql.Types.BLOB);
+            	//TODO check it, now only make a progress and make sure no regression with current version
+            	//ARRAY is not common, don't exist on lots of database, 
+            	//here only use the old way in javajet component for tjdbcoutput, not sure it works, maybe change it to BLOB
+                statement.setNull(index, java.sql.Types.ARRAY);
             } else {
                 statement.setNull(index, java.sql.Types.JAVA_OBJECT);
             }
@@ -97,8 +99,8 @@ public class JDBCMapping {
         } else if (AvroUtils.isSameType(basicSchema, AvroUtils._byte())) {
             statement.setByte(index, (Byte) value);
         } else if (AvroUtils.isSameType(basicSchema, AvroUtils._bytes())) {
-            // TODO need to consider it, bytes only map to blob?
-            // statement.setBlob
+        	//TODO check it, now only make a progress and make sure no regression with current version
+            statement.setBytes(index, (byte[])value);
         } else {
             statement.setObject(index, value);
         }
@@ -135,6 +137,10 @@ public class JDBCMapping {
             return Types.CHAR;
         } else if (AvroUtils.isSameType(basicSchema, AvroUtils._byte())) {
             return Types.TINYINT;
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._bytes())) {
+        	//TODO check it, now only make a progress and make sure no regression with current version
+        	//TODO maybe make it to ARRAY or BLOB?
+            return Types.OTHER;
         } else {
             return Types.OTHER;
         }

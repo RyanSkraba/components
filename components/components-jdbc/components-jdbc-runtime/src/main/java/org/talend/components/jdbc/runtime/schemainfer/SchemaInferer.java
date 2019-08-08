@@ -132,6 +132,8 @@ public class SchemaInferer {
             return AvroUtils._float();
         case BYTE:
             return AvroUtils._byte();
+        case BYTES:
+        	return AvroUtils._bytes();
         case SHORT:
             return AvroUtils._short();
         case CHARACTER:

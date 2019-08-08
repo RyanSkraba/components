@@ -80,6 +80,10 @@ public class JDBCAvroRegistry extends AvroRegistry {
         });
     }
 
+    //TODO remove all the methods for infer schema, as now :
+    //1. we use another class for infer schema for dataprep, and another class for studio, not this
+    //2. only snowflake extends current class for infer schema, should adjust snowflake part
+    //so will remove it after adjust snowflake runtime
     protected Schema inferSchemaResultSetMetaData(ResultSetMetaData metadata) throws SQLException {
         List<Field> fields = new ArrayList<>();
 
@@ -155,6 +159,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
         return result;
     }
 
+    //TODO move it as no any place to use it now
     protected Field sqlType2Avro(int size, int scale, int dbtype, boolean nullable, String name, String dbColumnName,
             Object defaultValue, boolean isKey) {
         Field field = null;
@@ -472,6 +477,23 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 }
 
             };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._bytes())) {
+            return new JDBCConverter() {
+
+                @Override
+                public Object convertToAvro(ResultSet value) {
+                    try {
+                        Object result = value.getBytes(index);
+                        if(value.wasNull()) {
+                        	return null;
+                        }
+                        return result;
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
         } else if (isObject(basicSchema)) {
             return new JDBCConverter() {
   
@@ -766,6 +788,23 @@ public class JDBCAvroRegistry extends AvroRegistry {
                         }
 
                         return value.getByte(index);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._bytes())) {
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                    	Object result = value.getBytes(index);
+                        if(value.wasNull()) {
+                        	return null;
+                        }
+                        return result;
                     } catch (SQLException e) {
                         throw new ComponentException(e);
                     }

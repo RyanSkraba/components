@@ -597,6 +597,8 @@ public class JDBCTypeMappingTestIT {
                 reader.advance();
             }
 
+            byte[] blob = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            
             IndexedRecord row = (IndexedRecord) reader.getCurrent();
             Integer c1 = (Integer) row.get(0);
             Short c2 = (Short) row.get(1);
@@ -613,6 +615,7 @@ public class JDBCTypeMappingTestIT {
             Long c13 = (Long) row.get(12);
             String c14 = (String) row.get(13);
             String c15 = (String) row.get(14);
+            byte[] c16 = (byte[])row.get(15);
 
             assertEquals(1, c1.intValue());
             assertEquals(2, c2.intValue());
@@ -629,6 +632,7 @@ public class JDBCTypeMappingTestIT {
             Assert.assertNotNull(c13);
             assertEquals("wangwei", c14);
             assertEquals("long content : 1", c15);
+            Assert.assertArrayEquals(blob, c16);
 
             reader.advance();
 
@@ -648,6 +652,7 @@ public class JDBCTypeMappingTestIT {
             c13 = (Long) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
+            c16 = (byte[])row.get(15);
 
             assertEquals(1, c1.intValue());
             assertEquals(2, c2.intValue());
@@ -664,6 +669,7 @@ public class JDBCTypeMappingTestIT {
             Assert.assertNotNull(c13);
             assertEquals("gaoyan", c14);
             assertEquals("long content : 2", c15);
+            Assert.assertArrayEquals(blob, c16);
 
             reader.advance();
 
@@ -683,6 +689,7 @@ public class JDBCTypeMappingTestIT {
             c13 = (Long) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
+            c16 = (byte[])row.get(15);
 
             assertEquals(1, c1.intValue());
             assertEquals(2, c2.intValue());
@@ -699,6 +706,7 @@ public class JDBCTypeMappingTestIT {
             Assert.assertNotNull(c13);
             assertEquals("dabao", c14);
             assertEquals("long content : 3", c15);
+            Assert.assertArrayEquals(blob, c16);
 
             reader.advance();
 
@@ -718,6 +726,7 @@ public class JDBCTypeMappingTestIT {
             c13 = (Long) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
+            c16 = (byte[])row.get(15);
 
             assertEquals(1, c1.intValue());
             Assert.assertNull(c2);
@@ -735,6 +744,7 @@ public class JDBCTypeMappingTestIT {
             // Assert.assertNull(c13);
             Assert.assertNull(c14);
             Assert.assertNull(c15);
+            Assert.assertArrayEquals(blob, c16);
 
             reader.advance();
 
@@ -754,6 +764,7 @@ public class JDBCTypeMappingTestIT {
             c13 = (Long) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
+            c16 = (byte[])row.get(15);
 
             Assert.assertNull(c1);
             Assert.assertNull(c2);
@@ -771,6 +782,7 @@ public class JDBCTypeMappingTestIT {
             // Assert.assertNull(c13);
             Assert.assertEquals("good luck", c14);
             Assert.assertNull(c15);
+            Assert.assertArrayEquals(blob, c16);
 
             reader.close();
 

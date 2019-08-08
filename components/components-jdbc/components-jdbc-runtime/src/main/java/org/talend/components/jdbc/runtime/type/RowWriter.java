@@ -374,7 +374,16 @@ public class RowWriter {
         }
 
         public void write(IndexedRecord input) throws SQLException {
-            // TODO
+        	Object inputValue = input.get(inputValueLocation);
+            if (inputValue == null) {
+                statement.setNull(statementIndex, java.sql.Types.ARRAY);
+                writeDebugColumnNullContent();
+            } else {
+                statement.setBytes(statementIndex, (byte[]) inputValue);
+                if (debug) {
+                    debugUtil.writeColumn(inputValue.toString(), false);
+                }
+            }
         }
 
     }

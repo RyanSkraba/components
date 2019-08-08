@@ -319,7 +319,7 @@ public class JDBCInputTestIT {
         BigDecimal col5 = (BigDecimal) record.get(5);
         String col6 = (String) record.get(6);
         String col7 = (String) record.get(7);
-        String col8 = (String) record.get(8);
+        byte[] col8 = (byte[]) record.get(8);
         String col9 = (String) record.get(9);
         Long col10 = (Long) record.get(10);
         Long col11 = (Long) record.get(11);
@@ -334,7 +334,8 @@ public class JDBCInputTestIT {
         assertEquals(new BigDecimal("1234567890.1234567890"), col5);
         assertEquals("abcd", col6);
         assertEquals("abcdefg", col7);
-        assertEquals("00010203040506070809", col8);
+        byte[] blob = {0,1,2,3,4,5,6,7,8,9};
+        Assert.assertArrayEquals(blob, col8);
         assertEquals("abcdefg", col9);
         assertEquals("2016-12-28", new SimpleDateFormat("yyyy-MM-dd").format(new Date(col10)));
         assertEquals("14:30:33", new SimpleDateFormat("HH:mm:ss").format(new Date(col11)));
