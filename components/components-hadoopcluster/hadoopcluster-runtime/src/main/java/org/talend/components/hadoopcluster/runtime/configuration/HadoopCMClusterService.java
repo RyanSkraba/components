@@ -15,6 +15,7 @@ package org.talend.components.hadoopcluster.runtime.configuration;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -28,31 +29,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.ws.rs.BadRequestException;
-
-import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.talend.components.api.exception.ComponentException;
 
-import com.cloudera.api.v3.ServicesResourceV3;
+import com.cloudera.api.swagger.ServicesResourceApi;
+import com.cloudera.api.swagger.client.ApiException;
 
 public class HadoopCMClusterService implements HadoopClusterService {
 
+    private static final String IGNORE_ERROR_MSG = "does not require a client configuration";
     private static final String SUPPORT_FILE = "site.xml";
 
-    private ServicesResourceV3 cluster;
+    private ServicesResourceApi serviceAPI;
 
     private String serviceName;
 
+    private String clusterName;
+
     private Map<String, Configuration> confs;// only contains *-site.xml
 
-    public HadoopCMClusterService(String serviceName, ServicesResourceV3 cluster, List<String> blacklistParams) {
+    public HadoopCMClusterService(String clusterName, String serviceName, ServicesResourceApi serviceAPI,
+            List<String> blacklistParams) {
         this.serviceName = serviceName;
-        this.cluster = cluster;
+        this.clusterName = clusterName;
+        this.serviceAPI = serviceAPI;
         init(blacklistParams);
     }
 
@@ -98,17 +103,12 @@ public class HadoopCMClusterService implements HadoopClusterService {
 
     private void init(List<String> blacklistParams) {
         confs = new HashMap<>();
-        InputStreamDataSource clientConfig = null;
+
         try {
-            clientConfig = cluster.getClientConfig(serviceName);
-        } catch (BadRequestException e) {
-            // ignore the exception, because some service don't contains configuration
-            return;
-        }
-        File directory = new File(System.getProperty("java.io.tmpdir"),
-                "Talend_Hadoop_Wizard_" + serviceName + String.valueOf(new Date().getTime()) + Thread.currentThread().getId());
-        try {
-            ZipInputStream zipInputStream = new ZipInputStream(clientConfig.getInputStream());
+            File configZipFile = this.serviceAPI.getClientConfig(this.clusterName, this.serviceName);
+            File directory = new File(System.getProperty("java.io.tmpdir"), "Talend_Hadoop_Wizard_" + serviceName
+                    + String.valueOf(new Date().getTime()) + Thread.currentThread().getId());
+            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(configZipFile));
             ZipEntry configInputZipEntry = null;
             while ((configInputZipEntry = zipInputStream.getNextEntry()) != null) {
                 String configFile = getConfFileName(configInputZipEntry.getName());
@@ -128,6 +128,13 @@ public class HadoopCMClusterService implements HadoopClusterService {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (ApiException e) {
+            if (e.getCode() == 400 && e.getResponseBody().contains(IGNORE_ERROR_MSG)) {
+                java.util.logging.Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,
+                        "service: " + this.serviceName + " " + IGNORE_ERROR_MSG);
+            } else {
+                throw new RuntimeException(e);
+            }
         }
     }
 
