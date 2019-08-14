@@ -122,8 +122,19 @@ public class Formatter {
         } else {//support the old int type input for time type though it's wrong before
             date = new Date((int) inputValue);
         }
-        
-        return getTimeFormatter().format(date);
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+
+        // we need to set the time with DST offset(01-01-1970)
+        Calendar c1 = Calendar.getInstance();
+        c1.setTimeInMillis(0);
+        c1.set(Calendar.HOUR_OF_DAY, c.get(Calendar.HOUR_OF_DAY));
+        c1.set(Calendar.MINUTE, c.get(Calendar.MINUTE));
+        c1.set(Calendar.SECOND, c.get(Calendar.SECOND));
+        c1.set(Calendar.MILLISECOND, c.get(Calendar.MILLISECOND));
+
+        return getTimeFormatter().format(c1.getTime());
     }
 
     public SimpleDateFormat getDateFormatter() {
