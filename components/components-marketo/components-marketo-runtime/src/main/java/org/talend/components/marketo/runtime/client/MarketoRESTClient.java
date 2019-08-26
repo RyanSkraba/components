@@ -44,8 +44,6 @@ public class MarketoRESTClient extends MarketoOpportunityClient implements Marke
             }
             // check credentials
             getToken();
-            // dummy call to finally check the connection
-            getPageToken("2017-01-01 00:00:00");
             return this;
         } catch (MalformedURLException e) {
             LOG.error(e.toString());

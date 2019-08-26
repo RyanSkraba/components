@@ -40,6 +40,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.marketo.runtime.MarketoAccessTokenPool;
 import org.talend.components.marketo.runtime.client.rest.response.LeadResult;
 import org.talend.components.marketo.runtime.client.rest.response.RequestResult;
 import org.talend.components.marketo.runtime.client.rest.response.SyncResult;
@@ -134,6 +135,8 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
 
     public static final String FIELD_RELATIONSHIPS = "relationships";
 
+    private final Integer connectionHash;
+
     private Map<Integer, String> supportedActivities;
 
     protected StringBuilder current_uri;
@@ -153,6 +156,7 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
         endpoint = connection.endpoint.getValue();
         userId = connection.clientAccessId.getValue();
         secretKey = connection.secretKey.getValue();
+        connectionHash = (endpoint + userId + secretKey).hashCode();
         retryCount = connection.maxReconnAttemps.getValue();
         retryInterval = connection.attemptsIntervalTime.getValue();
     }
@@ -168,6 +172,12 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
     }
 
     public void getToken() throws MarketoException {
+        String token = MarketoAccessTokenPool.getInstance().getToken(connectionHash);
+        if (token != null) {
+            LOG.debug("[getToken] got token from MarketoAccessTokenPool.");
+            accessToken = token;
+            return;
+        }
         try {
             URL basicURI = new URL(endpoint);
             current_uri = new StringBuilder(basicURI.getProtocol())//
@@ -186,7 +196,8 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
             Object ac = js.get("access_token");
             if (ac != null) {
                 accessToken = ac.toString();
-                LOG.debug("MarketoRestExecutor.getAccessToken GOT token");
+                MarketoAccessTokenPool.getInstance().setToken(connectionHash, accessToken);
+                LOG.debug("[getToken] got token from successful API call.");
             } else {
                 LinkedTreeMap err = (LinkedTreeMap) ((ArrayList) js.get(FIELD_ERRORS)).get(0);
                 throw new MarketoException(REST, err.get("code").toString(), err.get("message").toString());
@@ -477,6 +488,8 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
     public boolean isErrorRecoverable(List<MarketoError> errors) {
         if (isAccessTokenExpired(errors)) {
             try {
+                // our token is expired, so removing it from pool
+                MarketoAccessTokenPool.getInstance().invalidateToken(connectionHash);
                 // refresh token : the only action we have a possibility to act by ourselves.
                 getToken();
                 return true;

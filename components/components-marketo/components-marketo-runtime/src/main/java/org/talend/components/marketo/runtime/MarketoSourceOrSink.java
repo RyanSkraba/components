@@ -301,7 +301,7 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
         try {
             MarketoSourceOrSink sos = new MarketoSourceOrSink();
             sos.initialize(null, (ComponentProperties) properties);
-            sos.getClientService(null);
+            client = sos.getClientService(null);
             vr.setMessage(messages.getMessage("success.validation.connection"));
         } catch (IOException e) {
             vr.setStatus(Result.ERROR);
