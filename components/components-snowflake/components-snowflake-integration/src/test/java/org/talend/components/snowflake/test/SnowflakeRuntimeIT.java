@@ -299,8 +299,7 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
         return result;
     }
 
-    // Returns the rows written (having been re-read so they have their Ids)
-    protected Writer<Result> makeWriter(SnowflakeConnectionTableProperties props) throws Exception {
+    protected Writer<Result> makeWriter(SnowflakeConnectionTableProperties props) {
         SnowflakeSink SnowflakeSink = new SnowflakeSink();
         SnowflakeSink.initialize(container, props);
         SnowflakeSink.validate(container);

@@ -19,16 +19,24 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.talend.daikon.properties.presentation.Form.MAIN;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
@@ -36,14 +44,18 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.SnowflakeTableProperties;
 import org.talend.components.snowflake.runtime.SnowflakeSink;
 import org.talend.components.snowflake.runtime.SnowflakeWriteOperation;
 import org.talend.components.snowflake.runtime.SnowflakeWriter;
+import org.talend.components.snowflake.runtime.utils.DriverManagerUtils;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputDefinition;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
@@ -343,6 +355,79 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
     @Ignore
     public void testOutputLoad() throws Throwable {
         populateOutput(5000000);
+    }
+
+    /**
+     * Asserts that {@link SnowflakeWriter#write(Object)} creates table in Snowflake according runtime columns
+     * in incoming record, when dynamic column is present in design schema
+     */
+    @Test
+    public void testCreateTableDynamicSchema() throws IOException, SQLException {
+        // setup properties
+        TSnowflakeOutputProperties outputProps = (TSnowflakeOutputProperties) getComponentService()
+                .getComponentProperties(TSnowflakeOutputDefinition.COMPONENT_NAME);
+        setupProps(outputProps.connection);
+        outputProps.tableAction.setValue(TableAction.TableActionEnum.CREATE);
+        String tableName = "TDI42854_" + testNumber;
+        outputProps.table.tableName.setValue(tableName);
+
+        // setup schema
+        Schema designSchema = SchemaBuilder.builder().record("design")
+                .prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true")
+                .fields()
+                .requiredString("staticColumn")
+                .endRecord();
+        outputProps.table.main.schema.setValue(designSchema);
+
+        // create Writer
+        Writer writer = makeWriter(outputProps);
+
+        // setup record for test-case
+        Schema runtimeSchema = SchemaBuilder.builder().record("runtime").fields()
+                .requiredString("C1")
+                .requiredString("C2")
+                .requiredString("C3")
+                .requiredString("STATICCOLUMN")
+                .endRecord();
+
+        IndexedRecord record = new GenericData.Record(runtimeSchema);
+        record.put(0, "c1_value");
+        record.put(1, "c2_value");
+        record.put(2, "c3_value");
+        record.put(3, "staticColumn_value");
+
+        try (Connection connection = DriverManagerUtils.getConnection(outputProps.connection)) {
+            try {
+                // test case
+                writeRows(writer, Collections.singletonList(record));
+
+                // assert
+                DatabaseMetaData metaData = connection.getMetaData();
+                try (ResultSet rs = metaData.getColumns(DB, testSchema, tableName, null)) {
+                    rs.next();
+                    Assert.assertEquals("C1", rs.getString("COLUMN_NAME"));
+                    rs.next();
+                    Assert.assertEquals("C2", rs.getString("COLUMN_NAME"));
+                    rs.next();
+                    Assert.assertEquals("C3", rs.getString("COLUMN_NAME"));
+                    rs.next();
+                    Assert.assertEquals("STATICCOLUMN", rs.getString("COLUMN_NAME"));
+                    // asserts that there is no more columns in created table
+                    Assert.assertFalse(rs.next());
+                }
+
+            } finally {
+                execute(connection, "drop table if exists " + tableName);
+            }
+        }
+    }
+
+    private void execute(Connection connection, String sql) {
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(sql);
+        } catch (SQLException e) {
+            LOGGER.debug(e.getMessage());
+        }
     }
 
 }

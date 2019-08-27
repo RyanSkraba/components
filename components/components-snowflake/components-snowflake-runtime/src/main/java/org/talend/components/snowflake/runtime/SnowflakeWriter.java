@@ -91,9 +91,6 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
     private Formatter formatter = new Formatter();
 
     private transient List<Schema.Field> remoteTableFields;
-    private transient IndexedRecord input;
-
-    private transient boolean isFullDyn = false;
 
     private String emptyStringValue;
 
@@ -213,10 +210,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
 
                 TableActionConfig conf = new SnowflakeTableActionConfig(sprops.convertColumnsAndTableToUppercase.getValue());
 
-                Schema schemaForCreateTable = this.mainSchema;
-                if(isFullDyn) {
-                    schemaForCreateTable = ((GenericData.Record) datum).getSchema();
-                }
+                Schema schemaForCreateTable = getSchemaForTableAction(datum);
 
                 Map<String, String> dbTypeMap = getDbTypeMap();
                 TableActionManager.exec(processingConnection, selectedTableAction,
@@ -227,6 +221,14 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             } catch (Exception e) {
                 throw new IOException(e.getMessage(), e);
             }
+        }
+    }
+
+    private Schema getSchemaForTableAction(Object datum) {
+        if(isDynamic(mainSchema)) {
+            return ((GenericData.Record) datum).getSchema();
+        } else {
+            return mainSchema;
         }
     }
 
@@ -241,23 +243,21 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             return;
         }
 
-        input = getInputRecord(datum);
+        IndexedRecord input = getInputRecord(datum);
 
         /*
          * This piece will be executed only once per instance. Will not cause performance issue. Perform input and mainSchema
          * synchronization. Such situation is useful in case of Dynamic fields.
          */
-        if (isFirst && datum != null) {
+        if (isFirst) {
             remoteTableFields = mainSchema.getFields();
 
-            isFullDyn = mainSchema.getFields().isEmpty() && AvroUtils.isIncludeAllFields(mainSchema);
-
-            if(!isFullDyn) {
-                collectedFields = DynamicSchemaUtils.getCommonFieldsForDynamicSchema(mainSchema, input.getSchema());
-            }
-            else{
+            if(isDynamic(mainSchema)) {
                 collectedFields = ((GenericData.Record) datum).getSchema().getFields();
                 remoteTableFields = new ArrayList<>(collectedFields);
+            }
+            else{
+                collectedFields = DynamicSchemaUtils.getCommonFieldsForDynamicSchema(mainSchema, input.getSchema());
             }
 
             if (sprops.tableAction.getValue() != TableActionEnum.NONE) {
@@ -486,6 +486,17 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             this.columnsStr = columnsStr;
         }
 
+    }
+
+    /**
+     * Checks whether schema contains dynamic column.
+     * Schema may contain only dynamic column or dynamic column and several static columns
+     *
+     * @param schema schema to be checked
+     * @return true, if schema contains dynamic column
+     */
+    private boolean isDynamic(Schema schema) {
+        return AvroUtils.isIncludeAllFields(schema);
     }
 
 }
