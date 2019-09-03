@@ -73,13 +73,14 @@ public class SnowflakeRowStandalone extends SnowflakeRuntime implements Componen
                 try (PreparedStatement pstmt = connection.prepareStatement(rowProperties.getQuery())) {
                     SnowflakePreparedStatementUtils.fillPreparedStatement(pstmt, rowProperties.preparedStatementTable);
                     rs = pstmt.executeQuery();
+                    storeReturnedRows(rs);
                 }
             } else {
                 try (Statement statement = connection.createStatement()) {
                     rs = statement.executeQuery(rowProperties.getQuery());
+                    storeReturnedRows(rs);
                 }
             }
-            storeReturnedRows(rs);
         } catch (SQLException e) {
             throwComponentException(e, "error.queryExecution");
         } catch (IOException ioe) {
