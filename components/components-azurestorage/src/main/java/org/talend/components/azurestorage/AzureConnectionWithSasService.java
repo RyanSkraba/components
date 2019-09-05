@@ -24,9 +24,11 @@ import com.microsoft.azure.storage.StorageCredentialsSharedAccessSignature;
  */
 public class AzureConnectionWithSasService implements AzureConnection {
 
-    private String accountName;
+    private final String accountName;
 
-    private String sasToken;
+    private final String sasToken;
+
+    private final String endpointSuffix;
 
     public String getAccountName() {
         return accountName;
@@ -36,55 +38,50 @@ public class AzureConnectionWithSasService implements AzureConnection {
         return sasToken;
     }
 
+    public String getEndpointSuffix(){ return  endpointSuffix; }
+
     @Override
     public CloudStorageAccount getCloudStorageAccount() throws InvalidKeyException, URISyntaxException {
         StorageCredentials credentials = new StorageCredentialsSharedAccessSignature(sasToken);
-        return new CloudStorageAccount(credentials, true, null, accountName);
+        return new CloudStorageAccount(credentials, true, endpointSuffix, accountName);
     }
 
     private AzureConnectionWithSasService(Builder builder) {
         this.accountName = builder.accountName;
         this.sasToken = builder.sasToken;
+        this.endpointSuffix = builder.endpointSuffix;
     }
 
-    public static AccountName builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
-    private static class Builder implements Build, AccountName, SasToken {
+    public static class Builder {
 
         private String accountName;
 
         private String sasToken;
 
-        public SasToken accountName(String accountName) {
+        private String endpointSuffix;
+
+        public Builder accountName(String accountName) {
             this.accountName = accountName;
             return this;
         }
 
-        public Build sasToken(String sasToken) {
+        public Builder sasToken(String sasToken) {
             this.sasToken = sasToken;
+            return this;
+        }
+
+        public Builder endpointSuffix(String endpointSuffix) {
+            this.endpointSuffix = endpointSuffix;
             return this;
         }
 
         public AzureConnectionWithSasService build() {
             return new AzureConnectionWithSasService(this);
         }
-    }
-
-    public interface AccountName {
-
-        public SasToken accountName(String accountName);
-    }
-
-    public interface SasToken {
-
-        public Build sasToken(String sasToken);
-    }
-
-    public interface Build {
-
-        public AzureConnectionWithSasService build();
     }
 
 }

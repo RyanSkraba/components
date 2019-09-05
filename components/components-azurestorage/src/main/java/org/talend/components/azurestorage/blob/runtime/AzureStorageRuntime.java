@@ -31,7 +31,7 @@ public class AzureStorageRuntime implements RuntimableRuntime<ComponentPropertie
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(AzureStorageRuntime.class);
 
-    private static final String SAS_PATTERN = "(http.?)?://(.*)\\.(blob|file|queue|table)\\.core\\.windows\\.net\\/(.*)";
+    private static final String SAS_PATTERN = "(http.?)?://(.*)\\.(blob|file|queue|table)\\.(.*)/(.*)";
 
     @Override
     public ValidationResult initialize(RuntimeContainer runtimeContainer, ComponentProperties properties) {
@@ -119,7 +119,8 @@ public class AzureStorageRuntime implements RuntimableRuntime<ComponentPropertie
 
             return AzureConnectionWithSasService.builder()//
                     .accountName(m.group(2))//
-                    .sasToken(m.group(4))//
+                    .sasToken(m.group(5))//
+                    .endpointSuffix(m.group(4))
                     .build();
 
         } else {

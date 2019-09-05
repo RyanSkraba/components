@@ -89,6 +89,15 @@ public class AzureStorageRuntimeTest {
     }
 
     @Test
+    public void testInitializeValidSasCN() {
+        properties.useSharedAccessSignature.setValue(true);
+        properties.sharedAccessSignature.setValue(
+                "https://storageaccount.blob.core.chinacloudapi.cn/sastest?st=2019-08-27T07%3A12%3A27Z&se=2019-08-28T07%3A12%3A27Z&sp=rl&sv=2017-07-29&sr=c&sig=r0UYBj7NL6FQ0YVzU7WjuojHPn0q%2B3hhQp5yAkp7aGQ%3D");
+        ValidationResult validationResult = this.azureStorageRuntime.initialize(runtimeContainer, properties);
+        assertEquals(ValidationResult.Result.OK, validationResult.getStatus());
+    }
+
+    @Test
     public void testInitializeValidAccountNameAndKey() {
         properties.accountName.setValue("fakeAccountName");
         properties.accountKey.setValue("fakeAccountKey=ANBHFYRJJFHRIKKJFU");
