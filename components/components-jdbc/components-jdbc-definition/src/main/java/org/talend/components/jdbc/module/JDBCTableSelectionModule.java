@@ -21,6 +21,7 @@ import java.util.List;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.JdbcRuntimeInfo;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.daikon.NamedThing;
@@ -69,7 +70,7 @@ public class JDBCTableSelectionModule extends PropertiesImpl {
             List<NamedThing> tablenames = ss.getSchemaNames(null);
             tablename.setPossibleNamedThingValues(tablenames);
         } catch (ComponentException ex) {
-            return ex.getValidationResult();
+        	return new ValidationResult(ValidationResult.Result.ERROR, CommonUtils.getClearExceptionInfo(ex));
         }
         return ValidationResult.OK;
     }

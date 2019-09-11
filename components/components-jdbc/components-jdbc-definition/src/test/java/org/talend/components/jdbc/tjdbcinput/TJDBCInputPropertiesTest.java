@@ -102,6 +102,17 @@ public class TJDBCInputPropertiesTest {
         result = fixture.afterGuessQueryFromSchema();
         Assert.assertEquals(result, ValidationResult.OK);
     }
+    
+    @Test
+    public void testBeforeTablename() throws Exception {
+        TJDBCInputProperties fixture = new TJDBCInputProperties("input");
+        fixture.init();
+        
+        ValidationResult result = fixture.tableSelection.beforeTablename();
+        Assert.assertNotNull("not set result object, is wrong", result);
+        Assert.assertEquals(result.getStatus(), ValidationResult.Result.ERROR);
+        Assert.assertTrue(result.getMessage()!=null && !result.getMessage().isEmpty());
+    }
 
     /**
      * Run the void afterUseCursor() method test.
