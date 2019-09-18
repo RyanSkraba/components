@@ -265,7 +265,7 @@ public class JDBCInputTestIT {
             name = (String) row.get(1);
 
             assertEquals(2, id.intValue());
-            assertEquals("gaoyan", name);
+            assertEquals(" gaoyan ", name);
 
             reader.advance();
 
@@ -292,6 +292,125 @@ public class JDBCInputTestIT {
             }
         }
 
+    }
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Test
+    public void testTrimAll() {
+        Reader reader = null;
+        try {
+            TJDBCInputDefinition definition = new TJDBCInputDefinition();
+            TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
+
+            properties.main.schema.setValue(DBTestUtils.createTestSchema(tablename));
+            properties.tableSelection.tablename.setValue(tablename);
+            properties.sql.setValue(DBTestUtils.getSQL(tablename));
+            properties.trimStringOrCharColumns.setValue(true);
+
+            reader = DBTestUtils.createCommonJDBCInputReader(properties);
+
+            reader.start();
+
+            IndexedRecord row = (IndexedRecord) reader.getCurrent();
+            Integer id = (Integer) row.get(0);
+            String name = (String) row.get(1);
+
+            assertEquals(1, id.intValue());
+            assertEquals("wangwei", name);
+
+            reader.advance();
+
+            row = (IndexedRecord) reader.getCurrent();
+            id = (Integer) row.get(0);
+            name = (String) row.get(1);
+
+            assertEquals(2, id.intValue());
+            assertEquals("gaoyan", name);
+
+            reader.advance();
+
+            row = (IndexedRecord) reader.getCurrent();
+            id = (Integer) row.get(0);
+            name = (String) row.get(1);
+
+            assertEquals(3, id.intValue());
+            assertEquals("dabao", name);
+
+            reader.close();
+
+            Map<String, Object> returnMap = reader.getReturnValues();
+            Assert.assertEquals(3, returnMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Assert.fail(e.getMessage());
+                }
+            }
+        }
+    }
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Test
+    public void testTrimField() {
+        Reader reader = null;
+        try {
+            TJDBCInputDefinition definition = new TJDBCInputDefinition();
+            TJDBCInputProperties properties = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition);
+
+            properties.main.schema.setValue(DBTestUtils.createTestSchema(tablename));
+            properties.tableSelection.tablename.setValue(tablename);
+            properties.sql.setValue(DBTestUtils.getSQL(tablename));
+            properties.trimTable.columnName.setValue(Arrays.asList("ID","NAME"));
+            properties.trimTable.trim.setValue(Arrays.asList(false, true));
+
+            reader = DBTestUtils.createCommonJDBCInputReader(properties);
+
+            reader.start();
+
+            IndexedRecord row = (IndexedRecord) reader.getCurrent();
+            Integer id = (Integer) row.get(0);
+            String name = (String) row.get(1);
+
+            assertEquals(1, id.intValue());
+            assertEquals("wangwei", name);
+
+            reader.advance();
+
+            row = (IndexedRecord) reader.getCurrent();
+            id = (Integer) row.get(0);
+            name = (String) row.get(1);
+
+            assertEquals(2, id.intValue());
+            assertEquals("gaoyan", name);
+
+            reader.advance();
+
+            row = (IndexedRecord) reader.getCurrent();
+            id = (Integer) row.get(0);
+            name = (String) row.get(1);
+
+            assertEquals(3, id.intValue());
+            assertEquals("dabao", name);
+
+            reader.close();
+
+            Map<String, Object> returnMap = reader.getReturnValues();
+            Assert.assertEquals(3, returnMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Assert.fail(e.getMessage());
+                }
+            }
+        }
     }
 
     /**

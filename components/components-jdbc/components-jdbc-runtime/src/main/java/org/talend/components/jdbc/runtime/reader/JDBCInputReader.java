@@ -123,6 +123,10 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
                 querySchema = CommonUtils.mergeRuntimeSchema2DesignSchema4Dynamic(querySchema, runtimeSchema4ResultSet);
             }
 
+            if(setting.trim()) {
+                return querySchema;
+            }
+            
             List<String> trimColumnLabels = setting.getTrimColumns();
             List<Boolean> trims = setting.getTrims();
 

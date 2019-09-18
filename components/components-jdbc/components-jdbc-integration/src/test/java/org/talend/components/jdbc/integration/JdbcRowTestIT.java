@@ -211,7 +211,7 @@ public class JdbcRowTestIT {
 
                 resultSet.next();
                 Assert.assertEquals(2, resultSet.getInt(1));
-                Assert.assertEquals("gaoyan", resultSet.getString(2));
+                Assert.assertEquals(" gaoyan ", resultSet.getString(2));
 
                 resultSet.next();
                 Assert.assertEquals(3, resultSet.getInt(1));

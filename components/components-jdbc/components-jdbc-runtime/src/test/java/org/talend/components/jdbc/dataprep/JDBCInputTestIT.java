@@ -94,7 +94,7 @@ public class JDBCInputTestIT {
             name = (String) row.get(1);
 
             assertEquals("2", id);
-            assertEquals("gaoyan", name);
+            assertEquals(" gaoyan ", name);
 
             reader.advance();
 

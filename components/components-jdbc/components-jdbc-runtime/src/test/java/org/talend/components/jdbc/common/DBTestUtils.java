@@ -122,7 +122,7 @@ public class DBTestUtils {
             statement.executeUpdate();
 
             statement.setInt(1, 2);
-            statement.setString(2, "gaoyan");
+            statement.setString(2, " gaoyan ");
 
             statement.executeUpdate();
 
