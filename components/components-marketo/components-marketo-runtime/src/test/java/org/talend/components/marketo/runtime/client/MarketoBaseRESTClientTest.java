@@ -12,11 +12,6 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
-import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_REST;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +32,14 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
 import com.google.gson.internal.LinkedTreeMap;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.spy;
+import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_REST;
 
 public class MarketoBaseRESTClientTest {
 

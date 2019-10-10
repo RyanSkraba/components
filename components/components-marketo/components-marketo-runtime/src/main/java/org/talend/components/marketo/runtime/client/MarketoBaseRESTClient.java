@@ -58,6 +58,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.internal.LinkedTreeMap;
 
 import static java.lang.String.format;
+import static org.talend.components.marketo.MarketoConstants.API_REST;
 import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
 import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
 
@@ -320,10 +321,17 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
                 .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true))//
                 .append(fmtParams(FIELD_SINCE_DATETIME, sinceDatetime));
         LeadResult getResponse = (LeadResult) executeGetRequest(LeadResult.class);
+        String error = String.format("[getPageToken] Undefined endpoint error while getting page token %s.",
+                sinceDatetime);
         if (getResponse != null) {
-            return getResponse.getNextPageToken();
+            if (getResponse.isSuccess()) {
+                return getResponse.getNextPageToken();
+            } else {
+                error = getResponse.getErrorsString();
+                LOG.error("[getPageToken] Error while getting page token: {}.", error);
+            }
         }
-        return null;
+        throw new MarketoException(API_REST, error);
     }
 
     public <T> T getValueType(Field field, Object value) {

@@ -33,6 +33,7 @@ import org.talend.components.marketo.runtime.MarketoSource;
 import org.talend.components.marketo.runtime.client.rest.type.SyncStatus;
 import org.talend.components.marketo.runtime.client.type.ListOperationParameters;
 import org.talend.components.marketo.runtime.client.type.MarketoError;
+import org.talend.components.marketo.runtime.client.type.MarketoException;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
@@ -826,6 +827,19 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
             assertEquals(brand, r.get(runtimeSchema.getField("brand").pos()));
             assertTrue(models.contains(r.get(runtimeSchema.getField("model").pos()).toString()));
             assertNotNull(r.get(runtimeSchema.getField("customerId").pos()));
+        }
+    }
+
+    @Test
+    public void testFailingPageToken() throws Exception {
+        MarketoSource source = new MarketoSource();
+        source.initialize(null, iprops);
+        MarketoRESTClient client = (MarketoRESTClient) source.getClientService(null);
+        try {
+            client.getPageToken("2019 09 23 66:00:11");
+            fail("getPageToken should have failed...");
+        } catch (MarketoException e) {
+            assertFalse(e.getMessage().isEmpty());
         }
     }
 
