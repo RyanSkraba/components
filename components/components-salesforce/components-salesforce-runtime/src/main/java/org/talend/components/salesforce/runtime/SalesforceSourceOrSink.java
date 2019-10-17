@@ -18,6 +18,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.net.Proxy;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,6 +59,8 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
+import org.talend.proxy.TalendProxyAuthenticator;
+import org.talend.proxy.TalendProxySelector;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.BulkConnection;
@@ -445,6 +450,24 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
                     setAuthenticator(proxyHelper.getProxyUser(), proxyHelper.getProxyPwd());
                 }
             }
+        } else if ("local".equals(System.getProperty("http.proxySet")) || "local".equals(System.getProperty("socksProxySet"))) { //active custom proxy with tSetProxy
+            try {
+                URI salesforceEndpointUri = new URI(properties.getConnectionProperties().endpoint.getValue());
+                String endpointURIString = salesforceEndpointUri.getHost();
+                if (salesforceEndpointUri.getPort() != -1) {
+                    endpointURIString += ":" + salesforceEndpointUri.getPort();
+                }
+
+                Proxy proxy = TalendProxySelector.getInstance().getProxyForUriString(endpointURIString);
+                if (!Proxy.NO_PROXY.equals(proxy)) {
+                    config.setProxy(proxy);
+                    Authenticator.setDefault(TalendProxyAuthenticator.getInstance()); //set in case when proxy auth needed (was set up in tSetProxy component)
+                }
+
+            } catch (URISyntaxException ignored) {
+                //NOOP, not use proxy
+            }
+
         }
     }
 

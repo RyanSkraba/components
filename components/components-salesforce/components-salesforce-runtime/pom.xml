@@ -63,6 +63,11 @@
             <artifactId>commons-collections</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.talend.components.lib</groupId>
+            <artifactId>talend-proxy</artifactId>
+        </dependency>
+
         <!-- Generated Jar files from the WSDL -->
         <dependency>
             <groupId>com.force.api</groupId>
