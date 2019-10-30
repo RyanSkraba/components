@@ -17,7 +17,6 @@ import org.junit.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -60,5 +59,18 @@ public class FormatterTest {
         String actual = formatter.formatTimeMillis(actualDate);
 
         Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testFormatDateFromInteger() {
+        Formatter formatter = new Formatter();
+
+        // Sydney daylight saving time ended 2017-10-01
+        Assert.assertEquals("2017-09-30", formatter.formatDate(17439));
+        Assert.assertEquals("2017-10-01", formatter.formatDate(17440));
+
+        // Seoul daylight saving time started 1988-05-08
+        Assert.assertEquals("1988-05-07", formatter.formatDate(6701));
+        Assert.assertEquals("1988-05-08", formatter.formatDate(6702));
     }
 }
