@@ -31,6 +31,10 @@ public class OsgiNetSuiteComponentTestIT extends NetSuiteComponentTestBase {
     @Configuration
     public Option[] config() {
         return options(composite(ComponentsPaxExamOptions.getOptions()), //
+                linkBundle("javax.xml.bind-jaxb-api"), //
+                linkBundle("com.sun.xml.bind-jaxb-impl"), //
+                linkBundle("org.apache.geronimo.specs-geronimo-activation_1.1_spec"), //
+                linkBundle("org.apache.geronimo.specs-geronimo-saaj_1.3_spec"), //
                 linkBundle("org.talend.components-components-common-bundle"), //
                 linkBundle("org.talend.components-components-netsuite-definition-bundle"));
     }
