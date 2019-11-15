@@ -82,7 +82,11 @@ public abstract class SnowflakeRuntime {
         }
 
         conn = DriverManagerUtils.getConnection(connectionProperties);
-
+        try {
+            conn.setAutoCommit(connectionProperties.autoCommit.getValue());
+        } catch (SQLException e) {
+            throw new IOException(e);
+        }
         if (container != null) {
             container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, conn);
             container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION_PROPERTIES, connectionProperties);

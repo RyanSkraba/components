@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -47,7 +47,14 @@ public abstract class SnowflakeDefinition extends AbstractComponentDefinition {
 
     public static final String ROW_SOURCE_CLASS = "org.talend.components.snowflake.runtime.SnowflakeRowSource";
 
-    public static final String CLOSE_SOURCE_OR_SINK_CLASS = "org.talend.components.snowflake.runtime.SnowflakeCloseSourceOrSink";
+    public static final String CLOSE_SOURCE_OR_SINK_CLASS =
+            "org.talend.components.snowflake.runtime.SnowflakeCloseSourceOrSink";
+
+    public static final String COMMIT_SOURCE_OR_SINK_CLASS =
+            "org.talend.components.snowflake.runtime.SnowflakeCommitSourceOrSink";
+
+    public static final String ROLLBACK_SOURCE_OR_SINK_CLASS =
+            "org.talend.components.snowflake.runtime.SnowflakeRollbackSourceOrSink";
 
     public static final boolean USE_CURRENT_JVM_PROPS = true;
 
@@ -60,23 +67,24 @@ public abstract class SnowflakeDefinition extends AbstractComponentDefinition {
 
     @Override
     public String[] getFamilies() {
-        return new String[]{"Cloud/Snowflake"}; //$NON-NLS-1$
+        return new String[] { "Cloud/Snowflake" }; //$NON-NLS-1$
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
-        return new Class[]{SnowflakeConnectionProperties.class};
+        return new Class[] { SnowflakeConnectionProperties.class };
     }
 
     @Override
     public Property<?>[] getReturnProperties() {
-        return new Property[]{RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP};
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP };
     }
 
     public static RuntimeInfo getCommonRuntimeInfo(String clazzFullName) {
         return new JarRuntimeInfo(RUNTIME_MVN_URL,
-                DependenciesReader.computeDependenciesFilePath(RUNTIME_MVN_GROUP_ID, RUNTIME_MVN_ARTIFACT_ID), clazzFullName);
+                DependenciesReader.computeDependenciesFilePath(RUNTIME_MVN_GROUP_ID, RUNTIME_MVN_ARTIFACT_ID),
+                clazzFullName);
     }
 
     /**
@@ -119,7 +127,8 @@ public abstract class SnowflakeDefinition extends AbstractComponentDefinition {
          * @param useCurrentJvmProperties whether to use current JVM properties
          * @return sandboxed instance
          */
-        public SandboxedInstance getSandboxedInstance(final String runtimeClassName, final boolean useCurrentJvmProperties) {
+        public SandboxedInstance getSandboxedInstance(final String runtimeClassName,
+                final boolean useCurrentJvmProperties) {
             ClassLoader classLoader = SnowflakeDefinition.class.getClassLoader();
             RuntimeInfo runtimeInfo = SnowflakeDefinition.getCommonRuntimeInfo(runtimeClassName);
             if (useCurrentJvmProperties) {

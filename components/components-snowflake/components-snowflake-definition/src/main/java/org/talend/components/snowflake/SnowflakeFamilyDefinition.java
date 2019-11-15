@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -17,9 +17,11 @@ import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.snowflake.tsnowflakeclose.TSnowflakeCloseDefinition;
+import org.talend.components.snowflake.tsnowflakecommit.TSnowflakeCommitDefinition;
 import org.talend.components.snowflake.tsnowflakeconnection.TSnowflakeConnectionDefinition;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputDefinition;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputDefinition;
+import org.talend.components.snowflake.tsnowflakerollback.TSnowflakeRollbackDefinition;
 import org.talend.components.snowflake.tsnowflakerow.TSnowflakeRowDefinition;
 
 import com.google.auto.service.AutoService;
@@ -37,7 +39,8 @@ public class SnowflakeFamilyDefinition extends AbstractComponentFamilyDefinition
         super(NAME,
                 // Components
                 new TSnowflakeConnectionDefinition(), new TSnowflakeRowDefinition(), new TSnowflakeInputDefinition(),
-                new TSnowflakeOutputDefinition(), new TSnowflakeCloseDefinition(),
+                new TSnowflakeOutputDefinition(), new TSnowflakeCloseDefinition(), new TSnowflakeCommitDefinition(),
+                new TSnowflakeRollbackDefinition(),
                 // Component wizards
                 new SnowflakeConnectionWizardDefinition(),
                 // TODO remove the edit one

@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -11,6 +11,8 @@
 //
 // ============================================================================
 package org.talend.components.snowflake;
+
+import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -30,8 +32,6 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.sandbox.SandboxedInstance;
 import org.talend.daikon.serialize.PostDeserializeSetup;
 import org.talend.daikon.serialize.migration.SerializeSetVersion;
-
-import java.util.Properties;
 
 import static org.talend.components.snowflake.SnowflakeDefinition.SOURCE_OR_SINK_CLASS;
 import static org.talend.components.snowflake.SnowflakeDefinition.USE_CURRENT_JVM_PROPS;
@@ -83,6 +83,8 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
 
     public Property<String> jdbcParameters = newString("jdbcParameters");
 
+    public Property<Boolean> autoCommit = newBoolean("autoCommit", true);
+
     public String talendProductVersion;
 
     // Presentation items
@@ -90,7 +92,8 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
 
     public PresentationItem advanced = new PresentationItem("advanced", "Advanced...");
 
-    public ComponentReferenceProperties<SnowflakeConnectionProperties> referencedComponent = new ComponentReferenceProperties<>("referencedComponent", TSnowflakeConnectionDefinition.COMPONENT_NAME);
+    public ComponentReferenceProperties<SnowflakeConnectionProperties> referencedComponent =
+            new ComponentReferenceProperties<>("referencedComponent", TSnowflakeConnectionDefinition.COMPONENT_NAME);
 
     public SnowflakeConnectionProperties(String name) {
         super(name);
@@ -128,6 +131,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         mainForm.addRow(db);
 
         Form advancedForm = Form.create(this, Form.ADVANCED);
+        advancedForm.addRow(autoCommit);
         advancedForm.addRow(jdbcParameters);
         advancedForm.addRow(useCustomRegion);
         advancedForm.addColumn(customRegionID);
@@ -213,8 +217,8 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
 
     @Override
     public SnowflakeConnectionProperties getConnectionProperties() {
-        if (referencedComponent.referenceType.getValue() == null ||
-                referencedComponent.referenceType.getValue() == ComponentReferenceProperties.ReferenceType.THIS_COMPONENT) {
+        if (referencedComponent.referenceType.getValue() == null || referencedComponent.referenceType
+                .getValue() == ComponentReferenceProperties.ReferenceType.THIS_COMPONENT) {
             return this;
         }
         return referencedComponent.getReference();
@@ -262,12 +266,10 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
             throw new IllegalArgumentException(i18nMessages.getMessage("error.missingAccount"));
         }
 
-        String regionID = useCustomRegion.getValue()
-                ? this.customRegionID.getValue()
-                : this.region.getValue().getRegionID();
+        String regionID = useCustomRegion.getValue() ? customRegionID.getValue() : region.getValue().getRegionID();
         String warehouse = this.warehouse.getStringValue();
         String db = this.db.getStringValue();
-        String schema = this.schemaName.getStringValue();
+        String schema = schemaName.getStringValue();
         String role = this.role.getStringValue();
 
         appendProperty("warehouse", warehouse, connectionParams);
@@ -276,16 +278,13 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         appendProperty("role", role, connectionParams);
         appendProperty("application", getApplication(), connectionParams);
 
-        StringBuilder url = new StringBuilder()
-                .append("jdbc:snowflake://")
-                .append(account);
+        StringBuilder url = new StringBuilder().append("jdbc:snowflake://").append(account);
 
         if (!StringUtils.isEmpty(regionID)) {
             url.append(".").append(regionID);
         }
 
-        url.append(".snowflakecomputing.com")
-                .append("/?");
+        url.append(".snowflakecomputing.com").append("/?");
 
         String jdbcParameters = this.jdbcParameters.getStringValue();
         if (jdbcParameters != null && !jdbcParameters.isEmpty() && !"\"\"".equals(jdbcParameters)) {
