@@ -71,6 +71,11 @@
         </dependency>
         <dependency>
             <groupId>org.talend.daikon</groupId>
+            <artifactId>crypto-utils</artifactId>
+            <classifier>bundle</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.daikon</groupId>
             <artifactId>daikon-exception</artifactId>
             <version>${daikon.version}</version>
             <classifier>bundle</classifier>

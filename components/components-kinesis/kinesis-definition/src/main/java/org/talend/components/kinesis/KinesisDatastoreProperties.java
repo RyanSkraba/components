@@ -17,14 +17,14 @@ import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.EnumSet;
 
+import org.talend.components.api.properties.ComponentBasePropertiesImpl;
 import org.talend.components.common.datastore.DatastoreProperties;
-import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-public class KinesisDatastoreProperties extends PropertiesImpl implements DatastoreProperties {
+public class KinesisDatastoreProperties extends ComponentBasePropertiesImpl implements DatastoreProperties {
 
     public Property<Boolean> specifyCredentials = PropertyFactory.newBoolean("specifyCredentials", true);
 

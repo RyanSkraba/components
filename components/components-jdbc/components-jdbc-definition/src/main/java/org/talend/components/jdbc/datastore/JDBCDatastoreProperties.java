@@ -30,13 +30,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.properties.ComponentBasePropertiesImpl;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.dataprep.DBType;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.exception.error.CommonErrorCodes;
-import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -45,7 +45,7 @@ import org.talend.daikon.properties.property.PropertyFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class JDBCDatastoreProperties extends PropertiesImpl implements DatastoreProperties, RuntimeSettingProvider {
+public class JDBCDatastoreProperties extends ComponentBasePropertiesImpl implements DatastoreProperties, RuntimeSettingProvider {
 
     public static final Logger LOG = LoggerFactory.getLogger(JDBCDatastoreProperties.class);
 

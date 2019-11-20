@@ -18,12 +18,12 @@ import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.util.EnumSet;
 
-import org.talend.daikon.properties.PropertiesImpl;
+import org.talend.components.api.properties.ComponentBasePropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
-public class UserPasswordProperties extends PropertiesImpl {
+public class UserPasswordProperties extends ComponentBasePropertiesImpl {
 
     public Property<Boolean> useAuth = newBoolean("useAuth", false);
 

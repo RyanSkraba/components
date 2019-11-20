@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.daikon.properties.Properties;
-import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.PropertiesVisitor;
 
 /**
@@ -27,7 +26,7 @@ import org.talend.daikon.properties.PropertiesVisitor;
  * is a schema element defining what is the type of data the component ouputs.
  */
 
-public class ComponentPropertiesImpl extends PropertiesImpl implements ComponentProperties {
+public class ComponentPropertiesImpl extends ComponentBasePropertiesImpl implements ComponentProperties {
 
     /**
      * named constructor to be used is these properties are nested in other properties. Do not subclass this method for

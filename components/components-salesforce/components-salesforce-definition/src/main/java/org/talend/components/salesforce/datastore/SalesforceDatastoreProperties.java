@@ -24,14 +24,14 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.properties.ComponentBasePropertiesImpl;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
-public class SalesforceDatastoreProperties extends PropertiesImpl implements DatastoreProperties {
+public class SalesforceDatastoreProperties extends ComponentBasePropertiesImpl implements DatastoreProperties {
 
     public static final String CONFIG_FILE_lOCATION_KEY = "org.talend.component.salesforce.config.file";
 

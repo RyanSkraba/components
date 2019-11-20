@@ -56,6 +56,7 @@ public class ComponentsPaxExamOptions {
                 linkBundle("org.apache.commons-commons-lang3"), //
                 linkBundle("org.apache.avro-avro"), //
                 linkBundle("org.eclipse.jetty.orbit-javax.servlet"), //
+                linkBundle("org.talend.daikon-crypto-utils-bundle"), //
                 linkBundle("org.talend.daikon-daikon-bundle"), //
                 linkBundle("org.talend.daikon-daikon-exception-bundle"), //
                 linkBundle("org.talend.daikon-daikon-tests").noStart(), //

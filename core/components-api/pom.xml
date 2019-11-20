@@ -22,6 +22,10 @@
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.talend.daikon</groupId>
+            <artifactId>crypto-utils</artifactId>
+        </dependency>
         <!-- Third party compile -->
         <dependency>
             <groupId>javax.inject</groupId>
@@ -150,7 +154,7 @@
                                 </Import-Package>
                                 <Embed-Transitive>true</Embed-Transitive>
                                 <Embed-Dependency>
-                                    !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon|pax-url-aether
+                                    !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|crypto-utils|daikon|pax-url-aether
                                 </Embed-Dependency>
                                 <_exportcontents>!*.internal,!*.osgi,org.talend.*</_exportcontents>
                                 <!-- used to remove the spring classes -->

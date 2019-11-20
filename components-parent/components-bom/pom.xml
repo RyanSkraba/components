@@ -10,7 +10,7 @@
     <name>Component BOM</name>
     <properties>
         <components.version>0.28.0-SNAPSHOT</components.version>
-        <daikon.version>0.31.8</daikon.version>
+        <daikon.version>0.31.10-SNAPSHOT</daikon.version>
         <!-- -->
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
         <!-- -->
@@ -1263,6 +1263,23 @@
                 <artifactId>daikon</artifactId>
                 <version>${daikon.version}</version>
                 <classifier>bundle</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.daikon</groupId>
+                <artifactId>crypto-utils</artifactId>
+                <version>${daikon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.daikon</groupId>
+                <artifactId>crypto-utils</artifactId>
+                <version>${daikon.version}</version>
+                <classifier>bundle</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.daikon</groupId>
+                <artifactId>crypto-utils</artifactId>
+                <version>${daikon.version}</version>
+                <classifier>tests</classifier>
             </dependency>
             <dependency>
                 <groupId>org.apache.avro</groupId>
