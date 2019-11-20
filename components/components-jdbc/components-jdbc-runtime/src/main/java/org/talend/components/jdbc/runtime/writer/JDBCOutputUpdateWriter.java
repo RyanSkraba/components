@@ -94,6 +94,8 @@ public class JDBCOutputUpdateWriter extends JDBCOutputWriter {
             if (sql_fact != null) {
                 runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
             }
+            if (setting.getDebug())
+                LOG.debug("'"+sql_fact.trim()+"'.");
         } catch (SQLException e) {
             throw CommonUtils.newComponentException(e);
         }

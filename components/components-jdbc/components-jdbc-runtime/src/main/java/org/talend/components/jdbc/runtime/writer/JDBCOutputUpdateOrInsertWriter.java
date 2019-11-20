@@ -120,27 +120,30 @@ public class JDBCOutputUpdateOrInsertWriter extends JDBCOutputWriter {
         initRowWriterIfNot(columnList, inputSchema, componentSchema);
 
         try {
-            String sql_fact = rowWriter4Update.write(input);
-            if (sql_fact != null) {
-                runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
+            String updateSql_fact = rowWriter4Update.write(input);
+            if (updateSql_fact != null) {
+                runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, updateSql_fact);
             }
+            if (setting.getDebug())
+                LOG.debug("'"+updateSql_fact.trim()+"'.");
         } catch (SQLException e) {
             throw CommonUtils.newComponentException(e);
         }
 
         try {
             int count = statementUpdate.executeUpdate();
-
             updateCount += count;
 
             boolean noDataUpdate = (count == 0);
 
             if (noDataUpdate) {
-                String sql_fact = rowWriter4Insert.write(input);
-                if (sql_fact != null) {
-                    runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
+                String insertSql_fact = rowWriter4Insert.write(input);
+                if (insertSql_fact != null) {
+                    runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, insertSql_fact);
                 }
 
+                if (setting.getDebug())
+                    LOG.debug("'"+insertSql_fact.trim()+"'.");
                 insertCount += execute(input, statementInsert);
             } else {
                 result.totalCount++;

@@ -34,7 +34,10 @@ public class DebugUtil {
     }
 
     public String getSQL() {
-        return strBuffer.toString();
+        String sql = strBuffer.toString();
+        index = 0;
+        strBuffer = new StringBuffer(32);
+        return sql;
     }
 
 }
