@@ -55,10 +55,10 @@ public class SnowflakeRollbackAndCommitPropertiesTest {
 
     @Test
     public void testCheckCloseConnection() {
-        assertFalse(rollbackAndCommitProperties.closeConnection.getValue());
-        rollbackAndCommitProperties.closeConnection.setValue(true);
-
         assertTrue(rollbackAndCommitProperties.closeConnection.getValue());
+        rollbackAndCommitProperties.closeConnection.setValue(false);
+
+        assertFalse(rollbackAndCommitProperties.closeConnection.getValue());
     }
 
 }

@@ -29,6 +29,7 @@ public class SnowflakeRollbackAndCommitProperties extends TSnowflakeClosePropert
     @Override
     public void setupProperties() {
         super.setupProperties();
+        closeConnection.setValue(true);
     }
 
     @Override
