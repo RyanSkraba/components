@@ -61,6 +61,7 @@ public abstract class SnowflakeConnectionTableProperties extends FixedConnectors
 
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(connection.getForm(Form.ADVANCED));
+        connection.getForm(Form.ADVANCED).getWidget(connection.autoCommit.getName()).setHidden(true);
     }
 
     /**
@@ -68,7 +69,7 @@ public abstract class SnowflakeConnectionTableProperties extends FixedConnectors
      */
     public void afterMainSchema() {
         // Implement in subclasses.
-    };
+    }
 
 
     public String getTableName() {
@@ -85,6 +86,9 @@ public abstract class SnowflakeConnectionTableProperties extends FixedConnectors
         super.refreshLayout(form);
         for (Form childForm : connection.getForms()) {
             connection.refreshLayout(childForm);
+            if (childForm.getName() == Form.ADVANCED) {
+                childForm.getWidget(connection.autoCommit.getName()).setHidden(true);
+            }
         }
     }
 
