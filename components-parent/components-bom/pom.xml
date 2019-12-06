@@ -102,8 +102,8 @@
         <jackson-mapper-asl.version>1.9.14-TALEND</jackson-mapper-asl.version>
         <jackson-xc.version>1.9.13</jackson-xc.version>
         <jackson.1x.version>1.9.14-TALEND</jackson.1x.version>
-        <jackson.version.annotations>2.9.0</jackson.version.annotations>
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version.annotations>2.10.1</jackson.version.annotations>
+        <jackson.version>2.10.1</jackson.version>
         <javacsv.version>2.0</javacsv.version>
         <javapoet.version>1.8.0</javapoet.version>
         <javax.activation.version>1.1.1</javax.activation.version>

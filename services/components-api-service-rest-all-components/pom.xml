@@ -27,8 +27,8 @@
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
-        <jackson.version>2.9.9</jackson.version>
-        <jackson.version.annotations>2.9.0</jackson.version.annotations>
+        <jackson.version>2.10.1</jackson.version>
+        <jackson.version.annotations>2.10.1</jackson.version.annotations>
         <guava.version>20.0</guava.version>
         <logback.version>1.1.9</logback.version>
         <slf4.version>1.7.25</slf4.version>
