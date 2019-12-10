@@ -52,7 +52,7 @@ public class TextJacksonJsonProvider extends JacksonJsonProvider {
     }
 
     @Override
-    protected boolean isJsonType(MediaType mediaType) {
+    protected boolean hasMatchingMediaType(MediaType mediaType) {
         /*
          * As suggested by Stephen D, there are 2 ways to check: either being as inclusive as possible (if subtype is "json"),
          * or exclusive (major type "application", minor type "json"). Let's start with inclusive one, hard to know which major
