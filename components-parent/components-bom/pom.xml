@@ -71,6 +71,9 @@
         <dom4j.version>1.6.1</dom4j.version>
         <esri-geometry.version>2.0.0</esri-geometry.version>
         <force-wsc.version>46.0.0</force-wsc.version>
+        <geronimo-osgi-registry.version>1.1</geronimo-osgi-registry.version>
+        <geronimo-saaj_1.3_spec.version>1.1</geronimo-saaj_1.3_spec.version>
+        <geronimo-ws-metadata_2.0_spec.version>1.1.3</geronimo-ws-metadata_2.0_spec.version>
         <glassfish-jersey.version>2.26</glassfish-jersey.version>
         <google-api-client-appengine.version>${google-api-client.version}</google-api-client-appengine.version>
         <google-api-client-jackson2.version>${google-api-client.version}</google-api-client-jackson2.version>
@@ -112,6 +115,7 @@
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
         <javax.validation.version>1.1.0.Final</javax.validation.version>
         <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>
+        <javax.xml.ws.version>2.3.1</javax.xml.ws.version>
         <jaxb-impl.version>2.3.1</jaxb-impl.version>
         <javax.annotation-api.version>1.3</javax.annotation-api.version>
         <jersey-apache-client4.version>1.19.1</jersey-apache-client4.version>
@@ -520,6 +524,11 @@
                 <artifactId>javax.ws.rs-api</artifactId>
                 <version>${javax.ws.rs-api.version}</version>
             </dependency>
+            <dependency>
+                <groupId>javax.xml.ws</groupId>
+                <artifactId>jaxws-api</artifactId>
+                <version>${javax.xml.ws.version}</version>
+            </dependency>
              <dependency>
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
@@ -848,6 +857,21 @@
                 <artifactId>derbynet</artifactId>
                 <version>${derby.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-osgi-registry</artifactId>
+                <version>${geronimo-osgi-registry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-saaj_1.3_spec</artifactId>
+                <version>${geronimo-saaj_1.3_spec.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
+                <version>${geronimo-ws-metadata_2.0_spec.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.snowflake</groupId>
