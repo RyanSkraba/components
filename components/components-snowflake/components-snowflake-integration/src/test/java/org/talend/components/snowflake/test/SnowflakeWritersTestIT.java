@@ -254,6 +254,14 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
         assertEquals("1", rej.get(6)); // line
         assertEquals("100035", rej.get(8)); // code
 
+        rej = it.next();
+        assertEquals("1", rej.get(1)); // row
+        assertEquals("1", rej.get(3)); // character
+        assertThat((String) rej.get(4), containsString("NULL result in a non-nullable column"));
+        assertEquals("0", rej.get(5)); // byte offset
+        assertEquals("1", rej.get(6)); // line
+        assertEquals("100072", rej.get(8)); // code
+
         assertFalse(it.hasNext());
 
         assertEquals(1, wr1.getSuccessCount());
