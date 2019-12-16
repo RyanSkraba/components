@@ -61,7 +61,7 @@ public class TextJacksonJsonProvider extends JacksonJsonProvider {
         if (mediaType != null) {
             // Ok: there are also "xxx+json" subtypes, which count as well
             String subtype = mediaType.getSubtype();
-            return "json".equalsIgnoreCase(subtype) || subtype.endsWith("+json") || mediaType.equals(MediaType.TEXT_PLAIN_TYPE);
+            return "json".equalsIgnoreCase(subtype) || subtype.endsWith("+json") || mediaType.equals(MediaType.TEXT_PLAIN_TYPE) || "plain".equalsIgnoreCase(subtype);
         }
         /*
          * Not sure if this can happen; but it seems reasonable that we can at least produce json without media type?
