@@ -32,6 +32,9 @@ public class SimpleFileIODatasetProperties extends PropertiesImpl implements Dat
 
     public Property<String> specificRecordDelimiter = PropertyFactory.newString("specificRecordDelimiter", "\\n");
 
+    // define a max row size to avoid 'out of memory exception' (specially in case of wrong record delimiter param). 10 Mo at default.
+    public Property<Integer> maxRowSize = PropertyFactory.newInteger("maxRowSize", 10 * 1024 * 1024);
+
     public Property<FieldDelimiterType> fieldDelimiter = PropertyFactory.newEnum("fieldDelimiter", FieldDelimiterType.class)
             .setValue(FieldDelimiterType.SEMICOLON);
 
@@ -87,6 +90,7 @@ public class SimpleFileIODatasetProperties extends PropertiesImpl implements Dat
         //CSV properties
         mainForm.addRow(recordDelimiter);
         mainForm.addRow(specificRecordDelimiter);
+        mainForm.addRow(maxRowSize);
         mainForm.addRow(fieldDelimiter);
         mainForm.addRow(specificFieldDelimiter);
         mainForm.addRow(textEnclosureCharacter);
@@ -121,6 +125,7 @@ public class SimpleFileIODatasetProperties extends PropertiesImpl implements Dat
             form.getWidget(fieldDelimiter).setVisible(isCSV);
             form.getWidget(specificFieldDelimiter).setVisible(
                 isCSV && fieldDelimiter.getValue().equals(FieldDelimiterType.OTHER));
+            form.getWidget(this.maxRowSize).setVisible(isCSV);
             
             form.getWidget(textEnclosureCharacter).setVisible(isCSV);
             form.getWidget(escapeCharacter).setVisible(isCSV);
@@ -164,6 +169,10 @@ public class SimpleFileIODatasetProperties extends PropertiesImpl implements Dat
         } else {
             return recordDelimiter.getValue().getDelimiter();
         }
+    }
+
+    public Integer getMaxRowSize() {
+        return this.maxRowSize.getValue();
     }
 
     public String getFieldDelimiter() {
