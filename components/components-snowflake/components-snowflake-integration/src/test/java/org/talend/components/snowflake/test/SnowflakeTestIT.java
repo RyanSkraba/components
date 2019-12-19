@@ -39,6 +39,7 @@ import org.talend.components.common.CommonTestUtils;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.SnowflakeFamilyDefinition;
 import org.talend.components.snowflake.SnowflakeRegion;
+import org.talend.components.snowflake.tsnowflakeconnection.AuthenticationType;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
@@ -94,6 +95,7 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
         if (props == null) {
             props = (SnowflakeConnectionProperties) new SnowflakeConnectionProperties("foo").init();
         }
+        props.authenticationType.setValue(AuthenticationType.BASIC);
         props.userPassword.userId.setStoredValue(USER);
         props.userPassword.password.setStoredValue(PASSWORD);
         props.account.setStoredValue(ACCOUNT_STR);
@@ -164,7 +166,7 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
             this.repoLocation = repoLocation;
             this.schemaPropertyName = schemaPropertyName;
             if (schemaPropertyName != null) {
-                this.schema = (Schema) props.getValuedProperty(schemaPropertyName).getValue();
+                schema = (Schema) props.getValuedProperty(schemaPropertyName).getValue();
             }
         }
 

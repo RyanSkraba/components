@@ -160,6 +160,10 @@
                         <snowflake.warehouse>${snowflake.warehouse}</snowflake.warehouse>
                         <snowflake.db>${snowflake.db}</snowflake.db>
                         <snowflake.schema>${snowflake.schema}</snowflake.schema>
+                        <snowflake.keyStorePath>${snowflake.keyStorePath}</snowflake.keyStorePath>
+                        <snowflake.keyStoreType>${snowflake.keyStoreType}</snowflake.keyStoreType>
+                        <snowflake.keyStorePassPhrase>${snowflake.keyStorePassPhrase}</snowflake.keyStorePassPhrase>
+                        <snowflake.keyAlias>${snowflake.keyAlias}</snowflake.keyAlias>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

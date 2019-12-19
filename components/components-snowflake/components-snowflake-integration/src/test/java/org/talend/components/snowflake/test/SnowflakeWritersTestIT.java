@@ -44,7 +44,6 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
-import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;

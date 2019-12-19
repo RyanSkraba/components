@@ -114,7 +114,7 @@ public class SnowflakeConnectionPropertiesTest {
      */
     @Test
     public void testGetConnectionUrlValidParamsAzure() throws Exception {
-        this.setUpAzureRegion();
+        setUpAzureRegion();
 
         StringBuilder builder = new StringBuilder();
 
@@ -137,7 +137,7 @@ public class SnowflakeConnectionPropertiesTest {
      */
     @Test
     public void testGetConnectionUrlValidParamsAndAdditionalJDBCParams() throws Exception {
-        this.setAdditionalJDBCParameters();
+        setAdditionalJDBCParameters();
 
         StringBuilder builder = new StringBuilder();
 
@@ -160,7 +160,7 @@ public class SnowflakeConnectionPropertiesTest {
      */
     @Test
     public void testGetConnectionUrlWhenAdditionalJDBCParamsIsNull() throws Exception {
-        this.setAdditionalJDBCParametersToNull();
+        setAdditionalJDBCParametersToNull();
 
         StringBuilder builder = new StringBuilder();
 
@@ -343,7 +343,7 @@ public class SnowflakeConnectionPropertiesTest {
     }
 
     @Test
-    public void testGetJdbcProperties() {
+    public void testGetJdbcProperties() throws Exception {
         snowflakeConnectionProperties.userPassword.userId.setValue("talendTest");
         Properties properties = snowflakeConnectionProperties.getJdbcProperties();
         Assert.assertEquals(snowflakeConnectionProperties.userPassword.userId.getValue(), properties.getProperty("user"));
