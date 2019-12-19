@@ -220,10 +220,6 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
          */
         private void placeValueInFieldMap(String prefixName, XmlObject xo) {
             Object value = xo.getValue();
-            if (value == null || "".equals(value)) {
-                return;
-            }
-
             String columnName = null;
             if (prefixName != null && prefixName.length() > 0) {
                 columnName = prefixName + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER)
@@ -232,12 +228,16 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
                 columnName = xo.getName().getLocalPart();
             }
 
+            if (value != null) {
+                value = formatIfNecessary(value, columnName);
+            }
             if (valueMap.get(columnName) == null) {
-                valueMap.put(columnName, formatIfNecessary(value, columnName));
+                valueMap.put(columnName, value);
             } else {
                 if (!columnName.equals(xo.getName().getLocalPart())) {
-                    valueMap.put(columnName, valueMap.get(columnName) + schema.getProp(SalesforceSchemaConstants.VALUE_DELIMITER)
-                            + formatIfNecessary(value, columnName));
+                    valueMap
+                            .put(columnName, valueMap.get(columnName)
+                                    + schema.getProp(SalesforceSchemaConstants.VALUE_DELIMITER) + value);
                 }
             }
         }

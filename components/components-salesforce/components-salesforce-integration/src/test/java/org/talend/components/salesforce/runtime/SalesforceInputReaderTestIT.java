@@ -42,9 +42,12 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
+import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.integration.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
@@ -87,6 +90,13 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             .name("NumberOfEmployees").type().intType().noDefault() //
             .name("AnnualRevenue").type(AvroUtils._decimal()).noDefault() //
             .name("BillingCountry").type().bytesType().noDefault().endRecord();
+
+    public static Schema SCHEMA_CONTACT = SchemaBuilder.builder().record("Schema").fields() //
+            .name("Email").type().stringType().noDefault() //
+            .name("FirstName").type().stringType().noDefault() //
+            .name("LastName").type().stringType().noDefault() //
+            .name("AccountId").type().stringType().noDefault() //
+            .endRecord();
 
     @Test
     public void testStartAdvanceGetCurrent() throws IOException {
@@ -443,6 +453,90 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             }
         } else {
             LOGGER.warn("Query result is empty!");
+        }
+    }
+
+    /*
+     * Test nested query of SOQL. return values with field empty
+     */
+    @Test
+    public void testQueryWithSubquery() throws Throwable {
+
+        // 1.get a Account record Id
+        TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
+        props.manualQuery.setValue(true);
+        props.query.setValue("select Id from Account where Name = '" + randomizedValue + "' limit 1");
+        props.validateGuessSchema();
+        List<IndexedRecord> singleAccount = readRows(props);
+        assertEquals(1, singleAccount.size());
+
+        String accountId = (String) singleAccount.get(0).get(0);
+
+        // 2.Write Contact records
+        ComponentDefinition sfDef = new TSalesforceOutputDefinition();
+        TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
+        SalesforceTestBase.setupProps(sfProps.connection, false);
+        sfProps.module.setValue("moduleName", "Contact");
+        sfProps.module.main.schema.setValue(SCHEMA_CONTACT);
+        sfProps.outputAction.setValue(SalesforceOutputProperties.OutputAction.INSERT);
+        sfProps.ceaseForError.setValue(false);
+        sfProps.extendInsert.setValue(false);
+        sfProps.retrieveInsertId.setValue(true);
+        sfProps.module.schemaListener.afterSchema();
+
+        List records = new ArrayList<IndexedRecord>();
+        String random = createNewRandom();
+        IndexedRecord r1 = new GenericData.Record(SCHEMA_CONTACT);
+        r1.put(0, "aaa" + random + "@talend.com");
+        r1.put(1, "F1_" + random);
+        r1.put(2, "L1_" + random);
+        r1.put(3, accountId);
+        records.add(r1);
+        IndexedRecord r2 = new GenericData.Record(SCHEMA_CONTACT);
+        r2.put(1, "F2_" + random);
+        r2.put(2, "L2_" + random);
+        r2.put(3, accountId);
+        records.add(r2);
+        IndexedRecord r3 = new GenericData.Record(SCHEMA_CONTACT);
+        r3.put(0, "ccc" + random + "@talend.com");
+        r3.put(2, "L3_" + random);
+        r3.put(3, accountId);
+        records.add(r3);
+
+        doWriteRows(sfProps, records);
+
+        //3. check the Contacts in Account with sub-query
+        Schema querySchema = SchemaBuilder.builder().record("Schema").fields() //
+                .name("Id").type().stringType().noDefault() //
+                .name("Contacts_records_Id").type().stringType().noDefault() //
+                .name("Contacts_records_Email").type().stringType().noDefault() //
+                .name("Contacts_records_FirstName").type().stringType().noDefault() //
+                .name("Contacts_records_LastName").type().stringType().noDefault() //
+                .endRecord();
+        props.manualQuery.setValue(true);
+        props.normalizeDelimiter.setValue("-");
+        props.query
+                .setValue(
+                        "SELECT Id, (select Id, Email,FirstName,LastName from Contacts order by LastName) FROM ACCOUNT where Id = '"
+                                + accountId + "'");
+        props.validateGuessSchema();
+        props.module.main.schema.setValue(querySchema);
+        List<IndexedRecord> rows = readRows(props);
+
+        try {
+            assertEquals(1, rows.size());
+            IndexedRecord record = rows.get(0);
+            assertEquals("aaa" + random + "@talend.com-null-ccc" + random + "@talend.com", record.get(2));
+            assertEquals("F1_" + random + "-F2_" + random + "-null", record.get(3));
+            assertEquals("L1_" + random + "-L2_" + random + "-L3_" + random, record.get(4));
+        }finally {
+            // 6.Delete created contacts data
+            props.copyValuesFrom(sfProps);
+            props.manualQuery.setValue(true);
+            props.query.setValue("SELECT Id FROM Contact where FirstName like '%" + random + "'");
+            props.validateGuessSchema();
+            List<IndexedRecord> contacts = readRows(props);
+            deleteRows(contacts, props);
         }
     }
 
