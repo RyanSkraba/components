@@ -58,11 +58,12 @@ public class JdbcRuntimeUtils {
             throw new RuntimeException("JDBC URL should not be empty, please set it");
         }
 
-        if (!valid(setting.getDriverClass())) {
+        String driverClass = setting.getDriverClass();
+        if (!valid(driverClass)) {
             throw new RuntimeException("Driver Class should not be empty, please set it");
         }
 
-        java.lang.Class.forName(setting.getDriverClass());
+        java.lang.Class.forName(driverClass);
         final Properties properties = new Properties(){{
             if(setting.getUsername() != null) {
                 setProperty("user", setting.getUsername());
@@ -71,10 +72,22 @@ public class JdbcRuntimeUtils {
                 setProperty("password", setting.getPassword());
             }
             // Security Issues with LOAD DATA LOCAL https://jira.talendforge.org/browse/TDI-42006
-            setProperty("allowLoadLocalInfile", "false"); // MySQL
-            setProperty("allowLocalInfile", "false"); // MariaDB
+            if(isMysql(driverClass)) {
+            	setProperty("allowLoadLocalInfile", "false"); // MySQL
+            }
+            if(isMariadb(driverClass)) {
+            	setProperty("allowLocalInfile", "false"); // MariaDB
+            }
         }};
         return java.sql.DriverManager.getConnection(setting.getJdbcUrl(), properties);
+    }
+    
+    private static boolean isMysql(String driverClass) {
+    	return driverClass.toLowerCase().contains("mysql");
+    }
+    
+    private static boolean isMariadb(String driverClass) {
+    	return driverClass.toLowerCase().contains("mariadb");
     }
 
     private static boolean valid(String value) {
