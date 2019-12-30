@@ -303,8 +303,7 @@ public class SimpleFileIODatasetRuntimeTest {
             }
         }
         //writeTextFile(mini.getFs(), "/user/test/inputBig.csv", () -> content, "UTF-8");
-        //final String fileSpec = mini.getFs().getUri().resolve("/user/test/inputBig.csv").toString();
-
+        //final String fileSpec = mini.getFs().getUri().resolve("/user/test/inputBig.csv").toString()
         final ConfigurableHDFSFileSource<LongWritable, Text> source = ConfigurableHDFSFileSource.from(output.getPath(),
                 TextInputFormat.class, LongWritable.class, Text.class);
         BoundedSource.BoundedReader<KV<LongWritable, Text>> reader = source.createReader(null);
