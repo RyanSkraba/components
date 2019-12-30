@@ -58,7 +58,7 @@ public class JdbcRuntimeUtils {
             throw new RuntimeException("JDBC URL should not be empty, please set it");
         }
 
-        String driverClass = setting.getDriverClass();
+        final String driverClass = setting.getDriverClass();
         if (!valid(driverClass)) {
             throw new RuntimeException("Driver Class should not be empty, please set it");
         }
