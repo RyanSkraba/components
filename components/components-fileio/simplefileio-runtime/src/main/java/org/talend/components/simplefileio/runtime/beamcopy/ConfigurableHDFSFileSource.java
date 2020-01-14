@@ -182,7 +182,7 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
         conf.set("fs.file.impl.disable.cache", "true");
         conf.set("fs.hdfs.impl.disable.cache", "true");
         conf.set(LineRecordReader.MAX_LINE_LENGTH,
-                 Long.toString(conf.getLong("maxRowSize", 10L*1024L*1024L))); // 10 Mo Max per line.
+                 Integer.toString(conf.getInt("maxRowSize", 10*1024*1024))); // 10 Mo Max per line.
 
         return job;
     }
@@ -434,7 +434,7 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
                 final int length = ((BinaryComparable) value).getLength();
                 final int maxRowSize = conf.getInt("maxRowSize", 10 * 1024 * 1024);
                 if (length >= maxRowSize) {
-                    throw new FileParameterException("Row size exceeded maximum allowed size");
+                    throw new FileParameterException("Row size exceeded maximum allowed size (" + maxRowSize + ")");
                 }
             }
             return KV.of(key, value);

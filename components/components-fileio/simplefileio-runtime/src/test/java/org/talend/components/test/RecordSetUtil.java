@@ -144,18 +144,4 @@ public class RecordSetUtil {
       }
   }
 
-    public static void writeTextFile(FileSystem fs, String path, Supplier<String> contentGetter, String encoding) throws IOException {
-        try (PrintWriter w = (encoding != null ? new PrintWriter(new OutputStreamWriter(fs.create(new Path(path)), encoding)) : new PrintWriter(fs.create(new Path(path))))) {
-            String content = contentGetter.get();
-            long iter = 0;
-            while (content != null && content.length() > 0 && iter < 3_000_000L) {
-                w.print(content);
-                iter++;
-                if (iter % 10F == 0F) {
-                    w.flush();
-                }
-            }
-        }
-    }
-
 }
