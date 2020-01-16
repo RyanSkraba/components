@@ -82,7 +82,7 @@
 		"url" : "jdbc:redshift://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/database",
 		"paths" :
 		[
-			{"path" : "mvn:com.amazon.redshift/redshift-jdbc42-no-awssdk/1.2.10.1009"},
+			{"path" : "mvn:com.amazon.redshift/redshift-jdbc42-no-awssdk/1.2.37.1061"},
 			{"path" : "mvn:com.amazonaws/aws-java-sdk-core/1.11.118"},
 			{"path" : "mvn:com.amazonaws/aws-java-sdk-redshift/1.11.118"},
 			{"path" : "mvn:com.amazonaws/aws-java-sdk-sts/1.11.118"}
