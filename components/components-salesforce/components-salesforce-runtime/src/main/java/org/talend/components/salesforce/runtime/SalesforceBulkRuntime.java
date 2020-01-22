@@ -756,6 +756,7 @@ public class SalesforceBulkRuntime {
                 continue;
             }
             resultSet.addAll(Arrays.asList(getQueryResultList(job.getId(), batch.getId()).getResult()));
+            LOGGER.debug("Finished batch info: " + batch.toString().replaceAll("\n", ","));
         }
 
         queryResultIDs = resultSet.iterator();
