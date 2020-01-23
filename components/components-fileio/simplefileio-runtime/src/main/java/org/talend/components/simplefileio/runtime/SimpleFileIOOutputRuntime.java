@@ -72,9 +72,7 @@ public class SimpleFileIOOutputRuntime extends PTransform<PCollection<IndexedRec
             break;
 
         case CSV:
-            rf = new SimpleRecordFormatCsvIO(doAs, path, overwrite, limit,
-                    properties.getDatasetProperties().getRecordDelimiter(),
-                    properties.getDatasetProperties().getMaxRowSize(),
+            rf = new SimpleRecordFormatCsvIO(doAs, path, overwrite, limit, properties.getDatasetProperties().getRecordDelimiter(),
                     properties.getDatasetProperties().getFieldDelimiter(), mergeOutput);
             break;
 

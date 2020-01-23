@@ -39,7 +39,7 @@ public class S3DatasetPropertiesTest {
     /**
      * Useful constant listing all of the fields in the properties.
      */
-    public static final Iterable<String> ALL = Arrays.asList("format", "recordDelimiter", "maxRowSize", "fieldDelimiter");
+    public static final Iterable<String> ALL = Arrays.asList("format", "recordDelimiter", "fieldDelimiter");
 
     /**
      * Instance to test. A new instance is created for each test.
@@ -94,7 +94,7 @@ public class S3DatasetPropertiesTest {
         Form main = properties.getForm(Form.MAIN);
         assertThat(main, notNullValue());
 
-        assertThat(main.getWidgets(), hasSize(20));
+        assertThat(main.getWidgets(), hasSize(19));
 
         for (String field : ALL) {
             Widget w = main.getWidget(field);

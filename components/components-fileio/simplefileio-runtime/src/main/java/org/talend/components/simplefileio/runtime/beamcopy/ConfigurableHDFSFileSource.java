@@ -39,7 +39,6 @@ import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.BinaryComparable;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableUtils;
 import org.apache.hadoop.mapreduce.InputSplit;
@@ -49,7 +48,6 @@ import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.TaskAttemptID;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.LineRecordReader;
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
 
 import com.google.common.base.Function;
@@ -181,9 +179,6 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
         conf.set("fs.s3t.impl.disable.cache", "true");
         conf.set("fs.file.impl.disable.cache", "true");
         conf.set("fs.hdfs.impl.disable.cache", "true");
-        conf.set(LineRecordReader.MAX_LINE_LENGTH,
-                 Integer.toString(conf.getInt("maxRowSize", 10*1024*1024))); // 10 Mo Max per line.
-
         return job;
     }
 
@@ -389,7 +384,7 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
                         // advance the reader and see if it has records
                         InputSplit nextSplit = splitsIterator.next();
                         @SuppressWarnings("unchecked")
-                        RecordReader<K, V> reader = (RecordReader<K, V>) this.createRecordReader(nextSplit);
+                        RecordReader<K, V> reader = (RecordReader<K, V>) format.createRecordReader(nextSplit, attemptContext);
                         if (currentReader != null) {
                             currentReader.close();
                         }
@@ -413,11 +408,6 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
             }
         }
 
-        private <K, V> RecordReader<K, V> createRecordReader(InputSplit split) throws IOException, InterruptedException {
-            final RecordReader<K, V> reader = (RecordReader<K, V>) format.createRecordReader(split, this.attemptContext);
-            return LimitedLineRecordReader.buildReader(reader);
-        }
-
         @SuppressWarnings("unchecked")
         protected KV<K, V> nextPair() throws IOException, InterruptedException {
             K key = currentReader.getCurrentKey();
@@ -428,14 +418,6 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
             }
             if (value instanceof Writable) {
                 value = (V) WritableUtils.clone((Writable) value, conf);
-            }
-            if (value instanceof BinaryComparable) {
-                // test if exceed max row size.
-                final int length = ((BinaryComparable) value).getLength();
-                final int maxRowSize = conf.getInt("maxRowSize", 10 * 1024 * 1024);
-                if (length >= maxRowSize) {
-                    throw new FileParameterException("Row size exceeded maximum allowed size (" + maxRowSize + ")");
-                }
             }
             return KV.of(key, value);
         }

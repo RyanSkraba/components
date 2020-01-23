@@ -65,8 +65,6 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
 
     private final String recordDelimiter;
 
-    private final Integer maxRowSize;
-
     private final String fieldDelimiter;
     
     private String encoding = "UTF-8";
@@ -86,9 +84,9 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
      * @param fieldDelimiter
      */
     
-    public SimpleRecordFormatCsvIO(UgiDoAs doAs, String path, int limit, String recordDelimiter, Integer maxRowSize,
+    public SimpleRecordFormatCsvIO(UgiDoAs doAs, String path, int limit, String recordDelimiter,
             String fieldDelimiter, String encoding, long header, String textEnclosure, String escapeChar) {
-        this(doAs, path, false, limit, recordDelimiter, maxRowSize, fieldDelimiter, false);
+        this(doAs, path, false, limit, recordDelimiter, fieldDelimiter, false);
         this.encoding = encoding;
         this.header = header;
         this.textEnclosure = textEnclosure;
@@ -96,10 +94,9 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
     }
     
     public SimpleRecordFormatCsvIO(UgiDoAs doAs, String path, boolean overwrite, int limit, String recordDelimiter,
-                                   Integer maxRowSize, String fieldDelimiter, boolean mergeOutput) {
+            String fieldDelimiter, boolean mergeOutput) {
         super(doAs, path, overwrite, limit, mergeOutput);
         this.recordDelimiter = recordDelimiter;
-        this.maxRowSize = maxRowSize;
 
         String fd = fieldDelimiter;
         if (fd.length() > 1) {
@@ -120,7 +117,7 @@ public class SimpleRecordFormatCsvIO extends SimpleRecordFormatBase {
             isGSFileSystem = true;
             pc2 = in.apply(TextIO.read().from(path));
         } else {
-            CsvHdfsFileSource source = CsvHdfsFileSource.of(doAs, path, recordDelimiter, this.maxRowSize, encoding, header, textEnclosure, escapeChar);
+            CsvHdfsFileSource source = CsvHdfsFileSource.of(doAs, path, recordDelimiter, encoding, header, textEnclosure, escapeChar);
             source.getExtraHadoopConfiguration().addFrom(getExtraHadoopConfiguration());
 
             source.setLimit(limit);
