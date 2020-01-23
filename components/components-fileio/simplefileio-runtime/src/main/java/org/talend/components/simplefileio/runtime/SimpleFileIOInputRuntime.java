@@ -64,7 +64,6 @@ public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<Ind
         case CSV:
             SimpleFileIODatasetProperties dataset = properties.getDatasetProperties();
             rf = new SimpleRecordFormatCsvIO(doAs, path, limit, dataset.getRecordDelimiter(),
-                dataset.getMaxRowSize(),
                 dataset.getFieldDelimiter(), dataset.getEncoding(), 
                 dataset.getHeaderLine(), dataset.getTextEnclosureCharacter(), dataset.getEscapeCharacter());
             break;

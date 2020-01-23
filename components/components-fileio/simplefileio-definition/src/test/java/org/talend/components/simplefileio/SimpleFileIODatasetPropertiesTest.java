@@ -36,7 +36,7 @@ public class SimpleFileIODatasetPropertiesTest {
     /**
      * Useful constant listing all of the fields in the properties.
      */
-    public static final Iterable<String> ALL = Arrays.asList("format", "path", "recordDelimiter", "maxRowSize", "fieldDelimiter");
+    public static final Iterable<String> ALL = Arrays.asList("format", "path", "recordDelimiter", "fieldDelimiter");
 
     /**
      * Instance to test. A new instance is created for each test.
@@ -89,7 +89,7 @@ public class SimpleFileIODatasetPropertiesTest {
 
         Form main = properties.getForm(Form.MAIN);
         assertThat(main, notNullValue());
-        assertThat(main.getWidgets(), hasSize(17));
+        assertThat(main.getWidgets(), hasSize(16));
 
         for (String field : ALL) {
             Widget w = main.getWidget(field);
@@ -123,7 +123,6 @@ public class SimpleFileIODatasetPropertiesTest {
             case CSV:
                 assertThat(main.getWidget("recordDelimiter").isVisible(), is(true));
                 assertThat(main.getWidget("specificRecordDelimiter").isVisible(), is(false));
-                assertThat(main.getWidget("maxRowSize").isVisible(), is(true));
                 assertThat(main.getWidget("fieldDelimiter").isVisible(), is(true));
                 assertThat(main.getWidget("specificFieldDelimiter").isVisible(), is(false));
                 
