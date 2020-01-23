@@ -12,28 +12,19 @@
 // ============================================================================
 package org.talend.components.simplefileio.runtime;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.talend.components.test.RecordSetUtil.getEmptyTestData;
-import static org.talend.components.test.RecordSetUtil.getSimpleTestData;
-import static org.talend.components.test.RecordSetUtil.writeCsvFile;
-import static org.talend.components.test.RecordSetUtil.writeRandomAvroFile;
-import static org.talend.components.test.RecordSetUtil.writeRandomCsvFile;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.beam.sdk.io.BoundedSource;
+import org.apache.beam.sdk.values.KV;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matcher;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.common.dataset.DatasetDefinition;
@@ -42,10 +33,22 @@ import org.talend.components.simplefileio.SimpleFileIODatasetDefinition;
 import org.talend.components.simplefileio.SimpleFileIODatasetProperties;
 import org.talend.components.simplefileio.SimpleFileIOFormat;
 import org.talend.components.simplefileio.local.EncodingType;
+import org.talend.components.simplefileio.runtime.beamcopy.ConfigurableHDFSFileSource;
+import org.talend.components.simplefileio.runtime.beamcopy.FileParameterException;
 import org.talend.components.test.MiniDfsResource;
 import org.talend.components.test.RecordSet;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.runtime.RuntimeUtil;
+
+import java.io.*;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.talend.components.test.RecordSetUtil.*;
 
 /**
  * Unit tests for {@link SimpleFileIODatasetRuntime}.
@@ -280,6 +283,37 @@ public class SimpleFileIODatasetRuntimeTest {
         });
   
         assertThat(actual, hasSize(3));
+    }
+
+    @Test
+    public void testWrongCsv_bigFirstLine() throws Exception {
+        URL res = this.getClass().getResource(".");
+        File output = new File(res.getPath(), "bigfile.txt");
+        if (output.exists()) {
+            output.delete();
+        }
+
+        final String content = "TwoBigContentForOnlyOneLine : this will provoque out of memory error";
+        try (PrintWriter w = new PrintWriter(new FileOutputStream(output))) {
+            for (long i = 0; i < 30_000_000; i++) {
+                w.print(content);
+                if (i % 100L == 0L) {
+                    w.flush();
+                }
+            }
+        }
+        final ConfigurableHDFSFileSource<LongWritable, Text> source = ConfigurableHDFSFileSource.from(output.getPath(),
+                TextInputFormat.class, LongWritable.class, Text.class);
+        BoundedSource.BoundedReader<KV<LongWritable, Text>> reader = source.createReader(null);
+        try {
+            reader.start();
+            Assert.fail("Exception should be thrown");
+        }
+        catch (FileParameterException ex) {
+            // ok, exception thrown
+            Assert.assertNotNull(ex);
+        }
+        output.delete();
     }
 
     @Test

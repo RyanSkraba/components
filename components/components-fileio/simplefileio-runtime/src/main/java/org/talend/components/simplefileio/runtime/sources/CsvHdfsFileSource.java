@@ -32,7 +32,7 @@ public class CsvHdfsFileSource extends FileSourceBase<LongWritable, BytesWritabl
         SimpleFileIOAvroRegistry.get();
     }
 
-    private CsvHdfsFileSource(UgiDoAs doAs, String filepattern, String recordDelimiter, String encoding, long header, String textEnclosure, String escapeChar, ExtraHadoopConfiguration extraConfig,
+    private CsvHdfsFileSource(UgiDoAs doAs, String filepattern, String recordDelimiter, Integer maxRowSize, String encoding, long header, String textEnclosure, String escapeChar, ExtraHadoopConfiguration extraConfig,
             SerializableSplit serializableSplit) {
         super(doAs, filepattern, CSVFileInputFormat.class, LongWritable.class, BytesWritable.class, extraConfig, serializableSplit);
         ExtraHadoopConfiguration hadoop_config = getExtraHadoopConfiguration();
@@ -48,8 +48,8 @@ public class CsvHdfsFileSource extends FileSourceBase<LongWritable, BytesWritabl
         super(doAs, filepattern, CSVFileInputFormat.class, LongWritable.class, BytesWritable.class, extraConfig, serializableSplit);
     }
 
-    public static CsvHdfsFileSource of(UgiDoAs doAs, String filepattern, String recordDelimiter, String encoding, long header, String textEnclosure, String escapeChar) {
-        return new CsvHdfsFileSource(doAs, filepattern, recordDelimiter, encoding, header, textEnclosure, escapeChar, new ExtraHadoopConfiguration(), null);
+    public static CsvHdfsFileSource of(UgiDoAs doAs, String filepattern, String recordDelimiter, Integer maxRowSize, String encoding, long header, String textEnclosure, String escapeChar) {
+        return new CsvHdfsFileSource(doAs, filepattern, recordDelimiter, maxRowSize, encoding, header, textEnclosure, escapeChar, new ExtraHadoopConfiguration(), null);
     }
 
     @Override
@@ -63,4 +63,6 @@ public class CsvHdfsFileSource extends FileSourceBase<LongWritable, BytesWritabl
     protected UgiFileReader createReaderForSplit(SerializableSplit serializableSplit) throws IOException {
         return new UgiFileReader(this);
     }
+
+
 }
