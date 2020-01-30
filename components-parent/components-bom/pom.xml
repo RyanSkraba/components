@@ -14,7 +14,6 @@
         <!-- -->
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
         <!-- -->
-        <activemq.version>5.14.3</activemq.version>
         <aggdesigner-algorithm.version>6.0</aggdesigner-algorithm.version>
         <avatica.avatica-core.version>${avatica.version}</avatica.avatica-core.version>
         <avatica.avatica-metrics.version>${avatica.version}</avatica.avatica-metrics.version>
@@ -1461,11 +1460,6 @@
                 <version>${components.version}</version>
             </dependency>
             <!-- -->
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-client</artifactId>
-                <version>${activemq.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
                 <artifactId>hadoop-client</artifactId>

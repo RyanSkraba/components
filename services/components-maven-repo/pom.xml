@@ -57,11 +57,6 @@
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>jms-runtime_1_1</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-runtime</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -227,7 +222,6 @@
                                 <!-- Components runtime -->
                                 <extraArtifact>org.talend.components:components-salesforce-runtime:${project.version}:jar</extraArtifact>
                                 <extraArtifact>org.talend.components:components-jira:${project.version}:jar</extraArtifact>
-                                <extraArtifact>org.talend.components:jms-runtime_1_1:${project.version}:jar</extraArtifact>
                                 <extraArtifact>org.talend.components:localio-runtime:${project.version}:jar</extraArtifact>
                                 <extraArtifact>org.talend.components:kafka-runtime:${project.version}:jar</extraArtifact>
                                 <extraArtifact>org.talend.components:elasticsearch-runtime_2_4:${project.version}:jar</extraArtifact>
@@ -345,11 +339,6 @@
                                 <artifact>
                                     <groupId>org.talend.components</groupId>
                                     <artifactId>localio-definition</artifactId>
-                                    <version>${project.version}</version>
-                                </artifact>
-                                <artifact>
-                                    <groupId>org.talend.components</groupId>
-                                    <artifactId>jms-definition</artifactId>
                                     <version>${project.version}</version>
                                 </artifact>
                                 <artifact>
