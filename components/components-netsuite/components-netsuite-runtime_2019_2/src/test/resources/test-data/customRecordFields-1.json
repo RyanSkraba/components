@@ -1,0 +1,16 @@
+[
+  {
+    "scriptId":"custom_record_field_1",
+    "internalId":"100101",
+    "externalId":null,
+    "customizationType":"customRecordType",
+    "valueType":"STRING"
+  },
+  {
+    "scriptId":"custom_record_field_2",
+    "internalId":"100102",
+    "externalId":null,
+    "customizationType":"customRecordType",
+    "valueType":"DATE"
+  }
+]

@@ -9,52 +9,29 @@
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>components-netsuite-runtime</artifactId>
-    <name>Components - NetSuite Runtime</name>
+    <artifactId>components-netsuite-runtime_2019_2</artifactId>
+    <name>Components - NetSuite Runtime v2019.2</name>
     <packaging>jar</packaging>
 
     <properties>
+        <skipITs>true</skipITs>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.xml.ws</groupId>
-            <artifactId>jaxws-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-osgi-registry</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-saaj_1.3_spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-netsuite-definition</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-netsuite-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>
         </dependency>
 
         <dependency>
@@ -81,6 +58,7 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
         </dependency>
+        <!-- To include in dependencies.txt. -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -96,12 +74,6 @@
 
         <!-- Tests -->
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-annotation_1.3_spec</artifactId>
-            <version>1.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
             <scope>test</scope>
@@ -113,17 +85,24 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-netsuite-runtime</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- For dependency resolution. -->
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -132,10 +111,38 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>com/netsuite/webservices/**/*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <excludePackageNames>com.netsuite.webservices.*</excludePackageNames>
+                </configuration>
+            </plugin>
+
             <!-- Add Apache CXF generated sources to sources set. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -144,13 +151,13 @@
                 <executions>
                     <execution>
                         <id>add-source</id>
-                        <phase>generate-test-sources</phase>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>add-test-source</goal>
+                            <goal>add-source</goal>
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.build.directory}/generated-test-sources/cxf</source>
+                                <source>${project.build.directory}/generated-sources/cxf</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -164,21 +171,21 @@
                 <version>${cxf.version}</version>
                 <executions>
                     <execution>
-                        <id>cxf-generate-test-sources</id>
-                        <phase>generate-test-sources</phase>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
                         <configuration>
-                            <sourceRoot>${project.build.directory}/generated-test-sources/cxf</sourceRoot>
+                            <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl/2019.2/netsuite.wsdl</wsdl>
+                                    <wsdl>${basedir}/src/main/resources/wsdl/2019.2/netsuite.wsdl</wsdl>
                                     <serviceName>NetSuiteService</serviceName>
                                     <extraargs>
-                                        <extraarg>-xjc-b,${basedir}/src/test/resources/wsdl/2019.2/bindings.jaxb
+                                        <extraarg>-xjc-b,${basedir}/src/main/resources/wsdl/2019.2/bindings.jaxb
                                         </extraarg>
                                         <extraarg>-xjc-Xbg</extraarg>
                                         <extraarg>-p</extraarg>
                                         <extraarg>
-                                            urn:platform_2019_2.webservices.netsuite.com=com.netsuite.webservices.test.platform
+                                            urn:platform_2019_2.webservices.netsuite.com=com.netsuite.webservices.v2019_2.platform
                                         </extraarg>
                                     </extraargs>
                                 </wsdlOption>
@@ -199,34 +206,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>com/netsuite/webservices/**/*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <excludePackageNames>com.netsuite.webservices.*</excludePackageNames>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.20-PAXEXAM-PATCH</version>
@@ -242,8 +221,63 @@
                     <argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
                     <systemPropertyVariables>
                         <pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
+                        <netsuite.endpoint.url>${netsuite.endpoint.2019_2.url}</netsuite.endpoint.url>
+                        <netsuite.endpoint.2019_2.url>${netsuite.endpoint.2019_2.url}</netsuite.endpoint.2019_2.url>
+                        <netsuite.email>${netsuite.email}</netsuite.email>
+                        <netsuite.password>${netsuite.password}</netsuite.password>
+                        <netsuite.roleId>${netsuite.roleId}</netsuite.roleId>
+                        <netsuite.account>${netsuite.account}</netsuite.account>
+                        <netsuite.applicationId>${netsuite.applicationId}</netsuite.applicationId>
                     </systemPropertyVariables>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <!-- Build Lib bundle -->
+                    <execution>
+                        <id>lib-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                        <configuration>
+                            <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+                                <Bundle-SymbolicName>org.talend.components.netsuite.runtime.v2019_2.lib
+                                </Bundle-SymbolicName>
+                                <Bundle-Name>${project.name} lib</Bundle-Name>
+                                <Include-Resource>
+                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+                                </Include-Resource>
+                                <Service-Component>*</Service-Component>
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- The following plugins are there to make sure they are launched after
+                the bundle are packaged when used in the package phase.-->
+            <!-- They may be used with the -PgenerateP2 maven profile to build a p2
+                update site for distribution to the Studio -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho.extras</groupId>
+                <artifactId>tycho-p2-extras-plugin</artifactId>
+                <version>0.26.0</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

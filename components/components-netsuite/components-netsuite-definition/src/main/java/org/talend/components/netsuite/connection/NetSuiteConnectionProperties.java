@@ -52,7 +52,7 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
 
     public static final String FORM_WIZARD = "Wizard";
 
-    public static final NetSuiteVersion DEFAULT_API_VERSION = new NetSuiteVersion(2018, 2);
+    public static final NetSuiteVersion DEFAULT_API_VERSION = new NetSuiteVersion(2019, 2);
 
     public static final String DEFAULT_ENDPOINT_URL =
             "https://webservices.netsuite.com/services/NetSuitePort_" + DEFAULT_API_VERSION.getMajorAsString();
@@ -61,7 +61,7 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
      * List of versions supported by NetSuite components.
      */
     public static final List<String> API_VERSIONS =
-            Collections.unmodifiableList(Arrays.asList("2018.2", "2016.2", "2014.2"));
+            Collections.unmodifiableList(Arrays.asList("2019.2", "2018.2", "2016.2", "2014.2"));
 
     public final Property<String> name = newString("name").setRequired();
 
@@ -87,7 +87,7 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
      * custom fields which are exposed for components.
      */
     public final Property<Boolean> customizationEnabled = newBoolean("customizationEnabled");
-    
+
     public final Property<Boolean> useRequestLevelCredentials = newBoolean("useRequestLevelCredentials");
 
     public final PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
@@ -307,8 +307,6 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
             }
         }
         // Initialize possible values for apiVersion property.
-        if (apiVersion.getPossibleValues().isEmpty()) {
-            apiVersion.setPossibleValues(API_VERSIONS);
-        }
+        apiVersion.setPossibleValues(API_VERSIONS);
     }
 }

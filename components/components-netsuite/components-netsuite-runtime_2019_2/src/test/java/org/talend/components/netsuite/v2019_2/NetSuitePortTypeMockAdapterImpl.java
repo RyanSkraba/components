@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2020 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -11,7 +11,7 @@
 //
 // ============================================================================
 
-package org.talend.components.netsuite.test;
+package org.talend.components.netsuite.v2019_2;
 
 import java.net.URL;
 
@@ -21,122 +21,120 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
 import org.talend.components.netsuite.NetSuitePortTypeMockAdapter;
+import org.talend.components.netsuite.test.MessageContextHolder;
 
-import com.netsuite.webservices.test.platform.AsyncFault;
-import com.netsuite.webservices.test.platform.ExceededConcurrentRequestLimitFault;
-import com.netsuite.webservices.test.platform.ExceededRecordCountFault;
-import com.netsuite.webservices.test.platform.ExceededRequestLimitFault;
-import com.netsuite.webservices.test.platform.ExceededRequestSizeFault;
-import com.netsuite.webservices.test.platform.ExceededUsageLimitFault;
-import com.netsuite.webservices.test.platform.InsufficientPermissionFault;
-import com.netsuite.webservices.test.platform.InvalidAccountFault;
-import com.netsuite.webservices.test.platform.InvalidCredentialsFault;
-import com.netsuite.webservices.test.platform.InvalidSessionFault;
-import com.netsuite.webservices.test.platform.InvalidVersionFault;
-import com.netsuite.webservices.test.platform.NetSuitePortType;
-import com.netsuite.webservices.test.platform.UnexpectedErrorFault;
-import com.netsuite.webservices.test.platform.core.CustomizationRefList;
-import com.netsuite.webservices.test.platform.core.DataCenterUrls;
-import com.netsuite.webservices.test.platform.core.GetCustomizationIdResult;
-import com.netsuite.webservices.test.platform.core.GetDataCenterUrlsResult;
-import com.netsuite.webservices.test.platform.core.Status;
-import com.netsuite.webservices.test.platform.core.StatusDetail;
-import com.netsuite.webservices.test.platform.faults.types.StatusDetailCodeType;
-import com.netsuite.webservices.test.platform.faults.types.StatusDetailType;
-import com.netsuite.webservices.test.platform.messages.AddListRequest;
-import com.netsuite.webservices.test.platform.messages.AddListResponse;
-import com.netsuite.webservices.test.platform.messages.AddRequest;
-import com.netsuite.webservices.test.platform.messages.AddResponse;
-import com.netsuite.webservices.test.platform.messages.AsyncAddListRequest;
-import com.netsuite.webservices.test.platform.messages.AsyncDeleteListRequest;
-import com.netsuite.webservices.test.platform.messages.AsyncGetListRequest;
-import com.netsuite.webservices.test.platform.messages.AsyncInitializeListRequest;
-import com.netsuite.webservices.test.platform.messages.AsyncSearchRequest;
-import com.netsuite.webservices.test.platform.messages.AsyncStatusResponse;
-import com.netsuite.webservices.test.platform.messages.AsyncUpdateListRequest;
-import com.netsuite.webservices.test.platform.messages.AsyncUpsertListRequest;
-import com.netsuite.webservices.test.platform.messages.AttachRequest;
-import com.netsuite.webservices.test.platform.messages.AttachResponse;
-import com.netsuite.webservices.test.platform.messages.ChangeEmailRequest;
-import com.netsuite.webservices.test.platform.messages.ChangeEmailResponse;
-import com.netsuite.webservices.test.platform.messages.ChangePasswordRequest;
-import com.netsuite.webservices.test.platform.messages.ChangePasswordResponse;
-import com.netsuite.webservices.test.platform.messages.CheckAsyncStatusRequest;
-import com.netsuite.webservices.test.platform.messages.DeleteListRequest;
-import com.netsuite.webservices.test.platform.messages.DeleteListResponse;
-import com.netsuite.webservices.test.platform.messages.DeleteRequest;
-import com.netsuite.webservices.test.platform.messages.DeleteResponse;
-import com.netsuite.webservices.test.platform.messages.DetachRequest;
-import com.netsuite.webservices.test.platform.messages.DetachResponse;
-import com.netsuite.webservices.test.platform.messages.GetAllRequest;
-import com.netsuite.webservices.test.platform.messages.GetAllResponse;
-import com.netsuite.webservices.test.platform.messages.GetAsyncResultRequest;
-import com.netsuite.webservices.test.platform.messages.GetAsyncResultResponse;
-import com.netsuite.webservices.test.platform.messages.GetBudgetExchangeRateRequest;
-import com.netsuite.webservices.test.platform.messages.GetBudgetExchangeRateResponse;
-import com.netsuite.webservices.test.platform.messages.GetCurrencyRateRequest;
-import com.netsuite.webservices.test.platform.messages.GetCurrencyRateResponse;
-import com.netsuite.webservices.test.platform.messages.GetCustomizationIdRequest;
-import com.netsuite.webservices.test.platform.messages.GetCustomizationIdResponse;
-import com.netsuite.webservices.test.platform.messages.GetDataCenterUrlsRequest;
-import com.netsuite.webservices.test.platform.messages.GetDataCenterUrlsResponse;
-import com.netsuite.webservices.test.platform.messages.GetDeletedRequest;
-import com.netsuite.webservices.test.platform.messages.GetDeletedResponse;
-import com.netsuite.webservices.test.platform.messages.GetItemAvailabilityRequest;
-import com.netsuite.webservices.test.platform.messages.GetItemAvailabilityResponse;
-import com.netsuite.webservices.test.platform.messages.GetListRequest;
-import com.netsuite.webservices.test.platform.messages.GetListResponse;
-import com.netsuite.webservices.test.platform.messages.GetPostingTransactionSummaryRequest;
-import com.netsuite.webservices.test.platform.messages.GetPostingTransactionSummaryResponse;
-import com.netsuite.webservices.test.platform.messages.GetRequest;
-import com.netsuite.webservices.test.platform.messages.GetResponse;
-import com.netsuite.webservices.test.platform.messages.GetSavedSearchRequest;
-import com.netsuite.webservices.test.platform.messages.GetSavedSearchResponse;
-import com.netsuite.webservices.test.platform.messages.GetSelectValueRequest;
-import com.netsuite.webservices.test.platform.messages.GetSelectValueResponse;
-import com.netsuite.webservices.test.platform.messages.GetServerTimeRequest;
-import com.netsuite.webservices.test.platform.messages.GetServerTimeResponse;
-import com.netsuite.webservices.test.platform.messages.InitializeListRequest;
-import com.netsuite.webservices.test.platform.messages.InitializeListResponse;
-import com.netsuite.webservices.test.platform.messages.InitializeRequest;
-import com.netsuite.webservices.test.platform.messages.InitializeResponse;
-import com.netsuite.webservices.test.platform.messages.LoginRequest;
-import com.netsuite.webservices.test.platform.messages.LoginResponse;
-import com.netsuite.webservices.test.platform.messages.LogoutRequest;
-import com.netsuite.webservices.test.platform.messages.LogoutResponse;
-import com.netsuite.webservices.test.platform.messages.MapSsoRequest;
-import com.netsuite.webservices.test.platform.messages.MapSsoResponse;
-import com.netsuite.webservices.test.platform.messages.ReadResponseList;
-import com.netsuite.webservices.test.platform.messages.SearchMoreRequest;
-import com.netsuite.webservices.test.platform.messages.SearchMoreResponse;
-import com.netsuite.webservices.test.platform.messages.SearchMoreWithIdRequest;
-import com.netsuite.webservices.test.platform.messages.SearchMoreWithIdResponse;
-import com.netsuite.webservices.test.platform.messages.SearchNextRequest;
-import com.netsuite.webservices.test.platform.messages.SearchNextResponse;
-import com.netsuite.webservices.test.platform.messages.SearchRequest;
-import com.netsuite.webservices.test.platform.messages.SearchResponse;
-import com.netsuite.webservices.test.platform.messages.SsoLoginRequest;
-import com.netsuite.webservices.test.platform.messages.SsoLoginResponse;
-import com.netsuite.webservices.test.platform.messages.UpdateInviteeStatusListRequest;
-import com.netsuite.webservices.test.platform.messages.UpdateInviteeStatusListResponse;
-import com.netsuite.webservices.test.platform.messages.UpdateInviteeStatusRequest;
-import com.netsuite.webservices.test.platform.messages.UpdateInviteeStatusResponse;
-import com.netsuite.webservices.test.platform.messages.UpdateListRequest;
-import com.netsuite.webservices.test.platform.messages.UpdateListResponse;
-import com.netsuite.webservices.test.platform.messages.UpdateRequest;
-import com.netsuite.webservices.test.platform.messages.UpdateResponse;
-import com.netsuite.webservices.test.platform.messages.UpsertListRequest;
-import com.netsuite.webservices.test.platform.messages.UpsertListResponse;
-import com.netsuite.webservices.test.platform.messages.UpsertRequest;
-import com.netsuite.webservices.test.platform.messages.UpsertResponse;
+import com.netsuite.webservices.v2019_2.platform.AsyncFault;
+import com.netsuite.webservices.v2019_2.platform.ExceededConcurrentRequestLimitFault;
+import com.netsuite.webservices.v2019_2.platform.ExceededRecordCountFault;
+import com.netsuite.webservices.v2019_2.platform.ExceededRequestLimitFault;
+import com.netsuite.webservices.v2019_2.platform.ExceededRequestSizeFault;
+import com.netsuite.webservices.v2019_2.platform.ExceededUsageLimitFault;
+import com.netsuite.webservices.v2019_2.platform.InsufficientPermissionFault;
+import com.netsuite.webservices.v2019_2.platform.InvalidAccountFault;
+import com.netsuite.webservices.v2019_2.platform.InvalidCredentialsFault;
+import com.netsuite.webservices.v2019_2.platform.InvalidSessionFault;
+import com.netsuite.webservices.v2019_2.platform.InvalidVersionFault;
+import com.netsuite.webservices.v2019_2.platform.NetSuitePortType;
+import com.netsuite.webservices.v2019_2.platform.UnexpectedErrorFault;
+import com.netsuite.webservices.v2019_2.platform.core.CustomizationRefList;
+import com.netsuite.webservices.v2019_2.platform.core.DataCenterUrls;
+import com.netsuite.webservices.v2019_2.platform.core.GetCustomizationIdResult;
+import com.netsuite.webservices.v2019_2.platform.core.GetDataCenterUrlsResult;
+import com.netsuite.webservices.v2019_2.platform.core.Status;
+import com.netsuite.webservices.v2019_2.platform.messages.AddListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.AddListResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.AddRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.AddResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.AsyncAddListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.AsyncDeleteListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.AsyncGetListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.AsyncInitializeListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.AsyncSearchRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.AsyncStatusResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.AsyncUpdateListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.AsyncUpsertListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.AttachRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.AttachResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.ChangeEmailRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.ChangeEmailResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.ChangePasswordRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.ChangePasswordResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.CheckAsyncStatusRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.DeleteListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.DeleteListResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.DeleteRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.DeleteResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.DetachRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.DetachResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetAllRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetAllResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetAsyncResultRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetAsyncResultResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetBudgetExchangeRateRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetBudgetExchangeRateResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetCurrencyRateRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetCurrencyRateResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetCustomizationIdRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetCustomizationIdResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetDataCenterUrlsRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetDataCenterUrlsResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetDeletedRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetDeletedResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetItemAvailabilityRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetItemAvailabilityResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetListResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetPostingTransactionSummaryRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetPostingTransactionSummaryResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetSavedSearchRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetSavedSearchResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetSelectValueRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetSelectValueResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.GetServerTimeRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.GetServerTimeResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.InitializeListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.InitializeListResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.InitializeRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.InitializeResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.LoginRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.LoginResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.LogoutRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.LogoutResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.MapSsoRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.MapSsoResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.ReadResponseList;
+import com.netsuite.webservices.v2019_2.platform.messages.SearchMoreRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.SearchMoreResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.SearchMoreWithIdRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.SearchMoreWithIdResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.SearchNextRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.SearchNextResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.SearchRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.SearchResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.SsoLoginRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.SsoLoginResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.UpdateInviteeStatusListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.UpdateInviteeStatusListResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.UpdateInviteeStatusRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.UpdateInviteeStatusResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.UpdateListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.UpdateListResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.UpdateRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.UpdateResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.UpsertListRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.UpsertListResponse;
+import com.netsuite.webservices.v2019_2.platform.messages.UpsertRequest;
+import com.netsuite.webservices.v2019_2.platform.messages.UpsertResponse;
 
 /**
  *
  */
-@WebService(endpointInterface = "com.netsuite.webservices.test.platform.NetSuitePortType",
-        targetNamespace = "urn:platform_2016_2.webservices.netsuite.com",
+@WebService(endpointInterface = "com.netsuite.webservices.v2019_2.platform.NetSuitePortType",
+        targetNamespace = "urn:platform_2019_2.webservices.netsuite.com",
         serviceName = "NetSuiteService", portName = "NetSuitePort")
-public class NetSuitePortTypeMockAdapterImpl implements NetSuitePortTypeMockAdapter<NetSuitePortType>, NetSuitePortType {
+public class NetSuitePortTypeMockAdapterImpl implements NetSuitePortTypeMockAdapter<NetSuitePortType> {
 
     private NetSuitePortType port;
 
@@ -160,6 +158,7 @@ public class NetSuitePortTypeMockAdapterImpl implements NetSuitePortTypeMockAdap
         return port;
     }
 
+    @Override
     public void setPort(NetSuitePortType port) {
         this.port = port;
     }
@@ -345,10 +344,8 @@ public class NetSuitePortTypeMockAdapterImpl implements NetSuitePortTypeMockAdap
 
 //        List<Header> headers = getHeaders();
         try {
-            if (context != null) {
-                MessageContext messageContext = context.getMessageContext();
-                MessageContextHolder.set(messageContext);
-            }
+            MessageContext messageContext = context.getMessageContext();
+            MessageContextHolder.set(messageContext);
             return port.login(parameters);
         } finally {
             MessageContextHolder.remove();
@@ -536,17 +533,6 @@ public class NetSuitePortTypeMockAdapterImpl implements NetSuitePortTypeMockAdap
     public static Status createNotFoundStatus() {
         Status status = new Status();
         status.setIsSuccess(false);
-        return status;
-    }
-
-    public static Status createErrorStatus(StatusDetailCodeType code, String message) {
-        Status status = new Status();
-        status.setIsSuccess(false);
-        StatusDetail statusDetail = new StatusDetail();
-        statusDetail.setType(StatusDetailType.ERROR);
-        statusDetail.setCode(code);
-        statusDetail.setMessage(message);
-        status.getStatusDetail().add(statusDetail);
         return status;
     }
 }
