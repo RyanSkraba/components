@@ -11,8 +11,10 @@
     <properties>
         <components.version>0.28.0-SNAPSHOT</components.version>
         <daikon.version>0.31.10-SNAPSHOT</daikon.version>
-        <!-- -->
+        <!-- repositories -->
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
+        <talend.snapshots.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend.snapshots.repo>
+        <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</talend.releases.repo>
         <!-- -->
         <aggdesigner-algorithm.version>6.0</aggdesigner-algorithm.version>
         <avatica.avatica-core.version>${avatica.version}</avatica.avatica-core.version>
@@ -196,11 +198,11 @@
     <distributionManagement>
         <snapshotRepository>
             <id>talend_nexus_deployment</id>
-            <url>${talend_snapshots_deployment}</url>
+            <url>${talend.snapshots.repo}</url>
         </snapshotRepository>
         <repository>
             <id>talend_nexus_deployment</id>
-            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+            <url>${talend.releases.repo}</url>
         </repository>
     </distributionManagement>
 

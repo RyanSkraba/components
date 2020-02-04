@@ -26,7 +26,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>elasticsearch-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
 
         <!-- Tests -->

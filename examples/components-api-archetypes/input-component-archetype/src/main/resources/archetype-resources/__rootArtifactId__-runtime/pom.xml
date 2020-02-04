@@ -35,7 +35,7 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>\${rootArtifactId}-definition</artifactId>
-			<version>\${project.version}</version>
+			<version>\${components.version}</version>
 		</dependency>
 
 		<!-- APIs for all Components -->

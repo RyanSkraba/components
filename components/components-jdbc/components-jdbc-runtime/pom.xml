@@ -21,7 +21,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
 
         <dependency>
@@ -107,7 +107,7 @@
         <!--         <dependency> -->
         <!--             <groupId>org.talend.components</groupId> -->
         <!--             <artifactId>components-adapter-beam</artifactId> -->
-        <!--             <version>${project.version}</version> -->
+        <!--             <version>${components.version}</version> -->
         <!--         </dependency> -->
     </dependencies>
 

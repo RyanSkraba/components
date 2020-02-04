@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>kafka-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
 
         <dependency>
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>

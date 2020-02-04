@@ -30,12 +30,12 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-salesforce-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-salesforce-runtime</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
 
         <!-- Tests -->
@@ -167,7 +167,7 @@
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>components-salesforce-definition</artifactId>
                                     <classifier>bundle</classifier>
-                                    <version>${project.version}</version>
+                                    <version>${components.version}</version>
                                 </artifact>
                                 <!-- no need at final, but need to refactor the test before removing
                                     it -->
@@ -175,7 +175,7 @@
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>components-salesforce-runtime</artifactId>
                                     <classifier>bundle</classifier>
-                                    <version>${project.version}</version>
+                                    <version>${components.version}</version>
                                 </artifact>
                             </artifacts>
                         </configuration>

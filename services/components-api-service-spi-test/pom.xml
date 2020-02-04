@@ -15,7 +15,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-spi</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
 
         <!-- Component families to test. -->

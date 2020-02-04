@@ -25,17 +25,17 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>kinesis-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>kinesis-runtime</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-adapter-beam</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.beam</groupId>

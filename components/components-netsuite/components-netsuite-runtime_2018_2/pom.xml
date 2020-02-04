@@ -22,12 +22,12 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-netsuite-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-netsuite-runtime</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
@@ -93,7 +93,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-netsuite-runtime</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>

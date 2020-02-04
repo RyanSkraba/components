@@ -18,7 +18,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-googledrive-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <!-- googledrive runtime specific dependencies -->
         <dependency>

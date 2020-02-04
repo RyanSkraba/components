@@ -16,7 +16,7 @@
         <repository>
             <id>talend_nexus</id>
             <name>snapshots</name>
-            <url>${talend_snapshots_deployment}</url>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
         </repository>
         <repository>
             <id>releases</id>
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>multiple-runtime-comp</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

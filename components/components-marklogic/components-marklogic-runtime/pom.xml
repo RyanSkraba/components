@@ -16,6 +16,9 @@
 
     <properties>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
+        <!-- repositories -->
+        <spring.releases.repo>https://repo.spring.io/libs-release/</spring.releases.repo>
+
         <marklogic-client-api.version>4.0.4</marklogic-client-api.version>
         <marklogic.mlcp.version>9.0.5</marklogic.mlcp.version>
         <okio.version>1.14.0</okio.version>
@@ -23,23 +26,19 @@
     </properties>
 
     <repositories>
+        <!-- Spring repository is used for some dependencies. e.g. okhttp-digest dependency-->
         <repository>
-            <id>talend_nexus</id>
-            <name>snapshots</name>
-            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
-        </repository>
-        <repository>
-            <id>releases</id>
-            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+            <id>spring-releases</id>
+            <url>${spring.releases.repo}</url>
         </repository>
         <repository>
             <id>MarkLogic-releases</id>
             <name>MarkLogic Releases</name>
-            <url>http://developer.marklogic.com/maven2</url>
+            <url>https://developer.marklogic.com/maven2</url>
         </repository>
         <repository>
             <id>mapr-releases</id>
-            <url>http://repository.mapr.com/maven/</url>
+            <url>https://repository.mapr.com/maven/</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -53,7 +52,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-marklogic-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <!-- APIs for all Components -->
         <dependency>

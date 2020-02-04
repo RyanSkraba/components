@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>osgi-test-component</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -17,12 +17,12 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-marketo-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-marketo-runtime</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <!-- marketo runtime specific dependencies -->
         <dependency>

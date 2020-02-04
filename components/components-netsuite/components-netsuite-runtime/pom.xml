@@ -54,7 +54,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-netsuite-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
 
         <dependency>

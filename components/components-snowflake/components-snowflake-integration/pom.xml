@@ -23,12 +23,12 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-snowflake-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-snowflake-runtime</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>

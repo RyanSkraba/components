@@ -30,7 +30,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>simplefileio-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <!-- I'm not sure why this is necessary for the Spark runner tests. -->
         <dependency>
