@@ -70,7 +70,9 @@ public class S3OutputRuntime extends PTransform<PCollection<IndexedRecord>, PDon
             break;
 
         case CSV:
-            rf = new SimpleRecordFormatCsvIO(doAs, path, overwrite, limit, properties.getDatasetProperties().getRecordDelimiter(),
+            rf = new SimpleRecordFormatCsvIO(doAs, path, overwrite, limit,
+                    properties.getDatasetProperties().getRecordDelimiter(),
+                    properties.getDatasetProperties().getMaxRowSize(),
                     properties.getDatasetProperties().getFieldDelimiter(), mergeOutput);
             break;
 

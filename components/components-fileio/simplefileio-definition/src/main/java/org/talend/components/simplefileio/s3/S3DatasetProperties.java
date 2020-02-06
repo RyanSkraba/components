@@ -60,6 +60,9 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
     public Property<RecordDelimiterType> recordDelimiter = PropertyFactory.newEnum("recordDelimiter", RecordDelimiterType.class)
             .setValue(RecordDelimiterType.LF);
 
+    // define a max row size to avoid 'out of memory exception' (specially in case of wrong record delimiter param). 10 Mo at default.
+    public Property<Integer> maxRowSize = PropertyFactory.newInteger("maxRowSize", 10 * 1024 * 1024);
+
     public Property<String> specificRecordDelimiter = PropertyFactory.newString("specificRecordDelimiter", "\\n");
 
     public Property<FieldDelimiterType> fieldDelimiter = PropertyFactory.newEnum("fieldDelimiter", FieldDelimiterType.class)
@@ -129,6 +132,7 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
         //CSV only properties
         mainForm.addRow(recordDelimiter);
         mainForm.addRow(specificRecordDelimiter);
+        mainForm.addRow(this.maxRowSize);
         mainForm.addRow(fieldDelimiter);
         mainForm.addRow(specificFieldDelimiter);
         mainForm.addRow(textEnclosureCharacter);
@@ -171,6 +175,7 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
 
             boolean isCSV = format.getValue() == SimpleFileIOFormat.CSV;
             form.getWidget(recordDelimiter).setVisible(isCSV);
+            form.getWidget(this.maxRowSize).setVisible(isCSV);
             form.getWidget(specificRecordDelimiter)
                     .setVisible(isCSV && recordDelimiter.getValue().equals(RecordDelimiterType.OTHER));
 
@@ -248,6 +253,10 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
         } else {
             return recordDelimiter.getValue().getDelimiter();
         }
+    }
+
+    public Integer getMaxRowSize() {
+        return this.maxRowSize.getValue();
     }
 
     public String getFieldDelimiter() {

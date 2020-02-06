@@ -32,6 +32,9 @@ public class CSVFileRecordReader extends RecordReader<LongWritable, BytesWritabl
   private static final Log LOG = LogFactory.getLog(CSVFileRecordReader.class);
   public static final String MAX_LINE_LENGTH = "mapreduce.input.linerecordreader.line.maxlength";
 
+  /** maximum for max length line is 10 Mo*/
+  private static final int MAX_POSSIBLE_LINE_LENGH = 10 * 1024 * 1024;
+
   private long start;
   private long pos;
   private long end;
@@ -77,7 +80,7 @@ public class CSVFileRecordReader extends RecordReader<LongWritable, BytesWritabl
   public void initialize(InputSplit genericSplit, TaskAttemptContext context) throws IOException {
     FileSplit split = (FileSplit) genericSplit;
     Configuration job = context.getConfiguration();
-    this.maxLineLength = job.getInt(MAX_LINE_LENGTH, Integer.MAX_VALUE);
+    this.maxLineLength = job.getInt(MAX_LINE_LENGTH, CSVFileRecordReader.MAX_POSSIBLE_LINE_LENGH);
     start = split.getStart();
     end = start + split.getLength();
     final Path file = split.getPath();
@@ -122,7 +125,7 @@ public class CSVFileRecordReader extends RecordReader<LongWritable, BytesWritabl
   }
 
   private int maxBytesToConsume(long pos) {
-    return isCompressedInput ? Integer.MAX_VALUE : (int) Math.max(Math.min(Integer.MAX_VALUE, end - pos), maxLineLength);
+    return isCompressedInput ? Integer.MAX_VALUE : (int) Math.max(Math.min(CSVFileRecordReader.MAX_POSSIBLE_LINE_LENGH, end - pos), maxLineLength);
   }
 
   private long getFilePosition() throws IOException {
@@ -139,7 +142,7 @@ public class CSVFileRecordReader extends RecordReader<LongWritable, BytesWritabl
     // Strip BOM(Byte Order Mark)
     // Text only support UTF-8, we only need to check UTF-8 BOM
     // (0xEF,0xBB,0xBF) at the start of the text stream.
-    int newMaxLineLength = (int) Math.min(3L + (long) maxLineLength, Integer.MAX_VALUE);
+    int newMaxLineLength = (int) Math.min(3L + (long) maxLineLength, CSVFileRecordReader.MAX_POSSIBLE_LINE_LENGH);
     int newSize = in.readLine(value, newMaxLineLength, maxBytesToConsume(pos));
     // Even we read 3 extra bytes for the first line,
     // we won't alter existing behavior (no backwards incompat issue).
