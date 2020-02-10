@@ -31,6 +31,7 @@ import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.SnowflakeDbTypeProperties;
 import org.talend.components.snowflake.SnowflakeTableProperties;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
@@ -70,6 +71,17 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     public SnowflakeDbTypeProperties dbtypeTable = new SnowflakeDbTypeProperties("dbtypeTable");
 
     public Property<Boolean> convertEmptyStringsToNull = newBoolean("convertEmptyStringsToNull");
+
+    /**
+     * Advanced property which specifies whether date mapping should be used
+     */
+    public Property<Boolean> useDateMapping = newBoolean("useDateMapping");
+
+    /**
+     * Advanced property which sets Date columns mapping to one of Snowflake Date and Time types.
+     * Default value is DATE - the same default mapping as it was before this property introduction
+     */
+    public Property<DateMapping> dateMapping = newEnum("dateMapping", DateMapping.class);
 
     // Have to use an explicit class to get the override of afterTableName(), an anonymous
     // class cannot be public and thus cannot be called.
@@ -135,7 +147,8 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         convertEmptyStringsToNull.setValue(false);
 
         usePersonalDBType.setValue(false);
-
+        useDateMapping.setValue(false);
+        dateMapping.setValue(DateMapping.DATE);
     }
 
     @Override
@@ -156,6 +169,14 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         Widget dbTypeTableWidget = new Widget(dbtypeTable);
         advancedForm.addRow(dbTypeTableWidget.setWidgetType(Widget.TABLE_WIDGET_TYPE));
         dbTypeTableWidget.setVisible(false);
+
+        Widget useDateMappingWidget = new Widget(useDateMapping);
+        useDateMappingWidget.setVisible(false);
+        advancedForm.addRow(useDateMappingWidget);
+
+        Widget dateMappingWidget = new Widget(dateMapping);
+        dateMappingWidget.setVisible(false);
+        advancedForm.addColumn(dateMappingWidget);
     }
 
     public void afterOutputAction() {
@@ -163,6 +184,10 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     }
 
     public void afterTableAction() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterUseDateMapping(){
         refreshLayout(getForm(Form.MAIN));
     }
 
@@ -178,6 +203,9 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
             if (advForm != null) {
                 advForm.getWidget(dbtypeTable.getName()).setVisible(usePersonalDBType.getValue() && isCreateTableAction);
                 advForm.getWidget(usePersonalDBType.getName()).setVisible(isCreateTableAction);
+                advForm.getWidget(useDateMapping.getName()).setVisible(isCreateTableAction && isDesignSchemaDynamic());
+                advForm.getWidget(dateMapping.getName()).setVisible(useDateMapping.getValue() && isCreateTableAction
+                        && isDesignSchemaDynamic());
 
                 boolean isUpsert = OutputAction.UPSERT.equals(outputAction.getValue());
                 form.getWidget(upsertKeyColumn.getName()).setHidden(!isUpsert);
@@ -186,6 +214,14 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
                 }
             }
         }
+    }
+
+    public Schema getDesignSchema() {
+        return table.main.schema.getValue();
+    }
+
+    public boolean isDesignSchemaDynamic() {
+        return AvroUtils.isIncludeAllFields(getDesignSchema());
     }
 
     protected List<String> getFieldNames(Property<?> schema) {

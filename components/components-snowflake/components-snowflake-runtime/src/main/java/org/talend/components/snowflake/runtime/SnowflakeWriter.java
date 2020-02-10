@@ -208,7 +208,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
                     connectionProperties1 = sprops.getConnectionProperties();
                 }
 
-                TableActionConfig conf = new SnowflakeTableActionConfig(sprops.convertColumnsAndTableToUppercase.getValue());
+                TableActionConfig conf = createTableActionConfig();
 
                 Schema schemaForCreateTable = getSchemaForTableAction(datum);
 
@@ -222,6 +222,25 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
                 throw new IOException(e.getMessage(), e);
             }
         }
+    }
+
+    /**
+     * Creates configuration which is used during table action (like create table)
+     * Customizes SQLType to TypeName map to provide quickfix, which allows user to specify Snowflake type for
+     * Date and Time values
+     *
+     * @return TableActionConfig
+     */
+    private TableActionConfig createTableActionConfig() {
+        TableActionConfig conf = new SnowflakeTableActionConfig(sprops.convertColumnsAndTableToUppercase.getValue());
+        if (sprops.useDateMapping.getValue() && sprops.isDesignSchemaDynamic()) {
+            // will map java.util.Date to fake DI_DATE SQL type
+            conf.CONVERT_JAVATYPE_TO_SQLTYPE.put("java.util.Date", SnowflakeTableActionConfig.DI_DATE);
+            String outputDateType = sprops.dateMapping.getValue().toString();
+            // maps fake DI_DATE SQL type to Snowflake type chosen by user in advanced settings
+            conf.CUSTOMIZE_SQLTYPE_TYPENAME.put(SnowflakeTableActionConfig.DI_DATE, outputDateType);
+        } // else use mapping to SQL type - to Date type as before
+        return  conf;
     }
 
     private Schema getSchemaForTableAction(Object datum) {
@@ -264,7 +283,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
                 setLoaderColumnsPropertyAtRuntime(loader, collectedFields);
             }
             tableActionManagement(datum);
-            
+
             //fetch the runtime schema after table action is over which make sure the table is create already
             initRuntimeSchemaAndMapIfNecessary();
 
@@ -302,7 +321,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         } else if (null == inputValue || inputValue instanceof String) {
             return inputValue;
         } else if (AvroUtils.isSameType(s, AvroUtils._date())) {//TODO improve the performance as no need to get the runtimefield object from map every time
-            //if customer set the schema by self instead of retrieve schema function, 
+            //if customer set the schema by self instead of retrieve schema function,
             //the snowflake date type like : date, time, timestamp with time zone, timestamp with local time zone, timestamp without time zone all may be the column type in database table
             //please see the test : SnowflakeDateTypeTestIT which show the details about terrible snowflake jdbc date type support, all control by client!
             //so we have to process the date type and format it by different database data type
@@ -317,7 +336,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             }
             dbColumnName = isUpperCase ? dbColumnName.toUpperCase() : dbColumnName;
             Field runtimeField = dbColumnName2RuntimeField.get(dbColumnName);
-            
+
             if(runtimeField!=null) {
                 s = AvroUtils.unwrapIfNullable(runtimeField.schema());
             } else {
@@ -327,10 +346,10 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
                 return date.getTime();
             }
         }
-        
+
         return formatIfAnySnowflakeDateType(inputValue, s);
     }
-    
+
     //only retrieve schema function or dynamic may support logical types below as it runtime to fetch the schema by SnowflakeAvroRegistry
     private Object formatIfAnySnowflakeDateType(Object inputValue, Schema s) {
         if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timeMillis()) {
@@ -371,24 +390,24 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
 
     protected Schema getSchema() throws IOException {
         SnowflakeConnectionTableProperties connectionTableProperties = ((SnowflakeConnectionTableProperties) sink.properties);
-        
+
         if(connectionTableProperties == null) {//only work for mock test, will remove it later
             return sink.getRuntimeSchema(new SchemaResolver() {
-    
+
               @Override
               public Schema getSchema() throws IOException {
                   return sink.getSchema(container, processingConnection, sprops.getTableName());
               }
           }, this.sprops.tableAction.getValue());
         }
-        
+
         Schema designSchema = connectionTableProperties.getSchema();
-        
+
         // Don't retrieve schema from database if there is a table action that will create the table
         if (AvroUtils.isIncludeAllFields(designSchema) && this.sprops.tableAction.getValue() == TableAction.TableActionEnum.NONE) {
             return initRuntimeSchemaAndMapIfNecessary();
         }
-        
+
         return designSchema;
     }
 
