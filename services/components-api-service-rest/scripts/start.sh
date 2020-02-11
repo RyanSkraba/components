@@ -38,7 +38,7 @@ if [ ! -z "$CLASSPATH" ] ; then
   APP_CLASSPATH="$CLASSPATH:$APP_CLASSPATH"
 fi
 
-[ -z "${OPS4J_PAX_OPTS}" ] && export OPS4J_PAX_OPTS="-Dorg.ops4j.pax.url.mvn.useFallbackRepositories=false -Dorg.ops4j.pax.url.mvn.repositories=\"https://repo.maven.apache.org/maven2@id=maven,https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/@id=talend\""
+[ -z "${OPS4J_PAX_OPTS}" ] && export OPS4J_PAX_OPTS="-Dorg.ops4j.pax.url.mvn.useFallbackRepositories=false"
 
 APP_CLASS="org.talend.components.service.rest.Application"
 

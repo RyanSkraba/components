@@ -15,6 +15,6 @@ IF DEFINED PAX_MVN_REPO (
 )
 SET PATH=%PATH%;%HADOOP_HOME%\bin
 
-IF NOT DEFINED OPS4J_PAX_OPTS SET OPS4J_PAX_OPTS=-Dorg.ops4j.pax.url.mvn.useFallbackRepositories=false -Dorg.ops4j.pax.url.mvn.repositories="https://repo.maven.apache.org/maven2@id=maven,https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/@id=talend"
+IF NOT DEFINED OPS4J_PAX_OPTS SET OPS4J_PAX_OPTS=-Dorg.ops4j.pax.url.mvn.useFallbackRepositories=false
 
 java %JAVA_OPTS% %OPS4J_PAX_OPTS% -Xmx2048m -Dfile.encoding=UTF-8 -Dorg.ops4j.pax.url.mvn.localRepository="%THISDIR%\.m2" -Dorg.ops4j.pax.url.mvn.settings="%THISDIR%config\settings.xml" -Dcomponent.default.config.folder="%THISDIR%\config\default" -cp %CLASSPATH% %APP_CLASS%

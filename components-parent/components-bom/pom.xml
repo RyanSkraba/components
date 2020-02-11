@@ -32,6 +32,10 @@
         <aws.version>1.11.125</aws.version>
         <azure-keyvault-core.version>0.9.7</azure-keyvault-core.version>
         <azure-storage.version>5.0.0</azure-storage.version>
+        <org.bouncycastle.version>1.64</org.bouncycastle.version>
+        <bcmail-jdk15on.version>${org.bouncycastle.version}</bcmail-jdk15on.version>
+        <bcpkix-jdk15on.version>${org.bouncycastle.version}</bcpkix-jdk15on.version>
+        <bcprov-jdk15on.version>${org.bouncycastle.version}</bcprov-jdk15on.version>
         <beam.version>2.9.0</beam.version>
         <bnd-annotation.version>2.4.0</bnd-annotation.version>
         <calcite.version>1.16.0</calcite.version>
@@ -457,6 +461,21 @@
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-core</artifactId>
                 <version>${jersey-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcmail-jdk15on</artifactId>
+                <version>${bcmail-jdk15on.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk15on</artifactId>
+                <version>${bcpkix-jdk15on.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bcprov-jdk15on.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.jersey.core</groupId>

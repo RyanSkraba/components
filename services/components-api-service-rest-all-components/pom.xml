@@ -385,7 +385,7 @@
                                                 <!-- add filebeat log variable -->
                                                 <env>
                                                     <LOG_PATH>/maven/logs</LOG_PATH>
-                                                    <OPS4J_PAX_OPTS>-Dorg.ops4j.pax.url.mvn.useFallbackRepositories=false -Dorg.ops4j.pax.url.mvn.repositories="https://repo.maven.apache.org/maven2@id=maven,https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/@id=talend"</OPS4J_PAX_OPTS>
+                                                    <OPS4J_PAX_OPTS>-Dorg.ops4j.pax.url.mvn.useFallbackRepositories=false</OPS4J_PAX_OPTS>
                                                 </env>
                                                 <labels>
                                                     <name>Talend Component REST API packaged with all components</name>
