@@ -57,7 +57,7 @@ public class JDBCConnectionTestIT {
                 .setValue(Arrays.asList("mvn:org.talend.libraries/mysql-connector-java-5.1.30-bin/6.0.0"));
 
         RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.NONE);
-        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo,
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
                 definition.getClass().getClassLoader())) {
             sandboxedInstance.getInstance();
             Class.forName("org.gjt.mm.mysql.Driver");

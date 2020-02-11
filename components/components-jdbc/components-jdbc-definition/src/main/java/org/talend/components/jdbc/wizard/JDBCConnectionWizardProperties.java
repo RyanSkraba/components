@@ -73,7 +73,7 @@ public class JDBCConnectionWizardProperties extends ComponentPropertiesImpl impl
 
     public ValidationResult validateTestConnection() {
         JdbcRuntimeInfo jdbcRuntimeInfo = new JdbcRuntimeInfo(this, "org.talend.components.jdbc.runtime.JDBCSourceOrSink");
-        try (SandboxedInstance sandboxI = RuntimeUtil.createRuntimeClass(jdbcRuntimeInfo,
+        try (SandboxedInstance sandboxI = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(jdbcRuntimeInfo,
                 connection.getClass().getClassLoader())) {
             JdbcRuntimeSourceOrSink sourceOrSink = (JdbcRuntimeSourceOrSink) sandboxI.getInstance();
             sourceOrSink.initialize(null, this);
@@ -95,7 +95,7 @@ public class JDBCConnectionWizardProperties extends ComponentPropertiesImpl impl
 
     public ValidationResult afterFormFinishMain(Repository<Properties> repo) throws Exception {
         JdbcRuntimeInfo jdbcRuntimeInfo = new JdbcRuntimeInfo(this, "org.talend.components.jdbc.runtime.JDBCSourceOrSink");
-        try (SandboxedInstance sandboxI = RuntimeUtil.createRuntimeClass(jdbcRuntimeInfo,
+        try (SandboxedInstance sandboxI = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(jdbcRuntimeInfo,
                 connection.getClass().getClassLoader())) {
             JdbcRuntimeSourceOrSink sourceOrSink = (JdbcRuntimeSourceOrSink) sandboxI.getInstance();
             sourceOrSink.initialize(null, this);
