@@ -31,7 +31,7 @@ public abstract class SnowflakeRuntime {
     protected static final I18nMessages I18N_MESSAGES = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(SnowflakeRuntime.class);
 
-    public static final String KEY_CONNECTION = "connection";
+    public static final String KEY_CONNECTION = "Connection";
 
     public static final String KEY_CONNECTION_PROPERTIES = "ConnectionProperties";
 

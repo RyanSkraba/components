@@ -31,7 +31,7 @@ import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
  */
 public class NetSuiteEndpoint {
 
-    public static final String CONNECTION = "connection";
+    public static final String CONNECTION = "NetSuite_Connection";
 
     /** Creates instance of NetSuite client. */
     private NetSuiteClientFactory<?> clientFactory;
