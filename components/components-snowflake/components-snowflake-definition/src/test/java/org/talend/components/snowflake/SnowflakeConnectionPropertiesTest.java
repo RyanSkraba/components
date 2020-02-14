@@ -118,7 +118,7 @@ public class SnowflakeConnectionPropertiesTest {
 
         StringBuilder builder = new StringBuilder();
 
-        String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
+        String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append(AZURE_REGION.getRegionID()).append(".").append("snowflakecomputing.com/")
                 .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
                 .append("schema=").append(SCHEMA).append("&").append("role=").append(ROLE)
                 .append("&").append("application=Talend-").append(TALEND_PRODUCT_VERSION)
@@ -379,25 +379,6 @@ public class SnowflakeConnectionPropertiesTest {
         snowflakeConnectionProperties.postDeserialize(1, null, false);
 
         Assert.assertEquals(0, snowflakeConnectionProperties.loginTimeout.getValue().intValue());
-    }
-
-    @Test
-    public void testMigrationRegion() {
-        //Missing value from 0 version.
-        snowflakeConnectionProperties.region.setValue(SnowflakeRegion.AWS_AP_SOUTHEAST_2);
-        snowflakeConnectionProperties.account.setStoredValue("\"account\"");
-
-        snowflakeConnectionProperties.postDeserialize(0, null, false);
-
-        Assert.assertEquals("\"account\"+\".ap-southeast-2\"", snowflakeConnectionProperties.account.getStoredValue());
-
-        snowflakeConnectionProperties.account.setStoredValue("\"account2\"");
-        snowflakeConnectionProperties.useCustomRegion.setValue(true);
-        snowflakeConnectionProperties.customRegionID.setValue("customerID");
-
-        snowflakeConnectionProperties.postDeserialize(1, null, false);
-
-        Assert.assertEquals("\"account2\"+\".customerID\"", snowflakeConnectionProperties.account.getStoredValue());
     }
 
 }

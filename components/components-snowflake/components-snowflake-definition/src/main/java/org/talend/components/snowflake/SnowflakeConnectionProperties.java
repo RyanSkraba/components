@@ -73,14 +73,7 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
 
     public Property<String> account = newString("account").setRequired(); //$NON-NLS-1$
 
-    @Deprecated //only keep for backward compatibility
     public Property<SnowflakeRegion> region = newEnum("region", SnowflakeRegion.class);
-
-    @Deprecated //only keep for backward compatibility
-    public Property<Boolean> useCustomRegion = newBoolean("useCustomRegion");
-
-    @Deprecated //only keep for backward compatibility
-    public Property<String> customRegionID = newString("customRegionID");
 
     public Property<AuthenticationType> authenticationType =
             newEnum("authenticationType", AuthenticationType.class).setValue(AuthenticationType.BASIC);
@@ -94,6 +87,10 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
     public Property<String> db = newString("db").setRequired(); //$NON-NLS-1$
 
     public Property<String> schemaName = newString("schemaName").setRequired(); //$NON-NLS-1$
+
+    public Property<Boolean> useCustomRegion = newBoolean("useCustomRegion");
+
+    public Property<String> customRegionID = newString("customRegionID").setRequired();
 
     public Property<String> role = newString("role"); //$NON-NLS-1$
 
@@ -121,6 +118,8 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
         loginTimeout.setValue(DEFAULT_LOGIN_TIMEOUT);
         authenticationType.setValue(AuthenticationType.BASIC);
         keyAlias.setValue("");
+        region.setValue(SnowflakeRegion.AWS_US_WEST);
+        useCustomRegion.setValue(false);
     }
 
     @Override
@@ -130,6 +129,7 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
         Form wizardForm = Form.create(this, FORM_WIZARD);
         wizardForm.addRow(name);
         wizardForm.addRow(account);
+        wizardForm.addRow(region);
         wizardForm.addRow(authenticationType);
         wizardForm.addRow(userPassword.getForm(Form.MAIN));
         wizardForm.addRow(widget(keyAlias).setHidden(true));
@@ -141,6 +141,7 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
 
         Form mainForm = Form.create(this, Form.MAIN);
         mainForm.addRow(account);
+        mainForm.addRow(region);
         mainForm.addRow(authenticationType);
         mainForm.addRow(userPassword.getForm(Form.MAIN));
         mainForm.addRow(widget(keyAlias).setHidden(true));
@@ -151,6 +152,8 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
         Form advancedForm = Form.create(this, Form.ADVANCED);
         advancedForm.addRow(autoCommit);
         advancedForm.addRow(jdbcParameters);
+        advancedForm.addRow(useCustomRegion);
+        advancedForm.addColumn(customRegionID);
         advancedForm.addRow(loginTimeout);
         advancedForm.addRow(role);
         advanced.setFormtoShow(advancedForm);
@@ -171,6 +174,13 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
         refreshLayout(getForm(FORM_WIZARD));
     }
 
+    public void afterUseCustomRegion() {
+        refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.REFERENCE));
+        refreshLayout(getForm(Form.ADVANCED));
+        refreshLayout(getForm(FORM_WIZARD));
+    }
+
     public void afterReferencedComponent() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
@@ -182,6 +192,7 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
         form.getWidget(account.getName()).setHidden(hidden);
         form.getWidget(authenticationType.getName()).setHidden(hidden);
         form.getWidget(keyAlias.getName()).setHidden(hidden);
+        form.getWidget(region.getName()).setHidden(hidden);
         form.getWidget(warehouse.getName()).setHidden(hidden);
         form.getWidget(schemaName.getName()).setHidden(hidden);
         form.getWidget(db.getName()).setHidden(hidden);
@@ -202,6 +213,8 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
                 boolean isBasicAuth = authenticationType.getValue() == AuthenticationType.BASIC;
                 userPassword.getForm(Form.MAIN).getWidget(userPassword.password.getName()).setHidden(!isBasicAuth);
                 form.getWidget(keyAlias.getName()).setHidden(isBasicAuth);
+
+                form.getWidget(region.getName()).setHidden(useCustomRegion.getValue());
             }
         }
 
@@ -210,6 +223,8 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
                 form.setHidden(true);
             } else {
                 form.setHidden(false);
+
+                getForm(Form.ADVANCED).getWidget(customRegionID).setVisible(useCustomRegion.getValue());
             }
         }
     }
@@ -304,6 +319,8 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
             throw new IllegalArgumentException(i18nMessages.getMessage("error.missingAccount"));
         }
 
+        String regionID = useCustomRegion.getValue() ? customRegionID.getValue() : region.getValue().getRegionID();
+
         String warehouse = this.warehouse.getStringValue();
         String db = this.db.getStringValue();
         String schema = schemaName.getStringValue();
@@ -316,8 +333,12 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
         appendProperty("application", getApplication(), connectionParams);
 
         StringBuilder url = new StringBuilder().append("jdbc:snowflake://").append(account);
-        url.append(".snowflakecomputing.com")
-        .append("/?");
+
+        if (!StringUtils.isEmpty(regionID)) {
+            url.append(".").append(regionID);
+        }
+
+        url.append(".snowflakecomputing.com").append("/?");
 
         String jdbcParameters = this.jdbcParameters.getStringValue();
         if (jdbcParameters != null && !jdbcParameters.isEmpty() && !"\"\"".equals(jdbcParameters)) {
@@ -391,22 +412,12 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
             loginTimeout.setValue(DEFAULT_LOGIN_TIMEOUT);
             migrated = true;
         }
-        if (version < 2 && region.getValue() != null) {
-            if (useCustomRegion.getValue() && customRegionID.getValue() != null) {
-                account.setValue(String.valueOf(account.getStoredValue()) + "+\"." + customRegionID.getValue() + "\"");
-            }
-            if (!useCustomRegion.getValue() && !SnowflakeRegion.AWS_US_WEST.equals(region.getValue())) {
-                account.setValue(String.valueOf(account.getStoredValue()) +
-                        "+\"." + region.getValue().getRegionID() + "\"");
-            }
-            migrated = true;
-        }
         return migrated;
     }
 
     @Override
     public int getVersionNumber() {
-        return 2;
+        return 1;
     }
 
 }
