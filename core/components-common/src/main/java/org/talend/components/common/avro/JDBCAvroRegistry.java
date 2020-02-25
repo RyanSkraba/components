@@ -133,8 +133,8 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 boolean isKey = keys.contains(columnName);
 
                 String defaultValue = metadata.getString("COLUMN_DEF");
-
-                Field field = sqlType2Avro(size, scale, dbtype, nullable, columnName, columnName, defaultValue, isKey);
+                boolean isAutoIncremented = checkAutoIncremented(metadata);
+                Field field = sqlType2Avro(size, scale, dbtype, nullable, columnName, columnName, defaultValue, isKey, isAutoIncremented);
 
                 fields.add(field);
             } while (metadata.next());
@@ -157,6 +157,16 @@ public class JDBCAvroRegistry extends AvroRegistry {
         }
 
         return result;
+    }
+
+    protected boolean checkAutoIncremented(ResultSet metadata) throws SQLException {
+        return false;
+    }
+
+    //Added for Snowflake, to catch AutoIncremented fields.
+    protected Field sqlType2Avro(int size, int scale, int dbtype, boolean nullable, String name, String dbColumnName,
+            Object defaultValue, boolean isKey, boolean isAutoIncremented) {
+        return sqlType2Avro(size, scale, dbtype, nullable, name, dbColumnName, defaultValue, isKey);
     }
 
     //TODO move it as no any place to use it now
@@ -496,7 +506,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
             };
         } else if (isObject(basicSchema)) {
             return new JDBCConverter() {
-  
+
               @Override
               public Object convertToAvro(ResultSet value) {
                   try {
@@ -505,7 +515,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
                       throw new ComponentException(e);
                   }
               }
-  
+
             };
         } else {
             return new JDBCConverter() {
@@ -556,14 +566,16 @@ public class JDBCAvroRegistry extends AvroRegistry {
         }
 
         protected boolean isTrim() {
-            if (influencer != null)
+            if (influencer != null) {
                 return influencer.trim();
+            }
             return false;
         }
 
         protected boolean isTrim(int index) {
-            if (influencer != null)
+            if (influencer != null) {
                 return influencer.isTrim(index);
+            }
             return false;
         }
 
@@ -813,7 +825,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
             };
         } else if (isObject(basicSchema)) {
             return new JDBCSPConverter() {
-    
+
               @Override
               public Object convertToAvro(CallableStatement value) {
                   try {
@@ -822,7 +834,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
                       throw new ComponentException(e);
                   }
               }
-    
+
             };
         } else {
             return new JDBCSPConverter() {
@@ -841,7 +853,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
             };
         }
     }
-    
+
     //please see the method in MetadataToolAvroHelper :
     //org.talend.core.model.metadata.builder.connection.MetadataColumn convertFromAvro(Schema.Field field,
     //org.talend.core.model.metadata.builder.connection.MetadataColumn col)
@@ -849,13 +861,13 @@ public class JDBCAvroRegistry extends AvroRegistry {
         if(schema == null) {
             return false;
         }
-        
+
         if(schema.getType() == Schema.Type.STRING) {
             if(schema.getProp(SchemaConstants.JAVA_CLASS_FLAG) != null) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
