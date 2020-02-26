@@ -85,7 +85,7 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
 
     private transient static final Schema DEFAULT_GUESS_SCHEMA_TYPE = AvroUtils._string();
 
-    protected static final String KEY_CONNECTION = "Connection";
+    protected static final String KEY_CONNECTION = "connection";
 
     protected static final String KEY_CONNECTION_BULK = "ConnectionBulk";
 
