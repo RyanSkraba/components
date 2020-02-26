@@ -144,7 +144,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
         }
     }
 
-    private Set<String> getPrimaryKeys(DatabaseMetaData databaseMetdata, String catalogName, String schemaName, String tableName)
+    protected Set<String> getPrimaryKeys(DatabaseMetaData databaseMetdata, String catalogName, String schemaName, String tableName)
             throws SQLException {
         Set<String> result = new HashSet<>();
 

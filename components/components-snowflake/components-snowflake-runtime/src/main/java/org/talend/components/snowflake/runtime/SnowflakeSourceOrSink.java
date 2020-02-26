@@ -243,7 +243,7 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         try {
             JDBCTableMetadata tableMetadata = new JDBCTableMetadata();
             tableMetadata.setDatabaseMetaData(connection.getMetaData()).setCatalog(getCatalog(connProps))
-                    .setDbSchema(getDbSchema(connProps)).setTablename(tableName);
+                    .setDbSchema(escapeUnderscores(getDbSchema(connProps))).setTablename(escapeUnderscores(tableName));
             tableSchema = getSnowflakeAvroRegistry().inferSchema(tableMetadata);
             if (tableSchema == null) {
                 throw new IOException(i18nMessages.getMessage("error.tableNotFound", tableName));
@@ -254,6 +254,10 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
 
         return tableSchema;
 
+    }
+
+    private String escapeUnderscores(String value) {
+        return value.replace("_", "\\_");
     }
 
     @Override
