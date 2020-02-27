@@ -22,6 +22,7 @@ import org.talend.components.netsuite.client.model.BasicMetaData;
 import org.talend.components.netsuite.client.model.BasicRecordType;
 import org.talend.components.netsuite.client.model.CustomFieldDesc;
 import org.talend.components.netsuite.client.model.CustomRecordTypeInfo;
+import org.talend.components.netsuite.client.model.CustomTransactionTypeInfo;
 import org.talend.components.netsuite.client.model.FieldDesc;
 import org.talend.components.netsuite.client.model.RecordTypeDesc;
 import org.talend.components.netsuite.client.model.RecordTypeInfo;
@@ -154,10 +155,9 @@ public class DefaultMetaDataSource implements MetaDataSource {
 
         RecordTypeInfo recordTypeInfo = getRecordType(typeName);
         if (recordTypeInfo != null) {
-            if (recordTypeInfo instanceof CustomRecordTypeInfo) {
-                CustomRecordTypeInfo customRecordTypeInfo = (CustomRecordTypeInfo) recordTypeInfo;
-                baseTypeDesc = clientService.getBasicMetaData().getTypeInfo(customRecordTypeInfo.getRecordType().getTypeName());
-                targetTypeName = customRecordTypeInfo.getName();
+            if (recordTypeInfo instanceof CustomRecordTypeInfo || recordTypeInfo instanceof CustomTransactionTypeInfo) {
+                baseTypeDesc = clientService.getBasicMetaData().getTypeInfo(recordTypeInfo.getRecordType().getTypeName());
+                targetTypeName = recordTypeInfo.getName();
             } else {
                 baseTypeDesc = clientService.getBasicMetaData().getTypeInfo(typeName);
             }
@@ -176,13 +176,15 @@ public class DefaultMetaDataSource implements MetaDataSource {
         // Add basic fields except field list containers (custom field list, null field list)
         for (FieldDesc fieldDesc : baseFieldDescList) {
             String fieldName = fieldDesc.getName();
-            if (fieldName.equals("customFieldList") || fieldName.equals("nullFieldList")) {
+            // Custom field list is stored as it is, since we had an issue with retrieving it from NetSuite via SOAP calls
+            if (!(recordTypeInfo instanceof CustomTransactionTypeInfo) &&
+                    (fieldName.equals("customFieldList") || fieldName.equals("nullFieldList"))) {
                 continue;
             }
             resultFieldDescList.add(fieldDesc);
         }
 
-        if (recordTypeInfo != null) {
+        if (recordTypeInfo != null && !(recordTypeInfo instanceof CustomTransactionTypeInfo)) {
             if (customizationEnabled) {
                 // Add custom fields
                 Map<String, CustomFieldDesc> customFieldMap =

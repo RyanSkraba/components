@@ -21,7 +21,6 @@ import org.apache.avro.Schema;
 import org.talend.components.netsuite.client.CustomMetaDataSource;
 import org.talend.components.netsuite.client.model.BasicMetaData;
 import org.talend.components.netsuite.client.model.CustomFieldDesc;
-import org.talend.components.netsuite.client.model.CustomRecordTypeInfo;
 import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.daikon.avro.AvroUtils;
 
@@ -43,7 +42,7 @@ public class SchemaCustomMetaDataSource implements CustomMetaDataSource {
     private CustomMetaDataSource defaultSource;
     private Schema schema;
 
-    private CustomRecordTypeInfo customRecordTypeInfo;
+    private RecordTypeInfo customRecordTypeInfo;
     private Map<String, CustomFieldDesc> customFieldDescMap;
 
     /**
@@ -62,7 +61,7 @@ public class SchemaCustomMetaDataSource implements CustomMetaDataSource {
     }
 
     @Override
-    public Collection<CustomRecordTypeInfo> getCustomRecordTypes() {
+    public Collection<RecordTypeInfo> getCustomRecordTypes() {
         return defaultSource.getCustomRecordTypes();
     }
 
@@ -90,7 +89,7 @@ public class SchemaCustomMetaDataSource implements CustomMetaDataSource {
     }
 
     @Override
-    public CustomRecordTypeInfo getCustomRecordType(String typeName) {
+    public RecordTypeInfo getCustomRecordType(String typeName) {
         if (customRecordTypeInfo == null) {
             customRecordTypeInfo = loadCustomRecordTypeInfo();
         }
@@ -101,9 +100,9 @@ public class SchemaCustomMetaDataSource implements CustomMetaDataSource {
         return defaultSource.getCustomRecordType(typeName);
     }
 
-    private CustomRecordTypeInfo loadCustomRecordTypeInfo() {
+    private RecordTypeInfo loadCustomRecordTypeInfo() {
         for (Schema.Field field : schema.getFields()) {
-            CustomRecordTypeInfo customRecordTypeInfo =
+            RecordTypeInfo customRecordTypeInfo =
                     NetSuiteDatasetRuntimeImpl.readCustomRecord(basicMetaData, field);
             if (customRecordTypeInfo != null) {
                 return customRecordTypeInfo;

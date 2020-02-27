@@ -31,8 +31,9 @@ public enum BasicRecordType {
     CUSTOM_LIST("customList", "customList"),
     CUSTOM_RECORD("customRecord", "customRecord"),
     CUSTOM_RECORD_TYPE("customRecordType", "customRecord"),
-    CUSTOM_TRANSACTION("customTransaction", "transaction"),
-    CUSTOM_TRANSACTION_TYPE("customTransactionType", "transaction");
+    //It's not actual CustomTransaction searhType, but for RecordTypeEnum#CustomTransaction enum type
+    CUSTOM_TRANSACTION("customTransaction", "customTransaction"),
+    CUSTOM_TRANSACTION_TYPE("customTransactionType", "customTransaction");
 
     /** Name of NetSuite record type, as defined by {@code RecordType}. */
     private String type;

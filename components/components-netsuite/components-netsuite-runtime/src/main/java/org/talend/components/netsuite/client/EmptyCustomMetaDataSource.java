@@ -27,12 +27,12 @@ import org.talend.components.netsuite.client.model.RecordTypeInfo;
 public class EmptyCustomMetaDataSource implements CustomMetaDataSource {
 
     @Override
-    public Collection<CustomRecordTypeInfo> getCustomRecordTypes() {
+    public Collection<RecordTypeInfo> getCustomRecordTypes() {
         return Collections.emptyList();
     }
 
     @Override
-    public CustomRecordTypeInfo getCustomRecordType(String typeName) {
+    public RecordTypeInfo getCustomRecordType(String typeName) {
         return null;
     }
 

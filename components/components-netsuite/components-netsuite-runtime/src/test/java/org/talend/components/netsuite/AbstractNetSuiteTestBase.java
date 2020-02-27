@@ -332,17 +332,17 @@ public abstract class AbstractNetSuiteTestBase {
         }
 
         @Override
-        public Collection<CustomRecordTypeInfo> getCustomRecordTypes() {
+        public Collection<RecordTypeInfo> getCustomRecordTypes() {
             return Arrays.asList(getCustomRecordType("custom_record_type_1"));
         }
 
         @Override
-        public CustomRecordTypeInfo getCustomRecordType(String typeName) {
+        public RecordTypeInfo getCustomRecordType(String typeName) {
             try {
                 if (typeName.equals("custom_record_type_1")) {
                     JsonNode recordTypeNode = objectMapper.readTree(getClass().getResource(
                             "/test-data/customRecord-1.json"));
-                    CustomRecordTypeInfo customRecordTypeInfo =
+                    RecordTypeInfo customRecordTypeInfo =
                             TestUtils.readCustomRecord(clientService.getBasicMetaData(), recordTypeNode);
                     return customRecordTypeInfo;
                 }

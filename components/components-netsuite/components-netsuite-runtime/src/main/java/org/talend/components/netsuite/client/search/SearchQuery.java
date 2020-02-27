@@ -19,6 +19,7 @@ import static org.talend.components.netsuite.client.model.beans.Beans.toInitialL
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.talend.components.netsuite.client.MetaDataSource;
@@ -28,6 +29,7 @@ import org.talend.components.netsuite.client.NsRef;
 import org.talend.components.netsuite.client.NsSearchResult;
 import org.talend.components.netsuite.client.model.BasicRecordType;
 import org.talend.components.netsuite.client.model.CustomRecordTypeInfo;
+import org.talend.components.netsuite.client.model.CustomTransactionTypeInfo;
 import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.components.netsuite.client.model.RefType;
 import org.talend.components.netsuite.client.model.SearchRecordTypeDesc;
@@ -263,12 +265,19 @@ public class SearchQuery<SearchT, RecT> {
 
         BasicRecordType basicRecordType = BasicRecordType.getByType(searchRecordTypeDesc.getType());
         if (BasicRecordType.TRANSACTION == basicRecordType) {
-            SearchFieldAdapter<?> fieldAdapter = metaDataSource.getBasicMetaData()
-                    .getSearchFieldAdapter(SearchFieldType.SELECT);
-            Object searchTypeField = fieldAdapter.populate(
-                    "List.anyOf", Arrays.asList(recordTypeInfo.getRecordType().getType()));
-            setProperty(searchBasic, "type", searchTypeField);
-
+            SearchFieldAdapter<?> fieldAdapter;
+            Object searchTypeField;
+            if (recordTypeInfo instanceof CustomTransactionTypeInfo) {
+                fieldAdapter = metaDataSource.getBasicMetaData().getSearchFieldAdapter(SearchFieldType.STRING);
+                searchTypeField =
+                        fieldAdapter.populate("String.is", Collections.singletonList(recordTypeInfo.getName()));
+                setProperty(searchBasic, "recordType", searchTypeField);
+            } else {
+                fieldAdapter = metaDataSource.getBasicMetaData().getSearchFieldAdapter(SearchFieldType.SELECT);
+                searchTypeField = fieldAdapter
+                        .populate("List.anyOf", Collections.singletonList(recordTypeInfo.getRecordType().getType()));
+                setProperty(searchBasic, "type", searchTypeField);
+            }
         } else if (BasicRecordType.CUSTOM_RECORD == basicRecordType) {
             CustomRecordTypeInfo customRecordTypeInfo = (CustomRecordTypeInfo) recordTypeInfo;
             NsRef customizationRef = customRecordTypeInfo.getCustomizationRef();

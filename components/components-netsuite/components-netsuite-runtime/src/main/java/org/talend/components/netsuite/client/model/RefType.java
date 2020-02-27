@@ -19,7 +19,8 @@ package org.talend.components.netsuite.client.model;
 public enum RefType {
     RECORD_REF("RecordRef"),
     CUSTOM_RECORD_REF("CustomRecordRef"),
-    CUSTOMIZATION_REF("CustomizationRef");
+    CUSTOMIZATION_REF("CustomizationRef"),
+    CUSTOM_TRANSACTION_REF("CustomTransactionRef");
 
     /** Short name of NetSuite native reference object type. */
     private String typeName;

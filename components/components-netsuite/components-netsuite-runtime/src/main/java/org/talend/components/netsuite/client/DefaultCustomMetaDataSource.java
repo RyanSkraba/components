@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.netsuite.client.model.BasicRecordType;
 import org.talend.components.netsuite.client.model.CustomFieldDesc;
 import org.talend.components.netsuite.client.model.CustomRecordTypeInfo;
+import org.talend.components.netsuite.client.model.CustomTransactionTypeInfo;
 import org.talend.components.netsuite.client.model.RecordTypeDesc;
 import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.components.netsuite.client.model.RefType;
@@ -45,7 +46,7 @@ public class DefaultCustomMetaDataSource<PortT> implements CustomMetaDataSource 
 
     protected NetSuiteClientService<PortT> clientService;
 
-    protected Map<String, CustomRecordTypeInfo> customRecordTypeMap = new HashMap<>();
+    protected Map<String, RecordTypeInfo> customRecordTypeMap = new HashMap<>();
 
     protected boolean customRecordTypesLoaded = false;
 
@@ -72,10 +73,10 @@ public class DefaultCustomMetaDataSource<PortT> implements CustomMetaDataSource 
      * {@inheritDoc}
      */
     @Override
-    public Collection<CustomRecordTypeInfo> getCustomRecordTypes() {
-        return clientService.executeWithLock(new Function<Void, Collection<CustomRecordTypeInfo>>() {
+    public Collection<RecordTypeInfo> getCustomRecordTypes() {
+        return clientService.executeWithLock(new Function<Void, Collection<RecordTypeInfo>>() {
 
-            @Override public Collection<CustomRecordTypeInfo> apply(Void param) {
+            @Override public Collection<RecordTypeInfo> apply(Void param) {
                 retrieveCustomRecordTypes();
                 return new ArrayList(customRecordTypeMap.values());
             }
@@ -98,9 +99,9 @@ public class DefaultCustomMetaDataSource<PortT> implements CustomMetaDataSource 
      * {@inheritDoc}
      */
     @Override
-    public CustomRecordTypeInfo getCustomRecordType(String typeName) {
-        return clientService.executeWithLock(new Function<String, CustomRecordTypeInfo>() {
-            @Override public CustomRecordTypeInfo apply(String typeName) {
+    public RecordTypeInfo getCustomRecordType(String typeName) {
+        return clientService.executeWithLock(new Function<String, RecordTypeInfo>() {
+            @Override public RecordTypeInfo apply(String typeName) {
                 retrieveCustomRecordTypes();
                 return customRecordTypeMap.get(typeName);
             }
@@ -210,9 +211,10 @@ public class DefaultCustomMetaDataSource<PortT> implements CustomMetaDataSource 
                         .getRecordType(toInitialUpper(basicRecordType.getSearchType()));
             }
 
-            CustomRecordTypeInfo customRecordTypeInfo = new CustomRecordTypeInfo(customizationRef.getScriptId(),
-                    recordTypeDesc, customizationRef);
-            customRecordTypeMap.put(customRecordTypeInfo.getName(), customRecordTypeInfo);
+            RecordTypeInfo customTypeInfo = basicRecordType != BasicRecordType.CUSTOM_TRANSACTION_TYPE
+                    ? new CustomRecordTypeInfo(customizationRef.getScriptId(), recordTypeDesc, customizationRef)
+                    : new CustomTransactionTypeInfo(customizationRef.getScriptId(), recordTypeDesc);
+            customRecordTypeMap.put(customTypeInfo.getName(), customTypeInfo);
         }
 
         customRecordTypesLoaded = true;

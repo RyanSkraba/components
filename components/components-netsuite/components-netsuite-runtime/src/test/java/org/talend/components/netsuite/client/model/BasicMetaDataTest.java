@@ -69,9 +69,9 @@ public class BasicMetaDataTest {
                 "item",
                 "customList",
                 "customRecord",
-                "customRecordType",
-                "customTransaction",
-                "customTransactionType"
+                "customRecordType"
+                //"customTransaction",
+                //"customTransactionType"
         );
 
         for (String typeName : typeNames) {

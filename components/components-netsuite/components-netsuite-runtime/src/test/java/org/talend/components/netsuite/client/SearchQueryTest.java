@@ -315,7 +315,7 @@ public class SearchQueryTest {
     protected class TestCustomMetaDataSource extends EmptyCustomMetaDataSource {
 
         @Override
-        public Collection<CustomRecordTypeInfo> getCustomRecordTypes() {
+        public Collection<RecordTypeInfo> getCustomRecordTypes() {
             return Arrays.asList(getCustomRecordType("custom_record_type_1"));
         }
 

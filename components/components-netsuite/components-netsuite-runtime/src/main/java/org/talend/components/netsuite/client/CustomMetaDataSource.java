@@ -30,7 +30,7 @@ public interface CustomMetaDataSource {
      *
      * @return set of custom record types
      */
-    Collection<CustomRecordTypeInfo> getCustomRecordTypes();
+    Collection<RecordTypeInfo> getCustomRecordTypes();
 
     /**
      * Return information about a record type.
@@ -38,7 +38,7 @@ public interface CustomMetaDataSource {
      * @param typeName name of record type
      * @return record type info or <code>null</code> if record type was not found
      */
-    CustomRecordTypeInfo getCustomRecordType(String typeName);
+    RecordTypeInfo getCustomRecordType(String typeName);
 
     /**
      * Return custom fields for a record type.

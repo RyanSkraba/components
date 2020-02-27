@@ -126,7 +126,7 @@ public class CustomMetaDataSourceTest extends NetSuiteMockTestBase {
         customMetaDataRetriever.setCustomRecordType(customRecordType);
         customMetaDataRetriever.setCustomRecordFieldSpecs(customRecordFieldSpecs);
 
-        CustomRecordTypeInfo recordTypeInfo = customMetaDataSource.getCustomRecordType(customRecordType.getScriptId());
+        RecordTypeInfo recordTypeInfo = customMetaDataSource.getCustomRecordType(customRecordType.getScriptId());
         assertNotNull(recordTypeInfo);
 
         Map<String, CustomFieldDesc> customFieldDescMap = customMetaDataSource.getCustomFields(recordTypeInfo);
