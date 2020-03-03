@@ -618,11 +618,11 @@
     <repositories>
         <repository>
             <id>spring-releases</id>
-            <url>${spring.releases.repo}</url>
+            <url>https://repo.spring.io/libs-release/</url>
         </repository>
         <repository>
             <id>releases</id>
-            <url>${talend.releases.repo}</url>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -633,7 +633,7 @@
         <repository>
             <id>talend_nexus</id>
             <name>snapshots</name>
-            <url>${talend.snapshots.repo}</url>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
