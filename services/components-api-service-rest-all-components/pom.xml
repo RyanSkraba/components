@@ -29,7 +29,7 @@
         <spring.releases.repo>https://repo.spring.io/libs-release/</spring.releases.repo>
         <!-- Dependency versions -->
         <components.version>0.29.0-SNAPSHOT</components.version>
-        <daikon.version>0.31.11-SNAPSHOT</daikon.version>
+        <daikon.version>0.31.10</daikon.version>
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
