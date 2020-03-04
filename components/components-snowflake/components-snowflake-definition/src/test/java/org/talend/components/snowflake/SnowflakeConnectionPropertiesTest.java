@@ -381,4 +381,26 @@ public class SnowflakeConnectionPropertiesTest {
         Assert.assertEquals(0, snowflakeConnectionProperties.loginTimeout.getValue().intValue());
     }
 
+    @Test
+    public void testMigrationRegion() {
+        //Missing value from 0 version.
+        snowflakeConnectionProperties.region.setValue(SnowflakeRegion.AWS_AP_SOUTHEAST_2);
+        snowflakeConnectionProperties.customRegionID.setValue("ap-southeast-2");
+
+        snowflakeConnectionProperties.postDeserialize(0, null, false);
+
+        Assert.assertEquals("\"ap-southeast-2\"", snowflakeConnectionProperties.regionID.getStringValue());
+
+        snowflakeConnectionProperties.useCustomRegion.setValue(true);
+
+
+        snowflakeConnectionProperties.postDeserialize(1, null, false);
+
+        Assert.assertEquals("ap-southeast-2", snowflakeConnectionProperties.regionID.getValue());
+
+        snowflakeConnectionProperties.customRegionID.setStoredValue("context.regionID");
+        snowflakeConnectionProperties.postDeserialize(1, null, false);
+        Assert.assertEquals("context.regionID", snowflakeConnectionProperties.regionID.getValue());
+    }
+
 }
