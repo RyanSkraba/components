@@ -76,7 +76,7 @@ public class SnowflakeConnectionPropertiesTest {
     }
 
     private void setUpAzureRegion() {
-        snowflakeConnectionProperties.region.setValue(AZURE_REGION);
+        snowflakeConnectionProperties.regionID.setValue(AZURE_REGION.getRegionID());
     }
 
     private void setAdditionalJDBCParameters() {
