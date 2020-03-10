@@ -177,12 +177,13 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         StringSchemaInfo ssi = getStringSchemaInfo(sprops, mainSchema, columns);
 
         row = new Object[ssi.columnsStr.size()];
-
-        loader.setProperty(LoaderProperty.columns, ssi.columnsStr);
-
-        if (ssi.keyStr.size() > 0) {
-            loader.setProperty(LoaderProperty.keys, ssi.keyStr);
+        if (this.sprops.tableAction.getValue() != TableAction.TableActionEnum.NONE) {
+            loader.setProperty(LoaderProperty.columns, ssi.columnsStr);
+            if (ssi.keyStr.size() > 0) {
+                loader.setProperty(LoaderProperty.keys, ssi.keyStr);
+            }
         }
+
     }
 
     private Map<String, String> getDbTypeMap() {
@@ -262,7 +263,6 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         execTableAction(datum);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void write(Object datum) throws IOException {
         if (null == datum) {
@@ -295,10 +295,14 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
 
             isFirst = false;
         }
+        populateRowData(input, collectedFields, remoteTableFields);
+    }
 
-        for (int i = 0, j = 0; i < row.length && j < remoteTableFields.size(); j++) {
-            Field f = collectedFields.get(j);
-            Field remoteTableField = remoteTableFields.get(j);
+    protected void populateRowData(IndexedRecord input,
+            List<Schema.Field> recordFields, List<Schema.Field> remoteFields) {
+        for (int i = 0, j = 0; i < row.length && j < remoteFields.size(); j++) {
+            Field f = recordFields.get(j);
+            Field remoteTableField = remoteFields.get(j);
             if (f == null) {
                 if (Boolean.valueOf(remoteTableField.getProp(SnowflakeAvroRegistry.TALEND_FIELD_AUTOINCREMENTED))) {
                     continue;
@@ -428,7 +432,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         return designSchema;
     }
 
-    private Schema initRuntimeSchemaAndMapIfNecessary() throws IOException {
+    protected Schema initRuntimeSchemaAndMapIfNecessary() throws IOException {
         if (!dbColumnName2RuntimeField.isEmpty()) {
             return null;
         }
