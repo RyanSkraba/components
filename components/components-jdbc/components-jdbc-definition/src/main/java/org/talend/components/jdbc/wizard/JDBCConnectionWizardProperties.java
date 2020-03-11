@@ -94,20 +94,9 @@ public class JDBCConnectionWizardProperties extends ComponentPropertiesImpl impl
     }
 
     public ValidationResult afterFormFinishMain(Repository<Properties> repo) throws Exception {
-        JdbcRuntimeInfo jdbcRuntimeInfo = new JdbcRuntimeInfo(this, "org.talend.components.jdbc.runtime.JDBCSourceOrSink");
-        try (SandboxedInstance sandboxI = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(jdbcRuntimeInfo,
-                connection.getClass().getClassLoader())) {
-            JdbcRuntimeSourceOrSink sourceOrSink = (JdbcRuntimeSourceOrSink) sandboxI.getInstance();
-            sourceOrSink.initialize(null, this);
-            ValidationResult vr = sourceOrSink.validate(null);
-            if (vr.getStatus() != ValidationResult.Result.OK) {
-                return vr;
-            }
-
-            repo.storeProperties(this, this.name.getValue(), repositoryLocation, null);
-            // no need to store the schemas, tup will do it by the old way, so only need to store the connection properties
-            return ValidationResult.OK;
-        }
+        repo.storeProperties(this, this.name.getValue(), repositoryLocation, null);
+        // no need to store the schemas, tup will do it by the old way, so only need to store the connection properties
+        return ValidationResult.OK;
     }
 
     @Override
