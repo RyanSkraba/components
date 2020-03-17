@@ -6,7 +6,7 @@ There are three access methods for specifying a resource identification / locati
 
 #### Global search
 
-When specifying a `folerName` or `fileName` alone, a global search will be done in the Google Drive.
+When specifying a `folderName` or `fileName` alone, a global search will be done in the Google Drive.
 
 Examples:
 * `Work`

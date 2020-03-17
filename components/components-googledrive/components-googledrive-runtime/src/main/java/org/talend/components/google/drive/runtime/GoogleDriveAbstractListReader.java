@@ -13,6 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
@@ -26,11 +31,6 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.google.drive.GoogleDriveComponentProperties.AccessMethod;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
-
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.Drive.Files;
-import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
 
 public abstract class GoogleDriveAbstractListReader extends AbstractBoundedReader<IndexedRecord> {
 
@@ -72,9 +72,12 @@ public abstract class GoogleDriveAbstractListReader extends AbstractBoundedReade
 
     protected List<String> subFolders;
 
+    protected int maxPageSize = 1000;
+
     protected static final Logger LOG = LoggerFactory.getLogger(GoogleDriveListReader.class);
 
-    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(GoogleDriveListReader.class);
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(GoogleDriveListReader.class);
 
     protected GoogleDriveAbstractListReader(RuntimeContainer container, BoundedSource source) {
         super(source);
@@ -92,6 +95,8 @@ public abstract class GoogleDriveAbstractListReader extends AbstractBoundedReade
         query = Q_IN_PARENTS + ("DIRECTORIES".equals(listModeStr) ? QUERY_MIME_FOLDER : "") + qTrash;
         request = drive.files().list();
         request.setFields(FIELDS_SELECTION);
+        request.setPageSize(maxPageSize);
+        LOG.debug("[start] request: {}.", request);
         //
         if (folderAccessMethod.equals(AccessMethod.Id)) {
             subFolders.add(folderName);
@@ -132,7 +137,7 @@ public abstract class GoogleDriveAbstractListReader extends AbstractBoundedReade
         if (next) {
             searchIdx++;
         } else {
-            while (!next && !subFolders.isEmpty()) {
+            while (!next && (!subFolders.isEmpty() || (folderId != null))) {
                 next = processFolder();
             }
             if (next) {

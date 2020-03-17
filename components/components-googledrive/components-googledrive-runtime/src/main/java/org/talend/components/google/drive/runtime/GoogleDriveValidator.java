@@ -170,6 +170,11 @@ public class GoogleDriveValidator {
             vr.setMessage(messages.getMessage("error.validation.folder.empty"));
             return vr;
         }
+        if (properties.pageSize.getValue() < 1 || properties.pageSize.getValue() > 1000) {
+            vr.setStatus(Result.ERROR);
+            vr.setMessage(messages.getMessage("error.validation.pageSize.invalid"));
+            return vr;
+        }
         return vr;
     }
 

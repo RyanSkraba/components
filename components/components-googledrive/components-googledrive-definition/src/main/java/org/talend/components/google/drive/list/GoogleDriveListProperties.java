@@ -15,6 +15,7 @@ package org.talend.components.google.drive.list;
 import static org.talend.daikon.properties.presentation.Form.MAIN;
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.Date;
@@ -48,6 +49,8 @@ public class GoogleDriveListProperties extends GoogleDriveComponentProperties {
     public Property<ListMode> listMode = newEnum("listMode", ListMode.class);
 
     public Property<Boolean> includeTrashedFiles = newBoolean("includeTrashedFiles");
+
+    public Property<Integer> pageSize = newInteger("pageSize");
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(GoogleDriveListProperties.class);
@@ -118,6 +121,7 @@ public class GoogleDriveListProperties extends GoogleDriveComponentProperties {
         folder.setValue("root");
         listMode.setPossibleValues(ListMode.values());
         listMode.setValue(ListMode.Files);
+        pageSize.setValue(1000);
     }
 
     @Override
@@ -133,6 +137,7 @@ public class GoogleDriveListProperties extends GoogleDriveComponentProperties {
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(includeTrashedFiles);
+        advancedForm.addRow(pageSize);
     }
 
 }

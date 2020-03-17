@@ -12,7 +12,9 @@
 // ============================================================================
 package org.talend.components.google.drive.runtime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 
@@ -43,7 +45,7 @@ public class GoogleDrivePutGetTestIT extends GoogleDriveBaseTestIT {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        folder = "Talend-putget" + testTS;
+        folder = "TalendTest_putget" + testTS;
         putProperties = new GoogleDrivePutProperties(TEST_NAME);
         putProperties.setupProperties();
         putProperties.connection = connectionProperties;

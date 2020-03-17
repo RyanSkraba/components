@@ -1,6 +1,9 @@
 package org.talend.components.google.drive.runtime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -9,15 +12,15 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Collections;
 
+import com.google.api.services.drive.Drive.Files.List;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
+
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.google.drive.list.GoogleDriveListProperties;
 import org.talend.daikon.properties.ValidationResult.Result;
-
-import com.google.api.services.drive.Drive.Files.List;
-import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
 
 public class GoogleDriveListReaderTest extends GoogleDriveTestBaseRuntime {
 
@@ -157,6 +160,19 @@ public class GoogleDriveListReaderTest extends GoogleDriveTestBaseRuntime {
         properties.folder.setValue("");
         source.initialize(container, properties);
         assertEquals(Result.ERROR, source.validate(container).getStatus());
+    }
+
+    @Test
+    public void testValidationPageSize() throws Exception {
+        properties.pageSize.setValue(0);
+        source.initialize(container, properties);
+        assertEquals(Result.ERROR, source.validate(container).getStatus());
+        properties.pageSize.setValue(10300);
+        source.initialize(container, properties);
+        assertEquals(Result.ERROR, source.validate(container).getStatus());
+        properties.pageSize.setValue(1000);
+        source.initialize(container, properties);
+        assertEquals(Result.OK, source.validate(container).getStatus());
     }
 
 }

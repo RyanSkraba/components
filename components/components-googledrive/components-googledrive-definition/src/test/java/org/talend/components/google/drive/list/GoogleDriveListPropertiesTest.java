@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.google.drive.list;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.apache.avro.Schema;
 import org.junit.Before;
@@ -51,5 +51,10 @@ public class GoogleDriveListPropertiesTest {
         Schema s = properties.schemaMain.schema.getValue();
         assertEquals(s, properties.getSchema());
         assertEquals(s, properties.getSchema(null, true));
+    }
+
+    @Test
+    public void testPageSize() throws Exception {
+        assertEquals(1000, properties.pageSize.getValue().longValue());
     }
 }
