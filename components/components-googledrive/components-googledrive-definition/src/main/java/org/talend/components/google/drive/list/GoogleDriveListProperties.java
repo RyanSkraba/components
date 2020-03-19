@@ -50,7 +50,7 @@ public class GoogleDriveListProperties extends GoogleDriveComponentProperties {
 
     public Property<Boolean> includeTrashedFiles = newBoolean("includeTrashedFiles");
 
-    public Property<Integer> pageSize = newInteger("pageSize");
+    public Property<Integer> pageSize = newInteger("pageSize", 1000);
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(GoogleDriveListProperties.class);
