@@ -12,7 +12,9 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.AzureConnection;
 import org.talend.components.azurestorage.AzureConnectionWithKeyService;
 import org.talend.components.azurestorage.AzureConnectionWithSasService;
+import org.talend.components.azurestorage.AzureConnectionWithToken;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
+import org.talend.components.azurestorage.tazurestorageconnection.AuthType;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.i18n.GlobalI18N;
@@ -51,6 +53,11 @@ public class AzureStorageRuntime implements RuntimableRuntime<ComponentPropertie
 
             errorMessage = messages.getMessage("error.VacantConnection"); //$NON-NLS-1$
 
+        } else if (conn.authenticationType.getValue() == AuthType.ACTIVE_DIRECTORY_CLIENT_CREDENTIAL) {
+            if (StringUtils.isEmpty(conn.accountName.getValue()) || StringUtils.isEmpty(conn.tenantId.getValue())
+                    || StringUtils.isEmpty(conn.clientId.getValue()) || StringUtils.isEmpty(conn.clientSecret.getValue())) {
+                errorMessage = messages.getMessage("error.EmptyADProperties");
+            }
         } else if (conn.useSharedAccessSignature.getValue()) { // checks
             if (StringUtils.isEmpty(conn.sharedAccessSignature.getStringValue())) {
                 errorMessage = messages.getMessage("error.EmptySAS"); //$NON-NLS-1$
@@ -112,24 +119,28 @@ public class AzureStorageRuntime implements RuntimableRuntime<ComponentPropertie
     public AzureConnection getAzureConnection(RuntimeContainer runtimeContainer) {
 
         TAzureStorageConnectionProperties conn = getUsedConnection(runtimeContainer);
-        if (conn.useSharedAccessSignature.getValue()) {
-            // extract account name and sas token from sas url
-            Matcher m = Pattern.compile(SAS_PATTERN).matcher(conn.sharedAccessSignature.getValue());
-            m.matches();
+        if (conn.authenticationType.getValue() == AuthType.BASIC) {
+            if (conn.useSharedAccessSignature.getValue()) {
+                // extract account name and sas token from sas url
+                Matcher m = Pattern.compile(SAS_PATTERN).matcher(conn.sharedAccessSignature.getValue());
+                m.matches();
 
-            return AzureConnectionWithSasService.builder()//
-                    .accountName(m.group(2))//
-                    .sasToken(m.group(5))//
-                    .endpointSuffix(m.group(4))
-                    .build();
+                return AzureConnectionWithSasService.builder()//
+                        .accountName(m.group(2))//
+                        .sasToken(m.group(5))//
+                        .endpointSuffix(m.group(4))
+                        .build();
+
+            } else {
+
+                return AzureConnectionWithKeyService.builder()//
+                        .protocol(conn.protocol.getValue().toString().toLowerCase())//
+                        .accountName(conn.accountName.getValue())//
+                        .accountKey(conn.accountKey.getValue()).build();
+            }
 
         } else {
-
-            return AzureConnectionWithKeyService.builder()//
-                    .protocol(conn.protocol.getValue().toString().toLowerCase())//
-                    .accountName(conn.accountName.getValue())//
-                    .accountKey(conn.accountKey.getValue()).build();
+            return new AzureConnectionWithToken(conn.accountName.getValue(), conn.tenantId.getValue(), conn.clientId.getValue(), conn.clientSecret.getValue());
         }
-
     }
 }

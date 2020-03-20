@@ -23,6 +23,7 @@ import org.talend.components.azurestorage.blob.runtime.AzureStorageContainerCrea
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.properties.presentation.Form;
 
 
 public class TAzureStorageConnectionPropertiesTest {
@@ -44,10 +45,11 @@ public class TAzureStorageConnectionPropertiesTest {
      */
     @Test
     public final void testSetupProperties() {
-        assertTrue(props.protocol.getValue().equals(Protocol.HTTPS));
-        assertTrue(props.accountName.getValue().equals(""));
-        assertTrue(props.accountKey.getValue().equals(""));
-        assertTrue(props.useSharedAccessSignature.getValue().equals(false));
+        assertEquals(props.authenticationType.getValue(), AuthType.BASIC);
+        assertEquals(props.protocol.getValue(), Protocol.HTTPS);
+        assertEquals("", props.accountName.getValue());
+        assertEquals("", props.accountKey.getValue());
+        assertEquals(false, props.useSharedAccessSignature.getValue());
     }
 
     @Test
@@ -89,4 +91,39 @@ public class TAzureStorageConnectionPropertiesTest {
         assertEquals(Protocol.HTTPS, Protocol.valueOf("HTTPS"));
     }
 
+    @Test
+    public void testRefreshLayoutAfterChangeAuthTypeToActiveDirectory() {
+        props.authenticationType.setValue(AuthType.ACTIVE_DIRECTORY_CLIENT_CREDENTIAL);
+        props.afterAuthenticationType();
+
+        Form mainForm = props.getForm(Form.MAIN);
+
+        assertTrue(mainForm.getWidget(props.accountName).isVisible());
+        assertTrue(mainForm.getWidget(props.tenantId).isVisible());
+        assertTrue(mainForm.getWidget(props.clientId).isVisible());
+        assertTrue(mainForm.getWidget(props.clientSecret).isVisible());
+        assertTrue(mainForm.getWidget(props.accountKey).isHidden());
+        assertTrue(mainForm.getWidget(props.protocol).isHidden());
+        assertTrue(mainForm.getWidget(props.useSharedAccessSignature).isHidden());
+        assertTrue(mainForm.getWidget(props.sharedAccessSignature).isHidden());
+    }
+
+    @Test
+    public void testRefreshLayoutAfterChangeAuthTypeTwice() {
+        props.authenticationType.setValue(AuthType.ACTIVE_DIRECTORY_CLIENT_CREDENTIAL);
+        props.afterAuthenticationType();
+        props.authenticationType.setValue(AuthType.BASIC);
+        props.afterAuthenticationType();
+
+        Form mainForm = props.getForm(Form.MAIN);
+
+        assertTrue(mainForm.getWidget(props.accountName).isVisible());
+        assertTrue(mainForm.getWidget(props.tenantId).isHidden());
+        assertTrue(mainForm.getWidget(props.clientId).isHidden());
+        assertTrue(mainForm.getWidget(props.clientSecret).isHidden());
+        assertTrue(mainForm.getWidget(props.accountKey).isVisible());
+        assertTrue(mainForm.getWidget(props.protocol).isVisible());
+        assertTrue(mainForm.getWidget(props.useSharedAccessSignature).isVisible());
+        assertTrue(mainForm.getWidget(props.sharedAccessSignature).isHidden());
+    }
 }

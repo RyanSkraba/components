@@ -31,7 +31,8 @@
         <aws-java-sdk-sts.version>${aws.version}</aws-java-sdk-sts.version>
         <aws.version>1.11.125</aws.version>
         <azure-keyvault-core.version>0.9.7</azure-keyvault-core.version>
-        <azure-storage.version>5.0.0</azure-storage.version>
+        <azure-storage.version>8.6.0</azure-storage.version>
+        <msla4j.version>1.4.0</msla4j.version>
         <org.bouncycastle.version>1.64</org.bouncycastle.version>
         <bcmail-jdk15on.version>${org.bouncycastle.version}</bcmail-jdk15on.version>
         <bcpkix-jdk15on.version>${org.bouncycastle.version}</bcpkix-jdk15on.version>
@@ -421,6 +422,11 @@
                 <groupId>com.microsoft.azure</groupId>
                 <artifactId>azure-storage</artifactId>
                 <version>${azure-storage.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.microsoft.azure</groupId>
+                <artifactId>msal4j</artifactId>
+                <version>${msla4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup</groupId>

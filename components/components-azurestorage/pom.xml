@@ -15,6 +15,18 @@
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-storage</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- For Active directory authentication -->
+        <dependency>
+            <groupId>org.talend.components.lib</groupId>
+            <artifactId>azure-utils</artifactId>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
@@ -201,12 +213,15 @@
                                 <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.azurestorage</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*
+                                <Embed-Dependency>*;artifactId=!components*|!slf4j*|commons-lang3*|jackson-core*;scope=compile|runtime;inline=false;
                                 </Embed-Dependency>
                                 <Include-Resource>
                                     {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
                                 </Include-Resource>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+                                <Import-Package>!com.google.crypto.tink*,!com.sun.net.httpserver.*,!net.shibboleth.utilities.java.support.xml*,!org.bouncycastle.*,
+                                    !org.cryptomator.siv.*,!org.opensaml.*,*</Import-Package>
+                                <Embed-Transitive>true</Embed-Transitive>
                             </instructions>
                         </configuration>
                     </execution>

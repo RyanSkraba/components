@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
 import org.apache.avro.Schema;
@@ -29,6 +31,7 @@ import org.talend.components.azurestorage.blob.runtime.AzureStorageSourceOrSink;
 import org.talend.components.azurestorage.table.AzureStorageTableProperties;
 import org.talend.components.azurestorage.table.AzureStorageTableService;
 import org.talend.components.azurestorage.table.avro.AzureStorageAvroRegistry;
+import org.talend.components.azurestorage.tazurestorageconnection.AuthType;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
@@ -90,6 +93,13 @@ public class AzureStorageTableSourceOrSink extends AzureStorageSourceOrSink impl
             AzureStorageTableService tableService = new AzureStorageTableService(getAzureConnection(container));
             for (String t : tableService.listTables()) {
                 result.add(new SimpleNamedThing(t, t));
+            }
+        } catch (NoSuchElementException e) { //Azure Table not supported for active directory auth
+            if (properties.getConnectionProperties().authenticationType.getValue() != AuthType.ACTIVE_DIRECTORY_CLIENT_CREDENTIAL) {
+                throw new ComponentException(e);
+            } else {
+                LOGGER.debug("Azure tables not supported with Active directory authentication");
+                return Collections.emptyList();
             }
         } catch (InvalidKeyException | URISyntaxException e) {
             LOGGER.error(e.getLocalizedMessage());

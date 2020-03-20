@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2020 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -66,8 +66,18 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
     public Property<String> accountKey = newString("accountKey").setRequired()
             .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
+    public Property<AuthType> authenticationType =
+            newEnum("authenticationType", AuthType.class).setValue(AuthType.BASIC);
+
     /** accountName - The Azure Storage Account Name. */
     public Property<String> accountName = PropertyFactory.newString("accountName"); //$NON-NLS-1$
+
+    public Property<String> tenantId = newString("tenantId").setRequired();
+
+    public Property<String> clientId = newString("clientId").setRequired();
+
+    public Property<String> clientSecret = newString("clientSecret")
+            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING)).setRequired();
 
     public Property<Boolean> useSharedAccessSignature = PropertyFactory.newBoolean("useSharedAccessSignature");
 
@@ -89,6 +99,7 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
     @Override
     public void setupProperties() {
         super.setupProperties();
+        authenticationType.setValue(AuthType.BASIC);
         protocol.setValue(Protocol.HTTPS);
         accountName.setValue("");
         accountKey.setValue("");
@@ -100,10 +111,15 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(accountName);
+        mainForm.addRow(authenticationType);
         mainForm.addRow(widget(accountKey).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
         mainForm.addRow(protocol);
         mainForm.addRow(useSharedAccessSignature);
         mainForm.addRow(sharedAccessSignature);
+
+        mainForm.addRow(tenantId);
+        mainForm.addRow(clientId);
+        mainForm.addColumn(widget(clientSecret).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
 
         Form refForm = Form.create(this, Form.REFERENCE);
         Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
@@ -114,10 +130,14 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
         Form wizardForm = Form.create(this, FORM_WIZARD);
         wizardForm.addRow(name);
         wizardForm.addRow(accountName);
+        wizardForm.addRow(authenticationType);
         wizardForm.addRow(widget(accountKey).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
         wizardForm.addRow(protocol);
         wizardForm.addRow(useSharedAccessSignature);
         wizardForm.addRow(sharedAccessSignature);
+        wizardForm.addRow(tenantId);
+        wizardForm.addRow(clientId);
+        wizardForm.addColumn(widget(clientSecret).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
         wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
 
     }
@@ -129,19 +149,22 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
         String refComponentIdValue = getReferencedComponentId();
         boolean useOtherConnection = refComponentIdValue != null
                 && refComponentIdValue.startsWith(TAzureStorageConnectionDefinition.COMPONENT_NAME);
+
+        boolean isBasicAuthUsed = authenticationType.getValue() == AuthType.BASIC;
+        boolean isSASAuthUsed = useSharedAccessSignature.getValue();
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
             form.getWidget(accountName).setHidden(useOtherConnection);
-            form.getWidget(accountKey).setHidden(useOtherConnection);
-            form.getWidget(protocol).setHidden(useOtherConnection);
-            form.getWidget(useSharedAccessSignature.getName()).setHidden(useOtherConnection);
-            form.getWidget(sharedAccessSignature.getName()).setHidden(useOtherConnection);
-            boolean useSAS = useSharedAccessSignature.getValue();
-            if (!useOtherConnection) {
-                form.getWidget(accountName).setHidden(useSAS);
-                form.getWidget(accountKey).setHidden(useSAS);
-                form.getWidget(protocol).setHidden(useSAS);
-                form.getWidget(sharedAccessSignature.getName()).setHidden(!useSAS);
-            }
+            form.getWidget(authenticationType).setHidden(useOtherConnection);
+
+            form.getWidget(tenantId).setHidden(useOtherConnection || isBasicAuthUsed);
+            form.getWidget(clientId).setHidden(useOtherConnection || isBasicAuthUsed);
+            form.getWidget(clientSecret).setHidden(useOtherConnection || isBasicAuthUsed);
+
+            form.getWidget(accountKey).setVisible(!useOtherConnection && isBasicAuthUsed && !isSASAuthUsed);
+            form.getWidget(protocol).setVisible(!useOtherConnection && isBasicAuthUsed && !isSASAuthUsed);
+
+            form.getWidget(useSharedAccessSignature.getName()).setVisible(!useOtherConnection && isBasicAuthUsed);
+            form.getWidget(sharedAccessSignature.getName()).setVisible(!useOtherConnection && isBasicAuthUsed && isSASAuthUsed);
         }
     }
 
@@ -151,6 +174,12 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
     }
 
     public void afterUseSharedAccessSignature() {
+        refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.REFERENCE));
+        refreshLayout(getForm(FORM_WIZARD));
+    }
+
+    public void afterAuthenticationType() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
         refreshLayout(getForm(FORM_WIZARD));
