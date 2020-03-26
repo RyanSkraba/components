@@ -210,12 +210,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-jdbc-runtime</artifactId>
-            <version>${components.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <scope>test</scope>

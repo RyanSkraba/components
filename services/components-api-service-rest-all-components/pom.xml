@@ -41,6 +41,8 @@
         <bnd-annotation.version>2.4.0</bnd-annotation.version>
         <!-- Aligned with component-parent -->
         <docker-maven-plugin.version>0.26.0</docker-maven-plugin.version>
+        <!-- Override beanutils version from spring-boot-starter-parent 1.5.1.RELEASE-->
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
     </properties>
     <dependencies>
         <!-- rest service -->

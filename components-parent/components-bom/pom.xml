@@ -46,7 +46,7 @@
         <com.yahoo.datasketches.memory.version>${com.yahoo.datasketches.version}</com.yahoo.datasketches.memory.version>
         <com.yahoo.datasketches.sketches-core.version>${com.yahoo.datasketches.version}</com.yahoo.datasketches.sketches-core.version>
         <com.yahoo.datasketches.version>0.9.0</com.yahoo.datasketches.version>
-        <commons-beanutils.version>1.9.3</commons-beanutils.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-cli.version>1.2</commons-cli.version>
         <commons-codec.version>1.10</commons-codec.version>
         <commons-collections.version>3.2.2</commons-collections.version>
@@ -192,7 +192,7 @@
         <talend_file_enhanced_20070724.version>6.0.0</talend_file_enhanced_20070724.version>
         <talendcsv.version>6.0.0</talendcsv.version>
         <tomcat-jasper.version>5.5.23</tomcat-jasper.version>
-        <xercesImpl.version>2.9.1</xercesImpl.version>
+        <xercesImpl.version>2.12.0</xercesImpl.version>
         <xml-apis.version>1.4.01</xml-apis.version>
         <servicemix-jaxws-api.version>2.3_1</servicemix-jaxws-api.version>
         <jaxws-rt.version>2.3.1</jaxws-rt.version>
