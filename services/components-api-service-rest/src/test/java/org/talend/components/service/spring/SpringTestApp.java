@@ -19,14 +19,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.talend.components.service.rest.Application;
 import org.talend.components.service.rest.configuration.ComponentsRegistrySetup;
-import org.talend.daikon.spring.BndToSpringBeanNameGenerator;
 
 /**
  * Main Spring application to launch the component service for tests purposes.
  */
 @SpringBootApplication
 @ComponentScan(basePackages = { "org.talend.components",
-        "org.talend.daikon" }, nameGenerator = BndToSpringBeanNameGenerator.class, //
+        "org.talend.daikon" }, //
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Component.class), //
         excludeFilters = { //
                 @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*Osgi"),
