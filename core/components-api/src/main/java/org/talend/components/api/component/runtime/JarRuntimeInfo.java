@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.api.component.runtime;
 
+import sun.misc.Unsafe;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +42,7 @@ import org.talend.daikon.sandbox.SandboxControl;
 public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
 
     private static final Logger LOG = LoggerFactory.getLogger(JarRuntimeInfo.class);
-    
+
     private final String runtimeClassName;
 
     private final URL jarUrl;
@@ -59,7 +61,17 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
             if (mvnLocalRepo != null && !mvnLocalRepo.isEmpty()) {
                 System.setProperty("org.ops4j.pax.url.mvn.localRepository", mvnLocalRepo);
             }
-
+            // remove warnings on illegal reflective access using Unsafe... :-D
+            try {
+                Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+                theUnsafe.setAccessible(true);
+                Unsafe unsafe = (Unsafe) theUnsafe.get(null);
+                Class clazz = Class.forName("jdk.internal.module.IllegalAccessLogger");
+                Field logger = clazz.getDeclaredField("logger");
+                unsafe.putObjectVolatile(clazz, unsafe.staticFieldOffset(logger), null);
+            } catch (Exception ue) {
+                // ignore
+            }
             // If the URL above failed, the mvn protocol needs to be installed.
             // not advice create a wrap URLStreamHandlerFactory class now
             try {
