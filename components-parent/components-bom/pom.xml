@@ -164,6 +164,7 @@
         <netty-transport-native-epoll.version>4.0.27.Final</netty-transport-native-epoll.version>
         <netty-transport.version>4.1.17.Final</netty-transport.version>
         <netty.version>3.10.6.Final</netty.version>
+        <nimbus-jose-jwt.version>8.11</nimbus-jose-jwt.version>
         <okio.version>1.14.0</okio.version>
         <org.codehaus.janino.commons-compiler.version>${org.codehaus.janino.version}</org.codehaus.janino.commons-compiler.version>
         <org.codehaus.janino.janino.version>${org.codehaus.janino.version}</org.codehaus.janino.janino.version>
@@ -1656,6 +1657,11 @@
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
                 <version>${org.reflections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>${nimbus-jose-jwt.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
