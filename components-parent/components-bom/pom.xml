@@ -20,7 +20,7 @@
         <avatica.avatica-core.version>${avatica.version}</avatica.avatica-core.version>
         <avatica.avatica-metrics.version>${avatica.version}</avatica.avatica-metrics.version>
         <avatica.version>1.11.0</avatica.version>
-        <antlr4-runtime.version>4.6</antlr4-runtime.version>
+        <antlr4-runtime.version>4.7</antlr4-runtime.version>
         <avro.version>1.8.1</avro.version>
         <aws-java-sdk-cloudwatch.version>${aws.version}</aws-java-sdk-cloudwatch.version>
         <aws-java-sdk-core.version>${aws.version}</aws-java-sdk-core.version>

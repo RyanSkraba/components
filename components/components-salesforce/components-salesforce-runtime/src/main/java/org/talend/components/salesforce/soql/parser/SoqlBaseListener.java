@@ -1,4 +1,4 @@
-// Generated from Soql.g4 by ANTLR 4.6
+// Generated from Soql.g4 by ANTLR 4.7
 
 package org.talend.components.salesforce.soql.parser;
 
