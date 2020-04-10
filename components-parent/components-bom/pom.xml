@@ -72,7 +72,7 @@
         <commons-pool.version>1.6</commons-pool.version>
         <commons-pool2.version>2.4.2</commons-pool2.version>
         <commons-validator.version>1.6</commons-validator.version>
-        <cxf.version>3.3.4</cxf.version>
+        <cxf.version>3.3.6</cxf.version>
         <derby.version>10.12.1.1</derby.version>
         <dom4j.version>2.1.1</dom4j.version>
         <esri-geometry.version>2.0.0</esri-geometry.version>
