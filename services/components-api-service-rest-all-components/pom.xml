@@ -36,7 +36,6 @@
         <jackson.version>2.10.1</jackson.version>
         <jackson.version.annotations>2.10.1</jackson.version.annotations>
         <guava.version>20.0</guava.version>
-        <logback.version>1.1.9</logback.version>
         <slf4.version>1.7.25</slf4.version>
         <bnd-annotation.version>2.4.0</bnd-annotation.version>
         <!-- Aligned with component-parent -->
@@ -52,11 +51,6 @@
             <artifactId>components-api-service-rest</artifactId>
             <type>jar</type>
             <version>${components.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

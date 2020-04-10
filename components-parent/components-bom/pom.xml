@@ -147,7 +147,6 @@
         <kafka-clients.version>2.4.1</kafka-clients.version>
         <littleproxy.version>1.1.0</littleproxy.version>
         <log4j.version>1.2.17</log4j.version>
-        <logback-classic.version>1.1.9</logback-classic.version>
         <marketo-soap-sdk.version>3.1</marketo-soap-sdk.version>
         <mockito-core.version>2.24.0</mockito-core.version>
         <netty-all.version>4.1.17.Final</netty-all.version>
@@ -1261,24 +1260,11 @@
                 <artifactId>json-smart</artifactId>
                 <version>${json-smart.version}</version>
             </dependency>
-            <!-- -->
-            <!-- -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot.version}</version>
                 <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback-classic.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
@@ -1437,24 +1423,12 @@
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
                 <version>${components.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
                 <version>${components.version}</version>
                 <classifier>lib</classifier>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
