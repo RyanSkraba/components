@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.talend.components.netsuite.client.model.BasicRecordType;
 
+import com.netsuite.webservices.test.platform.core.RecordRef;
 import com.netsuite.webservices.test.platform.core.types.RecordType;
 import com.netsuite.webservices.test.setup.customization.CrmCustomField;
 import com.netsuite.webservices.test.setup.customization.CustomFieldType;
@@ -117,15 +118,16 @@ public class CustomFieldAdaptersTest {
     }
 
     @Test
-    public void testAdapterForGenericCustomField() {
+    public void testOtherCustomFieldAdapter() {
         OtherCustomField customField = new OtherCustomField();
-        customField.setFieldType(CustomizationFieldType.HYPERLINK);
+        customField.setFieldType(CustomizationFieldType.TEXT_AREA);
+        RecordRef recRef = new RecordRef();
+        recRef.setName("account");
+        customField.setRecType(recRef);
 
-        DefaultCustomFieldAdapter<CustomFieldType> adapter1 = new DefaultCustomFieldAdapter<>(BasicRecordType.OTHER_CUSTOM_FIELD, true);
-        assertTrue(adapter1.appliesTo("opportunity", customField));
+        OtherCustomFieldAdapter<OtherCustomField> adapter1 = new OtherCustomFieldAdapter<>();
+        assertTrue(adapter1.appliesTo("account", customField));
         assertEquals(CustomFieldRefType.STRING, adapter1.apply(customField));
-
-        DefaultCustomFieldAdapter<CustomFieldType> adapter2 = new DefaultCustomFieldAdapter<>(BasicRecordType.OTHER_CUSTOM_FIELD, false);
-        assertFalse(adapter2.appliesTo("opportunity", customField));
+        assertFalse(adapter1.appliesTo("opportunity", customField));
     }
 }

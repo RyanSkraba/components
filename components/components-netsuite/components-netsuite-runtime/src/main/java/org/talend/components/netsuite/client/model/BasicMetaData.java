@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2020 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -14,7 +14,6 @@
 package org.talend.components.netsuite.client.model;
 
 import static org.talend.components.netsuite.client.model.TypeUtils.collectXmlTypes;
-import static org.talend.components.netsuite.client.model.beans.Beans.toInitialUpper;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +37,7 @@ import org.talend.components.netsuite.client.model.customfield.DefaultCustomFiel
 import org.talend.components.netsuite.client.model.customfield.EntityCustomFieldAdapter;
 import org.talend.components.netsuite.client.model.customfield.ItemCustomFieldAdapter;
 import org.talend.components.netsuite.client.model.customfield.ItemOptionCustomFieldAdapter;
+import org.talend.components.netsuite.client.model.customfield.OtherCustomFieldAdapter;
 import org.talend.components.netsuite.client.model.customfield.TransactionBodyCustomFieldAdapter;
 import org.talend.components.netsuite.client.model.customfield.TransactionColumnCustomFieldAdapter;
 import org.talend.components.netsuite.client.model.search.SearchBooleanFieldAdapter;
@@ -220,13 +220,13 @@ public abstract class BasicMetaData {
         bindCustomFieldAdapter(new EntityCustomFieldAdapter<>());
         bindCustomFieldAdapter(new ItemCustomFieldAdapter<>());
         bindCustomFieldAdapter(new ItemOptionCustomFieldAdapter<>());
+        bindCustomFieldAdapter(new OtherCustomFieldAdapter<>());
         bindCustomFieldAdapter(new TransactionBodyCustomFieldAdapter<>());
         bindCustomFieldAdapter(new TransactionColumnCustomFieldAdapter<>());
         bindCustomFieldAdapter(new DefaultCustomFieldAdapter<>(BasicRecordType.CUSTOM_LIST, false));
         bindCustomFieldAdapter(new DefaultCustomFieldAdapter<>(BasicRecordType.CUSTOM_RECORD, true));
         bindCustomFieldAdapter(new DefaultCustomFieldAdapter<>(BasicRecordType.CUSTOM_RECORD_TYPE, true));
         bindCustomFieldAdapter(new DefaultCustomFieldAdapter<>(BasicRecordType.CUSTOM_TRANSACTION_TYPE, true));
-        bindCustomFieldAdapter(new DefaultCustomFieldAdapter<>(BasicRecordType.OTHER_CUSTOM_FIELD, false));
         bindCustomFieldAdapter(new DefaultCustomFieldAdapter<>(BasicRecordType.ITEM_NUMBER_CUSTOM_FIELD, false));
     }
 
