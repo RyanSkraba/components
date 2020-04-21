@@ -297,6 +297,24 @@ public class SnowflakeReadersTestIT extends SnowflakeRuntimeIOTestIT {
         assertTrue(schema.getFields().size() == NUM_COLUMNS);
     }
 
+    //This test will fail if the lowercase table name value is not converted to upper case
+    @Test
+    public void testGetDynamicInputSchemaConvertToUpperCase() throws IOException {
+        TSnowflakeInputProperties inputProperties = new TSnowflakeInputProperties("input");
+        setupProps(inputProperties.getConnectionProperties());
+        inputProperties.init();
+        inputProperties.convertColumnsAndTableToUppercase.setValue(true);
+        inputProperties.manualQuery.setValue(false);
+        Schema schema = SchemaBuilder.builder().record("Dynamic").fields().requiredString("DYNA").endRecord();
+        schema.addProp(SchemaConstants.INCLUDE_ALL_FIELDS, "true");
+        inputProperties.table.main.schema.setValue(schema);
+        inputProperties.table.tableName.setValue(testTable.toLowerCase());
+        List<IndexedRecord> rows = readRows(inputProperties);
+        assertEquals(100, rows.size());
+        assertEquals(NUM_COLUMNS, rows.get(0).getSchema().getFields().size());
+        assertEquals("ID", rows.get(0).getSchema().getFields().get(0).name());
+    }
+
     @Test
     public void testTableNamesInput() throws Throwable {
         TSnowflakeInputProperties props = (TSnowflakeInputProperties) getComponentService()

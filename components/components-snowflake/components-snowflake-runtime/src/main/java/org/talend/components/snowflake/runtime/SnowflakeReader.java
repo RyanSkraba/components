@@ -182,9 +182,14 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
             @Override
             public Schema getSchema() throws IOException {
                 try {
+                    final boolean isUpperCase = properties.convertColumnsAndTableToUppercase.getValue();
+                    String tableName = properties.getTableName();
+                    if(isUpperCase && !properties.manualQuery.getValue() && tableName != null) {
+                        tableName = tableName.toUpperCase();
+                    }
                     return properties.manualQuery.getValue()
                             ? factory.getRegistry().inferSchema(resultSet.getMetaData())
-                                    : source.getSchema(container, connection, properties.getTableName());
+                                    : source.getSchema(container, connection, tableName);
                 } catch (SQLException e) {
                     throw new IOException(e);
                 }
