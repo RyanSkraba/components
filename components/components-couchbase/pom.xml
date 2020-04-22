@@ -93,6 +93,7 @@
             <groupId>com.couchbase.client</groupId>
             <artifactId>encryption</artifactId>
             <version>${couchbase-client-encryption.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Transitive dependencies of Couchbase SDKs to be included into bundle -->
@@ -269,13 +270,13 @@
                                 <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.couchbase</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
-                                <Import-Package>!org.apache.hadoop.*, !org.apache.http.*, !com.fasterxml.jackson.databind.*,
+                                <Import-Package>!com.couchbase.client.encryption.*, !org.apache.hadoop.*, !org.apache.http.*, !com.fasterxml.jackson.databind.*,
                                     !org.apache.logging.log4j.*,!com.couchbase.client.deps.io.netty.internal.tcnative,!org.conscrypt,!com.barchart.udt,!com.barchart.udt.nio,!com.google.protobuf,!com.jcraft.jzlib,!com.sun.*,!sun.*,!gnu.io,!javassist,!org.jboss.*,!org.joda.*,!org.apache.logging.log4j,!org.apache.tomcat,!org.apache.tomcat.jni,!org.bouncycastle.*,!org.eclipse.*,*
                                 </Import-Package>
                                 <Export-Package>
                                     !com.couchbase.client.deps,org.talend.components.couchbase,org.talend.components.couchbase.input,org.talend.components.couchbase.output
                                 </Export-Package>
-                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*
+                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|encryption
                                 </Embed-Dependency>
                                 <Include-Resource>
                                     {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
