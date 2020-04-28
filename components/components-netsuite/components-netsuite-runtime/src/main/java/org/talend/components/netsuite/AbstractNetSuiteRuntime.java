@@ -89,8 +89,7 @@ public abstract class AbstractNetSuiteRuntime implements NetSuiteRuntime {
         NetSuiteEndpoint endpoint = null;
         // If caching is enabled then we should first try to get cached endpoint object.
         if (context != null && context.isCachingEnabled()) {
-            NetSuiteEndpoint.ConnectionConfig cachedConnectionConfig =
-                    (NetSuiteEndpoint.ConnectionConfig) context.getAttribute(NetSuiteEndpoint.ConnectionConfig.class.getName());
+            Object cachedConnectionConfig = context.getAttribute(NetSuiteEndpoint.ConnectionConfig.class.getName());
             // If any of key properties in connection properties was changed then
             // we should not use this cached object, we should create new.
             if (cachedConnectionConfig != null && connectionConfig.equals(cachedConnectionConfig)) {
