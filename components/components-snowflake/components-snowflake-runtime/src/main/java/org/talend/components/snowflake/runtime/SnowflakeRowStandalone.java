@@ -77,8 +77,14 @@ public class SnowflakeRowStandalone extends SnowflakeRuntime implements Componen
                 }
             } else {
                 try (Statement statement = connection.createStatement()) {
-                    rs = statement.executeQuery(rowProperties.getQuery());
-                    storeReturnedRows(rs);
+                    boolean isResultSet = statement.execute(rowProperties.getQuery());
+                    int updateCount;
+                    while (isResultSet || (updateCount = statement.getUpdateCount()) != -1) {
+                        if (isResultSet) {
+                            storeReturnedRows(statement.getResultSet());
+                        }
+                        isResultSet = statement.getMoreResults();
+                    }
                 }
             }
         } catch (SQLException e) {
