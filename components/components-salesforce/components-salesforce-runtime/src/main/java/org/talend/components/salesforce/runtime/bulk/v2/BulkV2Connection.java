@@ -13,19 +13,20 @@
 
 package org.talend.components.salesforce.runtime.bulk.v2;
 
-import static org.apache.oltu.oauth2.common.OAuth.OAUTH_HEADER_NAME;
-import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.GET;
-import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.PATCH;
-import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.POST;
-import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.PUT;
-
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
@@ -35,6 +36,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.codehaus.jackson.JsonFactory;
@@ -47,16 +49,19 @@ import org.talend.components.salesforce.runtime.bulk.v2.request.UpdateJobRequest
 import org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
-
 import com.sforce.async.JobStateEnum;
 import com.sforce.ws.ConnectorConfig;
 import com.sforce.ws.bind.CalendarCodec;
 import com.sforce.ws.tools.VersionInfo;
-import com.sforce.ws.util.Base64;
+
+import static org.apache.oltu.oauth2.common.OAuth.OAUTH_HEADER_NAME;
+import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.GET;
+import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.PATCH;
+import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.POST;
+import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.PUT;
 
 /**
  * Bulk Connection for Bulk API V2
- *
  */
 
 public class BulkV2Connection {
@@ -65,8 +70,7 @@ public class BulkV2Connection {
 
     public static final String CSV_CONTENT_TYPE = "text/csv";
 
-    private static final I18nMessages MESSAGES =
-            GlobalI18N.getI18nMessageProvider().getI18nMessages(BulkV2Connection.class);
+    private static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider().getI18nMessages(BulkV2Connection.class);
 
     private static final JsonFactory factory = new JsonFactory(new ObjectMapper());
 
@@ -85,7 +89,7 @@ public class BulkV2Connection {
 
         this.config = adaptBulkV2Config(config, apiVersion);
 
-        httpclient = HttpClients.createDefault();
+        this.httpclient = getHttpClient();
 
         if (config.getSessionId() == null) {
             throw new BulkV2ClientException(MESSAGES.getMessage("error.token.notfound"));
@@ -119,6 +123,9 @@ public class BulkV2Connection {
         bulkV2Config.setRestEndpoint(restEndpoint);
         bulkV2Config.setTraceMessage(bulkConfig.isTraceMessage());
         bulkV2Config.setValidateSchema(bulkConfig.isValidateSchema());
+        bulkV2Config.setProxy(bulkConfig.getProxy());
+        bulkV2Config.setProxyUsername(bulkConfig.getProxyUsername());
+        bulkV2Config.setProxyPassword(bulkConfig.getProxyPassword());
         if (bulkConfig.getConnectionTimeout() > 0) {
             config.setConnectionTimeout(bulkConfig.getConnectionTimeout());
         }
@@ -138,8 +145,7 @@ public class BulkV2Connection {
     private JobInfoV2 createJob(CreateJobRequest request, String endpoint) throws BulkV2ClientException {
         try {
             HttpPost httpPost = (HttpPost) createRequest(endpoint, HttpMethod.POST);
-            StringEntity entity =
-                    new StringEntity(serializeToJson(request), org.apache.http.entity.ContentType.APPLICATION_JSON);
+            StringEntity entity = new StringEntity(serializeToJson(request), org.apache.http.entity.ContentType.APPLICATION_JSON);
 
             httpPost.setEntity(entity);
             HttpResponse response = httpclient.execute(httpPost);
@@ -257,10 +263,13 @@ public class BulkV2Connection {
 
     public HttpRequestBase createRequest(String uri, String httpMethod) throws IOException {
 
+        Proxy proxy = config.getProxy();
+
         if (config.isTraceMessage()) {
-            config.getTraceStream().println("WSC: Creating a new connection to " + uri + " Proxy = " + config.getProxy()
-                    + " username " + config.getProxyUsername());
+            config.getTraceStream().println(
+                    "WSC: Creating a new connection to " + uri + " Proxy = " + proxy + " username " + config.getProxyUsername());
         }
+
         HttpRequestBase request = null;
         switch (httpMethod) {
         case PATCH:
@@ -285,6 +294,13 @@ public class BulkV2Connection {
             request.setHeader("User-Agent", VersionInfo.info());
         }
 
+        if (proxy != null && !Proxy.Type.DIRECT.equals(proxy.type())) {
+            HttpHost proxyHost = new HttpHost(((InetSocketAddress) proxy.address()).getHostName(),
+                    ((InetSocketAddress) proxy.address()).getPort());
+            RequestConfig requestConfig = RequestConfig.custom().setProxy(proxyHost).build();
+            request.setConfig(requestConfig);
+        }
+
         /*
          * Add all the client specific headers here
          */
@@ -295,13 +311,6 @@ public class BulkV2Connection {
         }
 
         request.setHeader(ACCESS_TOKEN, OAUTH_HEADER_NAME + " " + config.getSessionId());
-
-        if (config.getProxyUsername() != null) {
-            String token = config.getProxyUsername() + ":" + config.getProxyPassword();
-            String auth = "Basic " + new String(Base64.encode(token.getBytes()));
-            request.setHeader("Proxy-Authorization", auth);
-            request.setHeader("Https-Proxy-Authorization", auth);
-        }
 
         if (httpHeaders != null) {
             for (Map.Entry<String, String> entry : httpHeaders.entrySet()) {
@@ -321,8 +330,7 @@ public class BulkV2Connection {
         }
 
         if (config.isTraceMessage()) {
-            config.getTraceStream().println(
-                    "WSC: Connection configured to have request properties " + request.toString());
+            config.getTraceStream().println("WSC: Connection configured to have request properties " + request.toString());
         }
 
         return request;
@@ -330,5 +338,25 @@ public class BulkV2Connection {
 
     public ConnectorConfig getConfig() {
         return config;
+    }
+
+    private CloseableHttpClient getHttpClient() {
+        if (httpclient == null) {
+            if (config != null && config.getProxy() != null) {
+                Proxy proxy = config.getProxy();
+                if (!Proxy.Type.DIRECT.equals(proxy.type()) && config.getProxyUsername() != null
+                        && config.getProxyPassword() != null) {
+                    Credentials credentials = new UsernamePasswordCredentials(config.getProxyUsername(),
+                            config.getProxyPassword());
+                    AuthScope authScope = new AuthScope(((InetSocketAddress) proxy.address()).getHostName(),
+                            ((InetSocketAddress) proxy.address()).getPort());
+                    CredentialsProvider credsProvider = new BasicCredentialsProvider();
+                    credsProvider.setCredentials(authScope, credentials);
+                    return HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+                }
+            }
+            return HttpClients.createDefault();
+        }
+        return httpclient;
     }
 }
