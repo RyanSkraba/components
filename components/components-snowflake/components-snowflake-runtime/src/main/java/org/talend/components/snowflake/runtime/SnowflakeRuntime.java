@@ -59,13 +59,9 @@ public abstract class SnowflakeRuntime {
         if (refComponentId != null) {
             // In a runtime container
             if (container != null) {
-                conn = (Connection) container.getComponentData(refComponentId, KEY_CONNECTION);
-                try {
-                    if (conn != null && !conn.isClosed()) {
-                        return conn;
-                    }
-                } catch (SQLException ex) {
-                    throw new IOException(ex);
+                conn = getConnection(container, refComponentId);
+                if (isConnectionValid(conn)) {
+                    return conn;
                 }
                 throw new IOException(I18N_MESSAGES.getMessage("error.refComponentNotConnected", refComponentId));
             }
@@ -78,6 +74,10 @@ public abstract class SnowflakeRuntime {
         }
 
         if (container != null) {
+            conn = getConnection(container, container.getCurrentComponentId());
+            if (isConnectionValid(conn)) {
+                return conn;
+            }
             connectionProperties.talendProductVersion = (String) container.getGlobalData(KEY_TALEND_PRODUCT_VERSION);
         }
 
@@ -103,4 +103,15 @@ public abstract class SnowflakeRuntime {
         }
     }
 
+    private Connection getConnection(RuntimeContainer container, String componentId) throws IOException {
+        return  (Connection) container.getComponentData(componentId, KEY_CONNECTION);
+    }
+
+    private boolean isConnectionValid(Connection connection) throws IOException {
+        try {
+            return connection != null && !connection.isClosed();
+        } catch (SQLException e) {
+            throw new IOException(e);
+        }
+    }
 }
