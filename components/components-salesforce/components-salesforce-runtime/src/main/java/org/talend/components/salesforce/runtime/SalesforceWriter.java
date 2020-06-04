@@ -289,7 +289,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                 } else {
                     base64Data = ((String) value).getBytes();
                 }
-                if (Base64.isBase64(new String(base64Data))) {
+                if (isValidBase64String(new String(base64Data))) {
                     valueToAdd = Base64.decode(base64Data);
                     break;
                 }
@@ -736,5 +736,14 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     private String getPastForm(OutputAction outputAction) {
 
         return MESSAGES.getMessage(String.format("outputAction.%s.pastForm", outputAction.name()));
+    }
+
+    private boolean isValidBase64String(String isValidString){
+        try {
+           return Base64.isBase64(isValidString);
+        }catch (Throwable throwable){
+            // avoid some invalid string caused exception
+            return false;
+        }
     }
 }

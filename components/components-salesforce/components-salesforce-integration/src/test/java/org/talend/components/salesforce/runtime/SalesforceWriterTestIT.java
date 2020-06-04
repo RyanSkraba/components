@@ -12,23 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.FIELD_SALESFORCE_ID;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,8 +46,24 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.SchemaConstants;
-
 import com.sforce.ws.util.Base64;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.FIELD_SALESFORCE_ID;
 
 public class SalesforceWriterTestIT extends SalesforceTestBase {
 
@@ -1316,6 +1315,119 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             assertEquals("dGhpcyBpcyBiYXNlNjQgIHRlc3QgZmlsZS4g", r.get(2));
             assertEquals("this is base64 test file.", r.get(3));
             assertNotNull(r.get(4));
+        } finally {
+            deleteRows(inpuRecords, sfInputProps);
+        }
+    }
+
+    /**
+     * Test write base64 nullable fields, with image file
+     */
+    @Test
+    public void testBase64FieldWithException() throws Throwable {
+
+        String moduleName = "StaticResource";
+
+        ComponentDefinition sfDef = new TSalesforceOutputDefinition();
+        TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
+        SalesforceTestBase.setupProps(sfProps.connection, false);
+        sfProps.module.setValue("moduleName", moduleName);
+        sfProps.module.main.schema.setValue(SCHEMA_STATIC_RESOURCE);
+        sfProps.ceaseForError.setValue(true);
+        sfProps.module.schemaListener.afterSchema();
+        List records = new ArrayList<IndexedRecord>();
+        String randomName = getRandomString(10);
+        String resources = getClass().getResource("/component.gif").toURI().getPath();
+        byte[] base64Content = org.apache.commons.io.FileUtils.readFileToByteArray(new java.io.File(resources));
+        IndexedRecord record = new GenericData.Record(SCHEMA_STATIC_RESOURCE);
+        record.put(0, randomName);
+        record.put(1, "image/gif");
+        record.put(2, base64Content);
+        record.put(3, "component.gif.");
+
+        records.add(record);
+
+        SalesforceSink salesforceSink = new SalesforceSink();
+        salesforceSink.initialize(adaptor, sfProps);
+        salesforceSink.validate(adaptor);
+        Writer<Result> batchWriter = salesforceSink.createWriteOperation().createWriter(adaptor);
+
+        writeRows(batchWriter, records);
+
+        TSalesforceInputProperties sfInputProps = getSalesforceInputProperties();
+        sfInputProps.copyValuesFrom(sfProps);
+        sfInputProps.condition.setValue("Name = '" + randomName + "'");
+
+        sfProps.module.setValue("moduleName", moduleName);
+        sfProps.module.main.schema.setValue(SCHEMA_STATIC_RESOURCE);
+        List<IndexedRecord> inpuRecords = readRows(sfInputProps);
+        try {
+            assertEquals(1, inpuRecords.size());
+            IndexedRecord r = inpuRecords.get(0);
+            assertEquals(randomName, r.get(0));
+            assertEquals("image/gif", r.get(1));
+            String base64ContentString =
+                    "R0lGODdhwgEsAYQAAP///////wAAAL+/v9/f319fXz8/P5+fn39/fx8fHwcHB3d3d6enpzc3Nzs7Ow8PD4uLiyMjIy8vL29vbxMTEw"
+                            + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAwgEsAQAF/iAgjmRpnmiqrmzrvnAsz3Rt33iu73zv/8CgcEgs"
+                            + "Go/IpHLJbDqf0Kh0Sq1ar9isdsvter/gsHhMLpvP6LR6zW673/C4fE6v2+/4vH7P7/v/gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZ"
+                            + "aXmJmam5ydnp+goaKjpKWmp6ipqqusra6vsLGys7S1tre4ubq7vL2+v8DBwsPExcbHyMnKy8zNzs/Q0dLT1NXW19jZ2tvc3d7f"
+                            + "4OHi4+Tl5ufo6err7O3u7/Dx8vP09fb3+Pn6+/z9/v8AAwocSLCgwYMIEypcyLChw4cQI0qcSLGixYsYM2rcyLGjx48gQ4ocSb"
+                            + "KkyZMo/lOqXMmypcuXMGPKnEmzps2bOHPq3Mmzp8+fQIMKfTZgwFAkBIw+IlBAgFMDR4sMeOrogNOrAg5EHdLUKQJGVrE6VboV"
+                            + "SIKrXxWFFXsgQNkgWNMiWhvX7dsfBOImmio2q927PvKiRcQXawECfwH3EOz1UGGnCQYkVrxYb6HHAhIQoCyEsQC5gjBrLtUUqj"
+                            + "nPWgcROIt1M6m1oMWhVs36quRStQtIYlr7agIDqc3MDrSa7WRQj3VDotv36uEyw/8UN3wcVNfGjxA03/6ZTHQ/BsQmqP7Jc9ZHz"
+                            + "LljNR3mMdk+4cW6XnLAgP379pW70d76SX389+knBWYGFGXgAAX0/uaUgF6490d8dSmBoHoCGDDfGr2Nx8SE6lkohXkGkFefWGLQ"
+                            + "9Z4e110VIlIIKMjdaGswx2ARBLRIoW8XNgFhheSNwJ9TOXJBV5B3/IjjEUzd2Bd7aSgYHI0pKlkhFEbCuAJWJ3JhJJF1pCdAlkE"
+                            + "YKeVgThDAZQyYCXCmD2KO2Z0TOz6pApZhpLhmHGl+1iMPBOzo5lV3ClEYmDD4uSIRff7ZV6BBeHYoC3SCsSOjbUxHnVSKNhfbEX"
+                            + "QxKYN5bw6Rp6KbHmEkoSdE+kVvqMbhZ2Z77uBlXwnUamtzCeCFQAHPmZCmDVGqScSs4tlaK646qhgrCap6IVarJ5hJ6RVe/k5rQ"
+                            + "5tYJYCAZImNam0LKeZaQp7QpgCqhiTUWAB+vc6ArW/bBtDtdt/uYJkLzXJhnpwqHJDbGKD6Nex22iKWwnblvjCAiyVYihW/LrQJ"
+                            + "2gCv2jbDrAX3iPASj1mb7xbMldpwsF+K4eKjQeSZQFsskCyyDO8mtiOEL6/gIlnv+iaDyiyv4HIOTPFaAMQlGLnsCJ7Vq0LQvBJ"
+                            + "9rVg1c9hcwlQEa2XKmh4NgJczzkCyU3+leABsF9Nq19fPwpAnAlpzjYPDwqoAIbot0KV1C3ArrUKUXQNAsXo9e+El1U+LZeHdeX"
+                            + "rq9bO12UUX24z1bXNfaYkJHGKWOm1Cm4cr3Jzi/jHAXfKcKhbq290riE64CwrOOCJ3CBj8RZ4FoP7pq7XL8PkN4UrWuN+XRi7D4"
+                            + "Ftne9sIZLOQqFi5x7C7DRW3+ljN4xq2Q/Q9LEmCvy+2ZXsULtL9w8KUfw/AyYVD5trvtaErfAyvjufZ1SIURr3fLrI9A/o17Fhb"
+                            + "qyZ6wY5WJ7dsWWwHaRIX93BVgOOJgWQERFNzmieDV4HOBXSxUuNSRJb3eY5yAJgbkey3AtqZL4Tao0GKeHVAFFxHfCp4DAxVaJj"
+                            + "rRDCGtLLR5wI3BmxR0AdemuELOEeD+V2oNo/7iwddEL0AnoCEKQjiCQFARBMQ4AADOJORQmTDAi7oBb3R/pwIrpjFFGwxAF1E4J"
+                            + "gKNMUB0QtrU7NBei7IgvblyEWwSpdz1IarACCRPFB84sZqMMcSvM4pEMvgZtKIAiS6IFx7OuR5TKBIADAyB8TKFg+9g0f9jW87n"
+                            + "qRBmui4t4/h8URLZEHFEPAjlFUPO74CZRtHOQLy9SWWkbqkCT4mSF7WD4+4PKAueUehlbWRChUTItDwqMwPrmd4DztO/iaTShxO"
+                            + "rT8pCGS6mHlMWlqSO+9xWM+GWUusLMs8oSwB2sIZxrO1MAd4hMwmzfCuGzJxO2LEWwqLJjRUXsoECpphNVNQMQP86IfBLFXFJmk"
+                            + "DUFlooWMhwY4oSE4RrKWZI+iN/ivHCNHRiWCiYXvnDUZlTDaMaqM6eBdKdWe4oinoQhBaqYLANNBeLqk2d9KmCFR6TBH0pQEBde"
+                            + "I3lUWCihaPKivwH5HgtjJVpQhlRpVB+NKphnjaU3ncySe+WmrRTiIPmyfoDULHuMcWdHRBsSqMnAKGSB305QHMc8v/LJqtHBn1o"
+                            + "EmVDwr8lLu5HlV96hRpEf2krZ5e4WsrxcHXMPoCh24NbabJXI9YhYKavpJCgYKQXQlmWLZepWdzdViWjHqdmvnJgSQQE2gtJloT"
+                            + "RDVicXwDsa6aOgOWFQejDBZwdDZUHqmgfYC8rRfVM9bLomx+1svBqBD5l7nuiKq9RVVp/it72ursq7kWe+5xXruCBYrHsFbwLGN"
+                            + "rsKWH6SA9CmLj+a4CPMGW4F8oKIzkvuqcQQ5XTuX97Hm588P/nfEERoUQxOCG2tT+UwT+XU91uBtfiJLSDBDVKg1yEwBfygBtXs"
+                            + "EukCBU3HLqN75kMlcYPxeri06GwhaOwWJPjJa6utC9H/3w9vpSYBIA970tPhKAYRzDs96vh4bpDXiDWbIUwyCeY5FZjoHkM7BSM"
+                            + "sQ2fQq5UudIEjjIyGAEJUDt61oe+3UEUYpMj6a35djuOKIKW6iRJAwGzCRnyIY0JwCw3ILlfmkyJOvwCMTSo+SdgDma4VysruNK"
+                            + "u82Zx3x8I477/qJno37Zljo2o5MRPMEeMdhvCz2MZ2iLBbEK1QeEdgudWZCzsWLrTp3q0Y+I1iajBEuMnxZBqA+N5hvwtMzZ2pO"
+                            + "jhbmkzBJ10bkuZa2jGE/1dqwNVULj6YJQm7SMenJcpu+BXyzczcl4xs+S63eXFiFgOxvRWdZUWGncZCY30jbedc7Rmj3utAk7bg"
+                            + "27ImQdaGI2mMco8AVCpJ4dRdtepTrpCVRvavajLDGAxnYBoYh/XYJ9g7tu/vaojaEWK82OYAIFQMABNhNxtGiNlwqCbgksLgIIn"
+                            + "FXKk2ll6A4wNCzEKQDf8QE2+b1XFf33ydOOMkPPLPH2+uZ4aVqTCE8w/imfPlyVNgd5sPNq7oCqR8wvUPqymR43CSipgQuudo9p"
+                            + "TqMIDalRMz+6NREZaw8/XExCB1QJGuBiaaOVoLxM0QMSLvZsPgwCkzb6tVOAUwBMwE0iTwHb1b5L89ZR7Tl7ysZ7RDO8BYvTQOi"
+                            + "KJ3803hocm9Y9r6CcC6AAASwguFN/N9iGe6E3F83dVnw5kQWgH66PXM4RcIoEjpPBo5nTzsyT3SOxogDaL/1K/ybp0HTP970/cZ"
+                            + "pY0PhfVB4EO+k98zDwzA/HfK/f/r7dAkjMdRxwHP9VB9J6smL7Aud6pP1T+USvvrlaU5vOM5D4EDf866G8fkDVhgJZRAzqjJye/"
+                            + "sPAeQh4xWxhN2yaR3h1hmUgAm3iI3WwhDRRInJDxyx1l34GaHd0Vhja0hpJMTaul4CrlzAYuCVFlHcGth41tgUB+Enq9nxX9RiJ"
+                            + "ZW3/xgKYMV+0Ji509RTVoVcOyGjVcSqFR4CJhoMtg3r9oiIClhiuFyVEEiUJsxb28VkndHk8VyEnqCVatwMctGcTOH9AOFwvuFN"
+                            + "QA3xTklHGBwCOsoE6RHFRNk/lh0JHR26kRmINt4U+l2GpQoSStiRTZGhTqGdW+EVmEXrll2qNlVzlVobmh1Q+J0SZZDgnaCnFNY"
+                            + "gKxgLpkTAkEyRcNzMAB4eHSIJDFHoSlXNhkII9QBdP/qJ+4WZusEV/NZdiHjRdJ5B40QR3gHWHDXhknhhYeNiKsziHXTh2qqiLd"
+                            + "PYq8wQDTkiBb0dPV5gDO4KEvBV92mU6R/dSY5cWSUNtiIRkIpOFKJAtt9NtYkhnAVUdVeYC4kQeZmZ91zcD8mUCIIUGpLgD0qdk"
+                            + "iBhfGYI65sEofRFJZHIdHZYibpEUfyMeY1OQLAeO7ih/dXaP8aeD4fiLHCaNQvhnzaGPu7gz9PeO8LiMxCRSMvSJF1mEclZb6xh"
+                            + "nbbVptJhHVoZkZgOMNhiHIdll+4hVkxiLuSiMmXEmJHNOhtNTa/EkGrmRgMgnNVlUhphNLlKMopd9Msg8K7Bq/lTEcLh2QbJYi6"
+                            + "JHg/jTF0qJa1IJYhYmfeASk+vVk03ZhiXIUEEplGPIA3ESLWyRTRWzlQdTkjhXj7JmMeWIfZJTIx3CKPsCl80hl1Y2QQ2pkrwIf"
+                            + "Wdph17plJRIlxdGeE/1f08ggljomCHTMGloPN9DIIUJb9h4RaDYMKjYMAfASqbJSlVIkepXI8yUmjAYhjDZViIJGdIVVyqALT+2"
+                            + "ZjoQHxpyc2tAZkDjJzWjW/aBZO0SA5bTAslGdZkzmzsnBMRpAMb5LXEZlhV4mJ+RIwO5gsOlkCngfPBEFTIkmVEwQLgVUHdycus"
+                            + "BfxI5lKL3YG6YFaGJk5AnQG7SOc6T/o4p+YVmGD7GooeQop+8yJ9bxXpjmZNw4GbpE2nmop7+dwMK14n3s0rQFoxDsDwU8qAzoG"
+                            + "gVKmG4R5YBuigtkJcNhRY+GAdRwmbpYkF3A1mL9zZaaZ2y2Z3X+YOjhwQuyp4w0Ec0aaFLw5LcGaKOqUc1Kkqf1YtwADdYaUjIF"
+                            + "32leZrcIisiinRFyoUeB4xMmQRXdJrxYljPU0Ij+QKSJB6u6YvPVJY3igNcQ55VkEAJkyRkyqa2NpNUmqYpCRklNqRkQJiNiaei"
+                            + "NAAGiUW2w6fdNZ800CaVlwZBlB8aV0b1QzIeggVRQqBzsyx+kk9P5QbiFpvwOQSb+pSlowOP/ocHfJkpCGkFfHVP7nmn/DlRmsq"
+                            + "Jt8mRRiCgNrmq0AOieIBhFIKfWeAkrMOKPEc/3TiaZ1CRyimrRWCssbmkv+qdd8Ab91mmUkCNI2qXSBMekaFPzooGLbmsT9CtoG"
+                            + "qrNSAeerMGW7ou8YR1q8JnzYqYKKA1CtoG+1So4ooE8zqbzNqjvygdB6J/YaBRWtN3bOKQa8BoL9AU2eoEBrt7CYtboqgMA5eK5"
+                            + "BklctoEMQoDFVug1moCQ1Z2y0BZzZqo8KOne0qwzmKySEB5GesKvTEtrNGp+3Om8squYUCnSwCL0HBjqpqv+YmsJduVXYCrSgAh"
+                            + "9ZkL+YY3tVK0okms/sXKtFoAm0xwHSvLsht7BJihol8gllmgtReqmNBAclHAHEpLBUI2BmVbJtJ6DKtRUlKAdm/AYVPrA3DbE0r"
+                            + "4BoNCBnfbE34St0ogkHwbGEXxtxbhfZxBtaFauKzAmIi7ClC7uKjwl46bCvcWuamAGeVKuZOAGYKLuX7AHJvLuXxQe6BbCp0yuq"
+                            + "R7lKYLCkbyY6lrCbrZuqFworD7CbI7u51AmbZ7u2Gau5ugsryru5Dxu8C7lsKbCfFYvK5Lh8iLCMVBoMvrCDr6vNI7vdRbvdZ7v"
+                            + "dibvdq7vdzbvd77veAbvuI7vuRbvuZ7vuibvuq7vuzbvu77vvAbv/I7v/Rbdr/2e7/4m7/6u7/827/++78AHMACPMAEXMAGfMAI"
+                            + "nMAKvMAM3MAO/MAQHMESPMEUXMEWfMEYnMEavMEc3MEe/MEgHMIiPMIkXMImfMIonMIqvMIs3MIu/MIwHMMyPMM0XMM2fMM4nMM"
+                            + "6vMM83MM+/MNAHMQgHAIAOw==";
+            assertEquals(base64ContentString, r.get(2));
+            assertEquals("component.gif.", r.get(3));
         } finally {
             deleteRows(inpuRecords, sfInputProps);
         }
