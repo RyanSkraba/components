@@ -489,12 +489,18 @@ public class SalesforceBulkRuntime {
             }
             for (int i = 0; i < resultCols; i++) {
                 String header = resultHeader.get(i);
-                resultInfo.setValue(header, row.get(i));
+                Object resultColumnValue = row.get(i);
+                if (resultColumnValue != null) {
+                    resultInfo.setValue(header, resultColumnValue);
+                }
 
                 if ("Created".equals(header)) {
                     resultInfo.setValue("salesforce_created", row.get(i));
-                } else if ("Id".equals(header)) {
+                    continue;
+                }
+                if ("Id".equals(header)) {
                     resultInfo.setValue("salesforce_id", row.get(i));
+                    continue;
                 }
             }
             resultInfoList.add(resultInfo);

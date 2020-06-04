@@ -14,7 +14,9 @@ package org.talend.components.salesforce.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +26,7 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -38,6 +41,7 @@ import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.common.oauth.OAuth2FlowType;
 import org.talend.components.salesforce.SalesforceBulkProperties;
@@ -107,6 +111,11 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
         testOutputBulkExec(10,true);
     }
 
+    @Test
+    public void testOutputBulkExecV1Reject() throws Throwable {
+        testOutputBulkExecReject(false);
+    }
+
     /**
      *
      * Test when bulk file is empty
@@ -162,6 +171,56 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
             deleteRows(allReadTestRows, bulkExecProperties);
             inputRows = readRows(bulkExecProperties);
             assertEquals(0, filterAllTestRows(random, inputRows).size());
+        }
+    }
+
+    /**
+     * Test bulk exec with reject
+     */
+    private void testOutputBulkExecReject(boolean isBulkV2) throws Throwable {
+
+        String random = createNewRandom();
+
+        List<IndexedRecord> rows = new ArrayList<>();
+        GenericData.Record row = new GenericData.Record(getMakeRowSchema(false));
+        row.put("Id", "1010I000021iKTOQA2");
+        row.put("Name", "TestName");
+        row.put("ShippingStreet", TEST_KEY);
+        row.put("ShippingPostalCode", "01000000000000000000000");
+        row.put("BillingStreet", "123 Main Street");
+        row.put("BillingState", "CA");
+        row.put("BillingPostalCode", random);
+        rows.add(row);
+
+        TSalesforceOutputBulkExecProperties outputBulkExecProperties = null;
+
+        if (isBulkV2) {
+            outputBulkExecProperties = createBulkV2Properties();
+        } else {
+            outputBulkExecProperties = createAccountSalesforceOutputBulkExecProperties();
+        }
+
+        // Prepare the bulk file
+        TSalesforceOutputBulkProperties outputBulkProperties =
+                (TSalesforceOutputBulkProperties) outputBulkExecProperties.getInputComponentProperties();
+        generateBulkFile(outputBulkProperties, rows);
+
+        // Execute the bulk action
+        TSalesforceBulkExecProperties bulkExecProperties =
+                (TSalesforceBulkExecProperties) outputBulkExecProperties.getOutputComponentProperties();
+
+        try {
+            // change to update
+            bulkExecProperties.outputAction.setValue(SalesforceOutputProperties.OutputAction.UPDATE);
+            executeBulkInsert(bulkExecProperties, random, 1);
+            fail("record should be rejected");
+        } catch (DataRejectException e) {
+            Map<String, Object> info = e.getRejectInfo();
+            IndexedRecord record = (IndexedRecord) info.get("talend_record");
+            assertNotNull(record.get(record.getSchema().getField("Id").pos()));
+        } finally {
+            // Delete the generated bulk file
+            delete(outputBulkProperties);
         }
     }
 

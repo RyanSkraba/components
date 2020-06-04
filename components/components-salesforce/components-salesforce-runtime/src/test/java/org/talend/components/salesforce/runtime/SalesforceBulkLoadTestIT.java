@@ -234,7 +234,8 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 					String lastname = (String) record.get(2);
 					String phone = (String) record.get(3);
 
-					Assert.assertNull(resultid);
+					// id should not null, it should be keep as in bulk file.
+					Assert.assertEquals("not_exist",resultid);
 					Assert.assertEquals("Who", firstname);
 					Assert.assertEquals("Who", lastname);
 					Assert.assertEquals("010-89492686", phone);
