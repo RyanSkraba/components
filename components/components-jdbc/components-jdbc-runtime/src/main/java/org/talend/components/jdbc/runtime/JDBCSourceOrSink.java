@@ -238,7 +238,7 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
             return JDBCAvroRegistryString.get().inferSchema(tableMetadata);
         } else {
             Dbms mapping = getDBMapping(runtime);
-            return SchemaInferer.infer(tableMetadata, mapping);
+            return SchemaInferer.infer(tableMetadata, mapping, setting.getEnableSpecialTableName());
         }
     }
 
@@ -248,7 +248,7 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
             return JDBCAvroRegistryString.get().inferSchema(metadata);
         } else {
             Dbms mapping = getDBMapping(runtime);
-            return SchemaInferer.infer(metadata, mapping);
+            return SchemaInferer.infer(metadata, mapping, setting.getEnableSpecialTableName());
         }
     }
 

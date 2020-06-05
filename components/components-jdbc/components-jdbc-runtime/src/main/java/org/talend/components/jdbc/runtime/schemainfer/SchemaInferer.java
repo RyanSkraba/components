@@ -22,9 +22,11 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.NameUtil;
 import org.talend.daikon.avro.SchemaConstants;
 
+import static org.talend.components.jdbc.ComponentConstants.ENABLE_SPECIAL_TABLENAME;
+
 public class SchemaInferer {
 
-    public static Schema infer(ResultSetMetaData metadata, Dbms mapping) throws SQLException {
+    public static Schema infer(ResultSetMetaData metadata, Dbms mapping, boolean enableSpecialTableName) throws SQLException {
         List<Field> fields = new ArrayList<>();
 
         Set<String> existNames = new HashSet<String>();
@@ -50,14 +52,16 @@ public class SchemaInferer {
             
             Field field = sqlType2Avro(size, scale, dbtype, nullable, validName, dbColumnName, null, isKey, mapping,
                     columnTypeName);
-
+            if(enableSpecialTableName && !validName.equals(dbColumnName)){
+                field.addProp(ENABLE_SPECIAL_TABLENAME,"true");
+            }
             fields.add(field);
         }
 
         return Schema.createRecord("DYNAMIC", null, null, false, fields);
     }
 
-    public static Schema infer(JDBCTableMetadata tableMetadata, Dbms mapping) throws SQLException {
+    public static Schema infer(JDBCTableMetadata tableMetadata, Dbms mapping, boolean enableSpecialTableName) throws SQLException {
         DatabaseMetaData databaseMetdata = tableMetadata.getDatabaseMetaData();
 
         Set<String> keys = getPrimaryKeys(databaseMetdata, tableMetadata.getCatalog(), tableMetadata.getDbSchema(),
@@ -93,7 +97,9 @@ public class SchemaInferer {
 
                 Field field = sqlType2Avro(size, scale, dbtype, nullable, validName, columnName, defaultValue, isKey, mapping,
                         columnTypeName);
-
+                if(enableSpecialTableName && !validName.equals(columnName)){
+                    field.addProp(ENABLE_SPECIAL_TABLENAME,"true");
+                }
                 fields.add(field);
             } while (metadata.next());
 

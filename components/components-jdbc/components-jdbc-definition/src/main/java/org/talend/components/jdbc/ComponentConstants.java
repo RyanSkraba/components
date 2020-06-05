@@ -47,4 +47,6 @@ public interface ComponentConstants {
     String MAPPING_LOCATION = "MAPPING_LOCATION";
     
     String MAPPING_URL_SUBFIX = "MAPPINGS_URL";
+
+    String ENABLE_SPECIAL_TABLENAME = "ENABLE_SPECIAL_TABLENAME";
 }

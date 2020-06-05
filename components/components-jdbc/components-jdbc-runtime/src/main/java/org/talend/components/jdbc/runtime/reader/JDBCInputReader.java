@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import static org.talend.components.jdbc.ComponentConstants.ENABLE_SPECIAL_TABLENAME;
+
 /**
  * common JDBC reader
  */
@@ -122,7 +124,9 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
                 Schema runtimeSchema4ResultSet = source.infer(resultSet.getMetaData(), container);
                 querySchema = CommonUtils.mergeRuntimeSchema2DesignSchema4Dynamic(querySchema, runtimeSchema4ResultSet);
             }
-
+            if(setting.getEnableSpecialTableName()){
+                querySchema.addProp(ENABLE_SPECIAL_TABLENAME,true);
+            }
             if(setting.trim()) {
                 return querySchema;
             }

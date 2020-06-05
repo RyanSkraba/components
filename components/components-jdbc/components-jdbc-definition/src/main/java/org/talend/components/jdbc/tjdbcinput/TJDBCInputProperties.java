@@ -53,8 +53,11 @@ import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.properties.runtime.RuntimeContext;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.PostDeserializeHandler;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class TJDBCInputProperties extends FixedConnectorsComponentProperties implements RuntimeSettingProvider {
+public class TJDBCInputProperties extends FixedConnectorsComponentProperties implements RuntimeSettingProvider, SerializeSetVersion, PostDeserializeHandler {
 
     static final Logger LOG = LoggerFactory.getLogger(TJDBCInputProperties.class);
 
@@ -106,6 +109,8 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
     public Property<Boolean> enableDBMapping = PropertyFactory.newBoolean("enableDBMapping").setRequired();
 
     public Property<DBTypes> dbMapping = PropertyFactory.newEnum("dbMapping", DBTypes.class);
+
+    public Property<Boolean> enableSpecialTableName = PropertyFactory.newBoolean("enableSpecialTableName").setRequired();
     
     public Property<Boolean> usePreparedStatement = PropertyFactory.newBoolean("usePreparedStatement").setRequired();
 
@@ -139,6 +144,7 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
         advancedForm.addRow(widget(trimTable).setWidgetType(Widget.TABLE_WIDGET_TYPE));
         advancedForm.addRow(enableDBMapping);
         advancedForm.addRow(widget(dbMapping).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        advancedForm.addRow(enableSpecialTableName);
         advancedForm.addRow(usePreparedStatement);
         advancedForm.addRow(widget(preparedStatementTable).setWidgetType(Widget.TABLE_WIDGET_TYPE));
     }
@@ -154,6 +160,8 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
         tableSelection.setConnection(this);
 
         dbMapping.setValue(DBTypes.MYSQL);
+
+        enableSpecialTableName.setValue(true);
 
         // FIXME now the trigger can't work very well, so have to call the updateTrimTable method in refreshLayout method directly
         // though refreshLayout is called at some strange place
@@ -342,8 +350,24 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
         setting.setIndexs(this.preparedStatementTable.indexs.getValue());
         setting.setTypes(this.preparedStatementTable.types.getValue());
         setting.setValues(this.preparedStatementTable.values.getValue());
+        setting.setEnableSpecialTableName(this.enableSpecialTableName.getValue());
 
         return setting;
+    }
+
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated = super.postDeserialize(version, setup, persistent);
+        if(version < 2 && enableSpecialTableName.getValue() == null){
+            enableSpecialTableName.setValue(false);
+            migrated = true;
+        }
+        return migrated;
+    }
+
+    @Override
+    public int getVersionNumber() {
+        return 2;
     }
 
 }

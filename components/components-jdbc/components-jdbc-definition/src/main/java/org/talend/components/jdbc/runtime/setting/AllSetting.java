@@ -31,7 +31,7 @@ import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
 // for runtime class and properties class, that's TODO
 public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
 
-    private static final long serialVersionUID = 8998606157752865371L;
+    private static final long serialVersionUID = 3954643581067570850L;
 
     private String jdbcUrl;
 
@@ -90,6 +90,8 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
     private Boolean readOnly = false;
 
     private ComponentProperties referencedComponentProperties;
+
+    private Boolean enableSpecialTableName = false;
 
     public String getJdbcUrl() {
         return jdbcUrl;
@@ -328,6 +330,14 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
 
     public void setReferencedComponentProperties(ComponentProperties referencedComponentProperties) {
         this.referencedComponentProperties = referencedComponentProperties;
+    }
+
+    public Boolean getEnableSpecialTableName() {
+        return enableSpecialTableName;
+    }
+
+    public void setEnableSpecialTableName(Boolean enableSpecialTableName) {
+        this.enableSpecialTableName = enableSpecialTableName;
     }
 
     @Override

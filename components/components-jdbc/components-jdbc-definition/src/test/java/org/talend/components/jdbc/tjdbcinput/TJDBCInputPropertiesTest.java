@@ -283,4 +283,14 @@ public class TJDBCInputPropertiesTest {
         Assert.assertEquals(Integer.valueOf(1000), fixture.cursor.getValue());
     }
 
+
+    @Test
+    public void testMigration(){
+        TJDBCInputProperties fixture = new TJDBCInputProperties("input");
+        fixture.enableSpecialTableName.setValue(null);
+        Assert.assertTrue(fixture.postDeserialize(0,null,false));
+        Assert.assertEquals(false,fixture.enableSpecialTableName.getValue());
+
+    }
+
 }
