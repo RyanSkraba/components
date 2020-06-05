@@ -153,8 +153,8 @@
             </snapshots>
         </repository>
         <repository>
-            <id>mapr-releases-repository</id>
-            <url>http://repository.mapr.com/nexus/content/groups/mapr-public/releases/</url>
+            <id>mapr-releases-repository-proxy</id>
+            <url>https://artifacts-zl.talend.com/nexus/content/repositories/mapr_public/</url>
         </repository>
         <repository>
             <id>redshift</id>
