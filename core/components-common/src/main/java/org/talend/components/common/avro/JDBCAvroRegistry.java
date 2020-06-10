@@ -328,7 +328,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
                     java.util.Date date = null;
 
                     try {
-                        date = value.getTimestamp(index);
+                        return value.getTimestamp(index);
                     } catch (Exception e1) {
                         try {
                             date = value.getDate(index);
@@ -652,7 +652,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
                     java.util.Date date = null;
 
                     try {
-                        date = value.getTimestamp(index);
+                        return value.getTimestamp(index);
                     } catch (Exception e1) {
                         try {
                             date = value.getDate(index);

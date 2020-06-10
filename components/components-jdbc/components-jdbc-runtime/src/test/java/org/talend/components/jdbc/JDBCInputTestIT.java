@@ -12,14 +12,15 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertArrayEquals;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -441,9 +442,9 @@ public class JDBCInputTestIT {
         String col7 = (String) record.get(7);
         byte[] col8 = (byte[]) record.get(8);
         String col9 = (String) record.get(9);
-        Long col10 = (Long) record.get(10);
-        Long col11 = (Long) record.get(11);
-        Long col12 = (Long) record.get(12);
+        Timestamp col10 = (Timestamp) record.get(10);
+        Timestamp col11 = (Timestamp) record.get(11);
+        Timestamp col12 = (Timestamp) record.get(12);
         Boolean col13 = (Boolean) record.get(13);
 
         assertEquals(32767, col0.shortValue());
@@ -457,9 +458,9 @@ public class JDBCInputTestIT {
         byte[] blob = {0,1,2,3,4,5,6,7,8,9};
         assertArrayEquals(blob, col8);
         assertEquals("abcdefg", col9);
-        assertEquals("2016-12-28", new SimpleDateFormat("yyyy-MM-dd").format(new Date(col10)));
-        assertEquals("14:30:33", new SimpleDateFormat("HH:mm:ss").format(new Date(col11)));
-        assertEquals("2016-12-28 14:31:56.123", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date(col12)));
+        assertEquals("2016-12-28", new SimpleDateFormat("yyyy-MM-dd").format(col10));
+        assertEquals("14:30:33", new SimpleDateFormat("HH:mm:ss").format(col11));
+        assertEquals(Timestamp.valueOf("2016-12-28 14:31:56.12345"), col12);
         assertEquals(true, col13);
 
         Schema actualSchema = record.getSchema();
@@ -501,9 +502,9 @@ public class JDBCInputTestIT {
         String col7 = (String) record.get(7);
         byte[] col8 = (byte[]) record.get(8);
         String col9 = (String) record.get(9);
-        Long col10 = (Long) record.get(10);
-        Long col11 = (Long) record.get(11);
-        Long col12 = (Long) record.get(12);
+        Timestamp col10 = (Timestamp) record.get(10);
+        Timestamp col11 = (Timestamp) record.get(11);
+        Timestamp col12 = (Timestamp) record.get(12);
         Boolean col13 = (Boolean) record.get(13);
 
         assertEquals(32767, col0.shortValue());
@@ -517,9 +518,9 @@ public class JDBCInputTestIT {
         byte[] blob = {0,1,2,3,4,5,6,7,8,9};
         assertArrayEquals(blob, col8);
         assertEquals("abcdefg", col9);
-        assertEquals("2016-12-28", new SimpleDateFormat("yyyy-MM-dd").format(new Date(col10)));
-        assertEquals("14:30:33", new SimpleDateFormat("HH:mm:ss").format(new Date(col11)));
-        assertEquals("2016-12-28 14:31:56.123", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date(col12)));
+        assertEquals("2016-12-28", new SimpleDateFormat("yyyy-MM-dd").format(col10));
+        assertEquals("14:30:33", new SimpleDateFormat("HH:mm:ss").format(col11));
+        assertEquals(Timestamp.valueOf("2016-12-28 14:31:56.12345"), col12);
         assertEquals(true, col13);
 
         Schema actualSchema = record.getSchema();

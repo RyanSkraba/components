@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -310,9 +311,9 @@ public class JDBCTypeMappingTestIT {
             assertEquals(BigDecimal.class, record.get(7).getClass());
             assertEquals(Boolean.class, record.get(8).getClass());
             assertEquals(String.class, record.get(9).getClass());
-            assertEquals(Long.class, record.get(10).getClass());
-            assertEquals(Long.class, record.get(11).getClass());
-            assertEquals(Long.class, record.get(12).getClass());
+            assertEquals(Timestamp.class, record.get(10).getClass());
+            assertEquals(Timestamp.class, record.get(11).getClass());
+            assertEquals(Timestamp.class, record.get(12).getClass());
             assertEquals(String.class, record.get(13).getClass());
             assertEquals(String.class, record.get(14).getClass());
 
@@ -358,9 +359,9 @@ public class JDBCTypeMappingTestIT {
             BigDecimal c8 = (BigDecimal) row.get(7);
             Boolean c9 = (Boolean) row.get(8);
             String c10 = (String) row.get(9);
-            Long c11 = (Long) row.get(10);
-            Long c12 = (Long) row.get(11);
-            Long c13 = (Long) row.get(12);
+            Timestamp c11 = (Timestamp) row.get(10);
+            Timestamp c12 = (Timestamp) row.get(11);
+            Timestamp c13 = (Timestamp) row.get(12);
             String c14 = (String) row.get(13);
             String c15 = (String) row.get(14);
 
@@ -393,9 +394,9 @@ public class JDBCTypeMappingTestIT {
             c8 = (BigDecimal) row.get(7);
             c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (Long) row.get(10);
-            c12 = (Long) row.get(11);
-            c13 = (Long) row.get(12);
+            c11 = (Timestamp) row.get(10);
+            c12 = (Timestamp) row.get(11);
+            c13 = (Timestamp) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
 
@@ -428,9 +429,9 @@ public class JDBCTypeMappingTestIT {
             c8 = (BigDecimal) row.get(7);
             c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (Long) row.get(10);
-            c12 = (Long) row.get(11);
-            c13 = (Long) row.get(12);
+            c11 = (Timestamp) row.get(10);
+            c12 = (Timestamp) row.get(11);
+            c13 = (Timestamp) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
 
@@ -463,9 +464,9 @@ public class JDBCTypeMappingTestIT {
             c8 = (BigDecimal) row.get(7);
             c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (Long) row.get(10);
-            c12 = (Long) row.get(11);
-            c13 = (Long) row.get(12);
+            c11 = (Timestamp) row.get(10);
+            c12 = (Timestamp) row.get(11);
+            c13 = (Timestamp) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
 
@@ -499,9 +500,9 @@ public class JDBCTypeMappingTestIT {
             c8 = (BigDecimal) row.get(7);
             c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (Long) row.get(10);
-            c12 = (Long) row.get(11);
-            c13 = (Long) row.get(12);
+            c11 = (Timestamp) row.get(10);
+            c12 = (Timestamp) row.get(11);
+            c13 = (Timestamp) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
 
@@ -610,9 +611,9 @@ public class JDBCTypeMappingTestIT {
             BigDecimal c8 = (BigDecimal) row.get(7);
             Boolean c9 = (Boolean) row.get(8);
             String c10 = (String) row.get(9);
-            Long c11 = (Long) row.get(10);
-            Long c12 = (Long) row.get(11);
-            Long c13 = (Long) row.get(12);
+            Timestamp c11 = (Timestamp) row.get(10);
+            Timestamp c12 = (Timestamp) row.get(11);
+            Timestamp c13 = (Timestamp) row.get(12);
             String c14 = (String) row.get(13);
             String c15 = (String) row.get(14);
             byte[] c16 = (byte[])row.get(15);
@@ -647,9 +648,9 @@ public class JDBCTypeMappingTestIT {
             c8 = (BigDecimal) row.get(7);
             c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (Long) row.get(10);
-            c12 = (Long) row.get(11);
-            c13 = (Long) row.get(12);
+            c11 = (Timestamp) row.get(10);
+            c12 = (Timestamp) row.get(11);
+            c13 = (Timestamp) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
             c16 = (byte[])row.get(15);
@@ -684,9 +685,9 @@ public class JDBCTypeMappingTestIT {
             c8 = (BigDecimal) row.get(7);
             c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (Long) row.get(10);
-            c12 = (Long) row.get(11);
-            c13 = (Long) row.get(12);
+            c11 = (Timestamp) row.get(10);
+            c12 = (Timestamp) row.get(11);
+            c13 = (Timestamp) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
             c16 = (byte[])row.get(15);
@@ -721,9 +722,9 @@ public class JDBCTypeMappingTestIT {
             c8 = (BigDecimal) row.get(7);
             c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (Long) row.get(10);
-            c12 = (Long) row.get(11);
-            c13 = (Long) row.get(12);
+            c11 = (Timestamp) row.get(10);
+            c12 = (Timestamp) row.get(11);
+            c13 = (Timestamp) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
             c16 = (byte[])row.get(15);
@@ -759,9 +760,9 @@ public class JDBCTypeMappingTestIT {
             c8 = (BigDecimal) row.get(7);
             c9 = (Boolean) row.get(8);
             c10 = (String) row.get(9);
-            c11 = (Long) row.get(10);
-            c12 = (Long) row.get(11);
-            c13 = (Long) row.get(12);
+            c11 = (Timestamp) row.get(10);
+            c12 = (Timestamp) row.get(11);
+            c13 = (Timestamp) row.get(12);
             c14 = (String) row.get(13);
             c15 = (String) row.get(14);
             c16 = (byte[])row.get(15);

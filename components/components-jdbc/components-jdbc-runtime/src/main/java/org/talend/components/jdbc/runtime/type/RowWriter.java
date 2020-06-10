@@ -185,21 +185,35 @@ public class RowWriter {
             if (inputValue == null) {
                 statement.setNull(statementIndex, java.sql.Types.TIMESTAMP);
             } else {
-                if (inputValue instanceof Date) {
+                if (inputValue instanceof Timestamp) {
+                    //some jdbc implement may not follow jdbc spec, for example :
+                    //mysq_preparestatement.setTimestamp(oracle_timestamp) may not work
+                    //but that is only a guess, may not right, maybe can set directly, so do the thing below
+                    //here only for safe, so do like this
+                    Timestamp source = (Timestamp) inputValue;
+                    Timestamp target = new Timestamp(source.getTime());
+                    target.setNanos(source.getNanos());
+                    statement.setTimestamp(statementIndex, target);
+                    debug(inputValue);
+                } else if (inputValue instanceof Date) {
                     statement.setTimestamp(statementIndex, new Timestamp(((Date) inputValue).getTime()));
-                    if (debug) {
-                        if (pattern.length() == 0 || pattern == null) {
-                            debugUtil.writeColumn(inputValue.toString(), false);
-                        } else {
-                            SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-                            debugUtil.writeColumn(sdf.format((Date) inputValue), false);
-                        }
-                    }
+                    debug(inputValue);
                 } else {
                     statement.setTimestamp(statementIndex, new Timestamp((long) inputValue));
                     if (debug) {
                         debugUtil.writeColumn(new Timestamp((long) inputValue).toString(), false);
                     }
+                }
+            }
+        }
+
+        private void debug(Object inputValue) {
+            if (debug) {
+                if (pattern.length() == 0 || pattern == null) {
+                    debugUtil.writeColumn(inputValue.toString(), false);
+                } else {
+                    SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+                    debugUtil.writeColumn(sdf.format((Date) inputValue), false);
                 }
             }
         }
@@ -385,7 +399,7 @@ public class RowWriter {
         }
 
         public void write(IndexedRecord input) throws SQLException {
-        	Object inputValue = input.get(inputValueLocation);
+            Object inputValue = input.get(inputValueLocation);
             if (inputValue == null) {
                 statement.setNull(statementIndex, java.sql.Types.ARRAY);
                 writeDebugColumnNullContent();
