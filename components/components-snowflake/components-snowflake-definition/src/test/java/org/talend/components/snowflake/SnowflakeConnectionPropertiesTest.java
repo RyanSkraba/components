@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2020 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -349,6 +349,16 @@ public class SnowflakeConnectionPropertiesTest {
         Assert.assertEquals(snowflakeConnectionProperties.userPassword.userId.getValue(), properties.getProperty("user"));
         Assert.assertEquals(snowflakeConnectionProperties.userPassword.password.getValue(), properties.getProperty("password"));
         Assert.assertEquals(String.valueOf(snowflakeConnectionProperties.loginTimeout.getValue()),
+                properties.getProperty("loginTimeout"));
+    }
+
+    @Test
+    public void testGetJdbcPropertiesWithOauth2Parameters() throws Exception {
+        final String accessToken = "accessToken";
+        Properties properties = snowflakeConnectionProperties.getJdbcProperties(accessToken);
+        Assert.assertEquals(accessToken, properties.getProperty("token"));
+        Assert.assertEquals("oauth", properties.getProperty("authenticator"));
+        Assert.assertEquals(String.valueOf(SnowflakeConnectionProperties.DEFAULT_LOGIN_TIMEOUT),
                 properties.getProperty("loginTimeout"));
     }
 

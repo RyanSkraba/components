@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2020 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -19,6 +19,7 @@ import java.sql.DriverManager;
 
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.runtime.SnowflakeConstants;
+import org.talend.components.snowflake.tsnowflakeconnection.AuthenticationType;
 
 /**
  * This utils class is only for test purpose.
@@ -31,10 +32,16 @@ public class DriverManagerUtils {
             Driver driver = (Driver) Class.forName(SnowflakeConstants.SNOWFLAKE_DRIVER).newInstance();
 
             DriverManager.registerDriver(driver);
-            return DriverManager.getConnection(properties.getConnectionUrl(), properties.getJdbcProperties());
+            return DriverManager
+                    .getConnection(properties.getConnectionUrl(),
+                            AuthenticationType.OAUTH == properties.authenticationType.getValue()
+                                    ? properties.getJdbcProperties(OauthTokenUtils.getToken(properties.getOauthProperties()))
+                                    : properties.getJdbcProperties());
         } catch (Exception e) {
-            if (e.getMessage().contains("HTTP status=403")) {
-                throw new IllegalArgumentException(e.getMessage());
+            if (e instanceof IllegalArgumentException) {
+                throw IllegalArgumentException.class.cast(e);
+            } else if(e.getMessage().contains("HTTP status=403")) {
+                throw new IllegalArgumentException(e.getMessage(), e);
             } else {
                 throw new IOException(e);
             }

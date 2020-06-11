@@ -40,6 +40,7 @@ import org.talend.components.snowflake.SnowflakeGuessSchemaProperties;
 import org.talend.components.snowflake.SnowflakeProvideConnectionProperties;
 import org.talend.components.snowflake.SnowflakeRuntimeSourceOrSink;
 import org.talend.components.snowflake.runtime.utils.SchemaResolver;
+import org.talend.components.snowflake.tsnowflakeconnection.AuthenticationType;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.avro.AvroUtils;
@@ -72,7 +73,9 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
             createConnection(container);
         } catch (IllegalArgumentException e) {
             ValidationResultMutable vr = new ValidationResultMutable();
-            vr.setMessage(e.getMessage().concat(SnowflakeConstants.INCORRECT_SNOWFLAKE_ACCOUNT_MESSAGE));
+            vr.setMessage(e.getCause() instanceof SQLException
+                            ? e.getMessage().concat(SnowflakeConstants.INCORRECT_SNOWFLAKE_ACCOUNT_MESSAGE)
+                            : e.getMessage());
             vr.setStatus(ValidationResult.Result.ERROR);
             return vr;
         } catch (Exception ex) {
@@ -117,11 +120,25 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         if (StringUtils.isEmpty(connectionProperties.account.getValue())) {
             missingProperties.append("'Account', ");
         }
-        if (StringUtils.isEmpty(connectionProperties.userPassword.password.getValue())) {
+        if (AuthenticationType.BASIC == connectionProperties.authenticationType.getValue()
+                && StringUtils.isEmpty(connectionProperties.userPassword.password.getValue())) {
             missingProperties.append("'Password', ");
         }
-        if (StringUtils.isEmpty(connectionProperties.userPassword.userId.getValue())) {
+        if (AuthenticationType.OAUTH != connectionProperties.authenticationType.getValue()
+                && StringUtils.isEmpty(connectionProperties.userPassword.userId.getValue())) {
             missingProperties.append("'UserID', ");
+        }
+        if (AuthenticationType.OAUTH == connectionProperties.authenticationType.getValue()
+                && StringUtils.isEmpty(connectionProperties.oauthProperties.oauthTokenEndpoint.getValue())) {
+            missingProperties.append("'OAuthTokenEndpoint', ");
+        }
+        if (AuthenticationType.OAUTH == connectionProperties.authenticationType.getValue()
+                && StringUtils.isEmpty(connectionProperties.oauthProperties.clientId.getValue())) {
+            missingProperties.append("'ClientID', ");
+        }
+        if (AuthenticationType.OAUTH == connectionProperties.authenticationType.getValue()
+                && StringUtils.isEmpty(connectionProperties.oauthProperties.clientSecret.getValue())) {
+            missingProperties.append("'ClientSecret', ");
         }
         if (StringUtils.isEmpty(connectionProperties.schemaName.getValue())) {
             missingProperties.append("'Schema', ");
@@ -219,6 +236,7 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         return ss.getSchemaFromQuery(container);
     }
 
+    @Override
     public Schema getSchemaFromQuery(RuntimeContainer container) throws IOException {
         ResultSetMetaData metadata = null;
         try (Connection connection = createConnection(container);

@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2019 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2020 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -16,6 +16,9 @@ import static java.util.Optional.ofNullable;
 import static org.talend.components.snowflake.SnowflakeDefinition.SOURCE_OR_SINK_CLASS;
 import static org.talend.components.snowflake.SnowflakeDefinition.USE_CURRENT_JVM_PROPS;
 import static org.talend.components.snowflake.SnowflakeDefinition.getSandboxedInstance;
+import static org.talend.components.snowflake.tsnowflakeconnection.AuthenticationType.BASIC;
+import static org.talend.components.snowflake.tsnowflakeconnection.AuthenticationType.KEY_PAIR;
+import static org.talend.components.snowflake.tsnowflakeconnection.AuthenticationType.OAUTH;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
@@ -28,6 +31,7 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +55,7 @@ import org.talend.daikon.serialize.PostDeserializeSetup;
 import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
 public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
-implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
+        implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SnowflakeConnectionProperties.class);
 
@@ -64,6 +68,8 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
 
     private static final String USERPASSWORD = "userPassword";
 
+    private static final String OAUTH_PROPERTIES = "oauthProperties";
+
     public static final String FORM_WIZARD = "Wizard";
 
     // Only for the wizard use
@@ -75,13 +81,13 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
 
     public Property<String> regionID = newString("regionID"); //$NON-NLS-1$
 
-    @Deprecated //only keep for backward compatibility
+    @Deprecated // only keep for backward compatibility
     public Property<SnowflakeRegion> region = newEnum("region", SnowflakeRegion.class);
 
-    @Deprecated //only keep for backward compatibility
+    @Deprecated // only keep for backward compatibility
     public Property<Boolean> useCustomRegion = newBoolean("useCustomRegion");
 
-    @Deprecated //only keep for backward compatibility
+    @Deprecated // only keep for backward compatibility
     public Property<String> customRegionID = newString("customRegionID");
 
     public Property<AuthenticationType> authenticationType =
@@ -90,6 +96,8 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
     public UserPasswordProperties userPassword = new UserPasswordProperties(USERPASSWORD);
 
     public Property<String> keyAlias = newString("keyAlias");
+
+    public SnowflakeOauthConnectionProperties oauthProperties = new SnowflakeOauthConnectionProperties(OAUTH_PROPERTIES);
 
     public Property<String> warehouse = newString("warehouse"); //$NON-NLS-1$
 
@@ -121,20 +129,22 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
     public void setupProperties() {
         super.setupProperties();
         loginTimeout.setValue(DEFAULT_LOGIN_TIMEOUT);
-        authenticationType.setValue(AuthenticationType.BASIC);
+        authenticationType.setValue(BASIC);
         keyAlias.setValue("");
+        oauthProperties.setupProperties();
     }
 
     @Override
     public void setupLayout() {
         super.setupLayout();
-
+        oauthProperties.setupLayout();
         Form wizardForm = Form.create(this, FORM_WIZARD);
         wizardForm.addRow(name);
         wizardForm.addRow(account);
         wizardForm.addRow(authenticationType);
         wizardForm.addRow(userPassword.getForm(Form.MAIN));
         wizardForm.addRow(widget(keyAlias).setHidden(true));
+        wizardForm.addRow(widget(oauthProperties.getForm(Form.MAIN)));
         wizardForm.addRow(warehouse);
         wizardForm.addRow(schemaName);
         wizardForm.addRow(db);
@@ -146,6 +156,7 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
         mainForm.addRow(authenticationType);
         mainForm.addRow(userPassword.getForm(Form.MAIN));
         mainForm.addRow(widget(keyAlias).setHidden(true));
+        mainForm.addRow(widget(oauthProperties.getForm(Form.MAIN)));
         mainForm.addRow(warehouse);
         mainForm.addRow(schemaName);
         mainForm.addRow(db);
@@ -188,6 +199,7 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
         form.getWidget(warehouse.getName()).setHidden(hidden);
         form.getWidget(schemaName.getName()).setHidden(hidden);
         form.getWidget(db.getName()).setHidden(hidden);
+        oauthProperties.getForm(Form.MAIN).setHidden(hidden);
     }
 
     @Override
@@ -202,9 +214,11 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
                 setHiddenProps(form, false);
                 // Do nothing
                 form.setHidden(false);
-                boolean isBasicAuth = authenticationType.getValue() == AuthenticationType.BASIC;
-                userPassword.getForm(Form.MAIN).getWidget(userPassword.password.getName()).setHidden(!isBasicAuth);
-                form.getWidget(keyAlias.getName()).setHidden(isBasicAuth);
+                AuthenticationType authType = authenticationType.getValue();
+                userPassword.getForm(Form.MAIN).getWidget(userPassword.userId.getName()).setHidden(authType == OAUTH);
+                userPassword.getForm(Form.MAIN).getWidget(userPassword.password.getName()).setHidden(authType != BASIC);
+                form.getWidget(keyAlias.getName()).setHidden(authType != KEY_PAIR);
+                oauthProperties.getForm(Form.MAIN).setHidden(authType != OAUTH);
             }
         }
 
@@ -253,20 +267,38 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
         return null;
     }
 
-    public Properties getJdbcProperties() throws IOException {
+    public Properties getJdbcProperties() throws Exception {
         String user = userPassword.userId.getStringValue();
         String password = userPassword.password.getStringValue();
         String loginTimeout = String.valueOf(this.loginTimeout.getValue());
 
         Properties properties = new Properties();
-        if (user != null) {
-            properties.put("user", user);
-        }
-        if (AuthenticationType.BASIC == authenticationType.getValue()) {
+        ofNullable(user).ifPresent(p -> properties.put("user", p));
+        if (KEY_PAIR == authenticationType.getValue()) {
+            if (keyAlias.getValue() != null) {
+                properties.put("privateKey", getPrivateKey());
+            }
+        } else {
             ofNullable(password).ifPresent(p -> properties.put("password", p));
-        } else if (keyAlias.getValue() != null) {
-            properties.put("privateKey", getPrivateKey());
         }
+
+        if (loginTimeout != null) {
+            properties.put("loginTimeout", loginTimeout);
+        }
+        return properties;
+    }
+
+    /**
+     *
+     * @param access token
+     * @return properties
+     */
+    public Properties getJdbcProperties(String accessToken) {
+        String loginTimeout = String.valueOf(this.loginTimeout.getValue());
+
+        Properties properties = new Properties();
+        properties.put("authenticator", "oauth");
+        properties.put("token", accessToken);
 
         if (loginTimeout != null) {
             properties.put("loginTimeout", loginTimeout);
@@ -319,11 +351,10 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
         appendProperty("application", getApplication(), connectionParams);
 
         StringBuilder url = new StringBuilder().append("jdbc:snowflake://").append(account);
-        if(StringUtils.isNotEmpty(regionID.getValue())){
+        if (StringUtils.isNotEmpty(regionID.getValue())) {
             url.append('.').append(regionID.getValue());
         }
-        url.append(".snowflakecomputing.com")
-        .append("/?");
+        url.append(".snowflakecomputing.com").append("/?");
 
         String jdbcParameters = this.jdbcParameters.getStringValue();
         if (jdbcParameters != null && !jdbcParameters.isEmpty() && !"\"\"".equals(jdbcParameters)) {
@@ -381,6 +412,10 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
         return application.toString();
     }
 
+    public SnowflakeOauthConnectionProperties getOauthProperties() {
+        return this.oauthProperties;
+    }
+
     private void appendProperty(String propertyName, String propertyValue, StringBuilder builder) {
         if (propertyValue != null && !propertyValue.isEmpty()) {
             if (builder.length() > 0) {
@@ -406,6 +441,7 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
             }
             migrated = true;
         }
+        authenticationType.setPossibleValues(Arrays.asList(AuthenticationType.values()));
         return migrated;
     }
 
