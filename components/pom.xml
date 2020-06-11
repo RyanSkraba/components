@@ -16,27 +16,28 @@
 
     <modules>
         <module>components-azurestorage</module>
+        <module>components-couchbase</module>
         <module>components-fileio</module>
-        <module>components-kafka</module>
-        <module>components-localio</module>
-        <module>components-processing</module>
         <module>components-jdbc</module>
         <module>components-splunk</module>
         <module>components-jira</module>
-        <module>components-filedelimited</module>
-        <module>components-elasticsearch</module>
-        <module>components-filterrow</module>
-        <module>components-bigquery</module>
-        <module>components-pubsub</module>
         <module>components-marketo</module>
-        <module>components-netsuite</module>
         <module>components-hadoopcluster</module>
-        <module>components-kinesis</module>
         <module>components-marklogic</module>
         <module>components-googledrive</module>
         <!-- Slow-building components are built last. -->
+        <module>components-netsuite</module>
         <module>components-salesforce</module>
         <module>components-snowflake</module>
-        <module>components-couchbase</module>
+        <!-- Disabled components. They are not used in any product -->
+<!--        <module>components-bigquery</module>-->
+<!--        <module>components-elasticsearch</module>-->
+<!--        <module>components-filedelimited</module>-->
+<!--        <module>components-filterrow</module>-->
+<!--        <module>components-kafka</module>-->
+<!--        <module>components-kinesis</module>-->
+<!--        <module>components-localio</module>-->
+<!--        <module>components-processing</module>-->
+<!--        <module>components-pubsub</module>-->
     </modules>
 </project>
