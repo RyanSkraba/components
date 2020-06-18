@@ -167,7 +167,8 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
 
         if (upsert) {
             keyStr.clear();
-            keyStr.add(outputProperties.upsertKeyColumn.getValue());
+            String upserKeyColumn = outputProperties.upsertKeyColumn.getValue();
+            keyStr.add(isUpperCase ? upserKeyColumn.toUpperCase() : upserKeyColumn);
         }
 
         return new StringSchemaInfo(keyStr, columnsStr);

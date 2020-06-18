@@ -31,6 +31,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -47,14 +49,17 @@ import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.common.tableaction.TableAction;
+import org.talend.components.common.tableaction.TableAction.TableActionEnum;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.SnowflakeTableProperties;
 import org.talend.components.snowflake.runtime.SnowflakeSink;
 import org.talend.components.snowflake.runtime.SnowflakeWriteOperation;
 import org.talend.components.snowflake.runtime.SnowflakeWriter;
 import org.talend.components.snowflake.runtime.utils.DriverManagerUtils;
+import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputDefinition;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
@@ -67,6 +72,8 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
 
     private static final String CREATE_TABLE_WITH_AUTOINCREMENTED_COLUMNS = "create table %s (" + "%s varchar(20),"
             + "%s varchar(20)," + "A1 int autoincrement (1,1)," + "A2 int default \"seq_TDI-43629\".nextval" + ");";
+
+    private static final String DROP_TABLE_WITH_LOWERCASE_COLUMN_NAME = "DROP TABLE " + testSchema + ".\"" + testTable + "_lowercase_column\"";
 
     private static final String CREATE_SEQUENCE = "create or replace sequence \"seq_TDI-43629\";";
 
@@ -290,6 +297,73 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
 
         handleRows(makeRows(100), props, TSnowflakeOutputProperties.OutputAction.UPSERT);
         assertEquals(100, readRows(props).size());
+    }
+
+    @Test
+    public void testOutputUpsertWithUpperCaseChange() throws Throwable {
+        TSnowflakeOutputProperties props = (TSnowflakeOutputProperties) populateOutput(100);
+        handleRows(makeRows(50), props, TSnowflakeOutputProperties.OutputAction.DELETE);
+        assertEquals(50, readRows(props).size());
+
+        Form f = props.getForm(MAIN);
+        props = (TSnowflakeOutputProperties) PropertiesTestUtils.checkAndBeforePresent(getComponentService(), f,
+                props.upsertKeyColumn.getName(), props);
+        LOGGER.debug(props.upsertKeyColumn.getPossibleValues().toString());
+        props.convertColumnsAndTableToUppercase.setValue(true);
+        assertEquals(NUM_COLUMNS, props.upsertKeyColumn.getPossibleValues().size());
+        props.upsertKeyColumn.setStoredValue("id");
+
+        handleRows(makeRows(100), props, TSnowflakeOutputProperties.OutputAction.UPSERT);
+        assertEquals(100, readRows(props).size());
+    }
+
+    @Test
+    public void testOutputUpsertWithoutUpperCaseChange() throws Throwable {
+        try {
+            TSnowflakeOutputProperties props = new TSnowflakeOutputProperties("ForUpsert");
+            props.init();
+            setupProps(props.getConnectionProperties());
+            setupTableWithStaticValues(props);
+            props.table.tableName.setValue(testTable + "_lowercase_column");
+            props.tableAction.setValue(TableActionEnum.CREATE_IF_NOT_EXISTS);
+            props.outputAction.setStoredValue(TSnowflakeOutputProperties.OutputAction.INSERT);
+            props.afterOutputAction();
+            props.convertColumnsAndTableToUppercase.setValue(false);
+
+            Schema schema = SchemaBuilder.builder().record("schema").fields()
+                    .name("id").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type(AvroUtils._decimal()).noDefault()
+                    .name("c1").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "c1").type().nullable().stringType().noDefault().endRecord();
+            props.table.main.schema.setValue(schema);
+            List<IndexedRecord> rows = IntStream.range(0, 10).mapToObj(i -> {
+                GenericData.Record record = new GenericData.Record(schema);
+                record.put("id", i);
+                record.put("c1", "foo_" + i);
+                return record;
+            }).collect(Collectors.toList());
+
+            handleRows(rows, props, TSnowflakeOutputProperties.OutputAction.INSERT);
+
+            TSnowflakeInputProperties inputProps = new TSnowflakeInputProperties("input");
+            inputProps.init();
+            inputProps.connection = props.getConnectionProperties();
+            inputProps.table = props.table;
+            inputProps.manualQuery.setValue(true);
+            inputProps.query.setValue("select * from \"" + testTable + "_lowercase_column\"");
+            assertEquals(10, readRows(inputProps).size());
+
+            props.upsertKeyColumn.setStoredValue("id");
+            List<IndexedRecord> rows2 = IntStream.range(0, 20).mapToObj(i -> {
+                GenericData.Record record = new GenericData.Record(schema);
+                record.put("id", i);
+                record.put("c1", "foo_new_" + i);
+                return record;
+            }).collect(Collectors.toList());
+            handleRows(rows2, props, TSnowflakeOutputProperties.OutputAction.UPSERT);
+
+            assertEquals(20, readRows(inputProps).size());
+        } finally {
+            execute(testConnection, DROP_TABLE_WITH_LOWERCASE_COLUMN_NAME);
+        }
     }
 
     @Test
