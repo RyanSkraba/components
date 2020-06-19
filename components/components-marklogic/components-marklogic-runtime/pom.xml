@@ -34,7 +34,7 @@
         <repository>
             <id>MarkLogic-releases</id>
             <name>MarkLogic Releases</name>
-            <url>https://developer.marklogic.com/maven2</url>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/marklogic</url>
         </repository>
         <repository>
             <id>mapr-releases</id>
