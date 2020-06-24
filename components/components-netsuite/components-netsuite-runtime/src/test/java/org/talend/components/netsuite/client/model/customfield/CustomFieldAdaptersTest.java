@@ -96,9 +96,11 @@ public class CustomFieldAdaptersTest {
         TransactionBodyCustomField customField = new TransactionBodyCustomField();
         customField.setFieldType(CustomizationFieldType.DECIMAL_NUMBER);
         customField.setBodyOpportunity(true);
+        customField.setBodySale(true);
 
         TransactionBodyCustomFieldAdapter adapter1 = new TransactionBodyCustomFieldAdapter();
         assertTrue(adapter1.appliesTo(RecordType.OPPORTUNITY.value(), customField));
+        assertTrue(adapter1.appliesTo(RecordType.SALES_ORDER.value(), customField));
         assertEquals(CustomFieldRefType.DOUBLE, adapter1.apply(customField));
 
         assertFalse(adapter1.appliesTo(RecordType.CUSTOMER_PAYMENT.value(), customField));

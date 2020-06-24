@@ -40,6 +40,7 @@ public class TransactionBodyCustomFieldAdapter<T> extends CustomFieldAdapter<T> 
             .put("vendorCredit", "bodyPurchase")
             .put("creditMemo", "bodySale")
             .put("invoice", "bodySale")
+            .put("salesOrder", "bodySale")
             .build();
 
     public TransactionBodyCustomFieldAdapter() {
