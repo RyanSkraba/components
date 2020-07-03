@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -359,10 +358,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             if (runtimeField != null) {
                 s = AvroUtils.unwrapIfNullable(runtimeField.schema());
             } else {
-                // TODO this is the old action, we keep it if can't fetch the type by the schema db column name
-                // consider to adjust it
-                Date date = (Date) inputValue;
-                return date.getTime();
+                return formatter.formatTimestampMillis(inputValue);
             }
         }
 

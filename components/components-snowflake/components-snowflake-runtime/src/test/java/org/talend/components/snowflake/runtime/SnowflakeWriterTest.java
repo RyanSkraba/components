@@ -42,6 +42,7 @@ import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
 import net.snowflake.client.jdbc.internal.joda.time.DateTime;
@@ -171,6 +172,35 @@ public class SnowflakeWriterTest {
         Mockito.when(record.getSchema()).thenReturn(schema);
         Mockito.when(record.get(Mockito.anyInt())).thenReturn("FirstValue", 10_000, 99.9, daysFrom1970, true, timeMillis, timeStamp,
                 null);
+
+        writer.open("uId");
+        writer.write(record);
+
+        // Need to check if specific array came to loader
+        Mockito.verify(loader, Mockito.times(1)).submitRow(Mockito.eq(expectedRow));
+
+    }
+
+    @Test
+    public void testWriteBigDate() throws Exception {
+        String actualDate = "9999-12-31 23:59:59.999Z";
+        SimpleDateFormat dateFormatter = new Formatter().getTimestampFormatter();
+        dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date dateValue = dateFormatter.parse(actualDate);
+
+        Object[] expectedRow = { actualDate };
+
+        List<Field> fields = new ArrayList<>();
+        Field field = new Field("dateColumn", AvroUtils._date(), "",  new Date().getTime());
+        field.addProp(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName());
+        fields.add(field);
+        Schema schema = Schema.createRecord("records", null, null, false, fields);
+        Mockito.when(sink.getRuntimeSchema(Mockito.any(SchemaResolver.class), Mockito.eq(properties.tableAction.getValue()))).thenReturn(schema);
+        properties.table.main.schema.setValue(schema);
+        properties.outputAction.setValue(OutputAction.INSERT);
+        IndexedRecord record = Mockito.mock(IndexedRecord.class);
+        Mockito.when(record.getSchema()).thenReturn(schema);
+        Mockito.when(record.get(Mockito.anyInt())).thenReturn(dateValue);
 
         writer.open("uId");
         writer.write(record);

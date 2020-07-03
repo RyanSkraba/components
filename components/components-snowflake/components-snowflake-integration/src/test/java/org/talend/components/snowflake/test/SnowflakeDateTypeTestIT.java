@@ -53,7 +53,7 @@ import org.talend.daikon.avro.SchemaConstants;
  * This is the test for all Snowflake date type. Keep here for reference purposes and to verify it. All should pass
  * please see :
  * https://docs.snowflake.net/manuals/sql-reference/data-types-datetime.html#timestamp-ltz-timestamp-ntz-timestamp-tz
- * 
+ *
  * TODO need a test that the insert time zone is different with query time zone
  */
 public class SnowflakeDateTypeTestIT {
@@ -72,14 +72,14 @@ public class SnowflakeDateTypeTestIT {
     private final static String DATABASE = System.getProperty("snowflake.db");
     private final static String SCHEMA = System.getProperty("snowflake.schema");
     private final static String TABLE = "LOADER_TEST_DATE_TYPES_TABLE";
-    
+
     private final static String TESTNUMBER = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
     private final static String TESTSCHEMA = SCHEMA + "_" + TESTNUMBER;
     private final static String TESTTABLE = TABLE + "_" + TESTNUMBER;
     private final static String REMOTESTAGE = "LOADERTEST" + TESTNUMBER;
-    
+
     private final static String SCHEMATABLE = TESTSCHEMA + "." + TESTTABLE;
-    
+
     private final static String TESTTABLE_FULLNAME_FOR_DROP_IF_AND_CREATE = TESTSCHEMA + "TESTTABLE_FOR_DROP_IF_AND_CREATE" + "_" + TESTNUMBER;
 
     /*
@@ -91,25 +91,19 @@ public class SnowflakeDateTypeTestIT {
             "192.168.0.* | localhost");
     }
     */
-    
+
     @BeforeClass
     public static void setUpClass() throws Throwable {
         //setProxy();
-      
-        Class.forName("net.snowflake.client.jdbc.SnowflakeDriver");
-        
-        String connectionUrl = "jdbc:snowflake://" + ACCOUNTSTR +
-                  ".snowflakecomputing.com";
 
-        connectionUrl = connectionUrl
-                + "/?user=" +
-                USER + "&password=" +
-                PASSWORD + "&warehouse=" + WAREHOUSE +
-                "&schema=" + TESTSCHEMA +
-                "&db=" + DATABASE;
+        Class.forName("net.snowflake.client.jdbc.SnowflakeDriver");
+
+        String connectionUrl = "jdbc:snowflake://" + ACCOUNTSTR + ".snowflakecomputing.com/?warehouse=" + WAREHOUSE
+                + "&schema=" + TESTSCHEMA + "&db=" + DATABASE;
 
         Properties properties = new Properties();
-
+        properties.put("user", USER);
+        properties.put("password", PASSWORD);
         testConnection = DriverManager.getConnection(connectionUrl, properties);
 
         testConnection.createStatement().execute("CREATE OR REPLACE SCHEMA " + TESTSCHEMA);
@@ -146,7 +140,7 @@ public class SnowflakeDateTypeTestIT {
     @Test
     public void testRetrieveSchemaAfterTableAction() throws Exception {
       SnowflakeWriter writer = createWriter(true, TESTTABLE_FULLNAME_FOR_DROP_IF_AND_CREATE, TableActionEnum.DROP_IF_EXISTS_AND_CREATE);
-      
+
       Result result = null;
       writer.open("snowflake");
       try {
@@ -157,21 +151,21 @@ public class SnowflakeDateTypeTestIT {
       } finally {
           result = writer.close();
       }
-      
+
       assertEquals(10, result.getSuccessCount());
       assertEquals(0, result.getRejectCount());
-      
+
       ResultSet rs = testConnection.createStatement().executeQuery(
           "SELECT * FROM " + TESTTABLE_FULLNAME_FOR_DROP_IF_AND_CREATE + " WHERE C1 = 'foo_0'");
-      
+
       rs.next();
-      
+
       Timestamp c2 = rs.getTimestamp(2);
       Timestamp c3 = rs.getTimestamp(3);
       Timestamp c4 = rs.getTimestamp(4);
       Timestamp c5 = rs.getTimestamp(5);
       Timestamp c6 = rs.getTimestamp(6);
-      
+
       //create table use Snowflake Date type is custom schema and not config the DB type, so assert like this
       //in my view, should use Snowflake Timestamp as default
       Assert.assertEquals("2018-11-08", date_format.format(c2));
@@ -179,14 +173,14 @@ public class SnowflakeDateTypeTestIT {
       Assert.assertEquals("2018-11-08", date_format.format(c4));
       Assert.assertEquals("2018-11-08", date_format.format(c5));
       Assert.assertEquals("2018-11-08", date_format.format(c6));
-      
+
       rs.close();
     }
-    
+
     @Test
     public void testCustomSchemaAndDateInput4Time() throws Exception {
       SnowflakeWriter writer = createWriter(true, TESTTABLE, TableActionEnum.NONE);
-      
+
       Result result = null;
       writer.open("snowflake");
       try {
@@ -197,38 +191,38 @@ public class SnowflakeDateTypeTestIT {
       } finally {
           result = writer.close();
       }
-      
+
       assertEquals(10, result.getSuccessCount());
       assertEquals(0, result.getRejectCount());
-      
+
       ResultSet rs = testConnection.createStatement().executeQuery(
           "SELECT * FROM " + SCHEMATABLE + " WHERE C1 = 'foo_0'");
-      
+
       resultAssert(rs);
     }
 
     private void resultAssert(ResultSet rs) throws SQLException {
       rs.next();
-      
+
       Timestamp c2 = rs.getTimestamp(2);
       Timestamp c3 = rs.getTimestamp(3);
       Timestamp c4 = rs.getTimestamp(4);
       Timestamp c5 = rs.getTimestamp(5);
       Timestamp c6 = rs.getTimestamp(6);
-      
+
       Assert.assertEquals("2018-11-08", date_format.format(c2));
       Assert.assertEquals("14:09:01.262", time_format.format(c3));
       Assert.assertEquals(timestamp.getTime(), c4.getTime());
       Assert.assertEquals(timestamp.getTime(), c5.getTime());
       Assert.assertEquals(timestamp.getTime(), c6.getTime());
-      
+
       rs.close();
     }
-    
+
     @Test
     public void testRetrievedSchemaAndDateInput4Time() throws Exception {
       SnowflakeWriter writer = createWriter(false, TESTTABLE, TableActionEnum.NONE);
-      
+
       Result result = null;
       writer.open("snowflake");
       try {
@@ -239,20 +233,20 @@ public class SnowflakeDateTypeTestIT {
       } finally {
           result = writer.close();
       }
-      
+
       assertEquals(10, result.getSuccessCount());
       assertEquals(0, result.getRejectCount());
-      
+
       ResultSet rs = testConnection.createStatement().executeQuery(
           "SELECT * FROM " + SCHEMATABLE + " WHERE C1 = 'foo_10'");
-      
+
       resultAssert(rs);
     }
-    
+
     @Test
     public void testRetrievedSchemaAndIntInput4Time() throws Exception {
       SnowflakeWriter writer = createWriter(false, TESTTABLE, TableActionEnum.NONE);
-      
+
       Result result = null;
       writer.open("snowflake");
       try {
@@ -263,13 +257,13 @@ public class SnowflakeDateTypeTestIT {
       } finally {
           result = writer.close();
       }
-      
+
       assertEquals(10, result.getSuccessCount());
       assertEquals(0, result.getRejectCount());
-      
+
       ResultSet rs = testConnection.createStatement().executeQuery(
           "SELECT * FROM " + SCHEMATABLE + " WHERE C1 = 'foo_20'");
-      
+
       resultAssert(rs);
     }
 
@@ -283,17 +277,17 @@ public class SnowflakeDateTypeTestIT {
       connProperties.warehouse.setStoredValue(WAREHOUSE);
       connProperties.db.setStoredValue(DATABASE);
       connProperties.schemaName.setStoredValue(TESTSCHEMA);
-      
+
       SnowflakeTableProperties tableProps = props.table;
       tableProps.tableName.setValue(tableName);
-      
+
       props.tableAction.setValue(tableaction);
       props.afterTableAction();
       props.outputAction.setStoredValue(TSnowflakeOutputProperties.OutputAction.INSERT);
       props.afterOutputAction();
-      
+
       tableProps.main.schema.setValue(custom_schema ? getMakeRowSchemaWithoutLogicalTypes() : getMakeRowSchemaWithLogicalTypes());
-      
+
       RuntimeContainer container = new DefaultComponentRuntimeContainerImpl();
       SnowflakeSink SnowflakeSink = new SnowflakeSink();
       SnowflakeSink.initialize(container, props);
@@ -302,7 +296,7 @@ public class SnowflakeDateTypeTestIT {
       SnowflakeWriter writer = writeOperation.createWriter(container);
       return writer;
     }
-    
+
     SimpleDateFormat date_format = new SimpleDateFormat("yyyy-MM-dd");
     Date date = null;
     {
@@ -311,7 +305,7 @@ public class SnowflakeDateTypeTestIT {
         } catch (ParseException e) {
         }
     }
-    
+
     SimpleDateFormat time_format = new SimpleDateFormat("HH:mm:ss.SSS");
     Date time = null;
     {
@@ -320,7 +314,7 @@ public class SnowflakeDateTypeTestIT {
         } catch (ParseException e) {
         }
     }
-    
+
     SimpleDateFormat timestamp_format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
     Date timestamp = null;
     {
@@ -329,12 +323,12 @@ public class SnowflakeDateTypeTestIT {
         } catch (ParseException e) {
         }
     }
-    
-    
+
+
     //customer manual set schema case, all date input for any date type, not support int input for time as it's wrong
     public IndexedRecord makeRowWithoutLogicalTypes(int i) {
         GenericData.Record row = new GenericData.Record(getMakeRowSchemaWithoutLogicalTypes());
-  
+
         row.put("C1", "foo_" + i);
         row.put("C2", date);
         row.put("C3", time);
@@ -343,11 +337,11 @@ public class SnowflakeDateTypeTestIT {
         row.put("C6", timestamp);
         return row;
     }
-    
+
     //customer use the retrieved schema, date input for time type
     public IndexedRecord makeRowWithLogicalTypesWithDateInput4TIME(int i) {
         GenericData.Record row = new GenericData.Record(getMakeRowSchemaWithLogicalTypes());
-    
+
         row.put("C1", "foo_" + i);
         row.put("C2", date);
         row.put("C3", time);
@@ -356,11 +350,11 @@ public class SnowflakeDateTypeTestIT {
         row.put("C6", timestamp);
         return row;
     }
-    
+
     //customer use the retrieved schema from the old job, int input for time type
     public IndexedRecord makeRowWithLogicalTypesWithIntInput4TIME(int i) {
         GenericData.Record row = new GenericData.Record(getMakeRowSchemaWithLogicalTypes());
-    
+
         row.put("C1", "foo_" + i);
         row.put("C2", date);
         row.put("C3", (int)time.getTime());
@@ -369,7 +363,7 @@ public class SnowflakeDateTypeTestIT {
         row.put("C6", timestamp);
         return row;
     }
-    
+
     public Schema getMakeRowSchemaWithoutLogicalTypes() {
       SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.builder().record("MakeRowRecord").fields()
           .name("C1").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C1").type(AvroUtils._string()).noDefault()
@@ -380,7 +374,7 @@ public class SnowflakeDateTypeTestIT {
           .name("C6").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C6").type(AvroUtils._date()).noDefault();
       return fa.endRecord();
     }
-      
+
     public Schema getMakeRowSchemaWithLogicalTypes() {
         SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.builder().record("MakeRowRecord").fields()
             .name("C1").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C1").type(AvroUtils._string()).noDefault()

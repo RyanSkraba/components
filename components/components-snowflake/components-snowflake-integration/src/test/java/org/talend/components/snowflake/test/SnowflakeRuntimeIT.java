@@ -47,6 +47,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.SnowflakeTableProperties;
+import org.talend.components.snowflake.runtime.SnowflakeConstants;
 import org.talend.components.snowflake.runtime.SnowflakeReader;
 import org.talend.components.snowflake.runtime.SnowflakeSink;
 import org.talend.components.snowflake.runtime.SnowflakeSource;
@@ -157,7 +158,7 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
         row.put("C3", Double.valueOf(i));
         // logical type date should be of int type - number of days since 1970
         row.put("C4", (int) TimeUnit.MILLISECONDS.toDays(testDate.getTime()));
-        row.put("C5", testTime);//support java.util.Date and Integer/int input for SNOWFLAKE TIME TYPE both 
+        row.put("C5", testTime);//support java.util.Date and Integer/int input for SNOWFLAKE TIME TYPE both
         row.put("C6", testTimestamp);
         row.put("C7", makeJson(i));
         return row;
@@ -392,7 +393,7 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
 
     @BeforeClass
     public static void setupDatabase() throws Exception {
-        Class.forName("com.snowflake.client.jdbc.SnowflakeDriver");
+        Class.forName(SnowflakeConstants.SNOWFLAKE_DRIVER);
 
         if (ACCOUNT_STR == null) {
             throw new Exception(
@@ -401,13 +402,11 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
 
         try {
 
-            String connectionUrl = "jdbc:snowflake://" + ACCOUNT_STR + ".snowflakecomputing.com";
-
-            connectionUrl += "/?user=" + USER + "&password=" + PASSWORD + "&testSchema=" + testSchema + "&db=" + DB
-                    + "&warehouse=" + WAREHOUSE;
-
+            String connectionUrl = "jdbc:snowflake://" + ACCOUNT_STR + ".snowflakecomputing.com/?testSchema="
+                    + testSchema + "&db=" + DB + "&warehouse=" + WAREHOUSE;
             Properties properties = new Properties();
-
+            properties.put("user", USER);
+            properties.put("password", PASSWORD);
             testConnection = DriverManager.getConnection(connectionUrl, properties);
             testConnection.createStatement().execute("CREATE OR REPLACE SCHEMA " + testSchema);
             testConnection.createStatement().execute("USE SCHEMA " + testSchema);
