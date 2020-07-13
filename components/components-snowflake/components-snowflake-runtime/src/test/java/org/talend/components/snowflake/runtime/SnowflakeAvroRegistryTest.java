@@ -86,7 +86,7 @@ public class SnowflakeAvroRegistryTest {
             Schema.Field field = snowflakeAvroRegistry
                     .sqlType2Avro(size, scale, entry.getKey(), nullable, FIELD_NAME, DB_COLUMN_NAME, DEFAULT_VALUE);
 
-            Assert.assertEquals(DB_COLUMN_NAME, field.name());
+            Assert.assertEquals(FIELD_NAME, field.name());
             Assert.assertEquals(-1, field.pos());
             Assert.assertEquals(entry.getKey(), field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
             Assert.assertEquals(DB_COLUMN_NAME, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
@@ -107,7 +107,7 @@ public class SnowflakeAvroRegistryTest {
 
         LOGGER.debug("field: " + field.toString());
 
-        Assert.assertEquals(DB_COLUMN_NAME, field.name());
+        Assert.assertEquals(FIELD_NAME, field.name());
         Assert.assertEquals(-1, field.pos());
         Assert.assertEquals(TALEND_EXPECTED_DATE_PATTERN, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         Assert.assertEquals(java.sql.Types.DATE, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
@@ -131,7 +131,7 @@ public class SnowflakeAvroRegistryTest {
 
         LOGGER.debug("field: " + field.toString());
 
-        Assert.assertEquals(DB_COLUMN_NAME, field.name());
+        Assert.assertEquals(FIELD_NAME, field.name());
         Assert.assertEquals(-1, field.pos());
         Assert.assertEquals(TALEND_EXPECTED_TIME_PATTERN, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         Assert.assertEquals(java.sql.Types.TIME, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
@@ -155,29 +155,12 @@ public class SnowflakeAvroRegistryTest {
 
         LOGGER.debug("field: " + field.toString());
 
-        Assert.assertEquals(DB_COLUMN_NAME, field.name());
+        Assert.assertEquals(FIELD_NAME, field.name());
         Assert.assertEquals(-1, field.pos());
         Assert.assertEquals(TALEND_EXPECTED_TIMESTAMP_PATTERN, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         Assert.assertEquals(java.sql.Types.TIMESTAMP, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
         Assert.assertEquals(DB_COLUMN_NAME, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
         Assert.assertEquals(DEFAULT_VALUE, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
-
-        LOGGER.debug(field.getObjectProps().toString());
-
-    }
-
-    @Test
-    public void testSqlType2AvroReservedNames() throws Exception {
-        final int dbtype = java.sql.Types.VARCHAR;
-        String reservedWord = "void";
-        Schema.Field field = snowflakeAvroRegistry
-                .sqlType2Avro(size, scale, dbtype, nullable, FIELD_NAME, reservedWord, DEFAULT_VALUE);
-
-        LOGGER.debug("field: " + field.toString());
-        Assert.assertEquals("_void", field.name());
-        Assert.assertEquals(-1, field.pos());
-        Assert.assertEquals(java.sql.Types.VARCHAR, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
-        Assert.assertEquals(reservedWord, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
 
         LOGGER.debug(field.getObjectProps().toString());
 

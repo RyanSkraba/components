@@ -86,6 +86,9 @@ public class JDBCAvroRegistry extends AvroRegistry {
     //so will remove it after adjust snowflake runtime
     protected Schema inferSchemaResultSetMetaData(ResultSetMetaData metadata) throws SQLException {
         List<Field> fields = new ArrayList<>();
+        
+        Set<String> existNames = new HashSet<String>();
+        int index = 0;
 
         int count = metadata.getColumnCount();
         for (int i = 1; i <= count; i++) {
@@ -99,8 +102,12 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
             // not necessary for the result schema from the query statement
             boolean isKey = false;
+            
+            //TODO consider remove AvroNamesValidationHelper.getAvroCompatibleName wrapper, here keep it as it's called for snowflake before, and current class only for snowflake
+            String validName = AvroNamesValidationHelper.getAvroCompatibleName(NameUtil.correct(fieldName, index++, existNames));
+            existNames.add(validName);
 
-            Field field = sqlType2Avro(size, scale, dbtype, nullable, fieldName, dbColumnName, null, isKey);
+            Field field = sqlType2Avro(size, scale, dbtype, nullable, validName, dbColumnName, null, isKey);
 
             fields.add(field);
         }
@@ -113,6 +120,9 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
         Set<String> keys = getPrimaryKeys(databaseMetdata, tableMetadata.getCatalog(), tableMetadata.getDbSchema(),
                 tableMetadata.getTablename());
+        
+        Set<String> existNames = new HashSet<String>();
+        int index = 0;
 
         try (ResultSet metadata = databaseMetdata.getColumns(tableMetadata.getCatalog(), tableMetadata.getDbSchema(),
                 tableMetadata.getTablename(), null)) {
@@ -134,7 +144,11 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 String defaultValue = metadata.getString("COLUMN_DEF");
                 boolean isAutoIncremented = checkAutoIncremented(metadata);
-                Field field = sqlType2Avro(size, scale, dbtype, nullable, columnName, columnName, defaultValue, isKey, isAutoIncremented);
+                
+                String validName = AvroNamesValidationHelper.getAvroCompatibleName(NameUtil.correct(columnName, index++, existNames));
+                existNames.add(validName);
+                
+                Field field = sqlType2Avro(size, scale, dbtype, nullable, validName, columnName, defaultValue, isKey, isAutoIncremented);
 
                 fields.add(field);
             } while (metadata.next());

@@ -81,7 +81,6 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
         }
         Field field = null;
         Schema schema = null;
-        name = AvroNamesValidationHelper.getAvroCompatibleName(NameUtil.correct(dbColumnName, 0, Collections.<String>emptySet()));
         switch (dbtype) {
         case java.sql.Types.VARCHAR:
         case java.sql.Types.LONGVARCHAR:
