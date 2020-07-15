@@ -19,7 +19,6 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -57,6 +56,8 @@ public class SalesforceAnyTypeFieldTestIT extends SalesforceTestBase {
     private SimpleDateFormat dateTimeFormat;
 
     private String recordId;
+
+    private List<?> possibleValues;
 
     public static Schema SCHEMA_CUSTOM_MODULE = SchemaBuilder.builder().record("Schema").fields() //
             .name("Id").type().stringType().noDefault() //
@@ -106,6 +107,13 @@ public class SalesforceAnyTypeFieldTestIT extends SalesforceTestBase {
         TSalesforceOutputProperties outProps = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
         setupProps(outProps.connection, !ADD_QUOTES);
         outProps.module.moduleName.setValue(moduleName);
+        // save time for testing
+        if(possibleValues == null){
+            outProps.module.beforeModuleName();
+            this.possibleValues =  outProps.module.moduleName.getPossibleValues();
+        }else {
+            outProps.module.moduleName.setPossibleValues(possibleValues);
+        }
         outProps.module.afterModuleName();
         return outProps;
     }
@@ -209,7 +217,13 @@ public class SalesforceAnyTypeFieldTestIT extends SalesforceTestBase {
         setupProps(inputProps.connection, !ADD_QUOTES);
         inputProps.module.moduleName.setValue(CUSTOM_MODULE_HISTORY);
         if (isRetrieveSchema) {
-            inputProps.module.beforeModuleName();
+            // save time for testing
+            if(possibleValues == null){
+                inputProps.module.beforeModuleName();
+                this.possibleValues =  inputProps.module.moduleName.getPossibleValues();
+            }else {
+                inputProps.module.moduleName.setPossibleValues(possibleValues);
+            }
             inputProps.module.afterModuleName();
         } else {
             inputProps.module.main.schema.setValue(SCHEMA_QUERY_HISTORY);
