@@ -17,6 +17,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.tableaction.TableAction;
-import org.talend.components.snowflake.SnowflakeDbTypeProperties;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -104,8 +104,8 @@ public class TSnowflakeOutputPropertiesTest {
         assertEquals(TableAction.TableActionEnum.NONE, tableAction);
 
         assertFalse(defaultUsePersonalDBType);
-        assertEquals(null, defaultDBTypeColumns);
-        assertEquals(null, defaultDBTypeType);
+        assertEquals(Collections.emptyList(), defaultDBTypeColumns);
+        assertEquals(Collections.emptyList(), defaultDBTypeType);
     }
 
     @Test

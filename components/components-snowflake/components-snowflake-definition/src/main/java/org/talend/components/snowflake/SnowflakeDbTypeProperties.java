@@ -82,6 +82,11 @@ public class SnowflakeDbTypeProperties extends ComponentPropertiesImpl  {
     public void setupProperties() {
         super.setupProperties();
         setFieldNames(Collections.EMPTY_LIST);
+
+        // to avoid setting of an exact first value in closed lists as a default value
+        // for more info TDI-41286 or\and ComponentsUtils#getParameterValue
+        column.setValue(Collections.emptyList());
+        dbtype.setValue(Collections.emptyList());
     }
 
     @Override
