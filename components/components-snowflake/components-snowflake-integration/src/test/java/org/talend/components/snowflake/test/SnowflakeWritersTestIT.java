@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.talend.daikon.properties.presentation.Form.MAIN;
 
@@ -331,7 +332,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
             props.convertColumnsAndTableToUppercase.setValue(false);
 
             Schema schema = SchemaBuilder.builder().record("schema").fields()
-                    .name("id").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type(AvroUtils._decimal()).noDefault()
+                    .name("id").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "id1").type(AvroUtils._decimal()).noDefault()
                     .name("c1").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "c1").type().nullable().stringType().noDefault().endRecord();
             props.table.main.schema.setValue(schema);
             List<IndexedRecord> rows = IntStream.range(0, 10).mapToObj(i -> {
@@ -348,7 +349,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
             inputProps.connection = props.getConnectionProperties();
             inputProps.table = props.table;
             inputProps.manualQuery.setValue(true);
-            inputProps.query.setValue("select * from \"" + testTable + "_lowercase_column\"");
+            inputProps.query.setValue("select * from \"" + testTable + "_lowercase_column\" order by \"id1\"");
             assertEquals(10, readRows(inputProps).size());
 
             props.upsertKeyColumn.setStoredValue("id");
@@ -359,8 +360,12 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
                 return record;
             }).collect(Collectors.toList());
             handleRows(rows2, props, TSnowflakeOutputProperties.OutputAction.UPSERT);
-
-            assertEquals(20, readRows(inputProps).size());
+            List<IndexedRecord> readRows = readRows(inputProps);
+            final int fieldPos = readRows.get(0).getSchema().getField("c1").pos();
+            assertEquals(20, readRows.size());
+            for (int i=0; i< readRows.size(); i++) {
+                assertTrue(readRows.get(i).get(fieldPos).equals("foo_new_" + i));
+            }
         } finally {
             execute(testConnection, DROP_TABLE_WITH_LOWERCASE_COLUMN_NAME);
         }
