@@ -165,6 +165,7 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
 
         // FIXME now the trigger can't work very well, so have to call the updateTrimTable method in refreshLayout method directly
         // though refreshLayout is called at some strange place
+        // EVENT_PROPERTY_VALUE_CHANGED will be fired only for one form which is ready to refresh (others will be ignored)
         schemaListener = new ISchemaListener() {
 
             @Override
@@ -177,6 +178,10 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
         connection.setNotRequired();
 
         sql.setTaggedValue(org.talend.components.common.ComponentConstants.LINE_SEPARATOR_REPLACED_TO, " ");
+
+        // It prevents this property to be recognized as simple boolean value (List<Boolean> is Boolean, null is false)
+        // org.talend.designer.core.generic.utils.ComponentsUtils.getParameterValue
+        trimTable.trim.setValue(Collections.emptyList());
     }
 
     @Override

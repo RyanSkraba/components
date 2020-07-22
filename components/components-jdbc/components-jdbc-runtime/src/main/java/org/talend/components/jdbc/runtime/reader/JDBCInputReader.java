@@ -130,12 +130,13 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
             if(setting.trim()) {
                 return querySchema;
             }
-            
+
+            // two those lists can be empty for the first initialization of the component
             List<String> trimColumnLabels = setting.getTrimColumns();
             List<Boolean> trims = setting.getTrims();
 
             Map<Integer, Boolean> trimMap = new HashMap<>();
-            boolean defaultTrim = includeDynamic
+            boolean defaultTrim = (includeDynamic && !trims.isEmpty())
                     ? trims.get(Integer.valueOf(querySchema.getProp(ComponentConstants.TALEND6_DYNAMIC_COLUMN_POSITION))) : false;
 
             int i = 0;
