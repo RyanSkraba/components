@@ -40,9 +40,9 @@ import org.talend.daikon.i18n.I18nMessages;
  */
 public class SnowflakeReaderTest {
 
-    private static final String TEST_QUERY = "select \"FIELD\", \"COLUMN\" from \"TABLE\"";
+    private static final String TEST_QUERY = "select field, column from Table";
 
-    private static final String WHERE_TEST_QUERY = "select \"FIELD\", \"COLUMN\" from \"TABLE\" where id = 1";
+    private static final String WHERE_TEST_QUERY = "select field, column from Table where id = 1";
 
     private static final String TEST_LOWERCASE_NAMES_QUERY = "select \"field\", \"column\" from \"Table\"";
 

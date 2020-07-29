@@ -93,10 +93,10 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
                 sb.append(", "); //$NON-NLS-1$
             }
             String columnName = se.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
-            sb.append(StringUtils.wrap(isUpperCase ? columnName.toUpperCase() : columnName, '"'));
+            sb.append(isUpperCase ? columnName : StringUtils.wrap(columnName, '"'));
         }
         sb.append(" from "); //$NON-NLS-1$
-        String tableName = StringUtils.wrap(isUpperCase ? properties.getTableName().toUpperCase() : properties.getTableName(), '"');
+        String tableName = isUpperCase ? properties.getTableName() : StringUtils.wrap(properties.getTableName(), '"');
         sb.append(tableName);
         if (condition != null && condition.trim().length() > 0) {
             sb.append(" where ");

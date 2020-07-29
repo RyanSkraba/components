@@ -43,6 +43,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Writer;
@@ -105,6 +106,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
 
     @Test
     public void testOutputActionType() throws Throwable {
+        ComponentDefinition definition = getComponentService().getComponentDefinition(TSnowflakeOutputDefinition.COMPONENT_NAME);
         TSnowflakeOutputProperties outputProps = (TSnowflakeOutputProperties) getComponentService()
                 .getComponentProperties(TSnowflakeOutputDefinition.COMPONENT_NAME);
         setupProps(outputProps.connection);
@@ -407,6 +409,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
 
     @Test
     public void testSchemaSerialized2() throws Throwable {
+        ComponentDefinition definition = getComponentService().getComponentDefinition(TSnowflakeOutputDefinition.COMPONENT_NAME);
         TSnowflakeOutputProperties outputProps = (TSnowflakeOutputProperties) getComponentService()
                 .getComponentProperties(TSnowflakeOutputDefinition.COMPONENT_NAME);
 
@@ -469,7 +472,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
         outputProps.table.main.schema.setValue(designSchema);
 
         // create Writer
-        Writer<Result> writer = makeWriter(outputProps);
+        Writer writer = makeWriter(outputProps);
 
         // setup record for test-case
         Schema runtimeSchema = SchemaBuilder.builder().record("runtime").fields()
@@ -534,7 +537,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
         outputProps.table.main.schema.setValue(designSchema);
 
         // create Writer
-        Writer<Result> writer = makeWriter(outputProps);
+        Writer writer = makeWriter(outputProps);
 
         // setup record for test-case
         Schema runtimeSchema = SchemaBuilder.builder().record("runtime").fields()
