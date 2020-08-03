@@ -86,6 +86,9 @@ public class SnowflakeSchemaAndDateTypeTestIT {
     private final static String TESTTABLE_SPECIAL_CHARS_COLUMN_NAME = "TESTTABLE_SPECIAL_CHARS_COLUMN_NAME" + "_" + TESTNUMBER;
     private final static String TESTTABLE_FULLNAME_SPECIAL_CHARS_COLUMN_NAME = TESTSCHEMA + "." + TESTTABLE_SPECIAL_CHARS_COLUMN_NAME;
 
+    private final static String TESTTABLE_ORDER = "TESTTABLE_ORDER" + "_" + TESTNUMBER;
+    private final static String SCHEMATABLE_ORDER = TESTSCHEMA + "." + TESTTABLE_ORDER;
+
     /*
     private static void setProxy() {
         System.setProperty("http.proxySet", "true");
@@ -116,6 +119,7 @@ public class SnowflakeSchemaAndDateTypeTestIT {
                 "USE SCHEMA " + TESTSCHEMA);
         testConnection.createStatement().execute(
                 "CREATE OR REPLACE STAGE " + REMOTESTAGE);
+
         testConnection.createStatement().execute(
                 "DROP TABLE IF EXISTS " + SCHEMATABLE +
                         " CASCADE");
@@ -129,6 +133,9 @@ public class SnowflakeSchemaAndDateTypeTestIT {
                         + "C5 TIMESTAMP_LTZ, "//TIMESTAMP WITH LOCAL TIME ZONE is alias
                         + "C6 TIMESTAMP_TZ )");//TIMESTAMP WITH TIME ZONE is alias
 
+        testConnection.createStatement().execute(
+                "DROP TABLE IF EXISTS " + TESTTABLE_FULLNAME_SPECIAL_CHARS_COLUMN_NAME +
+                        " CASCADE");
         testConnection.createStatement().execute("CREATE TABLE " + TESTTABLE_FULLNAME_SPECIAL_CHARS_COLUMN_NAME + " (\n" +
                 "  \"顧客ID\" INT,\n" +
                 "  \"顧客名_漢字\" VARCHAR(18),\n" +
@@ -142,6 +149,19 @@ public class SnowflakeSchemaAndDateTypeTestIT {
                 "  \"住所２\" VARCHAR(30),\n" +
                 "  \"電話番号\" VARCHAR(20)\n" +
                 ")");
+
+        testConnection.createStatement().execute(
+                "DROP TABLE IF EXISTS " + SCHEMATABLE_ORDER +
+                        " CASCADE");
+        testConnection.createStatement().execute(
+                "CREATE TABLE " + SCHEMATABLE_ORDER +
+                        " ("
+                        + "C2 DATE, "
+                        + "C1 VARCHAR(64), "
+                        + "C3 TIME, "
+                        + "C4 TIMESTAMP_NTZ, "//DATETIME is alias, TIMESTAMP WITHOUT TIME ZONE is alias, TIMESTAMP's default alias
+                        + "C5 TIMESTAMP_LTZ, "//TIMESTAMP WITH LOCAL TIME ZONE is alias
+                        + "C6 TIMESTAMP_TZ )");//TIMESTAMP WITH TIME ZONE is alias
     }
 
     @AfterClass
@@ -151,7 +171,11 @@ public class SnowflakeSchemaAndDateTypeTestIT {
         testConnection.createStatement().execute(
                 "DROP TABLE IF EXISTS " + TESTTABLE_FULLNAME_SPECIAL_CHARS_COLUMN_NAME);
         testConnection.createStatement().execute(
+                "DROP TABLE IF EXISTS " + SCHEMATABLE_ORDER);
+
+        testConnection.createStatement().execute(
             "DROP TABLE IF EXISTS " + TESTTABLE_FULLNAME_FOR_DROP_IF_AND_CREATE);
+
         testConnection.createStatement().execute(
                 "DROP STAGE IF EXISTS " + REMOTESTAGE);
         testConnection.createStatement().execute("DROP SCHEMA IF EXISTS " + TESTSCHEMA);
@@ -173,6 +197,31 @@ public class SnowflakeSchemaAndDateTypeTestIT {
         SnowflakeSourceOrSink sourceOrSink = new SnowflakeSourceOrSink();
         sourceOrSink.initialize(container, connProperties);
         sourceOrSink.getSchema(container, testConnection, TESTTABLE_SPECIAL_CHARS_COLUMN_NAME);
+    }
+
+    @Test
+    public void testDesignSchemaOrderNotMatchDBTableColumnOrder() throws Exception {
+        SnowflakeWriter writer = createWriter(true, TESTTABLE_ORDER, TableActionEnum.NONE);
+
+        Result result = null;
+        writer.open("snowflake");
+        try {
+            for (int i = 30; i < 40; i++) {
+                IndexedRecord row = makeRowWithoutLogicalTypes(i);
+                writer.write(row);
+            }
+        } finally {
+            result = writer.close();
+        }
+
+        assertEquals(10, result.getSuccessCount());
+        assertEquals(0, result.getRejectCount());
+
+        //the table columns order is : C2,C1,C3,C4,C5,C6
+        ResultSet rs = testConnection.createStatement().executeQuery(
+                "SELECT C1,C2,C3,C4,C5,C6 FROM " + SCHEMATABLE_ORDER + " WHERE C1 = 'foo_30'");
+
+        resultAssert(rs);
     }
 
     @Test

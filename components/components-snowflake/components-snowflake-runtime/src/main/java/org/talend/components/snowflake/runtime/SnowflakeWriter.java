@@ -84,6 +84,8 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
     // we need it always for the runtime database column type to decide how to format the date type like : date, time,
     // timestampntz, timestampltz, timestamptz
     protected transient Map<String, Field> dbColumnName2RuntimeField = new HashMap<>();
+    
+    private transient List<Field> runtimeFields = new ArrayList<>();
 
     private transient boolean isFirst = true;
 
@@ -132,9 +134,29 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         loader.setListener(listener);
         loader.start();
     }
+    
+    private boolean needCorrectColumnOrderByRuntimeSchema() {
+        //when table exists possible already, we need to correct the column order as it may not follow the order in database table.
+        //but if have using runtime schema for main schema, no need that correct
+        TableAction.TableActionEnum tableAction = this.sprops.tableAction.getValue();
+        return ((tableAction == TableAction.TableActionEnum.CREATE_IF_NOT_EXISTS) || (tableAction == TableAction.TableActionEnum.NONE) || (tableAction == TableAction.TableActionEnum.TRUNCATE)
+                || (tableAction == TableAction.TableActionEnum.CLEAR)) && !useRuntimeSchemaForMainSchema;
+    }
+    
+    private boolean supposeTableExists() {
+        TableAction.TableActionEnum tableAction = this.sprops.tableAction.getValue();
+        //we keep the old action for safe, in future, should treat truncate and clear the same
+        return (tableAction == TableAction.TableActionEnum.NONE)/* || (tableAction == TableAction.TableActionEnum.TRUNCATE)
+          || (tableAction == TableAction.TableActionEnum.CLEAR)*/;
+    }
 
     private static StringSchemaInfo getStringSchemaInfo(TSnowflakeOutputProperties outputProperties, Schema mainSchema,
             List<Field> columns) {
+        return getStringSchemaInfo(outputProperties, mainSchema, columns, false, null, null, false);
+    }
+    
+    private static StringSchemaInfo getStringSchemaInfo(TSnowflakeOutputProperties outputProperties, Schema mainSchema,
+            List<Field> columns, boolean orderIsAdjusted, List<Field> remoteColumns, TableAction.TableActionEnum tableAction, boolean isDynamic) {
         boolean isUpperCase = false;
         boolean upsert = false;
         if (outputProperties != null) {
@@ -144,11 +166,28 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
 
         List<String> keyStr = new ArrayList<>();
         List<String> columnsStr = new ArrayList<>();
+        
+        //please see setLoaderColumnsPropertyAtRuntime implement, before current commit, it only reset columnStr for loader when table action is not "NONE"
+        //after current commit, when NONE, we also reset columnStr as we correct the column order by runtime schema. But one risk appear:
+        //please see current getStringSchemaInfo method, it use input fields to get the TALEND_COLUMN_DB_COLUMN_NAME,TALEND_FIELD_AUTOINCREMENTED,TALEND_COLUMN_IS_KEY,
+        //in my view, it's totally wrong, a bug, but consider some customer job may depend on the wrong action when table action is not "NONE", we do the special process here:
+        //only when table action is "NONE", not dynamic, we use component fields, not input fields
+        //TODO if one bug is reported in future, we consider to remove the code below
+        boolean avoidUseInputField = (tableAction!=null) && (tableAction == TableAction.TableActionEnum.NONE) && !isDynamic;
 
         int i = 0;
+        List<Field> mainFields = mainSchema.getFields();
         for (Field overlapField : columns) {
-            Field f = overlapField == null ? mainSchema.getFields().get(i) : overlapField;
+            Field f;
+            if(avoidUseInputField) {
+                f = orderIsAdjusted ? remoteColumns.get(i) : mainFields.get(i);
+            } else {
+                f = overlapField == null ? (orderIsAdjusted ? remoteColumns.get(i) : mainFields.get(i)) : overlapField;
+            }
+            
             i++;
+            
+            //no UI show, dangerous
             if (Boolean.valueOf(f.getProp(SnowflakeAvroRegistry.TALEND_FIELD_AUTOINCREMENTED))) {
                 continue;
             }
@@ -176,18 +215,19 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         return new StringSchemaInfo(keyStr, columnsStr);
     }
 
-    protected void setLoaderColumnsPropertyAtRuntime(Loader loader, List<Field> columns) {
-        StringSchemaInfo ssi = getStringSchemaInfo(sprops, mainSchema, columns);
+    private void setLoaderColumnsPropertyAtRuntime(Loader loader, List<Field> columns, List<Field> remoteColumns, boolean orderIsAdjusted) {
+        StringSchemaInfo ssi = getStringSchemaInfo(sprops, mainSchema, columns, orderIsAdjusted, remoteColumns, sprops.tableAction.getValue(), useRuntimeSchemaForMainSchema);
 
         row = new Object[ssi.columnsStr.size()];
-        if (this.sprops.tableAction.getValue() != TableAction.TableActionEnum.NONE) {
+        
+        //TODO remove the condition, now add it only for more safe for old job
+        if(orderIsAdjusted || (sprops.tableAction.getValue()!=TableAction.TableActionEnum.NONE)) {
             loader.setProperty(LoaderProperty.columns, ssi.columnsStr);
             if (ssi.keyStr.size() > 0) {
                 loader.setProperty(LoaderProperty.keys, ssi.keyStr);
             }
+            }
         }
-
-    }
 
     private Map<String, String> getDbTypeMap() {
         Map<String, String> dbTypeMap = new HashMap<>();
@@ -288,13 +328,53 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
                 remoteTableFields = new ArrayList<>(mainSchema.getFields());
             }
 
-            // Set Columns, KeyColumns to Loader in all modes.
-            setLoaderColumnsPropertyAtRuntime(loader, collectedFields);
-
             tableActionManagement(datum);
 
             // fetch the runtime schema after table action is over which make sure the table is create already
             initRuntimeSchemaAndMapIfNecessary();
+            
+            //correct order by runtime schema after sure table exists already
+            boolean orderIsAdjusted = false;
+            if(needCorrectColumnOrderByRuntimeSchema()) {
+                List<Field> finalCollectedFields = new ArrayList<>();
+                List<Field> finalRemoteTableFields = new ArrayList<>();
+                
+                boolean isUpperCase = this.sprops.convertColumnsAndTableToUppercase.getValue();
+                
+                int j = 0;
+                for(Field runtimeField : runtimeFields) {
+                    String realDbColumnName = runtimeField.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+                    
+                    for(int i=0;i<remoteTableFields.size();i++) {
+                        Field field = remoteTableFields.get(i);
+                        String dbColumnName = field.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+                        if (dbColumnName == null) {
+                            dbColumnName = field.name();
+                        }
+                        dbColumnName = isUpperCase ? dbColumnName.toUpperCase() : dbColumnName;
+                        
+                        if(dbColumnName.equals(realDbColumnName)) {
+                            if((j++) != field.pos()) {//mean order is adjusted
+                                orderIsAdjusted = true;
+                            }
+                            finalRemoteTableFields.add(field);
+                            finalCollectedFields.add(collectedFields.get(i));
+                            break;
+                        }
+                    }
+                    
+                }
+                
+                if(!finalRemoteTableFields.isEmpty() && (finalRemoteTableFields.size() == remoteTableFields.size())) {
+                    collectedFields = finalCollectedFields;
+                    remoteTableFields = finalRemoteTableFields;
+                } else {
+                    orderIsAdjusted = false;
+                }
+            }
+            
+            // Set Columns, KeyColumns to Loader in all modes.
+            setLoaderColumnsPropertyAtRuntime(loader, collectedFields, remoteTableFields, orderIsAdjusted);
 
             isFirst = false;
         }
@@ -406,6 +486,8 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
     public WriteOperation<Result> getWriteOperation() {
         return snowflakeWriteOperation;
     }
+    
+    private transient boolean useRuntimeSchemaForMainSchema;
 
     protected Schema getSchema() throws IOException {
         SnowflakeConnectionTableProperties connectionTableProperties =
@@ -424,8 +506,9 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         Schema designSchema = connectionTableProperties.getSchema();
 
         // Don't retrieve schema from database if there is a table action that will create the table
-        if (AvroUtils.isIncludeAllFields(designSchema)
-                && this.sprops.tableAction.getValue() == TableAction.TableActionEnum.NONE) {
+        if (isDynamic(designSchema)
+                && supposeTableExists()) {
+            useRuntimeSchemaForMainSchema = true;
             return initRuntimeSchemaAndMapIfNecessary();
         }
 
@@ -443,6 +526,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             for (Field field : runtimeSchema.getFields()) {
                 String dbColumnName = field.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
                 dbColumnName2RuntimeField.put(dbColumnName, field);
+                runtimeFields.add(field);
             }
         }
         return runtimeSchema;
