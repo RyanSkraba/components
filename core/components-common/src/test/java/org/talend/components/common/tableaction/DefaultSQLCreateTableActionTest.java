@@ -72,6 +72,55 @@ public class DefaultSQLCreateTableActionTest {
     }
 
     @Test
+    public void createTableWithDbTypeInProp() {
+
+        // Enforce dbType in field prop
+        this.schema.getField("date").addProp(SchemaConstants.TALEND_COLUMN_DB_TYPE, "VARCHAR");
+
+        DefaultSQLCreateTableAction action =
+                new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, false, false, false);
+        TableActionConfig conf = new TableActionConfig();
+        conf.SQL_ESCAPE_ENABLED = false;
+        action.setConfig(conf);
+        try {
+            List<String> queries = action.getQueries();
+            assertEquals(1, queries.size());
+            assertEquals(
+                    "CREATE TABLE MyTable (id INTEGER, name VARCHAR(255) DEFAULT \"ok\", date VARCHAR, salary MY_DOUBLE(38, 4), updated TIMESTAMP, CONSTRAINT pk_MyTable PRIMARY KEY (id, name))",
+                    queries.get(0));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void createTableWithDbTypeConfOverSchema() {
+
+        // Enforce dbType in field prop
+        this.schema.getField("date").addProp(SchemaConstants.TALEND_COLUMN_DB_TYPE, "VARCHAR");
+
+        DefaultSQLCreateTableAction action =
+                new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, false, false, false);
+        TableActionConfig conf = new TableActionConfig();
+        conf.SQL_ESCAPE_ENABLED = false;
+        action.setConfig(conf);
+
+        Map dbTypMap = new HashMap();
+        dbTypMap.put("date", "MyOwnDbType");
+        action.setDbTypeMap(dbTypMap);
+
+        try {
+            List<String> queries = action.getQueries();
+            assertEquals(1, queries.size());
+            assertEquals(
+                    "CREATE TABLE MyTable (id INTEGER, name VARCHAR(255) DEFAULT \"ok\", date MyOwnDbType, salary MY_DOUBLE(38, 4), updated TIMESTAMP, CONSTRAINT pk_MyTable PRIMARY KEY (id, name))",
+                    queries.get(0));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
     public void createTableIfNotExists() {
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, true, false, false);

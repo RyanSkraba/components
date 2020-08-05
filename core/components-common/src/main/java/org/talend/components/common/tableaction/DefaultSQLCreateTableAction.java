@@ -121,7 +121,6 @@ public class DefaultSQLCreateTableAction extends TableAction {
 
             String sDBLength = f.getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH);
             String sDBName = f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
-            String sDBType = f.getProp(SchemaConstants.TALEND_COLUMN_DB_TYPE);
             String sDBDefault = f.getProp(SchemaConstants.TALEND_COLUMN_DEFAULT);
             String sDBPrecision = f.getProp(SchemaConstants.TALEND_COLUMN_PRECISION);
             boolean sDBIsKey = Boolean.valueOf(f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY)).booleanValue();
@@ -134,9 +133,11 @@ public class DefaultSQLCreateTableAction extends TableAction {
             sb.append(escape(updateCaseIdentifier(name)));
             sb.append(" ");
 
+
+            String sDBType = this.getDbTypeMap().get(f.name());
+
             if(isNullOrEmpty(sDBType)){
-                // if SchemaConstants.TALEND_COLUMN_DB_TYPE not set, use given map
-                sDBType = this.getDbTypeMap().get(f.name());
+                sDBType = f.getProp(SchemaConstants.TALEND_COLUMN_DB_TYPE);
             }
 
             if (isNullOrEmpty(sDBType)) {
@@ -144,6 +145,7 @@ public class DefaultSQLCreateTableAction extends TableAction {
                 sDBType = convertAvroToSQL.convertToSQLTypeString(f.schema());
             }
             sb.append(updateCaseIdentifier(sDBType));
+
 
             buildLengthPrecision(sb, f, sDBType);
 
