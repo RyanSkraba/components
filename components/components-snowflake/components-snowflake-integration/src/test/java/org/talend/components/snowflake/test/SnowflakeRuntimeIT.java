@@ -129,7 +129,7 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
 
     public Schema getMakeRowSchema() {
         SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.builder().record("MakeRowRecord").fields() //
-                .name("ID").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ID").type(AvroUtils._decimal()).noDefault() //
+                .name("ID").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ID").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type(AvroUtils._decimal()).noDefault() //
                 .name("C1").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C1").type().nullable().stringType().noDefault() //
                 .name("C2").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C2").type().nullable().booleanType().noDefault() //
                 .name("C3").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C3").type().nullable().doubleType().noDefault() //
@@ -141,7 +141,8 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
                 .name("C6").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C6").type(AvroUtils._logicalTimestamp())
                 .noDefault() //
                 // variant
-                .name("C7").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C7").type().nullable().stringType().noDefault();
+                .name("C7").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "C7").type().nullable().stringType().noDefault()
+                .name("C8").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "マイナンバー").type().nullable().stringType().noDefault();
         return fa.endRecord();
     }
 
@@ -161,6 +162,7 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
         row.put("C5", testTime);//support java.util.Date and Integer/int input for SNOWFLAKE TIME TYPE both
         row.put("C6", testTimestamp);
         row.put("C7", makeJson(i));
+        row.put("C8", "testJapanese : " + i);
         return row;
     }
 
@@ -185,7 +187,7 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
         int iC5 = 0;
         int iC6 = 0;
         int iC7 = 0;
-
+        int iC8 = 0;
         int checkCount = 0;
         for (IndexedRecord row : rows) {
             if (rowSchema == null) {
@@ -198,16 +200,14 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
                 iC5 = rowSchema.getField("C5").pos();
                 iC6 = rowSchema.getField("C6").pos();
                 iC7 = rowSchema.getField("C7").pos();
+                iC8 = rowSchema.getField("C8").pos();
             }
 
-            if (false) {
-                LOGGER.debug("check - id: " + row.get(iId) + " C1: " + row.get(iC1) + " C2: " + row.get(iC2) + " C3: "
-                        + row.get(iC3) + " C4: " + row.get(iC4) + " C5: " + row.get(iC5));
-            }
             assertEquals(BigDecimal.valueOf(checkCount), row.get(iId));
             assertEquals("foo_" + checkCount, row.get(iC1));
             assertEquals(Boolean.valueOf(true), row.get(iC2));
             assertEquals(Double.valueOf(checkCount), row.get(iC3));
+            assertEquals("testJapanese : " +  + checkCount, row.get(iC8));
 
             Object date = row.get(iC4);
             if (date instanceof Integer) {
@@ -370,6 +370,8 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
         for (Schema.Field child : schema.getFields()) {
             LOGGER.debug(child.name());
         }
+        //Set already defined schema that contains all required fields.
+        tableProps.main.schema.setValue(getMakeRowSchema());
         assertEquals(NUM_COLUMNS, schema.getFields().size());
     }
 
@@ -413,7 +415,7 @@ public abstract class SnowflakeRuntimeIT extends SnowflakeTestIT {
             testConnection.createStatement().execute("DROP TABLE IF EXISTS " + testSchema + "." + testTable + " CASCADE");
             testConnection.createStatement()
                     .execute("CREATE TABLE " + testSchema + "." + testTable + " (" + "ID int PRIMARY KEY, " + "C1 varchar(255), "
-                            + "C2 boolean, " + "C3 double, " + "C4 date, " + "C5 time, " + "C6 timestamp, " + "C7 variant)");
+                            + "C2 boolean, " + "C3 double, " + "C4 date, " + "C5 time, " + "C6 timestamp, " + "C7 variant, " + "\"マイナンバー\" varchar(255))");
         } catch (Exception ex) {
             throw new Exception("Make sure the system properties are correctly set as they might have caused this error", ex);
         }

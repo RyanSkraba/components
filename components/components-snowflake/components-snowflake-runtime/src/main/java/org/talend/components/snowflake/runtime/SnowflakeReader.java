@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.regex.Pattern;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -42,6 +43,8 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
 
     private transient SnowflakeResultSetIndexedRecordConverter factory;
 
+    private final transient Pattern identifierPattern;
+
     protected TSnowflakeInputProperties properties;
 
     protected int dataCount;
@@ -61,6 +64,7 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
         this.container = container;
         this.properties = props;
         factory = new SnowflakeResultSetIndexedRecordConverter();
+        identifierPattern = Pattern.compile("[a-zA-Z_][a-zA-Z_0-9$]*");
     }
 
     protected Connection getConnection() throws IOException {
@@ -85,7 +89,6 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
             condition = properties.condition.getStringValue();
         }
         StringBuilder sb = new StringBuilder();
-        boolean isUpperCase = properties.convertColumnsAndTableToUppercase.getValue();
         sb.append("select "); //$NON-NLS-1$
         int count = 0;
         for (Schema.Field se : getSchema().getFields()) {
@@ -93,16 +96,35 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
                 sb.append(", "); //$NON-NLS-1$
             }
             String columnName = se.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
-            sb.append(isUpperCase ? columnName : StringUtils.wrap(columnName, '"'));
+            sb.append(useUnquotedIndentifier(columnName) ? columnName : StringUtils.wrap(columnName, '"'));
         }
         sb.append(" from "); //$NON-NLS-1$
-        String tableName = isUpperCase ? properties.getTableName() : StringUtils.wrap(properties.getTableName(), '"');
+        String tableName = useUnquotedIndentifier(properties.getTableName()) ? properties.getTableName() : StringUtils.wrap(properties.getTableName(), '"');
         sb.append(tableName);
         if (condition != null && condition.trim().length() > 0) {
             sb.append(" where ");
             sb.append(condition);
         }
         return sb.toString();
+    }
+
+    /**
+     * Checks whether <b>value</b> has to be unquoted or quoted.
+     * <ul><li>If property <b>convertColumnsAndTableToUppercase</b> is false we don't need to check other conditions, return <b>false</b></li>
+     * <li>If <b>value</b> starts and ends with quotes \"...\" we shouldn't quote it again, return <b>true</b></li>
+     * <li>Return <b>true</b>, if <b>value</b> conforms Snowflake restriction of Unquoted object identifiers: <ol>
+     * <li>Start with a letter (A-Z, a-z) or an underscore (“_”).</li>
+     * <li>Contain only letters, underscores, decimal digits (0-9), and dollar signs (“$”).</li>
+     * <li>Are case-insensitive.</li></ol>
+     * </li></ul>
+     *
+     * @param value
+     * @return
+     */
+    private boolean useUnquotedIndentifier(String value) {
+            return properties.convertColumnsAndTableToUppercase.getValue() &&
+                    ((value.startsWith("\"") && value.endsWith("\""))
+                            || identifierPattern.matcher(value).matches());
     }
 
     @Override

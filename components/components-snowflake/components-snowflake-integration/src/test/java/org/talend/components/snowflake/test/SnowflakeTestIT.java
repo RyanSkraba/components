@@ -86,7 +86,7 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
 
     private ComponentServiceImpl componentService;
 
-    protected static final int NUM_COLUMNS = 8;
+    protected static final int NUM_COLUMNS = 9;
 
     public SnowflakeTestIT() {
     }
