@@ -50,6 +50,7 @@ import net.snowflake.client.loader.Loader;
 import net.snowflake.client.loader.LoaderFactory;
 import net.snowflake.client.loader.LoaderProperty;
 import net.snowflake.client.loader.Operation;
+import net.snowflake.client.loader.StreamLoader;
 
 public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
@@ -139,8 +140,9 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         //when table exists possible already, we need to correct the column order as it may not follow the order in database table.
         //but if have using runtime schema for main schema, no need that correct
         TableAction.TableActionEnum tableAction = this.sprops.tableAction.getValue();
+        boolean isStreamLoader = this.loader instanceof StreamLoader;//not affect bulk connector;
         return ((tableAction == TableAction.TableActionEnum.CREATE_IF_NOT_EXISTS) || (tableAction == TableAction.TableActionEnum.NONE) || (tableAction == TableAction.TableActionEnum.TRUNCATE)
-                || (tableAction == TableAction.TableActionEnum.CLEAR)) && !useRuntimeSchemaForMainSchema;
+                || (tableAction == TableAction.TableActionEnum.CLEAR)) && !useRuntimeSchemaForMainSchema && isStreamLoader;
     }
     
     private boolean supposeTableExists() {
