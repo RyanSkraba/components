@@ -1,0 +1,14 @@
+[
+
+	{
+		"id" : "DATABRICKS_DELTA_LAKE",
+		"class" : "com.simba.spark.jdbc.Driver",
+		"url" : "jdbc:spark://",
+		"paths" : 
+	 	[
+	 		{"path" : "mvn:Spark/SparkJDBC42/2.6.14.1018/jar"}
+	 	]
+	
+	}
+
+]
