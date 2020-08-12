@@ -34,4 +34,14 @@ public class SalesforceInputPropertiesMigrationTaskTest {
         assertEquals("\"https://login.salesforce.com/services/Soap/u/42.0\"",
                 properties.connection.endpoint.getValue());
     }
+    @Test
+    public void testQueryModePossibleValues() throws IOException {
+        Deserialized<TSalesforceInputProperties> deser = Properties.Helper.fromSerializedPersistent(
+                TestUtils.getResourceAsString(getClass(), "tSalesforceInputProperties_721.json"),
+                TSalesforceInputProperties.class);
+
+        TSalesforceInputProperties properties = deser.object;
+        assertEquals(3,properties.queryMode.getPossibleValues().size());
+        assertTrue(properties.queryMode.getPossibleValues().contains(TSalesforceInputProperties.QueryMode.BulkV2));
+    }
 }

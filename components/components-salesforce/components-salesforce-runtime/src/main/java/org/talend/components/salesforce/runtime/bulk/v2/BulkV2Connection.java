@@ -13,12 +13,19 @@
 
 package org.talend.components.salesforce.runtime.bulk.v2;
 
+import static org.apache.oltu.oauth2.common.OAuth.OAUTH_HEADER_NAME;
+import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.GET;
+import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.PATCH;
+import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.POST;
+import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.PUT;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.Map;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -39,26 +46,21 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.talend.components.salesforce.runtime.bulk.v2.error.BulkV2ClientException;
 import org.talend.components.salesforce.runtime.bulk.v2.request.CreateJobRequest;
+import org.talend.components.salesforce.runtime.bulk.v2.request.GetQueryJobResultRequest;
 import org.talend.components.salesforce.runtime.bulk.v2.request.UpdateJobRequest;
 import org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
+
 import com.sforce.async.JobStateEnum;
 import com.sforce.ws.ConnectorConfig;
 import com.sforce.ws.bind.CalendarCodec;
 import com.sforce.ws.tools.VersionInfo;
-
-import static org.apache.oltu.oauth2.common.OAuth.OAUTH_HEADER_NAME;
-import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.GET;
-import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.PATCH;
-import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.POST;
-import static org.talend.components.salesforce.runtime.bulk.v2.type.HttpMethod.PUT;
 
 /**
  * Bulk Connection for Bulk API V2
@@ -70,15 +72,16 @@ public class BulkV2Connection {
 
     public static final String CSV_CONTENT_TYPE = "text/csv";
 
-    private static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider().getI18nMessages(BulkV2Connection.class);
-
-    private static final JsonFactory factory = new JsonFactory(new ObjectMapper());
+    private static final I18nMessages MESSAGES =
+            GlobalI18N.getI18nMessageProvider().getI18nMessages(BulkV2Connection.class);
 
     private ConnectorConfig config;
 
     private CloseableHttpClient httpclient;
 
-    public BulkV2Connection(ConnectorConfig config, String apiVersion) throws BulkV2ClientException {
+    private OperationType operationType;
+
+    public BulkV2Connection(ConnectorConfig config, OperationType operationType) throws BulkV2ClientException {
         if (config == null) {
             throw new BulkV2ClientException(MESSAGES.getMessage("error.config.empty"));
         }
@@ -87,9 +90,11 @@ public class BulkV2Connection {
             throw new BulkV2ClientException(MESSAGES.getMessage("error.endpoint.empty"));
         }
 
-        this.config = adaptBulkV2Config(config, apiVersion);
+        this.config = adaptBulkV2Config(config);
 
         this.httpclient = getHttpClient();
+
+        this.operationType = operationType;
 
         if (config.getSessionId() == null) {
             throw new BulkV2ClientException(MESSAGES.getMessage("error.token.notfound"));
@@ -109,7 +114,7 @@ public class BulkV2Connection {
         return mapper.readValue(in, tmpClass);
     }
 
-    private ConnectorConfig adaptBulkV2Config(ConnectorConfig bulkConfig, String apiVersion) {
+    private ConnectorConfig adaptBulkV2Config(ConnectorConfig bulkConfig) {
         String restEndpoint = bulkConfig.getRestEndpoint();
         // Check whether it has been adapted
         if (restEndpoint.indexOf("/data/v") != -1) {
@@ -118,6 +123,7 @@ public class BulkV2Connection {
         ConnectorConfig bulkV2Config = new ConnectorConfig();
         bulkV2Config.setSessionId(bulkConfig.getSessionId());
 
+        String apiVersion = restEndpoint.substring(restEndpoint.lastIndexOf("/services/async/") + 16);
         // Replace rest endpoint with bulk v2 rest one.
         restEndpoint = restEndpoint.substring(0, restEndpoint.lastIndexOf("/async/")) + "/data/v" + apiVersion;
         bulkV2Config.setRestEndpoint(restEndpoint);
@@ -134,7 +140,11 @@ public class BulkV2Connection {
 
     public JobInfoV2 createJob(CreateJobRequest request) throws BulkV2ClientException {
         String endpoint = getRestEndpoint();
-        endpoint = endpoint + "jobs/ingest";
+        if (operationType == OperationType.LOAD) {
+            endpoint = endpoint + "jobs/ingest";
+        } else {
+            endpoint = endpoint + "jobs/query";
+        }
         return createJob(request, endpoint);
     }
 
@@ -145,11 +155,15 @@ public class BulkV2Connection {
     private JobInfoV2 createJob(CreateJobRequest request, String endpoint) throws BulkV2ClientException {
         try {
             HttpPost httpPost = (HttpPost) createRequest(endpoint, HttpMethod.POST);
-            StringEntity entity = new StringEntity(serializeToJson(request), org.apache.http.entity.ContentType.APPLICATION_JSON);
+            StringEntity entity =
+                    new StringEntity(serializeToJson(request), org.apache.http.entity.ContentType.APPLICATION_JSON);
 
             httpPost.setEntity(entity);
             HttpResponse response = httpclient.execute(httpPost);
             if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                if (response.getStatusLine().getStatusCode() == 404) {
+                    throw new BulkV2ClientException(MESSAGES.getMessage("error.resource.not.found"));
+                }
                 throw new BulkV2ClientException(response.getStatusLine().getReasonPhrase());
             }
             HttpEntity responseEntity = response.getEntity();
@@ -171,7 +185,10 @@ public class BulkV2Connection {
         return endpoint;
     }
 
-    public void uploadDataFromStream(String jobId, InputStream input) throws BulkV2ClientException {
+    public void uploadDataFromStream(String jobId, InputStream input) throws IOException {
+        if (operationType != OperationType.LOAD) {
+            throw new IOException(MESSAGES.getMessage("error.unsupported.method"));
+        }
         try {
             String endpoint = getRestEndpoint();
             endpoint = endpoint + "jobs/ingest/" + jobId + "/batches";
@@ -193,19 +210,65 @@ public class BulkV2Connection {
         }
     }
 
-    public InputStream getUnprocessedRecordsStream(String jobId) throws BulkV2ClientException {
+    public InputStream getUnprocessedRecordsStream(String jobId) throws IOException {
+        if (operationType != OperationType.LOAD) {
+            throw new IOException(MESSAGES.getMessage("error.unsupported.method"));
+        }
         String endpoint = getRestEndpoint() + "jobs/ingest/" + jobId + "/unprocessedrecords/";
         return doHttpGet(endpoint);
     }
 
-    public InputStream getFailedRecordsStream(String jobId) throws BulkV2ClientException {
+    public InputStream getFailedRecordsStream(String jobId) throws IOException {
+        if (operationType != OperationType.LOAD) {
+            throw new IOException(MESSAGES.getMessage("error.unsupported.method"));
+        }
         String endpoint = getRestEndpoint() + "jobs/ingest/" + jobId + "/failedResults/";
         return doHttpGet(endpoint);
     }
 
-    public InputStream getSuccessRecordsStream(String jobId) throws BulkV2ClientException {
-        String endpoint = getRestEndpoint() + "jobs/ingest/" + jobId + "/successfulResults/";
+    public InputStream getResult(String jobId) throws BulkV2ClientException {
+        String endpoint = null;
+        if (operationType == OperationType.LOAD) {
+            endpoint = getRestEndpoint() + "jobs/ingest/" + jobId + "/successfulResults/";
+        } else {
+            endpoint = getRestEndpoint() + "jobs/query/" + jobId + "/results/";
+        }
         return doHttpGet(endpoint);
+    }
+
+    public InputStream getResult(GetQueryJobResultRequest request) throws BulkV2ClientException {
+        String endpoint = getRestEndpoint() + "jobs/query/" + request.getQueryJobId() + "/results/";
+        if (request.getLocator() == null && request.getMaxRecords() != null && request.getMaxRecords() > 0) {
+            endpoint += "?maxRecords=" + request.getMaxRecords();
+        } else if (request.getLocator() != null && request.getMaxRecords() != null && request.getMaxRecords() > 0) {
+            endpoint += "?locator=" + request.getLocator() + "&maxRecords=" + request.getMaxRecords();
+        }
+        try {
+            HttpGet httpGet = (HttpGet) createRequest(endpoint, HttpMethod.GET);
+            httpGet.addHeader("Accept", CSV_CONTENT_TYPE);
+
+            HttpResponse response = httpclient.execute(httpGet);
+            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                throw new BulkV2ClientException(response.getStatusLine().getReasonPhrase());
+            }
+            Header locator = response.getFirstHeader("Sforce-Locator");
+            if (locator != null && locator.getValue() != null && !"null".equals(locator.getValue())) {
+                request.setLocator(locator.getValue());
+            } else {
+                request.setLocator(null);
+            }
+
+            HttpEntity responseEntity = response.getEntity();
+            if (responseEntity != null) {
+                return responseEntity.getContent();
+            } else {
+                throw new IOException(MESSAGES.getMessage("error.job.info"));
+            }
+        } catch (BulkV2ClientException bec) {
+            throw bec;
+        } catch (IOException e) {
+            throw new BulkV2ClientException(MESSAGES.getMessage("error.query.job"), e);
+        }
     }
 
     private InputStream doHttpGet(String endpoint) throws BulkV2ClientException {
@@ -231,13 +294,22 @@ public class BulkV2Connection {
     }
 
     public JobInfoV2 getJobStatus(String jobId) throws IOException {
-        String endpoint = getRestEndpoint() + "jobs/ingest/" + jobId;
+        String endpoint = null;
+        if (operationType == OperationType.LOAD) {
+            endpoint = getRestEndpoint() + "jobs/ingest/" + jobId;
+        } else {
+            endpoint = getRestEndpoint() + "jobs/query/" + jobId;
+        }
         return deserializeJsonToObject(doHttpGet(endpoint), JobInfoV2.class);
     }
 
     public JobInfoV2 updateJob(String jobId, JobStateEnum state) throws BulkV2ClientException {
         String endpoint = getRestEndpoint();
-        endpoint += "jobs/ingest/" + jobId;
+        if (operationType == OperationType.LOAD) {
+            endpoint += "jobs/ingest/" + jobId;
+        } else {
+            endpoint += "jobs/query/" + jobId;
+        }
         UpdateJobRequest request = new UpdateJobRequest.Builder(state).build();
         try {
             HttpPatch httpPatch = (HttpPatch) createRequest(endpoint, HttpMethod.PATCH);
@@ -266,8 +338,10 @@ public class BulkV2Connection {
         Proxy proxy = config.getProxy();
 
         if (config.isTraceMessage()) {
-            config.getTraceStream().println(
-                    "WSC: Creating a new connection to " + uri + " Proxy = " + proxy + " username " + config.getProxyUsername());
+            config
+                    .getTraceStream()
+                    .println("WSC: Creating a new connection to " + uri + " Proxy = " + proxy + " username "
+                            + config.getProxyUsername());
         }
 
         HttpRequestBase request = null;
@@ -330,7 +404,9 @@ public class BulkV2Connection {
         }
 
         if (config.isTraceMessage()) {
-            config.getTraceStream().println("WSC: Connection configured to have request properties " + request.toString());
+            config
+                    .getTraceStream()
+                    .println("WSC: Connection configured to have request properties " + request.toString());
         }
 
         return request;
@@ -346,8 +422,8 @@ public class BulkV2Connection {
                 Proxy proxy = config.getProxy();
                 if (!Proxy.Type.DIRECT.equals(proxy.type()) && config.getProxyUsername() != null
                         && config.getProxyPassword() != null) {
-                    Credentials credentials = new UsernamePasswordCredentials(config.getProxyUsername(),
-                            config.getProxyPassword());
+                    Credentials credentials =
+                            new UsernamePasswordCredentials(config.getProxyUsername(), config.getProxyPassword());
                     AuthScope authScope = new AuthScope(((InetSocketAddress) proxy.address()).getHostName(),
                             ((InetSocketAddress) proxy.address()).getPort());
                     CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -358,5 +434,10 @@ public class BulkV2Connection {
             return HttpClients.createDefault();
         }
         return httpclient;
+    }
+
+    public enum OperationType {
+        LOAD,
+        QUERY,
     }
 }

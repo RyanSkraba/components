@@ -132,12 +132,42 @@ public class TSalesforceInputPropertiesTest extends SalesforceTestBase {
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.normalizeDelimiter.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.columnNameDelimiter.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.batchSize.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.returnNullValue).isVisible());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.safetySwitch).isVisible());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.useResultLocator.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.maxRecords.getName()).isHidden());
         Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.jobTimeOut.getName()).isHidden());
         Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.pkChunking.getName()).isHidden());
         Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.chunkSize.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getChildForm(properties.connection.getName())
                 .getWidget(properties.connection.bulkConnection.getName()).isHidden());
+
+        properties.queryMode.setValue(QueryMode.BulkV2);
+        properties.manualQuery.setValue(false);
+        properties.refreshLayout(properties.getForm(Form.MAIN));
+        Assert.assertTrue(properties.getForm(Form.MAIN).getWidget(properties.includeDeleted.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.MAIN).getWidget(properties.query.getName()).isHidden());
+        Assert.assertFalse(properties.getForm(Form.MAIN).getWidget(properties.condition.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.MAIN).getWidget(properties.guessSchema.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.MAIN).getWidget(properties.guessQuery.getName()).isHidden());
+
+        properties.refreshLayout(properties.getForm(Form.ADVANCED));
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.normalizeDelimiter.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.columnNameDelimiter.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.batchSize.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.returnNullValue).isVisible());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.safetySwitch).isVisible());
+        Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.useResultLocator.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.maxRecords.getName()).isHidden());
+        Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.jobTimeOut.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.pkChunking.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.chunkSize.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getChildForm(properties.connection.getName())
+                .getWidget(properties.connection.bulkConnection.getName()).isHidden());
+
+        properties.useResultLocator.setValue(true);
+        properties.refreshLayout(properties.getForm(Form.ADVANCED));
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.maxRecords.getName()).isVisible());
     }
 
     @Test

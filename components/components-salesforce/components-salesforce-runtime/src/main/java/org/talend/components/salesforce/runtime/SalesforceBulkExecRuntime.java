@@ -59,8 +59,9 @@ public class SalesforceBulkExecRuntime extends SalesforceSourceOrSink
     @Override
     public void runAtDriver(RuntimeContainer container) {
         TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
-        boolean useBulkApiV2 = SalesforceConnectionProperties.LoginType.OAuth.equals(
-                sprops.getEffectiveConnProperties().loginType.getValue()) && sprops.bulkProperties.bulkApiV2.getValue();
+        boolean useBulkApiV2 = SalesforceConnectionProperties.LoginType.OAuth
+                .equals(sprops.getEffectiveConnProperties().loginType.getValue())
+                && sprops.bulkProperties.bulkApiV2.getValue();
         if (useBulkApiV2) {
             bulkV2Execute(container);
         } else {
@@ -76,9 +77,11 @@ public class SalesforceBulkExecRuntime extends SalesforceSourceOrSink
             bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getValue());
             bulkRuntime.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getValue());
             // We only support CSV file for bulk output
-            bulkRuntime.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getValue(), sprops.hardDelete.getValue(),
-                    sprops.upsertKeyColumn.getStringValue(), "csv", sprops.bulkFilePath.getStringValue(),
-                    sprops.bulkProperties.bytesToCommit.getValue(), sprops.bulkProperties.rowsToCommit.getValue());
+            bulkRuntime
+                    .executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getValue(),
+                            sprops.hardDelete.getValue(), sprops.upsertKeyColumn.getStringValue(), "csv",
+                            sprops.bulkFilePath.getStringValue(), sprops.bulkProperties.bytesToCommit.getValue(),
+                            sprops.bulkProperties.rowsToCommit.getValue());
             // count results
             for (int i = 0; i < bulkRuntime.getBatchCount(); i++) {
                 for (BulkResult result : bulkRuntime.getBatchLog(i)) {
@@ -104,8 +107,7 @@ public class SalesforceBulkExecRuntime extends SalesforceSourceOrSink
                 throw new BulkV2ClientException(MESSAGES.getMessage("error.bulk.config"));
             }
             ConnectorConfig bulkConfig = bulkConnection.getConfig();
-            String apiVersion = sprops.getEffectiveConnProperties().apiVersion.getValue();
-            BulkV2Connection bulkV2Conn = new BulkV2Connection(bulkConfig, apiVersion);
+            BulkV2Connection bulkV2Conn = new BulkV2Connection(bulkConfig, BulkV2Connection.OperationType.LOAD);
             SalesforceBulkV2Runtime bulkRuntime = new SalesforceBulkV2Runtime(bulkV2Conn, sprops);
             bulkRuntime.executeBulk();
             dataCount = bulkRuntime.getNumberRecordsProcessed();

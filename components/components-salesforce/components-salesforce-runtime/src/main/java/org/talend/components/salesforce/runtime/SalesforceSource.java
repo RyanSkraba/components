@@ -56,10 +56,13 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
     public BoundedReader createReader(RuntimeContainer adaptor) {
         if (properties instanceof TSalesforceInputProperties) {
             TSalesforceInputProperties sfInProperties = (TSalesforceInputProperties) properties;
-            boolean isBulk = TSalesforceInputProperties.QueryMode.Bulk.equals(sfInProperties.queryMode.getValue());
-            sfInProperties.connection.bulkConnection.setValue(isBulk);
-            if (isBulk) {
+            boolean isBulkV1 = TSalesforceInputProperties.QueryMode.Bulk.equals(sfInProperties.queryMode.getValue());
+            boolean isBulkV2 = TSalesforceInputProperties.QueryMode.BulkV2.equals(sfInProperties.queryMode.getValue());
+            sfInProperties.connection.bulkConnection.setValue(isBulkV1||isBulkV2);
+            if (isBulkV1) {
                 return new SalesforceBulkQueryInputReader(adaptor, this, sfInProperties);
+            } else if (isBulkV2) {
+                return new SalesforceBulkQueryV2Reader(adaptor, this, sfInProperties);
             } else {
                 return new SalesforceInputReader(adaptor, this, sfInProperties);
             }

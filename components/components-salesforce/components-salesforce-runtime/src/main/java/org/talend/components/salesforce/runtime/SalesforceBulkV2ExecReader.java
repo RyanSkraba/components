@@ -67,8 +67,7 @@ final class SalesforceBulkV2ExecReader extends SalesforceReader {
         }
         ConnectorConfig bulkConfig = bulkConnection.getConfig();
         // Replace rest endpoint with bulk v2 rest one.
-        String apiVersion = sprops.getEffectiveConnProperties().apiVersion.getValue();
-        BulkV2Connection bulkV2Conn = new BulkV2Connection(bulkConfig, apiVersion);
+        BulkV2Connection bulkV2Conn = new BulkV2Connection(bulkConfig, BulkV2Connection.OperationType.LOAD);
         bulkRuntime = new SalesforceBulkV2Runtime(bulkV2Conn, sprops);
         try {
             bulkRuntime.executeBulk();

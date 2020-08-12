@@ -172,7 +172,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
     @Test
     public void testInputProps() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
-        assertEquals(2, props.queryMode.getPossibleValues().size());
+        assertEquals(3, props.queryMode.getPossibleValues().size());
         Property[] returns = new TSalesforceInputDefinition().getReturnProperties();
         assertEquals(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT, returns[1].getName());
 

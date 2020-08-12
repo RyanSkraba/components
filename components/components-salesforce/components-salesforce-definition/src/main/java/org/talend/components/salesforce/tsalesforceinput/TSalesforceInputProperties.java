@@ -20,6 +20,7 @@ import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
@@ -27,8 +28,10 @@ import org.apache.avro.Schema;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.ComponentConstants;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.common.SalesforceRuntimeSourceOrSink;
 import org.talend.components.salesforce.schema.SalesforceSchemaHelper;
+import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
@@ -37,19 +40,23 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.sandbox.SandboxedInstance;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.talend.daikon.serialize.PostDeserializeSetup;
 import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class TSalesforceInputProperties extends SalesforceConnectionModuleProperties implements SerializeSetVersion {
 
+    public static final String DEFAULT_QUERY = "\"SELECT Id, Name, IsDeleted FROM Account\"";
 
+    public static final int MAX_CHUNK_SIZE = 250_000;
 
-    public enum QueryMode {
-        Query,
-        Bulk;
-    }
+    public static final int DEFAULT_CHUNK_SIZE = 100_000;
+
+    public static final int DEFAULT_CHUNK_SLEEP_TIME = 15;
+
+    public static final int DEFAULT_JOB_TIME_OUT = 0; // Default : no timeout to wait until the job fails or is in
+
     public Property<QueryMode> queryMode = newEnum("queryMode", QueryMode.class);
 
     public Property<String> condition = newProperty("condition"); //$NON-NLS-1$
@@ -58,33 +65,26 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     public Property<String> query = newProperty("query"); //$NON-NLS-1$
 
-    public static final String DEFAULT_QUERY = "\"SELECT Id, Name, IsDeleted FROM Account\"";
+    //
 
     public transient PresentationItem guessSchema = new PresentationItem("guessSchema", "Guess schema");
+    //
 
     public transient PresentationItem guessQuery = new PresentationItem("guessQuery", "Guess query");
 
     public Property<Boolean> includeDeleted = newBoolean("includeDeleted"); //$NON-NLS-1$
 
-    //
+    // chunk size must be less than 250000.
 
     // Advanced
     public Property<Integer> batchSize = newInteger("batchSize"); //$NON-NLS-1$
-    //
+
     public Property<String> normalizeDelimiter = newProperty("normalizeDelimiter"); //$NON-NLS-1$
 
     public Property<String> columnNameDelimiter = newProperty("columnNameDelimiter"); //$NON-NLS-1$
 
-    // chunk size must be less than 250000.
-
-    public static final int MAX_CHUNK_SIZE = 250_000;
-    public static final int DEFAULT_CHUNK_SIZE = 100_000;
-
-    public static final int DEFAULT_CHUNK_SLEEP_TIME = 15;
-
-    public static final int DEFAULT_JOB_TIME_OUT = 0; // Default : no timeout to wait until the job fails or is in success
-
     public Property<Boolean> safetySwitch = newBoolean("safetySwitch", true);
+                                                      // success
 
     public Property<Boolean> returnNullValue = newBoolean("returnNullValue", false);
 
@@ -95,6 +95,10 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     public Property<Integer> chunkSize = newInteger("chunkSize", DEFAULT_CHUNK_SIZE);
 
     public Property<Integer> chunkSleepTime = newInteger("chunkSleepTime", DEFAULT_CHUNK_SLEEP_TIME);
+
+    public Property<Boolean> useResultLocator = newBoolean("useResultLocator", false);
+
+    public Property<Integer> maxRecords = newInteger("maxRecords", 50000);
 
     public TSalesforceInputProperties(@JsonProperty("name") String name) {
         super(name);
@@ -110,21 +114,31 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         columnNameDelimiter.setValue("_");
         query.setTaggedValue(ComponentConstants.LINE_SEPARATOR_REPLACED_TO, " ");
         query.setValue(DEFAULT_QUERY);
+        maxRecords.setValue(50000);
     }
 
     @Override
     public int getVersionNumber() {
-        return 1;
+        return 2;
     }
 
     @Override
     public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
         boolean deserialized = super.postDeserialize(version, setup, persistent);
 
-        Integer timeout = jobTimeOut.getValue();
-        if(timeout == null) {
-            deserialized = true;
-            jobTimeOut.setValue(DEFAULT_JOB_TIME_OUT);
+        if (version < 2) {
+            Integer timeout = jobTimeOut.getValue();
+            if (timeout == null) {
+                deserialized = true;
+                jobTimeOut.setValue(DEFAULT_JOB_TIME_OUT);
+            }
+        }
+
+        if (version < this.getVersionNumber()) {
+            if (queryMode.getPossibleValues().size() == 2) {
+                deserialized = true;
+                queryMode.setPossibleValues(Arrays.asList(QueryMode.Query, QueryMode.Bulk, QueryMode.BulkV2));
+            }
         }
 
         return deserialized;
@@ -154,6 +168,8 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         advancedForm.addRow(batchSize);
         advancedForm.addRow(normalizeDelimiter);
         advancedForm.addRow(columnNameDelimiter);
+        advancedForm.addRow(useResultLocator);
+        advancedForm.addRow(maxRecords);
     }
 
     public ValidationResult validateGuessSchema() {
@@ -161,8 +177,8 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
         try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS)) {
 
-            SalesforceRuntimeSourceOrSink salesforceSourceOrSink = (SalesforceRuntimeSourceOrSink) sandboxedInstance
-                    .getInstance();
+            SalesforceRuntimeSourceOrSink salesforceSourceOrSink =
+                    (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
             salesforceSourceOrSink.initialize(null, this);
 
             Schema schema = ((SalesforceSchemaHelper<Schema>) salesforceSourceOrSink).guessSchema(query.getValue());
@@ -187,15 +203,16 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
         try (SandboxedInstance sandboxedInstance = getSandboxedInstance(SOURCE_OR_SINK_CLASS)) {
 
-            SalesforceRuntimeSourceOrSink salesforceSourceOrSink = (SalesforceRuntimeSourceOrSink) sandboxedInstance
-                    .getInstance();
+            SalesforceRuntimeSourceOrSink salesforceSourceOrSink =
+                    (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
             salesforceSourceOrSink.initialize(null, this);
 
             Schema schema = module.main.schema.getValue();
             String moduleName = module.moduleName.getValue();
 
             if (!schema.getFields().isEmpty()) {
-                String soqlQuery = ((SalesforceSchemaHelper<Schema>)salesforceSourceOrSink).guessQuery(schema, moduleName);
+                String soqlQuery =
+                        ((SalesforceSchemaHelper<Schema>) salesforceSourceOrSink).guessQuery(schema, moduleName);
                 query.setValue(soqlQuery);
 
                 validationResult.setStatus(ValidationResult.Result.OK);
@@ -237,11 +254,16 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         refreshLayout(getForm(Form.ADVANCED));
     }
 
+    public void afterUseResultLocator() {
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
-            form.getWidget(includeDeleted.getName())
+            form
+                    .getWidget(includeDeleted.getName())
                     .setHidden(!((queryMode.getValue() != null) && queryMode.getValue().equals(QueryMode.Query)));
 
             form.getWidget(query.getName()).setHidden(!manualQuery.getValue());
@@ -250,17 +272,20 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
             form.getWidget(guessQuery.getName()).setHidden(!manualQuery.getValue());
         }
         if (Form.ADVANCED.equals(form.getName())) {
-            boolean isBulkQuery = queryMode.getValue().equals(QueryMode.Bulk);
-            form.getWidget(safetySwitch.getName()).setVisible(isBulkQuery);
-            form.getWidget(returnNullValue.getName()).setVisible(isBulkQuery);
-            form.getWidget(jobTimeOut.getName()).setVisible(isBulkQuery);
-            form.getWidget(pkChunking.getName()).setVisible(isBulkQuery);
-            form.getWidget(chunkSize.getName()).setVisible(isBulkQuery && pkChunking.getValue());
-            form.getWidget(chunkSleepTime.getName()).setVisible(isBulkQuery && pkChunking.getValue());
-            form.getWidget(normalizeDelimiter.getName()).setHidden(isBulkQuery);
-            form.getWidget(columnNameDelimiter.getName()).setHidden(isBulkQuery);
-            form.getWidget(batchSize.getName()).setHidden(isBulkQuery);
-            connection.bulkConnection.setValue(isBulkQuery);
+            boolean isBulkQueryV1 = queryMode.getValue().equals(QueryMode.Bulk);
+            boolean isBulkQueryV2 = queryMode.getValue().equals(QueryMode.BulkV2);
+            form.getWidget(safetySwitch.getName()).setVisible(isBulkQueryV1 || isBulkQueryV2);
+            form.getWidget(returnNullValue.getName()).setVisible(isBulkQueryV1 || isBulkQueryV2);
+            form.getWidget(jobTimeOut.getName()).setVisible(isBulkQueryV1 || isBulkQueryV2);
+            form.getWidget(pkChunking.getName()).setVisible(isBulkQueryV1);
+            form.getWidget(chunkSize.getName()).setVisible(isBulkQueryV1 && pkChunking.getValue());
+            form.getWidget(chunkSleepTime.getName()).setVisible(isBulkQueryV1 && pkChunking.getValue());
+            form.getWidget(normalizeDelimiter.getName()).setHidden(isBulkQueryV1 || isBulkQueryV2);
+            form.getWidget(columnNameDelimiter.getName()).setHidden(isBulkQueryV1 || isBulkQueryV2);
+            form.getWidget(batchSize.getName()).setHidden(isBulkQueryV1 || isBulkQueryV2);
+            form.getWidget(useResultLocator.getName()).setVisible(isBulkQueryV2);
+            form.getWidget(maxRecords.getName()).setVisible(isBulkQueryV2 && useResultLocator.getValue());
+            connection.bulkConnection.setValue(isBulkQueryV1 || isBulkQueryV2);
             connection.afterBulkConnection();
             form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
         }
@@ -268,6 +293,32 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
-        return isOutputConnection ? Collections.singleton(MAIN_CONNECTOR) : Collections.<PropertyPathConnector> emptySet();
+        return isOutputConnection ? Collections.singleton(MAIN_CONNECTOR)
+                : Collections.<PropertyPathConnector> emptySet();
+    }
+
+    /**
+     * If use connection from connection component, need return the referenced connection properties
+     */
+    public SalesforceConnectionProperties getEffectiveConnProperties() {
+        if (isUseExistConnection()) {
+            return connection.getReferencedConnectionProperties();
+        }
+        return connection;
+    }
+
+    /**
+     * Whether use other connection information
+     */
+    public boolean isUseExistConnection() {
+        String refComponentIdValue = connection.getReferencedComponentId();
+        return refComponentIdValue != null
+                && refComponentIdValue.startsWith(TSalesforceConnectionDefinition.COMPONENT_NAME);
+    }
+
+    public enum QueryMode {
+        Query,
+        Bulk,
+        BulkV2;
     }
 }

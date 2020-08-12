@@ -27,7 +27,7 @@ import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.runtime.BulkResultSet;
 import org.talend.components.salesforce.runtime.bulk.v2.error.BulkV2ClientException;
-import org.talend.components.salesforce.runtime.bulk.v2.request.CreateJobRequest;
+import org.talend.components.salesforce.runtime.bulk.v2.request.CreateLoadJobRequest;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -134,7 +134,7 @@ public class SalesforceBulkV2Runtime {
     }
 
     public JobInfoV2 createJob() throws IOException {
-        CreateJobRequest request = new CreateJobRequest();
+        CreateLoadJobRequest request = new CreateLoadJobRequest();
         request.setObject(objectType);
         request.setOperation(operation);
         if (OperationEnum.upsert.equals(operation)) {
@@ -166,7 +166,7 @@ public class SalesforceBulkV2Runtime {
     }
 
     public BulkResultSet getSuccessResultSet() throws IOException {
-        return getResultSet(bulkConnection.getSuccessRecordsStream(job.getId()));
+        return getResultSet(bulkConnection.getResult(job.getId()));
     }
 
     public BulkResultSet getFailedResultSet() throws IOException {
