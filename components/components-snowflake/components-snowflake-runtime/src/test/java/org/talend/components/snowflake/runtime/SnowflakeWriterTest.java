@@ -18,7 +18,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -92,6 +94,10 @@ public class SnowflakeWriterTest {
         properties.connection.schemaName.setValue("dbSchema");
         properties.connection.db.setValue("db");
         properties.outputAction.setValue(OutputAction.INSERT);
+        properties.usePersonalDBType.setValue(true);
+
+        properties.dbtypeTable.column.setValue(Arrays.asList("ninthColumn"));
+        properties.dbtypeTable.dbtype.setValue(Arrays.asList("VARCHAR"));
 
         PowerMockito.mockStatic(LoaderFactory.class);
         loader = Mockito.mock(StreamLoader.class);
@@ -136,6 +142,7 @@ public class SnowflakeWriterTest {
     public void testWrite() throws Exception {
         int daysFrom1970 = 17337;
         DateTime dateTime = new DateTime(0).plusDays(daysFrom1970);
+        Date date = (new GregorianCalendar(dateTime.getYear(), dateTime.getMonthOfYear() - 1, dateTime.getDayOfMonth())).getTime();
         int timeMillis = 1498031820;
         long timeStamp = 1498031820264L;
         Formatter formatterClass = new Formatter();
@@ -144,7 +151,7 @@ public class SnowflakeWriterTest {
         SimpleDateFormat timestampFormatter = formatterClass.getTimestampFormatter();
 
         Object[] expectedRow = { "FirstValue", 10_000, 99.9, dateFormatter.format(dateTime.toDate()), true, timeFormatter.format(new Date(timeMillis)),
-                timestampFormatter.format(new Date(timeStamp)), null };
+                timestampFormatter.format(new Date(timeStamp)), null, "20 / 06 / 2017" };
 
         SnowflakeAvroRegistry registry = SnowflakeAvroRegistry.get();
         List<Field> fields = new ArrayList<>();
@@ -164,14 +171,29 @@ public class SnowflakeWriterTest {
         fields.add(field);
         field = registry.sqlType2Avro(18, 10, Types.ARRAY, true, "eighthColumn", "eighth_column", "");
         fields.add(field);
+        field = registry.sqlType2Avro(18, 10, Types.DATE, true, "ninthColumn", "ninth_column", "");
+
+        // I use this workaround to set a date pattern different than the default one SnowflakeConstants.TALEND_DEFAULT_DATE_PATTERN.
+        Field fieldDate = new Field(field.name(), field.schema(), field.doc(), field.defaultVal());
+        field.getObjectProps().entrySet().stream().forEach(e -> {
+                                                                    if(SchemaConstants.TALEND_COLUMN_PATTERN.equals(e.getKey())){
+                                                                        fieldDate.addProp(e.getKey(), "dd / MM / yyyy");
+                                                                    }
+                                                                    else {
+                                                                        fieldDate.addProp(e.getKey(), e.getValue());
+                                                                    }
+                                                                });
+        fields.add(fieldDate);
+
         Schema schema = Schema.createRecord("records", null, null, false, fields);
         Mockito.when(sink.getRuntimeSchema(Mockito.any(SchemaResolver.class), Mockito.eq(properties.tableAction.getValue()))).thenReturn(schema);
+        properties.useSchemaDatePattern.setValue(true);
         properties.table.main.schema.setValue(schema);
         properties.outputAction.setValue(OutputAction.INSERT);
         IndexedRecord record = Mockito.mock(IndexedRecord.class);
         Mockito.when(record.getSchema()).thenReturn(schema);
         Mockito.when(record.get(Mockito.anyInt())).thenReturn("FirstValue", 10_000, 99.9, daysFrom1970, true, timeMillis, timeStamp,
-                null);
+                null, date);
 
         writer.open("uId");
         writer.write(record);

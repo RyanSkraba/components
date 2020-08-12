@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.tableaction.TableAction;
+import org.talend.components.snowflake.SnowflakeDbTypeProperties;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -90,10 +91,12 @@ public class TSnowflakeOutputPropertiesTest {
         OutputAction defaultValueOutputAction;
         boolean defaultConvertColumnsAndTableToUppercase;
         TableAction.TableActionEnum tableAction;
+        boolean useSchemaDatePattern;
 
         defaultValueOutputAction = outputProperties.outputAction.getValue();
         defaultConvertColumnsAndTableToUppercase = outputProperties.convertColumnsAndTableToUppercase.getValue();
         tableAction = outputProperties.tableAction.getValue();
+        useSchemaDatePattern = outputProperties.useSchemaDatePattern.getValue();
 
         boolean defaultUsePersonalDBType = outputProperties.usePersonalDBType.getValue();
         List<String> defaultDBTypeColumns = outputProperties.dbtypeTable.column.getValue();
@@ -106,6 +109,7 @@ public class TSnowflakeOutputPropertiesTest {
         assertFalse(defaultUsePersonalDBType);
         assertEquals(Collections.emptyList(), defaultDBTypeColumns);
         assertEquals(Collections.emptyList(), defaultDBTypeType);
+        assertFalse(useSchemaDatePattern);
     }
 
     @Test

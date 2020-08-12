@@ -83,6 +83,12 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
      */
     public Property<DateMapping> dateMapping = newEnum("dateMapping", DateMapping.class);
 
+    /**
+     * Advanced property to indicate if we use default snowflake driver date -> string conversion,
+     * or if we use the date pattern from schema.
+     */
+    public Property<Boolean> useSchemaDatePattern = newBoolean("useSchemaDatePattern");
+
     // Have to use an explicit class to get the override of afterTableName(), an anonymous
     // class cannot be public and thus cannot be called.
     public class TableSubclass extends SnowflakeTableProperties {
@@ -149,6 +155,8 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         usePersonalDBType.setValue(false);
         useDateMapping.setValue(false);
         dateMapping.setValue(DateMapping.DATE);
+
+        useSchemaDatePattern.setValue(false);
     }
 
     @Override
@@ -169,6 +177,10 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         Widget dbTypeTableWidget = new Widget(dbtypeTable);
         advancedForm.addRow(dbTypeTableWidget.setWidgetType(Widget.TABLE_WIDGET_TYPE));
         dbTypeTableWidget.setVisible(false);
+
+        Widget useSnowflakeDatePatternWidget = new Widget(useSchemaDatePattern);
+        useSnowflakeDatePatternWidget.setVisible(true);
+        advancedForm.addRow(useSnowflakeDatePatternWidget);
 
         Widget useDateMappingWidget = new Widget(useDateMapping);
         useDateMappingWidget.setVisible(false);

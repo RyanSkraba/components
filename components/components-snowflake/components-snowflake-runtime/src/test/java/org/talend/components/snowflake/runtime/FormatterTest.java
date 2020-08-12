@@ -15,9 +15,12 @@ package org.talend.components.snowflake.runtime;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.validation.constraints.AssertTrue;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class FormatterTest {
@@ -72,5 +75,23 @@ public class FormatterTest {
         // Seoul daylight saving time started 1988-05-08
         Assert.assertEquals("1988-05-07", formatter.formatDate(6701));
         Assert.assertEquals("1988-05-08", formatter.formatDate(6702));
+    }
+
+    @Test
+    public void testFormatDateWithPattern(){
+        Formatter formatter = new Formatter();
+        Assert.assertEquals("2017|30|09", formatter.formatDateWithPattern("yyyy|dd|MM", 17439));
+        Assert.assertEquals("2017|01|10", formatter.formatDateWithPattern("yyyy|dd|MM", 17440));
+        Assert.assertEquals("1988|07|05 00,00,00", formatter.formatDateWithPattern("yyyy|dd|MM HH,mm,ss", 6701));
+        Assert.assertEquals("1988|08|05 00,00,00", formatter.formatDateWithPattern("yyyy|dd|MM HH,mm,ss", 6702));
+
+        Calendar c = Calendar.getInstance(Locale.ENGLISH);
+        c.set(Calendar.YEAR, 2010);
+        c.set(Calendar.MONTH, 5);
+        c.set(Calendar.DAY_OF_MONTH, 10);
+        c.set(Calendar.HOUR_OF_DAY, 10);
+        c.set(Calendar.MINUTE, 25);
+        c.set(Calendar.SECOND, 30);
+        Assert.assertEquals("2010|10|06 10,25,30", formatter.formatDateWithPattern("yyyy|dd|MM hh,mm,ss", c.getTime()));
     }
 }

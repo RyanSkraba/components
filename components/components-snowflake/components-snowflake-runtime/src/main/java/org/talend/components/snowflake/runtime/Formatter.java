@@ -12,11 +12,16 @@
 // ============================================================================
 package org.talend.components.snowflake.runtime;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -24,9 +29,10 @@ import java.util.TimeZone;
  * share issue
  *
  * @author wangwei
- *
  */
 public class Formatter {
+
+    private static Map<String, DateFormat> dateFormats = new HashMap<>();
 
     private static final ThreadLocal<SimpleDateFormat> DATEFORMATTER_LOCAL = new ThreadLocal<SimpleDateFormat>() {
 
@@ -83,6 +89,33 @@ public class Formatter {
         }
     }
 
+    private Date inputValueAsDate(Object inputValue) {
+        Date date = null;
+        if (inputValue instanceof Date) {
+            // Sometimes it can be sent as a Date object. We need to process it like a common date then.
+            date = (Date) inputValue;
+        } else if (inputValue instanceof Integer) {
+            final LocalDate localDate = LocalDate.ofEpochDay(((Integer) inputValue).longValue());
+            date = Date.from(localDate.atStartOfDay().toInstant(ZoneOffset.ofHours(0)));
+
+            // Force time to 00:00:00
+            Calendar c = Calendar.getInstance(Locale.ENGLISH);
+            c.setTime(date);
+            c.set(Calendar.HOUR_OF_DAY, 0);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+            c.set(Calendar.MILLISECOND, 0);
+            date = c.getTime();
+
+        } else {
+            // long is just a common timestamp value.
+            date = new Date((Long) inputValue);
+        }
+
+        return date;
+    }
+
+
     /**
      * format date by this pattern : yyyy-MM-dd
      *
@@ -90,20 +123,22 @@ public class Formatter {
      * @return
      */
     String formatDate(Object inputValue) {
-        Date date = null;
-        if (inputValue instanceof Date) {
-            // Sometimes it can be sent as a Date object. We need to process it like a common date then.
-            date = (Date) inputValue;
-        } else if (inputValue instanceof Integer) {
+        if (inputValue instanceof Integer) {
             // If the date is int, it represents amount of days from 1970(no timezone). So if the date is
             // 14.01.2017 it shouldn't be influenced by timezones time differences. It should be the same date
             // in any timezone.
             return LocalDate.ofEpochDay(((Integer) inputValue).longValue()).format(DateTimeFormatter.ISO_LOCAL_DATE);
-        } else {
-            // long is just a common timestamp value.
-            date = new Date((Long) inputValue);
         }
+
+        Date date = inputValueAsDate(inputValue);
         return getDateFormatter().format(date);
+    }
+
+    String formatDateWithPattern(final String datePattern, final Object inputValue) {
+        Date date = inputValueAsDate(inputValue);
+
+        DateFormat df = dateFormats.computeIfAbsent(datePattern, p -> new SimpleDateFormat(p));
+        return df.format((Date) date);
     }
 
     /**
@@ -115,7 +150,7 @@ public class Formatter {
     String formatTimeMillis(Object inputValue) {
         final Date date;
         if (inputValue instanceof Date) {
-            date = (Date)inputValue;
+            date = (Date) inputValue;
         } else {//support the old int type input for time type though it's wrong before
             date = new Date((int) inputValue);
         }
