@@ -138,10 +138,10 @@ public class SnowflakeWriterTest {
         DateTime dateTime = new DateTime(0).plusDays(daysFrom1970);
         int timeMillis = 1498031820;
         long timeStamp = 1498031820264L;
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss.SSS");
-        timeFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-        SimpleDateFormat timestampFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
+        Formatter formatterClass = new Formatter();
+        SimpleDateFormat dateFormatter = formatterClass.getDateFormatter();
+        SimpleDateFormat timeFormatter = formatterClass.getTimeFormatter();
+        SimpleDateFormat timestampFormatter = formatterClass.getTimestampFormatter();
 
         Object[] expectedRow = { "FirstValue", 10_000, 99.9, dateFormatter.format(dateTime.toDate()), true, timeFormatter.format(new Date(timeMillis)),
                 timestampFormatter.format(new Date(timeStamp)), null };
