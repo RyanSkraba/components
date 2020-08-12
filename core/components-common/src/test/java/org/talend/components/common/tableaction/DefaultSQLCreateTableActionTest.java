@@ -344,7 +344,7 @@ public class DefaultSQLCreateTableActionTest {
             assertEquals(2, queries.size());
             assertEquals("DROP TABLE IF EXISTS MYTABLE CASCADE", queries.get(0));
             assertEquals(
-                    "CREATE TABLE MYTABLE (ID MY_ID_TYPE, NAME MY_NAME_TYPE(255) DEFAULT \"ok\", DATE MY_DATE_TYPE, SALARY MY_DOUBLE(38, 4), UPDATED TIMESTAMP, CONSTRAINT pk_MYTABLE PRIMARY KEY (ID, NAME))",
+                    "CREATE TABLE MYTABLE (ID MY_ID_TYPE, NAME MY_NAME_TYPE(255) DEFAULT \"ok\", DATE MY_DATE_TYPE, SALARY MY_SALARY_TYPE(38, 4), UPDATED TIMESTAMP, CONSTRAINT pk_MYTABLE PRIMARY KEY (ID, NAME))",
                     queries.get(1));
         } catch (Exception e) {
             e.printStackTrace();
