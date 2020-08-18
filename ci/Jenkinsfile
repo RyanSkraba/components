@@ -1,0 +1,73 @@
+def branch = 'master'
+def repo = 'components'
+// def bigquery_project = 'engineering-152721'
+// def service_account_file = '/var/lib/jenkins/tcomp-integration-test-bigquery.json'
+// def bigquery_gcp_temp_folder = 'gs://tcomp_it_bigquery'
+// def google_drive_service_account_file = '/var/lib/jenkins/tcomp-integration-test-drive.json'
+
+def slackChannel = 'components-ci'
+def escaped_branch = branch.toLowerCase().replaceAll("/", "_")
+
+def nexusCredentials = usernamePassword(
+	credentialsId: 'nexus-artifact-zl-credentials',
+    usernameVariable: 'NEXUS_USER',
+    passwordVariable: 'NEXUS_PASSWORD')
+
+def gitCredentials = usernamePassword(
+	credentialsId: 'github-credentials',
+    usernameVariable: 'GITHUB_LOGIN',
+    passwordVariable: 'GITHUB_TOKEN')
+
+def dockerCredentials = usernamePassword(
+	credentialsId: 'docker-registry-credentials',
+    passwordVariable: 'DOCKER_PASSWORD',
+    usernameVariable: 'DOCKER_LOGIN')
+
+pipeline {
+  agent any
+
+  options {
+    timeout(time: 120, unit: 'MINUTES')
+    skipStagesAfterUnstable()
+    buildDiscarder(logRotator(numToKeepStr: '10'))
+    disableConcurrentBuilds()
+  }
+
+  stages {
+
+    stage('Compile') {
+      steps {
+        sh 'mvn clean compile'
+      }
+    }
+
+    stage('Test') {
+      steps {
+        sh 'mvn test'
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        sh """
+            mvn -B -U -V 
+           """
+              // deploy
+              // -Dgit_branch="${escaped_branch}" \
+              // -Dbigquery.project="${bigquery_project}" \
+              // -Dbigquery.service.account.file="${service_account_file}" \
+              // -Dbigquery.gcp.temp.folder="${bigquery_gcp_temp_folder}" \
+              // -Dorg.talend.components.google.drive.service_account_file="${google_drive_service_account_file}" 
+      }
+    }
+  }
+
+  post {
+    success {
+        slackSend(color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
+    }
+    failure {
+        slackSend(color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
+    }
+  }
+}
