@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -64,6 +65,7 @@ public class SimpleFileIODatasetRuntimeTest {
     }
 
     @Test
+    @Ignore
     public void testBasic() throws Exception {
         File input = folder.newFile("stuff.csv");
         try (FileWriter fw = new FileWriter(input)) {
