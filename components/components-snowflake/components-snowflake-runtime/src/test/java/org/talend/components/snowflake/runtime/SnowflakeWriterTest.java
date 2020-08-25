@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.snowflake.runtime;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -38,7 +40,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.talend.components.api.component.runtime.Result;
-import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.snowflake.runtime.utils.SchemaResolver;
@@ -51,8 +52,6 @@ import net.snowflake.client.jdbc.internal.joda.time.DateTime;
 import net.snowflake.client.loader.LoaderFactory;
 import net.snowflake.client.loader.LoaderProperty;
 import net.snowflake.client.loader.StreamLoader;
-
-import static org.mockito.Matchers.anyObject;
 
 /**
  * Unit tests for {@link SnowflakeWriter} class
@@ -125,6 +124,7 @@ public class SnowflakeWriterTest {
     public void testOpenUpsert() throws Exception {
 
         properties.outputAction.setValue(OutputAction.UPSERT);
+        properties.useSchemaKeysForUpsert.setValue(false);
         properties.upsertKeyColumn.setValue("id_2");
 
         writer.open("uId");
@@ -361,4 +361,5 @@ public class SnowflakeWriterTest {
                 .closeConnection(Mockito.any(), Mockito.any(Connection.class));
         writer.close();
     }
+
 }

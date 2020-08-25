@@ -45,6 +45,7 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     private static final int CONVERT_COLUMNS_AND_TABLE_TO_UPPERCASE_VERSION = 1;
     private static final int TABLE_ACTION_VERSION = 2;
     private static final int CONVERT_EMPTY_STRINGS_TO_NULL_VERSION = 3;
+    private static final int USE_SCHEMA_KEYS_FOR_UPSERT = 4;
 
     public enum OutputAction {
         INSERT,
@@ -58,6 +59,8 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     public Property<OutputAction> outputAction = newEnum("outputAction", OutputAction.class); // $NON-NLS-1$
 
     public Property<String> upsertKeyColumn = newString("upsertKeyColumn"); //$NON-NLS-1$
+
+    public Property<Boolean> useSchemaKeysForUpsert = newBoolean("useSchemaKeysForUpsert");
 
     protected transient PropertyPathConnector FLOW_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow");
 
@@ -148,7 +151,7 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         table.connection = connection;
         table.setSchemaListener(listener);
         table.setupProperties();
-
+        useSchemaKeysForUpsert.setValue(true);
         convertColumnsAndTableToUppercase.setValue(true);
         convertEmptyStringsToNull.setValue(false);
 
@@ -170,6 +173,7 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(convertColumnsAndTableToUppercase);
         advancedForm.addRow(convertEmptyStringsToNull);
+        advancedForm.addRow(widget(useSchemaKeysForUpsert));
 
         advancedForm.addRow(usePersonalDBType);
         widget(usePersonalDBType).setVisible(false);
@@ -220,8 +224,10 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
                         && isDesignSchemaDynamic());
 
                 boolean isUpsert = OutputAction.UPSERT.equals(outputAction.getValue());
-                form.getWidget(upsertKeyColumn.getName()).setHidden(!isUpsert);
-                if (isUpsert) {
+                boolean isUseSchemaKeysForUpsert = useSchemaKeysForUpsert.getValue();
+                advForm.getWidget(useSchemaKeysForUpsert.getName()).setHidden(!isUpsert);
+                form.getWidget(upsertKeyColumn.getName()).setHidden(!isUpsert || isUseSchemaKeysForUpsert);
+                if (isUpsert && !isUseSchemaKeysForUpsert) {
                     beforeUpsertKeyColumn();
                 }
             }
@@ -249,6 +255,10 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         if (getSchema() != null) {
             upsertKeyColumn.setPossibleValues(getFieldNames(table.main.schema));
         }
+    }
+
+    public void afterUseSchemaKeysForUpsert(){
+        refreshLayout(getForm(Form.MAIN));
     }
 
     public void afterUsePersonalDBType(){
@@ -309,7 +319,7 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
 
     @Override
     public int getVersionNumber() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -336,6 +346,11 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
             migrated = true;
         }
 
+        if (version < USE_SCHEMA_KEYS_FOR_UPSERT) {
+            useSchemaKeysForUpsert.setValue(
+                    !OutputAction.UPSERT.equals(outputAction.getValue()));
+            migrated = true;
+        }
 
         return migrated;
     }

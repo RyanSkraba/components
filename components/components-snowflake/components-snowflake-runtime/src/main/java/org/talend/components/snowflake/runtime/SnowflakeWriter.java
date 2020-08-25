@@ -213,7 +213,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             }
         }
 
-        if (upsert) {
+        if (upsert && !outputProperties.useSchemaKeysForUpsert.getValue()) {
             keyStr.clear();
             String schemaUpsertColumn = outputProperties.upsertKeyColumn.getValue();
             String upserKeyColumn = mainSchema.getFields().stream()

@@ -74,11 +74,13 @@ public class TSnowflakeOutputPropertiesTest {
         boolean usePersonalDBTypePropertyVisibleIfCreateAction = advanced.getWidget(outputProperties.usePersonalDBType).isVisible();
         boolean isDbTypePropertyVisibleIfCreateAction = advanced.getWidget(outputProperties.dbtypeTable).isVisible();
 
+        boolean isUseSchemaKeysVisible = advanced.getWidget(outputProperties.useSchemaKeysForUpsert).isVisible();
         isUpsertKeyColumnVisibleWhenOutputActionIsUpsert = main.getWidget(outputProperties.upsertKeyColumn).isVisible();
 
         assertTrue(isOutputActionPropertyVisible);
         assertFalse(isUpsertKeyColumnVisible);
-        assertTrue(isUpsertKeyColumnVisibleWhenOutputActionIsUpsert);
+        assertFalse(isUpsertKeyColumnVisibleWhenOutputActionIsUpsert);
+        assertTrue(isUseSchemaKeysVisible);
         assertTrue(isTableActionProperyVisible);
         assertFalse(usePersonalDBTypePropertyVisible);
         assertFalse(isDbTypePropertyVisible);
@@ -110,6 +112,7 @@ public class TSnowflakeOutputPropertiesTest {
         assertEquals(Collections.emptyList(), defaultDBTypeColumns);
         assertEquals(Collections.emptyList(), defaultDBTypeType);
         assertFalse(useSchemaDatePattern);
+        assertTrue(outputProperties.useSchemaKeysForUpsert.getValue());
     }
 
     @Test
@@ -236,6 +239,15 @@ public class TSnowflakeOutputPropertiesTest {
         Assert.assertEquals(9, outputProperties.schemaReject.schema.getValue().getFields().size());
         Assert.assertEquals(1, outputProperties.dbtypeTable.column.getPossibleValues().size());
         Assert.assertEquals("id", outputProperties.dbtypeTable.column.getPossibleValues().get(0));
+    }
+
+    @Test
+    public void testAfterUseSchemaDefinedKeysForUpsert() {
+        outputProperties.outputAction.setValue(OutputAction.UPSERT);
+        assertFalse(outputProperties.getForm(Form.MAIN).getWidget(outputProperties.upsertKeyColumn).isVisible());
+        outputProperties.useSchemaKeysForUpsert.setValue(false);
+        outputProperties.afterUseSchemaKeysForUpsert();
+        assertTrue(outputProperties.getForm(Form.MAIN).getWidget(outputProperties.upsertKeyColumn).isVisible());
     }
 
 }

@@ -75,6 +75,12 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
 
     private static final String DROP_TABLE_WITH_LOWERCASE_COLUMN_NAME = "DROP TABLE " + testSchema + ".\"" + testTable + "_lowercase_column\"";
 
+    private static final String UPSERT_TABLE_NAME = testTable + "_UPSERT";
+
+    private static final String CREATE_TABLE_FOR_UPSERT = "create table " + UPSERT_TABLE_NAME + "(id1 int primary key, c1 varchar(2), c2 varchar (3));";
+
+    private static final String DROP_TABLE_FOR_UPSERT = "drop table " + UPSERT_TABLE_NAME;
+
     private static final String CREATE_SEQUENCE = "create or replace sequence \"seq_TDI-43629\";";
 
     public Writer<Result> createSnowflakeOutputWriter(TSnowflakeOutputProperties props) {
@@ -293,6 +299,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
         LOGGER.debug(props.upsertKeyColumn.getPossibleValues().toString());
         assertEquals(NUM_COLUMNS, props.upsertKeyColumn.getPossibleValues().size());
         props.upsertKeyColumn.setStoredValue("ID");
+        props.useSchemaKeysForUpsert.setValue(false);
 
         handleRows(makeRows(100), props, TSnowflakeOutputProperties.OutputAction.UPSERT);
         assertEquals(100, readRows(props).size());
@@ -311,6 +318,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
         props.convertColumnsAndTableToUppercase.setValue(true);
         assertEquals(NUM_COLUMNS, props.upsertKeyColumn.getPossibleValues().size());
         props.upsertKeyColumn.setStoredValue("id");
+        props.useSchemaKeysForUpsert.setValue(false);
 
         handleRows(makeRows(100), props, TSnowflakeOutputProperties.OutputAction.UPSERT);
         assertEquals(100, readRows(props).size());
@@ -351,6 +359,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
             assertEquals(10, readRows(inputProps).size());
 
             props.upsertKeyColumn.setStoredValue("id");
+            props.useSchemaKeysForUpsert.setValue(false);
             List<IndexedRecord> rows2 = IntStream.range(0, 20).mapToObj(i -> {
                 GenericData.Record record = new GenericData.Record(schema);
                 record.put("id", i);
@@ -366,6 +375,80 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
             }
         } finally {
             execute(testConnection, DROP_TABLE_WITH_LOWERCASE_COLUMN_NAME);
+        }
+    }
+
+    @Test
+    public void testOutputUpsertUseSchemaKeys() throws Throwable {
+        TSnowflakeOutputProperties props = new TSnowflakeOutputProperties("ForUpsert");
+        props.init();
+        setupProps(props.getConnectionProperties());
+        setupTableWithStaticValues(props);
+        props.table.tableName.setValue(UPSERT_TABLE_NAME);
+        props.tableAction.setValue(TableActionEnum.NONE);
+        props.outputAction.setStoredValue(TSnowflakeOutputProperties.OutputAction.INSERT);
+        props.afterOutputAction();
+
+        Schema schema = SchemaBuilder.builder().record("schema").fields()
+                .name("id").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "id1").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type(AvroUtils._decimal()).noDefault()
+                .name("c1").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "c1").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().stringType().noDefault()
+                .name("c2").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "c2").type().nullable().stringType().noDefault().endRecord();
+        props.table.main.schema.setValue(schema);
+        List<IndexedRecord> rows = IntStream.range(0, 10).mapToObj(i -> {
+            GenericData.Record record = new GenericData.Record(schema);
+            record.put("id", i);
+            record.put("c1", String.valueOf((char) ('a' + i)));
+            record.put("c2", "old");
+            return record;
+        }).collect(Collectors.toList());
+
+        TSnowflakeInputProperties inputProps = new TSnowflakeInputProperties("input");
+        inputProps.init();
+        inputProps.connection = props.getConnectionProperties();
+        inputProps.table = props.table;
+        inputProps.manualQuery.setValue(true);
+        inputProps.query.setValue("select * from " + UPSERT_TABLE_NAME + " order by id1, c1");
+
+        try {
+            execute(testConnection, CREATE_TABLE_FOR_UPSERT);
+
+            handleRows(rows, props, TSnowflakeOutputProperties.OutputAction.INSERT);
+
+            assertEquals(10, readRows(inputProps).size());
+
+            props.useSchemaKeysForUpsert.setValue(true);
+            List<IndexedRecord> rows2 = IntStream.range(0, 10).mapToObj(i -> {
+                GenericData.Record record = new GenericData.Record(schema);
+                record.put("id", i);
+                record.put("c1", String.valueOf((char) (i % 2 == 0 ? 'a' + i : 'A' + i)));
+                record.put("c2", "new");
+                return record;
+            }).collect(Collectors.toList());
+            handleRows(rows2, props, TSnowflakeOutputProperties.OutputAction.UPSERT);
+            List<IndexedRecord> readRows = readRows(inputProps);
+            final int field1Pos = readRows.get(0).getSchema().getField("c1").pos();
+            final int field2Pos = readRows.get(0).getSchema().getField("c2").pos();
+            assertEquals(15, readRows.size());
+            for (int i = 0, j = 0; i < readRows.size(); i++) {
+                String c1, c2;
+                if (i % 3 == 0) {
+                    c1 = String.valueOf((char) ('a' + j));
+                    c2 = "new";
+                    j++;
+                } else if (i % 3 == 1) {
+                    c1 = String.valueOf((char) ('A' + j));
+                    c2 = "new";
+                } else {
+                    c1 = String.valueOf((char) ('a' + j));
+                    c2 = "old";
+                    j++;
+                }
+
+                assertTrue(readRows.get(i).get(field1Pos).equals(c1));
+                assertTrue(readRows.get(i).get(field2Pos).equals(c2));
+            }
+        } finally {
+            execute(testConnection, DROP_TABLE_FOR_UPSERT);
         }
     }
 
