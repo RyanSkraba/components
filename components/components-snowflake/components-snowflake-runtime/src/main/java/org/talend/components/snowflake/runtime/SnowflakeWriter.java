@@ -245,7 +245,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         }
 
         Map<String, String> dbTypeMap = new HashMap<>();
-        if (!sprops.usePersonalDBType.getValue()) {
+        if (sprops == null || !sprops.usePersonalDBType.getValue()) {
             this.dbTypes = dbTypeMap;
             return this.dbTypes;
         }
@@ -464,7 +464,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         final String dbType = dbTypeMap.get(field.name());
         String dateAsString = null;
 
-        if(STRING_TYPES.contains(dbType) && sprops.useSchemaDatePattern.getValue()){
+        if(sprops != null && STRING_TYPES.contains(dbType) && sprops.useSchemaDatePattern.getValue()){
             final String datePattern = field.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
             dateAsString = formatter.formatDateWithPattern(datePattern, inputValue);
         }
