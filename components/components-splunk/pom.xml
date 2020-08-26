@@ -198,7 +198,7 @@
                                                     http://${docker.host.address}:${splunk.webui.port}/en-US/account/login?return_to=%2Fen-US%2F
                                                 </url>
                                             </http>
-                                            <time>30000</time>
+                                            <time>60000</time>
                                         </wait>
                                     </run>
                                 </image>
