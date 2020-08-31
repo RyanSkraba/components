@@ -42,6 +42,7 @@
         <docker-maven-plugin.version>0.26.0</docker-maven-plugin.version>
         <!-- Override beanutils version from spring-boot-starter-parent 1.5.1.RELEASE-->
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
+        <commons-codec.version>1.14</commons-codec.version> <!-- override commons-codec version from spring-boot-starter-parent -->
     </properties>
     <dependencies>
         <!-- rest service -->
