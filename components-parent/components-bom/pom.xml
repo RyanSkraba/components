@@ -15,7 +15,7 @@
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
         <talend.snapshots.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend.snapshots.repo>
         <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</talend.releases.repo>
-        <!-- -->
+        <!-- NOTE: if you modify versions here you may want to update them there: https://github.com/Talend/studio-se-master/blob/master/build/dependencies.p2/dependencies.p2.tos/pom.xml -->
         <aggdesigner-algorithm.version>6.0</aggdesigner-algorithm.version>
         <avatica.avatica-core.version>${avatica.version}</avatica.avatica-core.version>
         <avatica.avatica-metrics.version>${avatica.version}</avatica.avatica-metrics.version>
@@ -48,6 +48,7 @@
         <com.yahoo.datasketches.version>0.9.0</com.yahoo.datasketches.version>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-cli.version>1.2</commons-cli.version>
+        <!-- NOTE: if you modify the version you should update it also there: https://github.com/Talend/studio-se-master/blob/master/build/dependencies.p2/dependencies.p2.tos/pom.xml#L315 (it's pointer to the same library)-->
         <commons-codec.version>1.14</commons-codec.version>
         <commons-collections.version>3.2.2</commons-collections.version>
         <commons-compress.version>1.19</commons-compress.version>
