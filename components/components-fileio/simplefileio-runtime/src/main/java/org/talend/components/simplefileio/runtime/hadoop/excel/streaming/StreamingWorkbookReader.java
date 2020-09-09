@@ -138,7 +138,10 @@ public class StreamingWorkbookReader implements Iterable<Sheet>, AutoCloseable {
         Iterator<InputStream> iter = reader.getSheetsData();
         int i = 0;
         while (iter.hasNext()) {
-            XMLEventReader parser = XMLInputFactory.newInstance().createXMLEventReader(iter.next());
+            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+            // Disable DTDs
+            xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            XMLEventReader parser = xmlInputFactory.createXMLEventReader(iter.next());
             if(i < sheetNames.size()) {
               sheets.add(new StreamingSheet(sheetNames.get(i++), new StreamingSheetReader(sst, stylesTable, parser, rowCacheSize)));
             }
@@ -148,7 +151,10 @@ public class StreamingWorkbookReader implements Iterable<Sheet>, AutoCloseable {
     void lookupSheetNames(InputStream workBookData) throws IOException, InvalidFormatException, XMLStreamException {
         sheetNames.clear();
 
-        XMLEventReader parser = XMLInputFactory.newInstance().createXMLEventReader(workBookData);
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        // Disable DTDs
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        XMLEventReader parser = xmlInputFactory.createXMLEventReader(workBookData);
         boolean parsingsSheets = false;
         while (parser.hasNext()) {
             XMLEvent event = parser.nextEvent();
