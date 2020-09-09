@@ -19,10 +19,8 @@
         <hadoop.aws.artifactId>hadoop-aws-tlnd</hadoop.aws.artifactId>
         <hadoop.aws.version>2.7.3.1</hadoop.aws.version>
         <parquet.version>1.9.0</parquet.version>
-        <!--
+        <tika.version>1.24.1</tika.version>
         <poi.version>3.16</poi.version>
-        -->
-        <tika.version>1.15</tika.version>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
 
@@ -222,18 +220,22 @@
         </dependency>
 
         <!-- Excel format support -->
-        <!-- tika introduce poi, so not necessary
         <dependency>
             <groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>${poi.version}</version>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>${poi.version}</version>
+            <artifactId>poi-scratchpad</artifactId>
+            <version>${poi.version}</version>
         </dependency>
-        -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        
         <dependency>
 	    	<groupId>com.monitorjbl</groupId>
 		    <artifactId>xlsx-streamer</artifactId>
