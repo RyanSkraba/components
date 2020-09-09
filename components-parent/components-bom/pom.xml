@@ -200,7 +200,7 @@
         <xz.version>1.5</xz.version>
         <osgi.core.version>6.0.0</osgi.core.version>
         <osgi.component.annotations>1.3.0</osgi.component.annotations>
-        <talend-proxy.version>1.0.0</talend-proxy.version>
+        <talend-proxy.version>1.0.1</talend-proxy.version>
         <xstream.version>1.4.11.1</xstream.version>
     </properties>
 
