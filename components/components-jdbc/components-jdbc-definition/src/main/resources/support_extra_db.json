@@ -2,6 +2,7 @@
 
 	{
 		"id" : "DATABRICKS_DELTA_LAKE",
+		"displayName" : "Delta Lake",
 		"class" : "com.simba.spark.jdbc.Driver",
 		"url" : "jdbc:spark://",
 		"paths" : 
