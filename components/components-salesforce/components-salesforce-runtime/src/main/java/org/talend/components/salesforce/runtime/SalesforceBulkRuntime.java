@@ -389,6 +389,9 @@ public class SalesforceBulkRuntime {
      * @throws ConnectionException
      */
     public void closeJob() throws AsyncApiException, ConnectionException {
+        if(job == null){
+            return;
+        }
         JobInfo closeJob = new JobInfo();
         closeJob.setId(job.getId());
         closeJob.setState(JobStateEnum.Closed);

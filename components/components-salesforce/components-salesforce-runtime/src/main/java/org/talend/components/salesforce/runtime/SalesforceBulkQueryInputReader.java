@@ -24,10 +24,10 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.soql.SoqlQuery;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.exception.TalendRuntimeException;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.ws.ConnectionException;
-import org.talend.daikon.exception.TalendRuntimeException;
 
 public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedRecord> {
 
@@ -140,12 +140,15 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
     private String getModuleName() {
         TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
         if (inProperties.manualQuery.getValue()) {
-            SoqlQuery query = SoqlQuery.getInstance();
-            query.init(inProperties.query.getValue());
-            return query.getDrivingEntityName();
-        } else {
-            return properties.module.moduleName.getValue();
+            try {
+                SoqlQuery query = SoqlQuery.getInstance();
+                query.init(inProperties.query.getValue());
+                return query.getDrivingEntityName();
+            } catch (TalendRuntimeException e) {
+                // If the query can't parsed by our api, then still return the configured module name
+            }
         }
+        return properties.module.moduleName.getValue();
     }
 
     @Override

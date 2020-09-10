@@ -588,6 +588,28 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         Assert.assertTrue(value != null && value instanceof Long);
     }
 
+    /**
+     * Check SOQL include toLabel() in bulk query
+     */
+    @Test
+    public void testSOQLToLabelBulkQuery() throws Throwable {
+        TSalesforceInputProperties props = createTSalesforceInputProperties(true, true);
+        props.module.moduleName.setValue("Contact");
+        props.manualQuery.setValue(true);
+        props.query.setValue("SELECT toLabel(Contact.Name), Account.Name from Contact LIMIT 1");
+        props.module.main.schema
+                .setValue(SchemaBuilder.builder().record("ContactSchema") //
+                        .fields() //
+                        .name("Name").type().nullable().stringType().noDefault() //
+                        .name("Account_NAME").type().nullable().stringType().noDefault() //
+                        .endRecord()); //
+        try {
+            readRows(props);
+        } catch (Throwable throwable) {
+            fail(throwable.getMessage());
+        }
+    }
+
     @Test
     public void testInputNBLine() throws Throwable {
         TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
