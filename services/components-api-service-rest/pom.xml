@@ -32,6 +32,7 @@
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
 
         <groovy.version>2.5.6</groovy.version> <!-- spring boot sucks with its bom -->
+        <snakeyaml.version>1.26</snakeyaml.version>
         <osgi.core.version>6.0.0</osgi.core.version>
         <commons-io.version>2.5</commons-io.version>
         <commons-codec.version>1.14</commons-codec.version> <!-- override commons-codec version from spring-boot-starter-parent -->

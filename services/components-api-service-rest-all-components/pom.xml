@@ -30,6 +30,7 @@
         <!-- Dependency versions -->
         <components.version>0.29.0-SNAPSHOT</components.version>
         <daikon.version>0.31.11</daikon.version>
+        <snakeyaml.version>1.26</snakeyaml.version>
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
