@@ -53,6 +53,8 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
 
     private String localFolder;
 
+    private boolean keepRemoteDirStructure;
+
     private RemoteBlobsGetTable remoteBlobsGet;
 
     /** keep this attribute public for test purpose */
@@ -67,6 +69,7 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
 
         TAzureStorageGetProperties componentProperties = (TAzureStorageGetProperties) properties;
         localFolder = componentProperties.localFolder.getValue();
+        keepRemoteDirStructure = componentProperties.keepRemoteDirStructure.getValue();
         remoteBlobsGet = componentProperties.remoteBlobsGet;
         this.dieOnError = componentProperties.dieOnError.getValue();
         azureStorageBlobService = new AzureStorageBlobService(getAzureConnection(runtimeContainer));
@@ -100,10 +103,26 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
                 for (ListBlobItem blob : azureStorageBlobService.listBlobs(containerName, rmtb.prefix, rmtb.include)) {
                     if (blob instanceof CloudBlob) {
                         // TODO - Action when create is false and include is true ???
-                        if (rmtb.create) {
-                            new File(localFolder + "/" + ((CloudBlob) blob).getName()).getParentFile().mkdirs();
+                        if (keepRemoteDirStructure) {
+                            if (rmtb.create) {
+                                new File(localFolder + "/" + ((CloudBlob) blob).getName()).getParentFile().mkdirs();
+                            }
+                            fos = new FileOutputStream(localFolder + "/" + ((CloudBlob) blob).getName());
+                        } else {
+                            String blobFullName = ((CloudBlob) blob).getName();
+                            String resultFileName = blobFullName;
+                            String prefixDir = rmtb.prefix.contains("/") ? rmtb.prefix.substring(0, rmtb.prefix.lastIndexOf("/")) : rmtb.prefix;
+                            if (blobFullName.startsWith(prefixDir + "/")) {
+                                resultFileName = blobFullName.substring(prefixDir.length());
+                            }
+
+                            File pathToWrite = new File(localFolder + "/" + resultFileName);
+                            if (rmtb.create) {
+                                pathToWrite.getParentFile().mkdirs();
+                            }
+
+                            fos = new FileOutputStream(pathToWrite);
                         }
-                        fos = new FileOutputStream(localFolder + "/" + ((CloudBlob) blob).getName());
                         azureStorageBlobService.download((CloudBlob) blob, fos);
                     }
                 }

@@ -38,10 +38,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.stubbing.Answer;
+import org.mockito.verification.VerificationMode;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.azurestorage.FileUtils;
 import org.talend.components.azurestorage.RuntimeContainerMock;
@@ -159,6 +161,55 @@ public class AzureStorageGetRuntimeTest {
             storageGet.azureStorageBlobService = blobService;
             storageGet.runAtDriver(runtimeContainer);
 
+        } catch (StorageException | URISyntaxException | InvalidKeyException | IOException e) {
+            fail("should not throw " + e.getMessage());
+        } finally {
+            if (localFolderPath != null) {
+                Files.delete(new File(localFolderPath));
+            }
+        }
+
+    }
+
+    @Test
+    public void testRunAtDriverNotKeepRemoteDirStructure() {
+        String localFolderPath = null;
+        try {
+
+            localFolderPath = FileUtils.createTempDirectory().getAbsolutePath();
+
+            properties.keepRemoteDirStructure.setValue(false);
+            properties.remoteBlobsGet = new RemoteBlobsGetTable("RemoteBlobsGetTable");
+            properties.remoteBlobsGet.include.setValue(Arrays.asList(true));
+            properties.remoteBlobsGet.prefix.setValue(Arrays.asList("someDir/"));
+            properties.remoteBlobsGet.create.setValue(Arrays.asList(false));
+            properties.localFolder.setValue(localFolderPath);
+
+            ValidationResult validationResult = storageGet.initialize(runtimeContainer, properties);
+            assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
+
+            final List<CloudBlockBlob> list = new ArrayList<>();
+            list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/someDir/blob1.txt")));
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<ListBlobItem>() {
+
+                @Override
+                public Iterator<ListBlobItem> iterator() {
+                    return new DummyListBlobItemIterator(list);
+                }
+            });
+
+            doAnswer(new Answer<Void>() {
+
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    return null;
+                }
+            }).when(blobService).download(any(CloudBlob.class), any(OutputStream.class));
+            storageGet.azureStorageBlobService = blobService;
+            storageGet.runAtDriver(runtimeContainer);
+
+
+            Mockito.verify(blobService, Mockito.times(1)).download(any(), any());
         } catch (StorageException | URISyntaxException | InvalidKeyException | IOException e) {
             fail("should not throw " + e.getMessage());
         } finally {
