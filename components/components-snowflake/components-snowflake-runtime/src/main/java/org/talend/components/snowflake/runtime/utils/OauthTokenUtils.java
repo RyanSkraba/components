@@ -28,6 +28,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.talend.components.snowflake.SnowflakeOauthConnectionProperties;
+import org.talend.components.snowflake.SnowflakeOauthConnectionProperties.GrantType;
 import org.talend.components.snowflake.runtime.SnowflakeSourceOrSink;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -42,7 +43,9 @@ public final class OauthTokenUtils {
 
     private static final String GRANT_TYPE = "grant_type";
 
-    private static final String CLIENT_CREDENTIALS = "client_credentials";
+    private static final String USER = "username";
+
+    private static final String PASSWORD = "password";
 
     private static final String SCOPE = "scope";
 
@@ -65,7 +68,12 @@ public final class OauthTokenUtils {
         postRequest.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + encodedAuthParameters);
 
         List<NameValuePair> urlEncodedProperties = new ArrayList<NameValuePair>();
-        urlEncodedProperties.add(new BasicNameValuePair(GRANT_TYPE, CLIENT_CREDENTIALS));
+        GrantType grantType = oauthProperties.grantType.getValue();
+        if (grantType == GrantType.PASSWORD) {
+            urlEncodedProperties.add(new BasicNameValuePair(USER, oauthProperties.oauthUserName.getValue()));
+            urlEncodedProperties.add(new BasicNameValuePair(PASSWORD, oauthProperties.oauthPassword.getValue()));
+        }
+        urlEncodedProperties.add(new BasicNameValuePair(GRANT_TYPE, grantType.name().toLowerCase()));
         urlEncodedProperties.add(new BasicNameValuePair(SCOPE, oauthProperties.scope.getValue()));
 
         try {

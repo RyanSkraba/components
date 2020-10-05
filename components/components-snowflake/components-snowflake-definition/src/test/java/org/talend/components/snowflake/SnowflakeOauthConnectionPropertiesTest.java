@@ -15,6 +15,7 @@ package org.talend.components.snowflake;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.snowflake.SnowflakeOauthConnectionProperties.GrantType;
 import org.talend.daikon.properties.presentation.Form;
 
 public class SnowflakeOauthConnectionPropertiesTest {
@@ -42,4 +43,33 @@ public class SnowflakeOauthConnectionPropertiesTest {
         Assert.assertNotNull(snowflakeOauthConnectionProperties.getForm(Form.MAIN));
     }
 
+    @Test
+    public void testAfterGrantType() {
+        snowflakeOauthConnectionProperties.init();
+
+        Assert.assertFalse(
+                snowflakeOauthConnectionProperties
+                .getForm(Form.MAIN)
+                .getWidget(snowflakeOauthConnectionProperties.oauthUserName.getName())
+                .isVisible());
+        Assert.assertFalse(
+                snowflakeOauthConnectionProperties
+                .getForm(Form.MAIN)
+                .getWidget(snowflakeOauthConnectionProperties.oauthPassword.getName())
+                .isVisible());
+
+        snowflakeOauthConnectionProperties.grantType.setValue(GrantType.PASSWORD);
+        snowflakeOauthConnectionProperties.afterGrantType();
+
+        Assert.assertTrue(
+                snowflakeOauthConnectionProperties
+                .getForm(Form.MAIN)
+                .getWidget(snowflakeOauthConnectionProperties.oauthUserName.getName())
+                .isVisible());
+        Assert.assertTrue(
+                snowflakeOauthConnectionProperties
+                .getForm(Form.MAIN)
+                .getWidget(snowflakeOauthConnectionProperties.oauthPassword.getName())
+                .isVisible());
+    }
 }

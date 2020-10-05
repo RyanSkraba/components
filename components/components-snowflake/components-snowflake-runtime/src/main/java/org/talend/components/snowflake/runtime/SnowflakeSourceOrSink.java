@@ -39,6 +39,7 @@ import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.SnowflakeGuessSchemaProperties;
 import org.talend.components.snowflake.SnowflakeProvideConnectionProperties;
 import org.talend.components.snowflake.SnowflakeRuntimeSourceOrSink;
+import org.talend.components.snowflake.SnowflakeOauthConnectionProperties.GrantType;
 import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakeconnection.AuthenticationType;
 import org.talend.daikon.NamedThing;
@@ -139,6 +140,16 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         if (AuthenticationType.OAUTH == connectionProperties.authenticationType.getValue()
                 && StringUtils.isEmpty(connectionProperties.oauthProperties.clientSecret.getValue())) {
             missingProperties.append("'ClientSecret', ");
+        }
+        if (AuthenticationType.OAUTH == connectionProperties.authenticationType.getValue()
+                && GrantType.PASSWORD == connectionProperties.oauthProperties.grantType.getValue()
+                && StringUtils.isEmpty(connectionProperties.oauthProperties.oauthUserName.getValue())) {
+            missingProperties.append("'OAuth username', ");
+        }
+        if (AuthenticationType.OAUTH == connectionProperties.authenticationType.getValue()
+                && GrantType.PASSWORD == connectionProperties.oauthProperties.grantType.getValue()
+                && StringUtils.isEmpty(connectionProperties.oauthProperties.oauthPassword.getValue())) {
+            missingProperties.append("'OAuth password', ");
         }
         if (StringUtils.isEmpty(connectionProperties.schemaName.getValue())) {
             missingProperties.append("'Schema', ");
