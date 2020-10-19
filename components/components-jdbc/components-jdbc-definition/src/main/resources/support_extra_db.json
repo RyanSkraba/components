@@ -8,7 +8,30 @@
 		"paths" : 
 	 	[
 	 		{"path" : "mvn:Spark/SparkJDBC42/2.6.14.1018/jar"}
-	 	]
+	 	],
+		"excludes": [{
+				"component": "tJDBCSP"
+			},
+			{
+				"component": "tJDBCCommit"
+			},
+			{
+				"component": "tJDBCRollback"
+			}
+		],
+		"configuration": [{
+				"component": "tDeltaLakeConnection",
+				"parameters": [{
+						"name": "use_autocommit",
+						"value": "true"
+					},
+					{
+						"name": "autocommit",
+						"value": "true"
+					}
+				]
+			}
+		]
 	
 	}
 
