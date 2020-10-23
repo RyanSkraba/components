@@ -1,7 +1,0 @@
-{
-  "sql": "SELECT * FROM toto",
-  "main": {
-    "schema": "{\"type\":\"record\",\"name\":\"EmptyRecord\",\"fields\":[]}"
-  },
-  "@definitionName": "JDBCDataset"
-}

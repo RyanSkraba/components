@@ -1,7 +1,0 @@
-{
-  "dbTypes": "DERBY",
-  "jdbcUrl": "JDBC_URL",
-  "userId": "SA",
-  "password": null,
-  "@definitionName": "JDBCDatastore"
-}

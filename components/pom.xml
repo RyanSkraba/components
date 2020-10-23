@@ -17,7 +17,6 @@
     <modules>
         <module>components-azurestorage</module>
         <module>components-couchbase</module>
-        <module>components-fileio</module>
         <module>components-jdbc</module>
         <module>components-splunk</module>
         <module>components-jira</module>
