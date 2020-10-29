@@ -135,7 +135,17 @@ abstract class EntityParser {
             }
             case READ_JSON_STRING: {
                 entityBuilder.append(cur);
-                if (cur == '"' && prev != '\\') {
+                if (cur == '"' && prev == '\\') {
+                    int countBackslash = 0;
+                    for (int k = entityBuilder.length() - 2; k > 0; k--) {
+                        if (entityBuilder.charAt(k) != '\\' && countBackslash % 2 == 0) {
+                            currentState = State.READ_JSON_OBJECT;
+                            break;
+                        }
+                        countBackslash++;
+                    }
+
+                } else if (cur == '"' && prev != '\\') {
                     currentState = State.READ_JSON_OBJECT;
                 }
                 break;

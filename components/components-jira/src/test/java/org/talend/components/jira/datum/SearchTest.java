@@ -77,6 +77,24 @@ public class SearchTest {
     }
 
     /**
+     * Check {@link Search#getEntities()} returns a list with correct number of entities inside it
+     */
+    @Test
+    public void testBlackSlash() {
+        String paginationJson = "{\"expand\":\"schema,names\",\"startAt\":0,\"maxResults\":50,\"total\":37,\"issues\":["
+                + "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10413\","
+                + "\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Updated 37\",}},"
+                + "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10412\","
+                + "\"self\":\"http://localhost:8080/rest/api/2/issue/10412\",\"key\":\"TP-40\",\"fields\":{\"description\":\"Task updated\",\"summary\":\"TP 38 updated\\\\\",}},"
+                + "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10411\","
+                + "\"self\":\"http://localhost:8080/rest/api/2/issue/10411\",\"key\":\"TP-39\",\"fields\":{\"description\":null,\"summary\":\"115\",}}]}";
+        Search search = new Search(paginationJson);
+
+        List<Entity> entities = search.getEntities();
+        assertEquals(3, entities.size());
+    }
+
+    /**
      * Check {@link Search#getEntities()} handles json without errors, when there is no entities inside it
      * See https://jira.talendforge.org/browse/TDI-36301 for bug details
      */
