@@ -44,7 +44,7 @@
         <maven-scm-plugin.version>1.9.4</maven-scm-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
-        <cxf.version>3.3.6</cxf.version>
+        <cxf.version>3.3.7</cxf.version>
     </properties>
 
     <scm>
