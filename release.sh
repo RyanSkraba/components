@@ -142,7 +142,7 @@ checkAnswer(){
   if [ "$batch" = "false" ]; then
     echo -e "${BLUE}Continue? (Y/n)...${NC}    "
     read ANS
-    if [ "${ANS^^}" != "Y" ] && [ "$ANS" != "" ]; then
+    if [ "${ANS}" != "Y" ] && [ "${ANS}" != "y" ] && [ "$ANS" != "" ]; then
       echo -e "${GREEN}Exit${NC}"
       exit 0
     fi
@@ -366,7 +366,7 @@ createMaintenanceAndBumpMaster(){
   if [ "$batch" = "false" ] && [ "$custom" = "true" ]; then
     echo -e "${BLUE}Specify new master version:${NC}:  [${new_master_version}]"
     read ANS
-    if [ "${ANS^^}" != "Y" ] && [ "$ANS" != "" ]; then
+    if [ "${ANS}" != "Y" ] && [ "${ANS}" != "y" ] && [ "$ANS" != "" ]; then
       validateVersion $ANS
       new_master_version=$ANS
     fi
@@ -398,7 +398,7 @@ checkDaikonVersion(){
   if [ "$batch" = "false" ] && [ "$custom" = "true" ]; then
     echo -e "${BLUE}Specify new Daikon version:${NC}  [${daikon_version}]"
     read ANS
-    if [ "${ANS^^}" != "Y" ] && [ "$ANS" != "" ]; then
+    if [ "${ANS}" != "Y" ] && [ "${ANS}" != "y" ] && [ "$ANS" != "" ]; then
       daikon_prev_version=$daikon_version
       daikon_version=$ANS
       echo "New Daikon version = $daikon_version"
@@ -489,7 +489,7 @@ if [ "${step}" -le "4" ]; then
   if [ "$batch" = "false" ] && [ "$custom" = "true" ]; then
     echo -e "${BLUE}Specify release version:${NC}:  [${release_version}]"
     read ANS
-    if [ "${ANS^^}" != "Y" ] && [ "$ANS" != "" ]; then
+    if [ "${ANS}" != "Y" ] && [ "${ANS}" != "y" ] && [ "$ANS" != "" ]; then
       validateVersion $ANS
       release_version=$ANS
     fi
@@ -523,7 +523,7 @@ if [ "${step}" -le "7" ]; then
   if [ "$batch" = "false" ] && [ "$custom" = "true" ]; then
     echo -e "${BLUE}Specify post release version:${NC}:  [${post_release_version}]"
     read ANS
-    if [ "${ANS^^}" != "Y" ] && [ "$ANS" != "" ]; then
+    if [ "${ANS}" != "Y" ] && [ "${ANS}" != "y" ] && [ "$ANS" != "" ]; then
       validateVersion $ANS
       post_release_version=$ANS
     fi
