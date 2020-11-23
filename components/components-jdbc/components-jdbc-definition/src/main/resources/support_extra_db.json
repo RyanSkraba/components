@@ -33,6 +33,17 @@
 			}
 		]
 	
+	},
+	
+	{
+		"id" : "SINGLESTORE",
+		"displayName" : "SingleStore",
+		"class" : "org.mariadb.jdbc.Driver",
+		"url" : "jdbc:mariadb://",
+		"paths" : 
+	 	[
+	 		{"path" : "mvn:org.mariadb.jdbc/mariadb-java-client/2.5.3/jar"}
+	 	]
 	}
 
 ]
