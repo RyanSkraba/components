@@ -1,13 +1,3 @@
-def branch = 'master'
-def repo = 'components'
-// def bigquery_project = 'engineering-152721'
-// def service_account_file = '/var/lib/jenkins/tcomp-integration-test-bigquery.json'
-// def bigquery_gcp_temp_folder = 'gs://tcomp_it_bigquery'
-// def google_drive_service_account_file = '/var/lib/jenkins/tcomp-integration-test-drive.json'
-
-def slackChannel = 'components-ci'
-def escaped_branch = branch.toLowerCase().replaceAll("/", "_")
-
 def nexusCredentials = usernamePassword(
 	credentialsId: 'nexus-artifact-zl-credentials',
     usernameVariable: 'NEXUS_USER',
@@ -23,8 +13,46 @@ def dockerCredentials = usernamePassword(
     passwordVariable: 'DOCKER_PASSWORD',
     usernameVariable: 'DOCKER_LOGIN')
 
+def branch = env.BRANCH_NAME
+def repo = 'components'
+def slackChannel = 'components-ci'
+def escaped_branch = branch.toLowerCase().replaceAll("/", "_")    
+def PRODUCTION_DEPLOYMENT_REPOSITORY = "snapshots"
+def deploymentSuffix = (env.BRANCH_NAME == "master" || env.BRANCH_NAME.startsWith("maintenance/")) ? "${PRODUCTION_DEPLOYMENT_REPOSITORY}" : "dev_branch_snapshots/branch_${escaped_branch}"
+def m2 = "/tmp/jenkins/tdi/m2/${deploymentSuffix}"
+def podLabel = "components-${UUID.randomUUID().toString()}".take(53)
+
 pipeline {
-  agent any
+  agent {
+        kubernetes {
+            label podLabel
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+    containers:
+        -
+            name: main
+            image: '${env.TSBI_IMAGE}'
+            command: [cat]
+            tty: true
+            volumeMounts: [{name: docker, mountPath: /var/run/docker.sock}, {name: m2main, mountPath: /root/.m2/repository}, {name: dockercache, mountPath: /root/.dockercache}]
+            resources: {requests: {memory: 3G, cpu: '2.5'}, limits: {memory: 3G, cpu: '2.5'}}
+    volumes:
+        -
+            name: docker
+            hostPath: {path: /var/run/docker.sock}
+        -
+            name: m2main
+            hostPath: {path: ${m2} }
+        -
+            name: dockercache
+            hostPath: {path: /tmp/jenkins/tdi/docker}
+    imagePullSecrets:
+        - name: talend-registry
+"""
+        }
+    }
 
   options {
     timeout(time: 120, unit: 'MINUTES')
@@ -37,29 +65,33 @@ pipeline {
 
     stage('Compile') {
       steps {
-        sh 'mvn clean compile'
+          container('main') {
+             sh 'mvn clean compile'
+          }
       }
     }
 
     stage('Test') {
       steps {
-        sh 'mvn test'
+          container('main') {
+             sh 'mvn test'
+          }
       }
     }
 
-    stage('Deploy') {
-      steps {
-        sh """
-            mvn -B -U -V 
-           """
+    //stage('Deploy') {
+     // steps {
+    //    sh """
+     //       mvn -B -U -V 
+     //      """
               // deploy
               // -Dgit_branch="${escaped_branch}" \
               // -Dbigquery.project="${bigquery_project}" \
               // -Dbigquery.service.account.file="${service_account_file}" \
               // -Dbigquery.gcp.temp.folder="${bigquery_gcp_temp_folder}" \
               // -Dorg.talend.components.google.drive.service_account_file="${google_drive_service_account_file}" 
-      }
-    }
+   //   }
+   // }
   }
 
   post {
