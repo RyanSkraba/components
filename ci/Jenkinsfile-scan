@@ -71,6 +71,9 @@ spec:
             steps {
                 container('main') {
                     withCredentials([veracodeCredentials]) {
+                        sh "mvn -U -B clean install -pl core -Dmaven.test.skip=true"
+                        sh "mvn -U -B clean install -f components/components-jdbc/pom.xml -pl components-jdbc-runtime-beam"
+                        sh "mvn -U -B clean package -f components/pom.xml"
                         veracode applicationName: "$VERACODE_APP_NAME",
                             canFailJob: true,
                             createProfile: false,
@@ -83,7 +86,7 @@ spec:
                             createSandbox: true,
                             scanExcludesPattern: '',
                             scanIncludesPattern: '',
-                            scanName: "${env.BRANCH_NAME}-${currentBuild.number}-${currentBuild.startTimeInMillis}",
+                            scanName: "master-${currentBuild.number}-${currentBuild.startTimeInMillis}",
                             uploadExcludesPattern: '',
                             uploadIncludesPattern: '**/*.jar',
                             waitForScan: true,
