@@ -29,7 +29,7 @@
         <aws-java-sdk-kms.version>${aws.version}</aws-java-sdk-kms.version>
         <aws-java-sdk-s3.version>${aws.version}</aws-java-sdk-s3.version>
         <aws-java-sdk-sts.version>${aws.version}</aws-java-sdk-sts.version>
-        <aws.version>1.11.125</aws.version>
+        <aws.version>1.11.848</aws.version>
         <azure-keyvault-core.version>0.9.7</azure-keyvault-core.version>
         <azure-storage.version>8.6.0</azure-storage.version>
         <msla4j.version>1.4.0</msla4j.version>
