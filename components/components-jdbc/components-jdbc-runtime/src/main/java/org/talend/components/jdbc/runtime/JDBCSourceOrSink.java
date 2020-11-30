@@ -13,27 +13,11 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime;
 
-import java.io.IOException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
 import org.talend.components.common.avro.JDBCTableMetadata;
@@ -56,13 +40,28 @@ import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.ValidationResult;
 
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * common JDBC runtime execution object
  *
  */
 public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JDBCSourceOrSink.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JDBCSourceOrSink.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -76,9 +75,9 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
     @Override
     public ValidationResult initialize(RuntimeContainer runtime, ComponentProperties properties) {
+        LOG.debug("Parameters: [{}]",getLogString(properties));
         this.properties = (RuntimeSettingProvider) properties;
         setting = this.properties.getRuntimeSetting();
-
         converter = new JDBCResultSetIndexedRecordConverter();
         ((JDBCResultSetIndexedRecordConverter) converter).setInfluencer(setting);
 
@@ -89,7 +88,6 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
     public ValidationResult initialize(RuntimeContainer runtime, DatastoreProperties properties) {
         this.properties = (RuntimeSettingProvider) properties;
         setting = this.properties.getRuntimeSetting();
-
         converter = new ResultSetStringRecordConverter();
 
         work4dataprep = true;
@@ -102,7 +100,6 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
     public ValidationResult initialize(RuntimeContainer runtime, DatasetProperties properties) {
         this.properties = (RuntimeSettingProvider) properties;
         setting = this.properties.getRuntimeSetting();
-
         converter = new ResultSetStringRecordConverter();
 
         work4dataprep = true;
@@ -212,11 +209,11 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
     public Connection connect(RuntimeContainer runtime) throws ClassNotFoundException, SQLException {
         AllSetting setting = properties.getRuntimeSetting();
-
         // connection component
         Connection conn = JdbcRuntimeUtils.createConnectionOrGetFromSharedConnectionPoolOrDataSource(runtime, setting,
                 work4dataprep);
-
+        LOG.debug("Connection to '{}' has succeeded.",setting.getJdbcUrl());
+        LOG.debug("Connection is set auto commit to '{}'.",setting.getAutocommit());
         if (setting.getUseAutoCommit()) {
             conn.setAutoCommit(setting.getAutocommit());
         }

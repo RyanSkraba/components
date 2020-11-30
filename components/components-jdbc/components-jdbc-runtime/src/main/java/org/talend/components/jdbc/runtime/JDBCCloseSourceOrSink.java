@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime;
 
-import java.sql.SQLException;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.CommonUtils;
@@ -24,11 +24,14 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.ValidationResultMutable;
 
+import java.sql.SQLException;
+
 /**
  * JDBC close runtime execution object
  *
  */
 public class JDBCCloseSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
+    private static final Logger LOG = LoggerFactory.getLogger(JDBCCloseSourceOrSink.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -36,6 +39,7 @@ public class JDBCCloseSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
     @Override
     public ValidationResult initialize(RuntimeContainer runtime, ComponentProperties properties) {
+        LOG.debug("Parameters: [{}]",getLogString(properties));
         this.properties = properties;
         return ValidationResult.OK;
     }
@@ -54,11 +58,13 @@ public class JDBCCloseSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
     public void doCloseAction(RuntimeContainer runtime) throws SQLException {
         String refComponentId = ((RuntimeSettingProvider) properties).getRuntimeSetting().getReferencedComponentId();
+        LOG.debug("Closing connection: "+refComponentId);
         if (refComponentId != null && runtime != null) {
             java.sql.Connection conn = (java.sql.Connection) runtime.getComponentData(ComponentConstants.CONNECTION_KEY,
                     refComponentId);
             if (conn != null && !conn.isClosed()) {
                 conn.close();
+                LOG.debug("Connection closed");
             }
         } else {
             throw new RuntimeException("Can't find the connection by the key");

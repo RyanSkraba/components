@@ -1,14 +1,17 @@
 package org.talend.components.jdbc.runtime.setting;
 
+import org.apache.avro.Schema;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.common.UserPasswordProperties;
+import org.talend.components.common.config.jdbc.Dbms;
+import org.talend.daikon.NamedThing;
+import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.property.Property;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-
-import org.apache.avro.Schema;
-import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.common.config.jdbc.Dbms;
-import org.talend.daikon.NamedThing;
 
 public abstract class JdbcRuntimeSourceOrSinkDefault implements JdbcRuntimeSourceOrSink {
 
@@ -16,6 +19,7 @@ public abstract class JdbcRuntimeSourceOrSinkDefault implements JdbcRuntimeSourc
 
     private Connection conn;
 
+    @Override
     public void setDBTypeMapping(Dbms mapping) {
         
     }
@@ -48,6 +52,21 @@ public abstract class JdbcRuntimeSourceOrSinkDefault implements JdbcRuntimeSourc
 
     protected Connection connect(RuntimeContainer runtime) throws ClassNotFoundException, SQLException {
         return null;
+    }
+
+    protected String getLogString(Properties properties) {
+        StringBuilder sb = new StringBuilder();
+        for (NamedThing nt : properties.getProperties()) {
+            if (nt instanceof UserPasswordProperties) {
+                continue;
+            }
+            if (nt instanceof Property) {
+                sb.append(nt.getName()).append(":").append(((Property) nt).getValue()).append(", ");
+            } else if (nt instanceof Properties) {
+                sb.append(getLogString((Properties) nt));
+            }
+        }
+            return sb.toString();
     }
 
 }

@@ -12,28 +12,12 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime;
 
-import java.math.BigDecimal;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.runtime.SharedConnectionsPool;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.ComponentConstants;
-import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.module.PreparedStatementTable;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.setting.JdbcRuntimeSourceOrSinkDefault;
@@ -41,9 +25,22 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.ValidationResultMutable;
 
+import javax.sql.DataSource;
+import java.math.BigDecimal;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+
 public class JdbcRuntimeUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcRuntimeUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JdbcRuntimeUtils.class);
 
     /**
      * get the JDBC connection object by the runtime setting
@@ -54,6 +51,7 @@ public class JdbcRuntimeUtils {
      * @throws SQLException
      */
     public static Connection createConnection(final AllSetting setting) throws ClassNotFoundException, SQLException {
+
         if (!valid(setting.getJdbcUrl())) {
             throw new RuntimeException("JDBC URL should not be empty, please set it");
         }
@@ -194,10 +192,13 @@ public class JdbcRuntimeUtils {
     public static Connection createConnectionOrGetFromSharedConnectionPoolOrDataSource(RuntimeContainer runtime,
             AllSetting setting, boolean readonly) throws SQLException, ClassNotFoundException {
         Connection conn = null;
+        LOG.debug("Connection attempt to '{}' with the username '{}'",setting.getJdbcUrl(),setting.getUsername());
 
         if (setting.getShareConnection()) {
             SharedConnectionsPool sharedConnectionPool = (SharedConnectionsPool) runtime
                     .getGlobalData(ComponentConstants.GLOBAL_CONNECTION_POOL_KEY);
+            LOG.debug("Uses shared connection with name: '{}'",setting.getSharedConnectionName());
+            LOG.debug("Connection URL: '{}', User name: '{}'",setting.getJdbcUrl(),setting.getUsername());
             conn = sharedConnectionPool.getDBConnection(setting.getDriverClass(), setting.getJdbcUrl(), setting.getUsername(),
                     setting.getPassword(), setting.getSharedConnectionName());
         } else if (setting.getUseDataSource()) {
@@ -222,7 +223,7 @@ public class JdbcRuntimeUtils {
                 try {
                     conn.setReadOnly(setting.isReadOnly());
                 } catch (SQLException e) {
-                    LOGGER.debug("JDBC driver '{}' does not support read only mode.", setting.getDriverClass(), e);
+                    LOG.debug("JDBC driver '{}' does not support read only mode.", setting.getDriverClass(), e);
                 }
             }
         }

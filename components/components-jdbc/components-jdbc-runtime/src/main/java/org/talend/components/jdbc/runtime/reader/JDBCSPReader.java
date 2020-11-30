@@ -12,14 +12,10 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime.reader;
 
-import java.io.IOException;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Map;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
@@ -30,11 +26,18 @@ import org.talend.components.jdbc.avro.JDBCSPIndexedRecordCreator;
 import org.talend.components.jdbc.runtime.JDBCSPSource;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 
+import java.io.IOException;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Map;
+
 /**
  * JDBC reader for JDBC SP
  *
  */
 public class JDBCSPReader extends AbstractBoundedReader<IndexedRecord> {
+    private static final Logger LOG = LoggerFactory.getLogger(JDBCSPReader.class);
 
     protected RuntimeSettingProvider properties;
 
@@ -64,6 +67,7 @@ public class JDBCSPReader extends AbstractBoundedReader<IndexedRecord> {
 
     @Override
     public boolean start() throws IOException {
+        LOG.debug("JDBCSPReader start.");
         result = new Result();
 
         try {

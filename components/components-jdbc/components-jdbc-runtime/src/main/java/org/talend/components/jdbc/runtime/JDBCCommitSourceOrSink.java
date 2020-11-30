@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime;
 
-import java.sql.SQLException;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.CommonUtils;
@@ -25,11 +25,14 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.ValidationResultMutable;
 
+import java.sql.SQLException;
+
 /**
  * JDBC commit runtime execution object
  *
  */
 public class JDBCCommitSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
+    private static final Logger LOG = LoggerFactory.getLogger(JDBCCommitSourceOrSink.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -37,6 +40,7 @@ public class JDBCCommitSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
     @Override
     public ValidationResult initialize(RuntimeContainer runtime, ComponentProperties properties) {
+        LOG.debug("Parameters: [{}]",getLogString(properties));
         this.setting = ((RuntimeSettingProvider) properties).getRuntimeSetting();
         return ValidationResult.OK;
     }
@@ -59,9 +63,11 @@ public class JDBCCommitSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
             java.sql.Connection conn = (java.sql.Connection) runtime.getComponentData(ComponentConstants.CONNECTION_KEY,
                     refComponentId);
             if (conn != null && !conn.isClosed()) {
+                LOG.debug("Committing the transaction of "+ refComponentId);
                 conn.commit();
 
                 if (setting.getCloseConnection()) {
+                    LOG.debug("Closing connection");
                     conn.close();
                 }
             }
