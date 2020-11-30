@@ -17,7 +17,7 @@
     <properties>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
         <!-- repositories -->
-        <spring.releases.repo>https://repo.spring.io/libs-release/</spring.releases.repo>
+        <mulesoft.repo>https://repository.mulesoft.org/nexus/content/repositories/public/</mulesoft.repo>
 
         <marklogic-client-api.version>4.0.4</marklogic-client-api.version>
         <marklogic.mlcp.version>9.0.5</marklogic.mlcp.version>
@@ -28,8 +28,8 @@
     <repositories>
         <!-- Spring repository is used for some dependencies. e.g. okhttp-digest dependency-->
         <repository>
-            <id>spring-releases</id>
-            <url>${spring.releases.repo}</url>
+            <id>mulesoft-releases</id>
+            <url>${mulesoft.repo}</url>
         </repository>
         <repository>
             <id>MarkLogic-releases</id>
