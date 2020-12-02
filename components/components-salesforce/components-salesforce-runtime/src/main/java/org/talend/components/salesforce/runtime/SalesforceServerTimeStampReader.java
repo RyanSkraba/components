@@ -34,7 +34,7 @@ import com.sforce.ws.ConnectionException;
 
 public class SalesforceServerTimeStampReader extends AbstractBoundedReader<IndexedRecord> {
 
-    private transient static final Logger LOGGER = LoggerFactory.getLogger(SalesforceServerTimeStampReader.class);
+    private transient final Logger LOGGER = LoggerFactory.getLogger(SalesforceServerTimeStampReader.class);
 
     private static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(SalesforceServerTimeStampReader.class);

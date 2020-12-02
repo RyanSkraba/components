@@ -65,7 +65,7 @@ import com.sforce.ws.util.Base64;
 
 final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
-    private transient static final Logger LOGGER = LoggerFactory.getLogger(SalesforceWriter.class);
+    private transient final Logger LOGGER = LoggerFactory.getLogger(SalesforceWriter.class);
 
     private static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider().getI18nMessages(SalesforceWriter.class);
 

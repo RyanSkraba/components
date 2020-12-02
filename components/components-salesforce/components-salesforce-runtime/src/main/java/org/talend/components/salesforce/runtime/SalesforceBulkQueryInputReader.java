@@ -31,7 +31,7 @@ import com.sforce.ws.ConnectionException;
 
 public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedRecord> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SalesforceBulkQueryInputReader.class);
+    private final Logger LOG = LoggerFactory.getLogger(SalesforceBulkQueryInputReader.class);
 
     protected SalesforceBulkRuntime bulkRuntime;
 

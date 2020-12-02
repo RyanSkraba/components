@@ -55,7 +55,7 @@ public class SalesforceDatasetProperties extends PropertiesImpl
      */
     private static final long serialVersionUID = -8035880860245867110L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceDatasetProperties.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(SalesforceDatasetProperties.class);
 
     public ReferenceProperties<SalesforceDatastoreProperties> datastore =
             new ReferenceProperties<>("datastore", SalesforceDatastoreDefinition.NAME);

@@ -39,7 +39,7 @@ import com.sforce.ws.ConnectorConfig;
 public class SalesforceBulkExecRuntime extends SalesforceSourceOrSink
         implements ComponentDriverInitialization<ComponentProperties> {
 
-    private transient static final Logger LOG = getLogger(SalesforceBulkExecRuntime.class);
+    private transient final Logger LOG = getLogger(SalesforceBulkExecRuntime.class);
 
     private static final I18nMessages MESSAGES =
             GlobalI18N.getI18nMessageProvider().getI18nMessages(SalesforceBulkExecRuntime.class);

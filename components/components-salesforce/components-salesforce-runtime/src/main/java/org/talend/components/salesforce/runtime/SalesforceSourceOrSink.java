@@ -76,7 +76,7 @@ import com.sforce.ws.SessionRenewer;
 
 public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, SalesforceSchemaHelper<Schema> {
 
-    private transient static final Logger LOG = LoggerFactory.getLogger(SalesforceSourceOrSink.class);
+    private transient final Logger LOG = LoggerFactory.getLogger(SalesforceSourceOrSink.class);
 
     private static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(SalesforceSourceOrSink.class);

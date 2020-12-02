@@ -55,7 +55,7 @@ public class SalesforceDataprepSource
 
     private static final long serialVersionUID = 1930140572051028338L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(SalesforceDataprepSource.class);
+    private final Logger LOG = LoggerFactory.getLogger(SalesforceDataprepSource.class);
 
     private static final int DEFAULT_TIMEOUT = 60000;
 

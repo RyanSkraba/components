@@ -35,7 +35,7 @@ import com.sforce.ws.bind.XmlObject;
 
 public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SalesforceInputReader.class);
+    private final Logger LOG = LoggerFactory.getLogger(SalesforceInputReader.class);
 
     private transient QueryResult inputResult;
 

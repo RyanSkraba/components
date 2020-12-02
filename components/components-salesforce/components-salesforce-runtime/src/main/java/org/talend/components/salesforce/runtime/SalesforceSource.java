@@ -29,7 +29,7 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
 
 public class SalesforceSource extends SalesforceSourceOrSink implements BoundedSource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SalesforceSource.class);
+    private final Logger LOG = LoggerFactory.getLogger(SalesforceSource.class);
 
     public SalesforceSource() {
     }

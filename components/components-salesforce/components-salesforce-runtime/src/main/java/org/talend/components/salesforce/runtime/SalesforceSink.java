@@ -26,7 +26,7 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(SalesforceSink.class);
+    private final Logger LOG = LoggerFactory.getLogger(SalesforceSink.class);
 
     public SalesforceSink() {
     }

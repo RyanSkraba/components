@@ -31,7 +31,7 @@ import org.talend.daikon.i18n.I18nMessages;
  */
 public class SalesforceImplicitConnection {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceImplicitConnection.class.getName());
+    private final Logger LOGGER = LoggerFactory.getLogger(SalesforceImplicitConnection.class.getName());
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(SalesforceImplicitConnection.class);

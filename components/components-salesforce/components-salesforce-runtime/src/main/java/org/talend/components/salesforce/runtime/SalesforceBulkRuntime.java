@@ -66,7 +66,7 @@ import com.sforce.ws.ConnectionException;
 
 public class SalesforceBulkRuntime {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceBulkRuntime.class.getName());
+    private final Logger LOGGER = LoggerFactory.getLogger(SalesforceBulkRuntime.class.getName());
 
     private static final I18nMessages MESSAGES =
             GlobalI18N.getI18nMessageProvider().getI18nMessages(SalesforceBulkRuntime.class);
