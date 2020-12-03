@@ -136,7 +136,7 @@
         <jersey-server.version>1.9</jersey-server.version>
         <jersey-test-framework-core.version>1.9</jersey-test-framework-core.version>
         <jersey-test-framework-grizzly2.version>1.9</jersey-test-framework-grizzly2.version>
-        <jetty.version>9.4.24.v20191120</jetty.version>
+        <jetty.version>9.4.33.v20201020</jetty.version>
         <jline.version>2.12</jline.version>
         <jmespath-java.version>${aws.version}</jmespath-java.version>
         <joda-time.version>2.8.2</joda-time.version>
