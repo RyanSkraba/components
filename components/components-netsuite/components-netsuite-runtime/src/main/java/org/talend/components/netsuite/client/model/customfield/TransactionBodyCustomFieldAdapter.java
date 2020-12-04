@@ -63,6 +63,7 @@ public class TransactionBodyCustomFieldAdapter<T> extends CustomFieldAdapter<T> 
             .put("expenseReport", MAPPING_EXPENSEREPORT)
             .put("inventoryAdjustment", MAPPING_INVENTORYADJUSTMENT)
             .put("inventoryCostRevaluation", MAPPING_INVENTORYADJUSTMENT)
+            .put("inventoryTransfer", MAPPING_INVENTORYADJUSTMENT)
             .put("invoice", MAPPING_SALE)
             .put("itemFulfillment", MAPPING_ITEMFULFILLMENT)
             .put("itemReceipt", MAPPING_ITEMRECEIPT)
