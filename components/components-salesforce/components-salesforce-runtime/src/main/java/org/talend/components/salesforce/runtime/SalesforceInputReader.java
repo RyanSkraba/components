@@ -137,7 +137,7 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
             inputResult = getConnection().queryMore(inputResult.getQueryLocator());
             inputRecords = inputResult.getRecords();
             inputRecordsIndex = 0;
-            boolean advance = inputResult.getSize() > 0;
+            boolean advance = inputRecords != null && inputRecords.length > 0;
             if (advance) {
                 // New result set available to retrieve
                 dataCount++;

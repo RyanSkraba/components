@@ -297,6 +297,27 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     }
 
+    @Ignore("Need to create a custom big object in test salesforce server")
+    @Test
+    public void testBigObjectBatchQuery() throws Throwable {
+        // 1. Create big object in you salesforce account with any field
+        String bigObjectModule = "TestBigObject__b";
+        // 2. Write more 230 records into the created big object
+
+        // 3. Query the data with not bulkquery mode with batch 200
+        Schema bigObjectSchema = SchemaBuilder.builder()
+                .record("MakeRowRecord").fields()//
+                .name("Id").type().nullable().stringType().noDefault().endRecord();//
+        TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
+        props.batchSize.setValue(200);
+        props.module.moduleName.setValue(bigObjectModule);
+        props.module.main.schema.setValue(bigObjectSchema);
+        // 4. Read records with above configuration
+        List<IndexedRecord> outputRows = readRows(props);
+        assertEquals(230, outputRows.size());
+
+    }
+
     /**
      * This for basic connection manual query with dynamic
      */
