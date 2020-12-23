@@ -143,7 +143,12 @@
                 and it's pom does not import this bundle. -->
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>15.0</version>
+            <version>30.0-jre</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>failureaccess</artifactId>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 

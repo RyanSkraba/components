@@ -52,6 +52,7 @@ public class ComponentsPaxExamOptions {
                 linkBundle("org.codehaus.jackson-jackson-core-asl"), //
                 linkBundle("org.codehaus.jackson-jackson-mapper-asl"), //
                 linkBundle("com.google.guava-guava"), //
+                linkBundle("com.google.guava-failureaccess"), //
                 linkBundle("org.apache.commons-commons-compress"), //
                 linkBundle("org.apache.commons-commons-lang3"), //
                 linkBundle("org.apache.avro-avro"), //
