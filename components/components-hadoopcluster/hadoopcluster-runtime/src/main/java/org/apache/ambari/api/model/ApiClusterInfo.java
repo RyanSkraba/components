@@ -15,7 +15,7 @@ package org.apache.ambari.api.model;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 @XmlRootElement(name = "Clusters")
 public class ApiClusterInfo {
@@ -47,6 +47,6 @@ public class ApiClusterInfo {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).add("name", name).add("version", version).toString();
+        return MoreObjects.toStringHelper(this).add("name", name).add("version", version).toString();
     }
 }

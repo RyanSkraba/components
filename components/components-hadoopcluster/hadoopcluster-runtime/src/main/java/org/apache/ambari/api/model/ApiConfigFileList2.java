@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 /**
  * This is for old way to get configurations, when the server do not support service_config_versions
@@ -58,6 +58,6 @@ public class ApiConfigFileList2 extends ApiListBase<ApiConfigFile> {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).add("href", href).add("items", getFiles()).toString();
+        return MoreObjects.toStringHelper(this).add("href", href).add("items", getFiles()).toString();
     }
 }

@@ -14,7 +14,7 @@ package org.apache.ambari.api.model;
 
 import javax.xml.bind.annotation.XmlElement;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 /**
  * A cluster represents a set of interdependent services running on a set of hosts. All services on a given cluster are
@@ -33,7 +33,7 @@ public class ApiCluster {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).add("href", href).add("cluster", info).toString();
+        return MoreObjects.toStringHelper(this).add("href", href).add("cluster", info).toString();
     }
 
     /**
