@@ -135,6 +135,59 @@ public class JDBCOutputTestIT {
             }
         };
     }
+    
+    @Test
+    public void testDynamicInsert() throws Exception {
+        TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
+
+        //design schema for current component
+        Schema designSchema = DBTestUtils.createDynamicSchema(tablename);
+        properties.main.schema.setValue(designSchema);
+        properties.updateOutputSchemas();
+
+        properties.tableSelection.tablename.setValue(tablename);
+        properties.dataAction.setValue(DataAction.INSERT);
+        properties.dieOnError.setValue(true);
+
+        randomBatchAndCommit(properties);
+
+        JDBCOutputWriter writer = DBTestUtils.createCommonJDBCOutputWriter(definition, properties);
+
+        //runtime schema from input
+        Schema runtimeSchema = DBTestUtils.createTestSchema(tablename);
+        try {
+            writer.open("wid");
+
+            IndexedRecord r1 = new GenericData.Record(runtimeSchema);
+            r1.put(0, 4);
+            r1.put(1, "xiaoming");
+            writer.write(r1);
+
+            DBTestUtils.assertSuccessRecord(writer, r1);
+
+            IndexedRecord r2 = new GenericData.Record(runtimeSchema);
+            r2.put(0, 5);
+            r2.put(1, "xiaobai");
+            writer.write(r2);
+
+            DBTestUtils.assertSuccessRecord(writer, r2);
+
+            writer.close();
+        } finally {
+            writer.close();
+        }
+
+        TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, runtimeSchema, definition1, properties1);
+
+        assertThat(records, hasSize(5));
+        Assert.assertEquals(new Integer(4), records.get(3).get(0));
+        Assert.assertEquals("xiaoming", records.get(3).get(1));
+        Assert.assertEquals(new Integer(5), records.get(4).get(0));
+        Assert.assertEquals("xiaobai", records.get(4).get(1));
+    }
 
     @Test
     public void testInsert() throws Exception {
@@ -341,6 +394,60 @@ public class JDBCOutputTestIT {
         Assert.assertEquals(new Integer(8), records.get(5).get(0));
         Assert.assertEquals("dabao", records.get(5).get(1));
     }
+    
+    @Test
+    public void testDynamicUpdate() throws Exception {
+        TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
+
+        Schema designSchema = DBTestUtils.createDynamicSchema(tablename);
+        
+        properties.main.schema.setValue(designSchema);
+        properties.updateOutputSchemas();
+
+        properties.tableSelection.tablename.setValue(tablename);
+        properties.dataAction.setValue(DataAction.UPDATE);
+        properties.dieOnError.setValue(true);
+
+        String randomInfo = randomBatchAndCommit(properties);
+
+        JDBCOutputWriter writer = DBTestUtils.createCommonJDBCOutputWriter(definition, properties);
+
+        Schema runtimeSchema = DBTestUtils.createTestSchema2(tablename);
+        try {
+            writer.open("wid");
+
+            IndexedRecord r1 = new GenericData.Record(runtimeSchema);
+            r1.put(0, 1);
+            r1.put(1, "wangwei1");
+            writer.write(r1);
+
+            DBTestUtils.assertSuccessRecord(writer, r1);
+
+            IndexedRecord r2 = new GenericData.Record(runtimeSchema);
+            r2.put(0, 2);
+            r2.put(1, "gaoyan1");
+            writer.write(r2);
+
+            DBTestUtils.assertSuccessRecord(writer, r2);
+
+            writer.close();
+        } finally {
+            writer.close();
+        }
+
+        TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, runtimeSchema, definition1, properties1);
+
+        assertThat(records, hasSize(3));
+        Assert.assertEquals(new Integer(1), records.get(0).get(0));
+        Assert.assertEquals("wangwei1", records.get(0).get(1));
+        Assert.assertEquals(new Integer(2), records.get(1).get(0));
+        Assert.assertEquals(randomInfo, "gaoyan1", records.get(1).get(1));
+        Assert.assertEquals(new Integer(3), records.get(2).get(0));
+        Assert.assertEquals("dabao", records.get(2).get(1));
+    }
 
     @Test
     public void testUpdate() throws Exception {
@@ -466,6 +573,53 @@ public class JDBCOutputTestIT {
         Assert.assertEquals(new Integer(3), records.get(2).get(0));
         Assert.assertEquals("dabao1", records.get(2).get(1));
     }
+    
+    @Test
+    public void testDynamicDelete() throws Exception {
+        TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
+
+        Schema designSchema = DBTestUtils.createDynamicSchema(tablename);
+        properties.main.schema.setValue(designSchema);
+        properties.updateOutputSchemas();
+
+        properties.tableSelection.tablename.setValue(tablename);
+        properties.dataAction.setValue(DataAction.DELETE);
+        properties.dieOnError.setValue(true);
+
+        randomBatchAndCommit(properties);
+
+        JDBCOutputWriter writer = DBTestUtils.createCommonJDBCOutputWriter(definition, properties);
+
+        Schema runtimeSchema = DBTestUtils.createTestSchema2(tablename);
+        try {
+            writer.open("wid");
+
+            IndexedRecord r1 = new GenericData.Record(runtimeSchema);
+            r1.put(0, 1);
+            writer.write(r1);
+
+            DBTestUtils.assertSuccessRecord(writer, r1);
+
+            IndexedRecord r2 = new GenericData.Record(runtimeSchema);
+            r2.put(0, 2);
+            writer.write(r2);
+
+            DBTestUtils.assertSuccessRecord(writer, r2);
+
+            writer.close();
+        } finally {
+            writer.close();
+        }
+
+        TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, runtimeSchema, definition1, properties1);
+
+        assertThat(records, hasSize(1));
+        Assert.assertEquals(new Integer(3), records.get(0).get(0));
+        Assert.assertEquals("dabao", records.get(0).get(1));
+    }
 
     @Test
     public void testDelete() throws Exception {
@@ -582,6 +736,68 @@ public class JDBCOutputTestIT {
     }
 
     @Test
+    public void testDynamicInsertOrUpdate() throws Exception {
+        TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
+
+        Schema designSchema = DBTestUtils.createDynamicSchema(tablename);
+        properties.main.schema.setValue(designSchema);
+        properties.updateOutputSchemas();
+
+        properties.tableSelection.tablename.setValue(tablename);
+        properties.dataAction.setValue(DataAction.INSERT_OR_UPDATE);
+        properties.dieOnError.setValue(true);
+
+        properties.commitEvery.setValue(DBTestUtils.randomInt());
+
+        JDBCOutputWriter writer = DBTestUtils.createCommonJDBCOutputWriter(definition, properties);
+
+        Schema runtimeSchema = DBTestUtils.createTestSchema2(tablename);
+        try {
+            writer.open("wid");
+
+            IndexedRecord r1 = new GenericData.Record(runtimeSchema);
+            r1.put(0, 1);
+            r1.put(1, "wangwei1");
+            writer.write(r1);
+
+            DBTestUtils.assertSuccessRecord(writer, r1);
+
+            IndexedRecord r2 = new GenericData.Record(runtimeSchema);
+            r2.put(0, 2);
+            r2.put(1, "gaoyan1");
+            writer.write(r2);
+
+            DBTestUtils.assertSuccessRecord(writer, r2);
+
+            IndexedRecord r3 = new GenericData.Record(runtimeSchema);
+            r3.put(0, 4);
+            r3.put(1, "new one");
+            writer.write(r3);
+
+            DBTestUtils.assertSuccessRecord(writer, r3);
+
+            writer.close();
+        } finally {
+            writer.close();
+        }
+
+        TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, runtimeSchema, definition1, properties1);
+
+        assertThat(records, hasSize(4));
+        Assert.assertEquals(new Integer(1), records.get(0).get(0));
+        Assert.assertEquals("wangwei1", records.get(0).get(1));
+        Assert.assertEquals(new Integer(2), records.get(1).get(0));
+        Assert.assertEquals("gaoyan1", records.get(1).get(1));
+        Assert.assertEquals(new Integer(3), records.get(2).get(0));
+        Assert.assertEquals("dabao", records.get(2).get(1));
+        Assert.assertEquals(new Integer(4), records.get(3).get(0));
+        Assert.assertEquals("new one", records.get(3).get(1));
+    }
+    
+    @Test
     public void testInsertOrUpdate() throws Exception {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
         TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
@@ -642,6 +858,68 @@ public class JDBCOutputTestIT {
         Assert.assertEquals("new one", records.get(3).get(1));
     }
 
+    @Test
+    public void testDynamicUpdateOrInsert() throws Exception {
+        TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
+
+        Schema designSchema = DBTestUtils.createDynamicSchema(tablename);
+        properties.main.schema.setValue(designSchema);
+        properties.updateOutputSchemas();
+
+        properties.tableSelection.tablename.setValue(tablename);
+        properties.dataAction.setValue(DataAction.UPDATE_OR_INSERT);
+        properties.dieOnError.setValue(true);
+
+        properties.commitEvery.setValue(DBTestUtils.randomInt());
+
+        JDBCOutputWriter writer = DBTestUtils.createCommonJDBCOutputWriter(definition, properties);
+
+        Schema runtimeSchema = DBTestUtils.createTestSchema2(tablename);
+        try {
+            writer.open("wid");
+
+            IndexedRecord r1 = new GenericData.Record(runtimeSchema);
+            r1.put(0, 1);
+            r1.put(1, "wangwei1");
+            writer.write(r1);
+
+            DBTestUtils.assertSuccessRecord(writer, r1);
+
+            IndexedRecord r2 = new GenericData.Record(runtimeSchema);
+            r2.put(0, 2);
+            r2.put(1, "gaoyan1");
+            writer.write(r2);
+
+            DBTestUtils.assertSuccessRecord(writer, r2);
+
+            IndexedRecord r3 = new GenericData.Record(runtimeSchema);
+            r3.put(0, 4);
+            r3.put(1, "new one");
+            writer.write(r3);
+
+            DBTestUtils.assertSuccessRecord(writer, r3);
+
+            writer.close();
+        } finally {
+            writer.close();
+        }
+
+        TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, runtimeSchema, definition1, properties1);
+
+        assertThat(records, hasSize(4));
+        Assert.assertEquals(new Integer(1), records.get(0).get(0));
+        Assert.assertEquals("wangwei1", records.get(0).get(1));
+        Assert.assertEquals(new Integer(2), records.get(1).get(0));
+        Assert.assertEquals("gaoyan1", records.get(1).get(1));
+        Assert.assertEquals(new Integer(3), records.get(2).get(0));
+        Assert.assertEquals("dabao", records.get(2).get(1));
+        Assert.assertEquals(new Integer(4), records.get(3).get(0));
+        Assert.assertEquals("new one", records.get(3).get(1));
+    }
+    
     @Test
     public void testUpdateOrInsert() throws Exception {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();

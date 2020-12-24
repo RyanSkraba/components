@@ -50,13 +50,14 @@ public class JDBCOutputUpdateOrInsertWriter extends JDBCOutputWriter {
         super.open(uId);
         try {
             conn = sink.getConnection(runtime);
-
-            sqlInsert = JDBCSQLBuilder.getInstance().generateSQL4Insert(setting.getTablename(), columnList);
-            statementInsert = conn.prepareStatement(sqlInsert);
-
-            sqlUpdate = JDBCSQLBuilder.getInstance().generateSQL4Update(setting.getTablename(), columnList);
-            statementUpdate = conn.prepareStatement(sqlUpdate);
-
+            
+            if(!isDynamic) {
+                sqlInsert = JDBCSQLBuilder.getInstance().generateSQL4Insert(setting.getTablename(), columnList);
+                statementInsert = conn.prepareStatement(sqlInsert);
+        
+                sqlUpdate = JDBCSQLBuilder.getInstance().generateSQL4Update(setting.getTablename(), columnList);
+                statementUpdate = conn.prepareStatement(sqlUpdate);
+            }
         } catch (ClassNotFoundException | SQLException e) {
             throw CommonUtils.newComponentException(e);
         }
@@ -66,8 +67,30 @@ public class JDBCOutputUpdateOrInsertWriter extends JDBCOutputWriter {
     private RowWriter rowWriter4Update = null;
 
     private RowWriter rowWriter4Insert = null;
+    
+    private boolean initSchema;
+    private Schema currentSchema;
 
-    private void initRowWriterIfNot(List<JDBCSQLBuilder.Column> columnList, Schema inputSchema, Schema componentSchema) {
+    private void initRowWriterIfNot(Schema inputSchema) {
+        if(!initSchema) {
+            currentSchema = componentSchema;
+            if(isDynamic) {
+                try {
+                    currentSchema = CommonUtils.mergeRuntimeSchema2DesignSchema4Dynamic(componentSchema, inputSchema);
+                    columnList = JDBCSQLBuilder.getInstance().createColumnList(setting, currentSchema);
+                    sqlInsert = JDBCSQLBuilder.getInstance().generateSQL4Insert(setting.getTablename(), columnList);
+                    statementInsert = conn.prepareStatement(sqlInsert);
+            
+                    sqlUpdate = JDBCSQLBuilder.getInstance().generateSQL4Update(setting.getTablename(), columnList);
+                    statementUpdate = conn.prepareStatement(sqlUpdate);
+                } catch (SQLException e) {
+                    throw CommonUtils.newComponentException(e);
+                }
+            }
+            
+            initSchema = true;
+        }
+    	
         if (rowWriter4Update == null) {
             List<JDBCSQLBuilder.Column> columnList4Statement = new ArrayList<>();
             for (JDBCSQLBuilder.Column column : columnList) {
@@ -90,7 +113,7 @@ public class JDBCOutputUpdateOrInsertWriter extends JDBCOutputWriter {
                 }
             }
 
-            rowWriter4Update = new RowWriter(columnList4Statement, inputSchema, componentSchema, statementUpdate, setting.getDebug(), sqlUpdate);
+            rowWriter4Update = new RowWriter(columnList4Statement, inputSchema, currentSchema, statementUpdate, setting.getDebug(), sqlUpdate);
         }
 
         if (rowWriter4Insert == null) {
@@ -105,7 +128,7 @@ public class JDBCOutputUpdateOrInsertWriter extends JDBCOutputWriter {
                 }
             }
 
-            rowWriter4Insert = new RowWriter(columnList4Statement, inputSchema, componentSchema, statementInsert, setting.getDebug(), sqlInsert);
+            rowWriter4Insert = new RowWriter(columnList4Statement, inputSchema, currentSchema, statementInsert, setting.getDebug(), sqlInsert);
         }
     }
 
@@ -117,7 +140,7 @@ public class JDBCOutputUpdateOrInsertWriter extends JDBCOutputWriter {
 
         Schema inputSchema = input.getSchema();
 
-        initRowWriterIfNot(columnList, inputSchema, componentSchema);
+        initRowWriterIfNot(inputSchema);
 
         try {
             String updateSql_fact = rowWriter4Update.write(input);

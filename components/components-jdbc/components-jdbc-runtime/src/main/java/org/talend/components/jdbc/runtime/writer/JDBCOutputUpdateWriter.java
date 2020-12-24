@@ -43,8 +43,10 @@ public class JDBCOutputUpdateWriter extends JDBCOutputWriter {
         super.open(uId);
         try {
             conn = sink.getConnection(runtime);
-            sql = JDBCSQLBuilder.getInstance().generateSQL4Update(setting.getTablename(), columnList);
-            statement = conn.prepareStatement(sql);
+            if(!isDynamic) {
+                sql = JDBCSQLBuilder.getInstance().generateSQL4Update(setting.getTablename(), columnList);
+                statement = conn.prepareStatement(sql);
+            }
         } catch (ClassNotFoundException | SQLException e) {
             throw CommonUtils.newComponentException(e);
         }
@@ -53,8 +55,20 @@ public class JDBCOutputUpdateWriter extends JDBCOutputWriter {
 
     private RowWriter rowWriter = null;
 
-    private void initRowWriterIfNot(List<JDBCSQLBuilder.Column> columnList, Schema inputSchema, Schema componentSchema) {
+    private void initRowWriterIfNot(Schema inputSchema) {
         if (rowWriter == null) {
+            Schema currentSchema = componentSchema;
+            if(isDynamic) {
+                try {
+                    currentSchema = CommonUtils.mergeRuntimeSchema2DesignSchema4Dynamic(componentSchema, inputSchema);
+                    columnList = JDBCSQLBuilder.getInstance().createColumnList(setting, currentSchema);
+                    sql = JDBCSQLBuilder.getInstance().generateSQL4Update(setting.getTablename(), columnList);
+                    statement = conn.prepareStatement(sql);
+                } catch (SQLException e) {
+                    throw CommonUtils.newComponentException(e);
+                }
+            }
+            
             List<JDBCSQLBuilder.Column> columnList4Statement = new ArrayList<>();
             for (JDBCSQLBuilder.Column column : columnList) {
                 if (column.addCol || (column.isReplaced())) {
@@ -76,7 +90,7 @@ public class JDBCOutputUpdateWriter extends JDBCOutputWriter {
                 }
             }
 
-            rowWriter = new RowWriter(columnList4Statement, inputSchema, componentSchema, statement, setting.getDebug(), sql);
+            rowWriter = new RowWriter(columnList4Statement, inputSchema, currentSchema, statement, setting.getDebug(), sql);
         }
     }
 
@@ -87,7 +101,7 @@ public class JDBCOutputUpdateWriter extends JDBCOutputWriter {
         IndexedRecord input = this.getFactory(datum).convertToAvro(datum);
         Schema inputSchema = input.getSchema();
 
-        initRowWriterIfNot(columnList, inputSchema, componentSchema);
+        initRowWriterIfNot(inputSchema);
 
         try {
             String sql_fact = rowWriter.write(input);

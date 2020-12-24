@@ -43,6 +43,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
+import org.apache.avro.SchemaBuilder.RecordBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Assert;
@@ -50,6 +51,7 @@ import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.avro.JDBCAvroRegistryString;
 import org.talend.components.jdbc.runtime.JDBCSink;
 import org.talend.components.jdbc.runtime.JDBCSource;
@@ -149,6 +151,17 @@ public class DBTestUtils {
         builder = builder.name("NAME").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "NAME").type(schema).noDefault();
 
         return builder.endRecord();
+    }
+    
+    public static Schema createDynamicSchema(String tablename) {
+        RecordBuilder<Schema> builder = SchemaBuilder.builder().record(tablename);
+        Schema schema = builder.fields().endRecord();
+        schema = AvroUtils.setProperty(schema, ComponentConstants.TALEND6_DYNAMIC_COLUMN_NAME, "dynamic");
+        schema = AvroUtils.setProperty(schema, SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "a_fake_one_for_dynamic");
+        schema = AvroUtils.setProperty(schema, ComponentConstants.TALEND6_DYNAMIC_COLUMN_POSITION, "0");
+        schema = AvroUtils.setProperty(schema, SchemaConstants.TALEND_COLUMN_PATTERN, "dd-MM-yyyy");
+        schema = AvroUtils.setIncludeAllFields(schema, true);
+        return schema;
     }
 
     /**

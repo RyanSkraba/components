@@ -24,12 +24,12 @@ public class RowWriter {
 
     private DebugUtil debugUtil;
 
-    public RowWriter(List<JDBCSQLBuilder.Column> columnList, Schema inputSchema, Schema componentSchema,
+    public RowWriter(List<JDBCSQLBuilder.Column> columnList, Schema inputSchema, Schema currentSchema,
             PreparedStatement statement) {
-        this(columnList, inputSchema, componentSchema, statement, false, null);
+        this(columnList, inputSchema, currentSchema, statement, false, null);
     }
 
-    public RowWriter(List<JDBCSQLBuilder.Column> columnList, Schema inputSchema, Schema componentSchema,
+    public RowWriter(List<JDBCSQLBuilder.Column> columnList, Schema inputSchema, Schema currentSchema,
             PreparedStatement statement, boolean debug, String sql) {
         this.debug = debug;
 
@@ -44,7 +44,7 @@ public class RowWriter {
         for (JDBCSQLBuilder.Column column : columnList) {
             Field inputField = CommonUtils.getField(inputSchema, column.columnLabel);
 
-            Field componentField = CommonUtils.getField(componentSchema, column.columnLabel);
+            Field componentField = CommonUtils.getField(currentSchema, column.columnLabel);
             int inputValueLocation = inputField.pos();
             String pattern = componentField.getProp("talend.field.pattern");
             statementIndex++;

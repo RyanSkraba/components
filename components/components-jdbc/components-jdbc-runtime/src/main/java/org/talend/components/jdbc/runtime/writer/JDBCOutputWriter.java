@@ -30,6 +30,7 @@ import org.talend.components.jdbc.runtime.JDBCSink;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.setting.JDBCSQLBuilder;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 import java.io.IOException;
@@ -103,6 +104,8 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
     protected Schema componentSchema;
 
     protected Schema rejectSchema;
+    
+    protected boolean isDynamic;
 
     public JDBCOutputWriter(WriteOperation<Result> writeOperation, RuntimeContainer runtime) {
         this.writeOperation = writeOperation;
@@ -144,7 +147,13 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         LOG.debug("JDBCOutputWriter start.");
         componentSchema = CommonUtils.getMainSchemaFromInputConnector((ComponentProperties) properties);
         rejectSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
-        columnList = JDBCSQLBuilder.getInstance().createColumnList(setting, componentSchema);
+        
+        isDynamic = AvroUtils.isIncludeAllFields(componentSchema);
+        
+        //if not dynamic, we can computer it now for "fail soon" way, not fail in main part if fail
+        if(!isDynamic) {
+            columnList = JDBCSQLBuilder.getInstance().createColumnList(setting, componentSchema);
+        }
 
         if (!setting.getClearDataInTable()) {
             return;

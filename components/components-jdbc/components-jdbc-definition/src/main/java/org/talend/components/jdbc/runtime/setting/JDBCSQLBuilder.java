@@ -127,7 +127,9 @@ public class JDBCSQLBuilder {
         for (Field field : fields) {
             Column column = new Column();
             column.columnLabel = field.name();
-            column.dbColumnName = field.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+            //the javajet template have an issue for dynamic convert, it don't pass the origin column name
+            String originName = field.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+            column.dbColumnName = originName!=null ? originName: field.name();
 
             boolean isKey = Boolean.valueOf(field.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
             if (isKey) {
@@ -146,6 +148,12 @@ public class JDBCSQLBuilder {
 
         boolean enableFieldOptions = setting.getEnableFieldOptions();
         if (enableFieldOptions) {
+            //TODO about dynamic support here:
+            //for other javajet db output components, the dynamic support is static here, for example,
+            //only can set all db columns in dynamic field all to update keys, can't use one db column in dynamic column,
+            //not sure which is expected, and now, here user can use one db column in dynamic column,
+            //but user may not know the column label as it may be different with db column name as valid in java and studio.
+            //So here, we don't change anything, also as no much meaning for customer except making complex code
             List<String> schemaColumns4FieldOption = setting.getSchemaColumns4FieldOption();
             List<Boolean> updateKey = setting.getUpdateKey4FieldOption();
             List<Boolean> deletionKey = setting.getDeletionKey4FieldOption();
@@ -155,6 +163,9 @@ public class JDBCSQLBuilder {
             int i = 0;
             for (String columnName : schemaColumns4FieldOption) {
                 Column column = columnMap.get(columnName);
+                if(column==null) {
+                    throw new RuntimeException(columnName + " column label doesn't exist for current target table");
+                }
                 column.updateKey = updateKey.get(i);
                 column.deletionKey = deletionKey.get(i);
                 column.updatable = updatable.get(i);
@@ -169,6 +180,7 @@ public class JDBCSQLBuilder {
         List<String> positions = setting.getPositions4AdditionalParameters();
         List<String> referenceColumns = setting.getReferenceColumns4AdditionalParameters();
 
+        //here is a closed list in UI, even can't choose dynamic column, so no need to consider dynamic here
         int i = 0;
         for (String referenceColumn : referenceColumns) {
             int j = 0;
