@@ -6,7 +6,7 @@
     <parent>
         <artifactId>components-implementation-aggregator</artifactId>
         <groupId>org.talend.components</groupId>
-        <version>0.29.0-SNAPSHOT</version>
+        <version>0.30.0-SNAPSHOT</version>
     </parent>
 
     <groupId>org.talend.components</groupId>
