@@ -10,6 +10,7 @@
     <name>Component BOM</name>
     <properties>
         <components.version>0.30.0-SNAPSHOT</components.version>
+        <components-api-service-rest.version>0.28.14</components-api-service-rest.version>
         <daikon.version>0.31.11</daikon.version>
         <!-- repositories -->
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
@@ -1454,18 +1455,18 @@
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
-                <version>${components.version}</version>
+                <version>${components-api-service-rest.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
-                <version>${components.version}</version>
+                <version>${components-api-service-rest.version}</version>
                 <classifier>lib</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
-                <version>${components.version}</version>
+                <version>${components-api-service-rest.version}</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
