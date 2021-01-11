@@ -283,8 +283,9 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
         } catch (IOException e) {
             Throwable caused = e.getCause();
             // Should login fails with wrong pwd
-            assertThat(caused, instanceOf(LoginFault.class));
-            assertEquals(ExceptionCode.INVALID_LOGIN, ((LoginFault) caused).getExceptionCode());
+            assertThat(caused, instanceOf(ConnectionException.class));
+            assertEquals("Connection was not created, invalid credentials or user locked out.", caused.getMessage());
+
             LOGGER.debug("expect login fails: " + e.getMessage());
         }
 

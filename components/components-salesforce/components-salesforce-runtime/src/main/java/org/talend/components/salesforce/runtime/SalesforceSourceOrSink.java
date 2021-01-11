@@ -216,7 +216,12 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
      */
     private void performLogin(ConnectorConfig config, PartnerConnection connection) throws ConnectionException {
         config.setServiceEndpoint(config.getAuthEndpoint());
-        LoginResult loginResult = connection.login(config.getUsername(), config.getPassword());
+        LoginResult loginResult = null;
+        try {
+            loginResult = connection.login(config.getUsername(), config.getPassword());
+        }catch (ConnectionException e){
+            throw new ConnectionException(MESSAGES.getMessage("error.connectionFail"));
+        }
         if (loginResult.isPasswordExpired()) {
             throw new ConnectionException(MESSAGES.getMessage("error.expiredPassword"));
         }
