@@ -52,7 +52,7 @@
         <!-- NOTE: if you modify the version you should update it also there: https://github.com/Talend/studio-se-master/blob/master/build/dependencies.p2/dependencies.p2.tos/pom.xml#L315 (it's pointer to the same library)-->
         <commons-codec.version>1.14</commons-codec.version>
         <commons-collections.version>3.2.2</commons-collections.version>
-        <commons-compress.version>1.19</commons-compress.version>
+        <commons-compress.version>1.21</commons-compress.version>
         <commons-configuration.version>1.8</commons-configuration.version>
         <commons-csv.version>1.4</commons-csv.version>
         <commons-daemon.version>1.0.13</commons-daemon.version>
