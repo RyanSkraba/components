@@ -106,7 +106,7 @@
         <error_prone_annotations.version>2.3.4</error_prone_annotations.version>
         <j2objc-annotations.version>1.3</j2objc-annotations.version>
         <hadoop.version>3.2.1</hadoop.version>
-        <hadoop-talend.version>3.2.1-talend20191226</hadoop-talend.version>
+        <hadoop-talend.version>3.2.2</hadoop-talend.version>
         <hamcrest.version>1.3</hamcrest.version>
         <hdrhistogram.version>2.1.9</hdrhistogram.version>
         <httpcomponents.version>4.5.12</httpcomponents.version>
