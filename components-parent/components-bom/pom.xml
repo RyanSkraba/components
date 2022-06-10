@@ -88,7 +88,7 @@
         <google-api-client-java6.version>${google-api-client.version}</google-api-client-java6.version>
         <google-api-client-servlet.version>${google-api-client.version}</google-api-client-servlet.version>
         <google-api-client.version>1.27.0</google-api-client.version>
-        <google-oauth-client.version>1.31.0</google-oauth-client.version>
+        <google-oauth-client.version>1.33.3</google-oauth-client.version>
         <google-api-services-bigquery.version>v2-rev20181104-${google-api-client.version}</google-api-services-bigquery.version>
         <google-api-services-cloudresourcemanager.version>v1-rev20181015-${google-api-client.version}</google-api-services-cloudresourcemanager.version>
         <google-api-services-drive.version>v3-rev151-1.25.0</google-api-services-drive.version>
