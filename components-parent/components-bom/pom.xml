@@ -193,7 +193,7 @@
         <spring-retry.version>1.2.0.RELEASE</spring-retry.version>
         <spring-security-crypto.version>4.2.1.RELEASE</spring-security-crypto.version>
         <spring-security-rsa.version>1.0.3.RELEASE</spring-security-rsa.version>
-        <spring-test.version>4.3.25.RELEASE</spring-test.version>
+        <spring-test.version>5.2.21.RELEASE</spring-test.version>
         <stax2-api.version>4.1</stax2-api.version>
         <talend_file_enhanced_20070724.version>6.0.0</talend_file_enhanced_20070724.version>
         <talendcsv.version>6.0.0</talendcsv.version>
