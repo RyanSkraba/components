@@ -70,7 +70,7 @@
         <commons-math.version>2.1</commons-math.version>
         <commons-math3.version>3.4.1</commons-math3.version>
         <commons-modeler.version>2.0.1</commons-modeler.version>
-        <commons-net.version>2.2</commons-net.version>
+        <commons-net.version>3.9.0</commons-net.version>
         <commons-pool.version>1.6</commons-pool.version>
         <commons-pool2.version>2.4.2</commons-pool2.version>
         <commons-validator.version>1.6</commons-validator.version>
