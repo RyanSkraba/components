@@ -157,7 +157,7 @@
         <mockito-core.version>2.24.0</mockito-core.version>
         <netty-all.version>4.1.48.Final</netty-all.version>
         <netty-buffer.version>4.1.48.Final</netty-buffer.version>
-        <netty-codec-http.version>4.1.48.Final</netty-codec-http.version>
+        <netty-codec-http.version>4.1.86.Final</netty-codec-http.version>
         <netty-codec-http2.version>4.1.48.Final</netty-codec-http2.version>
         <netty-codec-socks.version>4.1.48.Final</netty-codec-socks.version>
         <netty-codec.version>4.1.48.Final</netty-codec.version>
